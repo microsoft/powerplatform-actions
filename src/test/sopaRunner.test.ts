@@ -26,10 +26,11 @@ describe('SoPa', () => {
         });
     });
 
-    it('can extract solution', async() => {
-        const solutionPath = path.resolve(__dirname, 'data', 'emptySolution_0_1_0_0.zip');
+    it('can pack solution', async() => {
+        const solutionPath = path.resolve(workDir, 'emptySolution');
+        const stagedDir = path.resolve(__dirname, 'data', 'emptySolution');
 
-        const res = await sopa.run([ '/nologo', '/action:extract', `/zipFile:${solutionPath}`, `/folder:${path.resolve(workDir, 'unpacked')}`]);
-        expect(res).to.contain('Unmanaged Extract complete.');
+        const res = await sopa.run([ '/nologo', '/action:pack', `/zipFile:${solutionPath}`, `/folder:${stagedDir}`]);
+        expect(res).to.contain('Unmanaged Pack complete.');
     }).timeout(20*1000);
 });
