@@ -3526,17 +3526,16 @@ class ExeRunner {
             // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
             const dirname = path.resolve(__dirname);
             const parentDir = path.dirname(dirname);
-            if (path.basename(dirname) === 'dist') {
-                this._outDirRoot = path.resolve(dirname);
-            }
-            else if (path.basename(parentDir) === 'out') {
-                this._outDirRoot = parentDir;
+            // /dist/actions/<action-name>/index.js:
+            // /out/actions/<action-name>/index.js:
+            if (path.basename(parentDir) === 'actions') {
+                this._outDirRoot = path.resolve(path.dirname(parentDir));
             }
             else if (path.basename(parentDir) === 'src') {
                 this._outDirRoot = path.resolve(parentDir, '..', 'out');
             }
             else {
-                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${__dirname}`);
+                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${dirname}`);
             }
         }
         return this._outDirRoot;
