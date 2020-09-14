@@ -1,0 +1,91 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha All tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--require", "ts-node/register",
+                "-u", "bdd",
+                "--timeout", "999999",
+                "src/test/**/*.ts"
+            ],
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Current File",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--require", "ts-node/register",
+                "-u", "bdd",
+                "--timeout", "999999",
+                "${file}"
+            ],
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch current TypeScript src",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "preLaunchTask": "gulp: compile",
+            "sourceMaps": true,
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch current TypeScript src with CLI parameters",
+            "program": "${file}",
+            "args": [
+                "--environmentUrl", "https://davidjenD365-1.crm.dynamics.com",
+                // "--appId", "2c6d7c95-ff20-4305-b87c-b97eb8277cf5",
+                // "--clientSecret", "",
+                // "--tenantId", "abcb8015-6e91-4c5f-b2b2-edb38c721f87",
+                "--userName", "davidjen@davidjenD365.onmicrosoft.com",
+                "--password", "",
+                "--solutionFile", "src/test/data/emptySolution_0_1_0_0.zip"
+            ],
+            "cwd": "${workspaceFolder}",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "preLaunchTask": "gulp: compile",
+            "sourceMaps": true,
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Gulp task",
+            "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "dist"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Action in dist",
+            "program": "${workspaceFolder}/dist/index.js",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "dist"
+            ],
+            "env": {
+                "INPUT_ENVIRONMENT-URL": "abc",
+                "INPUT_user-name": "cde",
+                "INPUT_password-secret": "42",
+                "INPUT_solution-name": "foo"
+            }
+        }
+    ]
+}
