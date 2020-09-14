@@ -29,6 +29,7 @@
     "@vercel/ncc": "^0.24.0",
     "chai": "^4.2.0",
     "eslint": "^7.9.0",
+    "glob": "^7.1.6",
     "gulp": "^4.0.2",
     "gulp-eslint": "^6.0.0",
     "gulp-mocha": "^7.0.2",
