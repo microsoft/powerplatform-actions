@@ -1,0 +1,22 @@
+{
+  "verbAuth": "on",
+  "verbOrg": "on",
+  "verbOrgEntity": "on",
+  "verbOrgQuery": "on",
+  "verbSolutionImport": "on",
+  "verbSolutionExport": "on",
+  "verbSolutionClone": "on",
+  "pcfVirtualControl": "on",
+  "pcfObjectType": "on",
+  "pcfPropertyDependencies": "on",
+  "pcfAllowLibraryResources": "on",
+  "pcfAllowCustomWebpack": "on",
+  "pcfAllowDefaultSelectedItemsForDataSet": "on",
+  "pcfAllowEvents": "on",
+  "pcfCanvasDataConnector": "on",
+  "pcfAllowLookup": "on",
+  "verbPlugin": "on",
+  "verbPcfPush": "on",
+  "verbPortal": "on",
+  "treatValidationErrorsAsWarnings": "off"
+}
