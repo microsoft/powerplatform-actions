@@ -17,5 +17,5 @@ inputs:
 
 runs:
   using: 'node12'
-  # main: 'dist/who-am-i/index.js'
-  main: '../out/actions/who-am-i/index.js'
+  main: '../dist/actions/who-am-i/index.js'
+  # main: '../out/actions/who-am-i/index.js'
