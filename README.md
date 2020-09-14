@@ -22,8 +22,8 @@ To run tasks from this offering, add the following to your existing Actions work
     - name: Unpack Solution
       uses: microsoft/powerplatform/unpack-solution@v0
       with:
-        solution-input-file: 'out/aSolution1.zip'
-        solution-target-folder: 'src/solutions/solution one'
+        solution-file: 'out/aSolution1.zip'
+        solution-folder: 'src/solutions/solution one'
         solution-type: 'Unmanaged'
         overwrite-files: true
 ```

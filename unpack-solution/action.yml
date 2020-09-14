@@ -3,11 +3,11 @@
 name: 'unpack-solution'
 description: 'Power Platform Unpack Solution'
 inputs:
-  solution-input-file:
+  solution-file:
     description: 'Path/filename of the local solution zip file'
     required: true
 
-  solution-target-folder:
+  solution-folder:
     description: 'Target folder into which to unpack the solution.zip contents'
     required: true
 

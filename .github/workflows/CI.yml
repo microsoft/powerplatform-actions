@@ -50,7 +50,7 @@ jobs:
     - name: Test unpack-solution action
       uses: ./unpack-solution
       with:
-        solution-input-file: 'out/CI/solution1.zip'
-        solution-target-folder: 'out/CI/solution one'
+        solution-file: 'out/CI/solution1.zip'
+        solution-folder: 'out/CI/solution one'
         solution-type: 'Unmanaged'
         overwrite-files: true
