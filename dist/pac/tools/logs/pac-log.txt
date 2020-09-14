@@ -1,7 +1,0 @@
-2020-09-14 05:53:30.7396|INFO|bolt.cli.Worker|StartExecutingVerb
-2020-09-14 05:53:30.7696|INFO|bolt.cli.Worker|Verbs: [""]
-2020-09-14 05:53:30.7696|INFO|bolt.cli.Worker|ProductVersion: 1.3.6
-2020-09-14 05:53:30.7696|INFO|bolt.cli.Worker|ProductName: pac
-2020-09-14 05:53:30.7696|INFO|bolt.cli.Worker|EndExecutingVerb
-2020-09-14 05:53:30.7696|INFO|bolt.cli.Worker|Success: True
-2020-09-14 05:53:30.7696|INFO|bolt.cli.Worker|Execution Time(ms): 0

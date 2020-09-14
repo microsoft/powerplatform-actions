@@ -3448,6 +3448,7 @@ const logger = new lib_1.ActionLogger();
     const sopa = new lib_1.SopaRunner(workingDir, logger);
     const unpackArgs = ['/action:extract', `/packageType:${solutionType}`, `/zipFile:${solutionZipFile}`, `/folder:${targetFolder}`, '/clobber', '/allowDelete:yes', '/allowWrite:yes'];
     yield sopa.run(unpackArgs);
+    core.info(`unpacked solution to: ${targetFolder}`);
     core.endGroup();
 }))().catch(error => {
     core.setFailed(`failed: ${error}`);
@@ -3531,6 +3532,9 @@ class ExeRunner {
             }
             else if (path.basename(parentDir) === 'src') {
                 this._outDirRoot = path.resolve(parentDir, '..', 'out');
+            }
+            else {
+                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${__dirname}`);
             }
         }
         return this._outDirRoot;

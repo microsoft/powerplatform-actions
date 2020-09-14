@@ -3450,6 +3450,7 @@ const logger = new lib_1.ActionLogger();
         exportArgs.push('--managed');
     }
     yield pac.run(exportArgs);
+    core.info(`exported solution to: ${outputFile}`);
     core.endGroup();
 }))().catch(error => {
     core.setFailed(`failed: ${error}`);
@@ -3533,6 +3534,9 @@ class ExeRunner {
             }
             else if (path.basename(parentDir) === 'src') {
                 this._outDirRoot = path.resolve(parentDir, '..', 'out');
+            }
+            else {
+                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${__dirname}`);
             }
         }
         return this._outDirRoot;
