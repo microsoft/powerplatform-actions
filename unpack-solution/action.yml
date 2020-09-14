@@ -24,4 +24,4 @@ inputs:
 runs:
   using: 'node12'
   # main: 'dist/index.js'
-  main: 'out/actions/unpack-solution/index.js'
+  main: '../out/actions/unpack-solution/index.js'

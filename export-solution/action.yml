@@ -38,4 +38,4 @@ inputs:
 runs:
   using: 'node12'
   # main: 'dist/export-solution/index.js'
-  main: 'out/actions/export-solution/index.js'
+  main: '../out/actions/export-solution/index.js'
