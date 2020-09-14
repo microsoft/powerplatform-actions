@@ -10,7 +10,7 @@ To run tasks from this offering, add the following to your existing Actions work
 ```yaml
     steps:
     - name: Export Solution
-      uses: microsoft/powerplatform/export-solution@v0
+      uses: microsoft/powerplatform-actions/export-solution@v0
       with:
         environment-url: 'https://myenv.crm.dynamics.com'
         user-name: 'me@myenv.onmicrosoft.com'
@@ -20,10 +20,10 @@ To run tasks from this offering, add the following to your existing Actions work
         working-directory: 'out'
 
     - name: Unpack Solution
-      uses: microsoft/powerplatform/unpack-solution@v0
+      uses: microsoft/powerplatform-actions/unpack-solution@v0
       with:
-        solution-input-file: 'out/aSolution1.zip'
-        solution-target-folder: 'src/solutions/solution one'
+        solution-file: 'out/aSolution1.zip'
+        solution-folder: 'src/solutions/solution one'
         solution-type: 'Unmanaged'
         overwrite-files: true
 ```
