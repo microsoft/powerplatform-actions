@@ -124,7 +124,9 @@ function binplace(compName, relativePath) {
     const targetDir = path.resolve(distdir, relativePath);
     log.info(`Copying ${compName} to ${targetDir}...`);
     fs.emptyDirSync(targetDir);
-    fs.copySync(path.resolve(outdir, relativePath), targetDir);
+    fs.copySync(path.resolve(outdir, relativePath), targetDir, {
+        filter: (src) => path.extname(src) !== '.pdb'
+    });
 }
 
 async function createDist() {
