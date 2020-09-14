@@ -30,6 +30,8 @@ export class ExeRunner {
                 this._outDirRoot = parentDir;
             } else if (path.basename(parentDir) === 'src') {
                 this._outDirRoot = path.resolve(parentDir, '..', 'out');
+            } else {
+                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${__dirname}`);
             }
         }
         return this._outDirRoot;
