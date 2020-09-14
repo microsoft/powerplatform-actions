@@ -3423,14 +3423,14 @@ const fs = __webpack_require__(5630);
 const process_1 = __webpack_require__(1765);
 const validSolutionTypes = new Set(['unmanaged', 'managed', 'both']);
 core.startGroup('unpack-solution:');
-const solutionZipFile = core.getInput('solution-input-file', { required: true });
+const solutionZipFile = core.getInput('solution-file', { required: true });
 const solutionType = core.getInput('solution-type', { required: false }) || 'Unmanaged';
 if (!validSolutionTypes.has(solutionType.toLowerCase())) {
     core.setFailed(`Unknown solution type "${solutionType}"; must be one of: "Unmanaged", "Managed", "Both"`);
     process_1.exit();
 }
 const workingDir = process.cwd();
-const targetFolderCand = core.getInput('solution-target-folder', { required: true });
+const targetFolderCand = core.getInput('solution-folder', { required: true });
 const targetFolder = path.isAbsolute(targetFolderCand) ? targetFolderCand : path.resolve(workingDir, targetFolderCand);
 core.info(`unpack solution: ${solutionZipFile} (${solutionType}) into: ${targetFolder}`);
 fs.ensureDirSync(targetFolder);
@@ -3438,7 +3438,7 @@ const overwrite = core.getInput('overwrite-files', { required: false }) || true;
 if (!overwrite || overwrite.toString().toLowerCase() !== 'true') {
     const files = fs.readdirSync(targetFolder);
     if (files.length > 0) {
-        core.setFailed(`solution-target-folder "${targetFolder}" is not empty, cannot overwrite files unless "overwrite-files" input parameter is set to "true"`);
+        core.setFailed(`solution-folder "${targetFolder}" is not empty, cannot overwrite files unless "overwrite-files" input parameter is set to "true"`);
         process_1.exit();
     }
 }
