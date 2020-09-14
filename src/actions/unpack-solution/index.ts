@@ -39,6 +39,7 @@ const logger = new ActionLogger();
 
     const unpackArgs = ['/action:extract', `/packageType:${solutionType}`, `/zipFile:${solutionZipFile}`, `/folder:${targetFolder}`, '/clobber', '/allowDelete:yes', '/allowWrite:yes'];
     await sopa.run(unpackArgs);
+    core.info(`unpacked solution to: ${targetFolder}`);
     core.endGroup();
 
 })().catch(error => {

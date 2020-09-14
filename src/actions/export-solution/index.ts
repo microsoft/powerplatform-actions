@@ -40,6 +40,7 @@ const logger = new ActionLogger();
         exportArgs.push('--managed');
     }
     await pac.run(exportArgs);
+    core.info(`exported solution to: ${outputFile}`);
     core.endGroup();
 
 })().catch(error => {
