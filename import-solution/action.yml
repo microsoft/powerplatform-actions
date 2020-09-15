@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 name: 'import-solution'
-description: 'Power Platform import Solution'
+description: 'Power Platform Import Solution'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
@@ -50,5 +50,5 @@ inputs:
 
 runs:
   using: 'node12'
-  main: '../dist/actions/export-solution/index.js'
-  # main: '../out/actions/export-solution/index.js'
+  main: '../dist/actions/import-solution/index.js'
+  # main: '../out/actions/import-solution/index.js'
