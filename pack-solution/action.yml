@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'unpack-solution'
-description: 'Power Platform Unpack Solution'
+name: 'pack-solution'
+description: 'Power Platform Pack Solution'
 inputs:
   solution-file:
     description: 'Path/filename of the local solution zip file'
@@ -12,16 +12,11 @@ inputs:
     required: true
 
   solution-type:
-    description: 'Solution type to unpack: "Unmanaged", "Managed" or "Both"'
+    description: 'Solution type to pack as: "Unmanaged", "Managed" or "Both"'
     required: false
     default: 'Unmanaged'
 
-  overwrite-files:
-    description: 'OK to overwrite existing files when unpacking a solution.zip'
-    required: false
-    default: true
-
 runs:
   using: 'node12'
-  main: '../dist/actions/unpack-solution/index.js'
-  # main: '../out/actions/unpack-solution/index.js'
+  main: '../dist/actions/pack-solution/index.js'
+  # main: '../out/actions/pack-solution/index.js'

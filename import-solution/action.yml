@@ -1,0 +1,54 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'import-solution'
+description: 'Power Platform Import Solution'
+inputs:
+  environment-url:
+    description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
+    required: true
+
+  user-name:
+    description: 'Power Platform user name, e.g. myname@my-org.onmicrosoft.com'
+    required: true
+
+  password-secret:
+    description: 'Power Platform password. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: true
+
+  solution-file:
+    description: 'Path/filename of solution zip file to be imported. Can be absolute or relative to working-directory'
+    required: true
+
+  activate-plugins:
+    description: 'Activate plug-ins and workflows on the solution'
+    required: false
+    default: true
+
+  force-overwrite:
+    description: 'Force an overwrite of unmanaged customizations'
+    required: false
+    default: true
+
+  skip-dependency-check:
+    description: 'Skip dependency check against dependencies flagged as product update'
+    required: false
+    default: false
+
+  import-as-holding:
+    description: 'Import the solution as a holding solution'
+    required: false
+    default: false
+
+  publish-changes:
+    description: 'Publish your changes upon a successful import'
+    required: false
+    default: false
+
+  working-directory:
+    description: 'Working directory; default: root of repository'
+    required: false
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/import-solution/index.js'
+  # main: '../out/actions/import-solution/index.js'

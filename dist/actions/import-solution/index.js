@@ -3399,7 +3399,7 @@ exports.fromPromise = function (fn) {
 
 /***/ }),
 
-/***/ 3365:
+/***/ 9351:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3420,37 +3420,56 @@ const core = __webpack_require__(2186);
 const lib_1 = __webpack_require__(2806);
 const path = __webpack_require__(5622);
 const fs = __webpack_require__(5630);
-core.startGroup('export-solution:');
+const process_1 = __webpack_require__(1765);
+core.startGroup('import-solution:');
 const envUrl = core.getInput('environment-url', { required: true });
 const username = core.getInput('user-name', { required: true });
 core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
 const password = core.getInput('password-secret', { required: true });
 if (!password || password.length === 0) {
     core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
+    process_1.exit();
 }
-const solutionName = core.getInput('solution-name', { required: true });
-const solutionVersion = core.getInput('solution-version', { required: false });
-const isManaged = lib_1.getInputAsBool('managed', false, false);
-core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged}`);
 const workingDir = lib_1.getWorkingDirectory('working-directory', false);
-const outputFileCandidate = core.getInput('solution-output-file', { required: true });
-const outputFile = path.isAbsolute(outputFileCandidate) ? outputFileCandidate : path.resolve(workingDir, outputFileCandidate);
-fs.ensureDirSync(path.dirname(outputFile));
+const solutionFileCandidate = core.getInput('solution-file', { required: true });
+const solutionFile = path.isAbsolute(solutionFileCandidate) ? solutionFileCandidate : path.resolve(workingDir, solutionFileCandidate);
+if (!fs.existsSync(solutionFile)) {
+    core.setFailed(`Solution file "${solutionFile}" does not exist`);
+    process_1.exit();
+}
+const activatePlugins = lib_1.getInputAsBool('activate-plugins', false, true);
+const forceOverwrite = lib_1.getInputAsBool('force-overwrite', false, true);
+const skipDepCheck = lib_1.getInputAsBool('skip-dependency-check', false, false);
+const importAsHolding = lib_1.getInputAsBool('import-as-holding', false, false);
+const publishChanges = lib_1.getInputAsBool('publish-changes', false, false);
+core.info(`solution import: ${solutionFile}`);
+core.info(`  activatePlugins: ${activatePlugins} - forceOverwrite: ${forceOverwrite}`);
+core.info(`  skipDependencyCheck: ${skipDepCheck} - importAsHolding: ${importAsHolding}`);
+core.info(`  publishChanges: ${publishChanges}`);
 const logger = new lib_1.ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const pac = new lib_1.PacAccess(workingDir, logger);
     yield pac.run(['auth', 'clear']);
     yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
-    const exportArgs = ['solution', 'export', '--name', solutionName, '--path', outputFile];
-    if (solutionVersion) {
-        exportArgs.push('--targetVersion', solutionVersion);
+    const importArgs = ['solution', 'import', '--path', solutionFile];
+    if (activatePlugins) {
+        importArgs.push('--activate-plugins');
     }
-    if (isManaged) {
-        exportArgs.push('--managed');
+    if (forceOverwrite) {
+        importArgs.push('--force-overwrite');
     }
-    yield pac.run(exportArgs);
-    core.info(`exported solution to: ${outputFile}`);
+    if (skipDepCheck) {
+        importArgs.push('--skip-dependency-check');
+    }
+    if (importAsHolding) {
+        importArgs.push('--import-as-holding');
+    }
+    if (publishChanges) {
+        importArgs.push('--publish-changes');
+    }
+    yield pac.run(importArgs);
+    core.info(`imported solution from: ${solutionFile}`);
     core.endGroup();
 }))().catch(error => {
     core.setFailed(`failed: ${error}`);
@@ -3720,6 +3739,14 @@ module.exports = require("path");
 
 /***/ }),
 
+/***/ 1765:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("process");
+
+/***/ }),
+
 /***/ 2413:
 /***/ ((module) => {
 
@@ -3774,6 +3801,6 @@ module.exports = require("util");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(3365);
+/******/ 	return __webpack_require__(9351);
 /******/ })()
 ;

@@ -37,6 +37,22 @@ jobs:
         user-name: 'davidjen@davidjenD365.onmicrosoft.com'
         password-secret: ${{ secrets.password }}
 
+    - name: Test pack-solution action
+      uses: ./pack-solution
+      with:
+        solution-folder: 'src/test/data/emptySolution'
+        solution-file: 'out/CI/emptySolution.zip'
+        solution-type: 'Unmanaged'
+
+    - name: Test import-solution action
+      uses: ./import-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        solution-file: 'out/CI/emptySolution.zip'
+        force-overwrite: true
+
     - name: Test export-solution action
       uses: ./export-solution
       with:

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, PacAccess } from '../../lib';
+import { ActionLogger, getInputAsBool, getWorkingDirectory, PacAccess } from '../../lib';
 import path = require('path');
 import fs = require('fs-extra');
 
@@ -16,10 +16,10 @@ if (!password || password.length === 0) {
 }
 const solutionName = core.getInput('solution-name', { required: true });
 const solutionVersion = core.getInput('solution-version', { required: false });
-const isManaged = core.getInput('managed', { required: false });
-core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged ?? false}`);
+const isManaged = getInputAsBool('managed', false, false);
+core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged}`);
 
-const workingDir = core.getInput('working-directory', { required: false }) || process.cwd();
+const workingDir = getWorkingDirectory('working-directory', false);
 const outputFileCandidate = core.getInput('solution-output-file', { required: true });
 const outputFile = path.isAbsolute(outputFileCandidate) ? outputFileCandidate : path.resolve(workingDir, outputFileCandidate);
 fs.ensureDirSync(path.dirname(outputFile));

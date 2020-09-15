@@ -329,7 +329,7 @@ exports.getState = getState;
 
 /***/ }),
 
-/***/ 274:
+/***/ 366:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -347,23 +347,27 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 // Licensed under the MIT License.
 const core = __webpack_require__(186);
 const lib_1 = __webpack_require__(806);
-core.startGroup('who-am-i');
-const envUrl = core.getInput('environment-url', { required: true });
-const username = core.getInput('user-name', { required: true });
-core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
-const password = core.getInput('password-secret', { required: true });
-if (!password || password.length === 0) {
-    core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
+const path = __webpack_require__(622);
+const process_1 = __webpack_require__(765);
+const validSolutionTypes = new Set(['unmanaged', 'managed', 'both']);
+core.startGroup('pack-solution:');
+const solutionZipFile = core.getInput('solution-file', { required: true });
+const solutionType = core.getInput('solution-type', { required: false }) || 'Unmanaged';
+if (!validSolutionTypes.has(solutionType.toLowerCase())) {
+    core.setFailed(`Unknown solution type "${solutionType}"; must be one of: "Unmanaged", "Managed", "Both"`);
+    process_1.exit();
 }
 const workingDir = process.cwd();
+const solutionFolderCand = core.getInput('solution-folder', { required: true });
+const solutionFolder = path.isAbsolute(solutionFolderCand) ? solutionFolderCand : path.resolve(workingDir, solutionFolderCand);
+core.info(`pack solution: ${solutionZipFile} (${solutionType}) from: ${solutionFolder}`);
 const logger = new lib_1.ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const pac = new lib_1.PacAccess(workingDir, logger);
-    yield pac.run(['auth', 'clear']);
-    yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
-    const whoArgs = ['org', 'who'];
-    yield pac.run(whoArgs);
+    const sopa = new lib_1.SopaRunner(workingDir, logger);
+    const packArgs = ['/action:pack', `/packageType:${solutionType}`, `/zipFile:${solutionZipFile}`, `/folder:${solutionFolder}`];
+    yield sopa.run(packArgs);
+    core.info(`packed solution into: ${solutionZipFile}`);
     core.endGroup();
 }))().catch(error => {
     core.setFailed(`failed: ${error}`);
@@ -598,6 +602,13 @@ module.exports = require("os");
 
 module.exports = require("path");
 
+/***/ }),
+
+/***/ 765:
+/***/ ((module) => {
+
+module.exports = require("process");
+
 /***/ })
 
 /******/ 	});
@@ -638,6 +649,6 @@ module.exports = require("path");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(274);
+/******/ 	return __webpack_require__(366);
 /******/ })()
 ;
