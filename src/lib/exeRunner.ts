@@ -27,7 +27,7 @@ export class ExeRunner {
             // /out/actions/<action-name>/index.js:
             if (path.basename(parentDir) === 'actions') {
                 this._outDirRoot = path.resolve(path.dirname(parentDir));
-            } else if (path.basename(parentDir) === 'src') {
+            } else if (path.basename(parentDir) === 'src' || path.basename(parentDir) === 'out') {
                 this._outDirRoot = path.resolve(parentDir, '..', 'out');
             } else {
                 throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${dirname}`);
