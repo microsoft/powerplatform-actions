@@ -70,3 +70,12 @@ jobs:
         solution-folder: 'out/CI/solution one'
         solution-type: 'Unmanaged'
         overwrite-files: true
+
+    - name: Test clone-solution action
+      uses: ./clone-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        solution-name: emptySolution
+        target-folder: 'out/CI/cloned'
