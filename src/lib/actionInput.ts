@@ -9,5 +9,5 @@ export function getInputAsBool(name: string, required: boolean, defaultValue: bo
 
 export function getWorkingDirectory(name: string, required: boolean, defaultValue?: string): string {
     const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? (defaultValue ?? process.cwd()) : process.cwd();
+    return (!textValue) ? (defaultValue ?? process.cwd()) : textValue;
 }

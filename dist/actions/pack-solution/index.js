@@ -395,7 +395,7 @@ function getInputAsBool(name, required, defaultValue) {
 exports.getInputAsBool = getInputAsBool;
 function getWorkingDirectory(name, required, defaultValue) {
     const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? (defaultValue !== null && defaultValue !== void 0 ? defaultValue : process.cwd()) : process.cwd();
+    return (!textValue) ? (defaultValue !== null && defaultValue !== void 0 ? defaultValue : process.cwd()) : textValue;
 }
 exports.getWorkingDirectory = getWorkingDirectory;
 
