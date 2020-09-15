@@ -3430,9 +3430,9 @@ if (!password || password.length === 0) {
 }
 const solutionName = core.getInput('solution-name', { required: true });
 const solutionVersion = core.getInput('solution-version', { required: false });
-const isManaged = core.getInput('managed', { required: false });
-core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged !== null && isManaged !== void 0 ? isManaged : false}`);
-const workingDir = core.getInput('working-directory', { required: false }) || process.cwd();
+const isManaged = lib_1.getInputAsBool('managed', false, false);
+core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged}`);
+const workingDir = lib_1.getWorkingDirectory('working-directory', false);
 const outputFileCandidate = core.getInput('solution-output-file', { required: true });
 const outputFile = path.isAbsolute(outputFileCandidate) ? outputFileCandidate : path.resolve(workingDir, outputFileCandidate);
 fs.ensureDirSync(path.dirname(outputFile));
@@ -3458,6 +3458,32 @@ const logger = new lib_1.ActionLogger();
 });
 
 //# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 1434:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getWorkingDirectory = exports.getInputAsBool = void 0;
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+const core = __webpack_require__(2186);
+function getInputAsBool(name, required, defaultValue) {
+    const textValue = core.getInput(name, { required: required });
+    return (!textValue) ? defaultValue : textValue.toLowerCase() === 'true';
+}
+exports.getInputAsBool = getInputAsBool;
+function getWorkingDirectory(name, required, defaultValue) {
+    const textValue = core.getInput(name, { required: required });
+    return (!textValue) ? (defaultValue !== null && defaultValue !== void 0 ? defaultValue : process.cwd()) : process.cwd();
+}
+exports.getWorkingDirectory = getWorkingDirectory;
+
+//# sourceMappingURL=actionInput.js.map
 
 
 /***/ }),
@@ -3531,7 +3557,7 @@ class ExeRunner {
             if (path.basename(parentDir) === 'actions') {
                 this._outDirRoot = path.resolve(path.dirname(parentDir));
             }
-            else if (path.basename(parentDir) === 'src') {
+            else if (path.basename(parentDir) === 'src' || path.basename(parentDir) === 'out') {
                 this._outDirRoot = path.resolve(parentDir, '..', 'out');
             }
             else {
@@ -3584,9 +3610,12 @@ exports.RunnerError = RunnerError;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SopaRunner = exports.PacAccess = exports.RunnerError = exports.ActionLogger = void 0;
+exports.SopaRunner = exports.PacAccess = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = exports.ActionLogger = void 0;
 var actionLogger_1 = __webpack_require__(3970);
 Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
+var actionInput_1 = __webpack_require__(1434);
+Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
+Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
 var exeRunner_1 = __webpack_require__(7021);
 Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
 var pacAccess_1 = __webpack_require__(4399);

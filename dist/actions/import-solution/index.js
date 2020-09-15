@@ -3399,7 +3399,7 @@ exports.fromPromise = function (fn) {
 
 /***/ }),
 
-/***/ 400:
+/***/ 9351:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3421,34 +3421,55 @@ const lib_1 = __webpack_require__(2806);
 const path = __webpack_require__(5622);
 const fs = __webpack_require__(5630);
 const process_1 = __webpack_require__(1765);
-const validSolutionTypes = new Set(['unmanaged', 'managed', 'both']);
-core.startGroup('unpack-solution:');
-const solutionZipFile = core.getInput('solution-file', { required: true });
-const solutionType = core.getInput('solution-type', { required: false }) || 'Unmanaged';
-if (!validSolutionTypes.has(solutionType.toLowerCase())) {
-    core.setFailed(`Unknown solution type "${solutionType}"; must be one of: "Unmanaged", "Managed", "Both"`);
+core.startGroup('import-solution:');
+const envUrl = core.getInput('environment-url', { required: true });
+const username = core.getInput('user-name', { required: true });
+core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
+const password = core.getInput('password-secret', { required: true });
+if (!password || password.length === 0) {
+    core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
     process_1.exit();
 }
-const workingDir = process.cwd();
-const targetFolderCand = core.getInput('solution-folder', { required: true });
-const targetFolder = path.isAbsolute(targetFolderCand) ? targetFolderCand : path.resolve(workingDir, targetFolderCand);
-core.info(`unpack solution: ${solutionZipFile} (${solutionType}) into: ${targetFolder}`);
-fs.ensureDirSync(targetFolder);
-const overwrite = core.getInput('overwrite-files', { required: false }) || true;
-if (!overwrite || overwrite.toString().toLowerCase() !== 'true') {
-    const files = fs.readdirSync(targetFolder);
-    if (files.length > 0) {
-        core.setFailed(`solution-folder "${targetFolder}" is not empty, cannot overwrite files unless "overwrite-files" input parameter is set to "true"`);
-        process_1.exit();
-    }
+const workingDir = lib_1.getWorkingDirectory('working-directory', false);
+const solutionFileCandidate = core.getInput('solution-file', { required: true });
+const solutionFile = path.isAbsolute(solutionFileCandidate) ? solutionFileCandidate : path.resolve(workingDir, solutionFileCandidate);
+if (!fs.existsSync(solutionFile)) {
+    core.setFailed(`Solution file "${solutionFile}" does not exist`);
+    process_1.exit();
 }
+const activatePlugins = lib_1.getInputAsBool('activate-plugins', false, true);
+const forceOverwrite = lib_1.getInputAsBool('force-overwrite', false, true);
+const skipDepCheck = lib_1.getInputAsBool('skip-dependency-check', false, false);
+const importAsHolding = lib_1.getInputAsBool('import-as-holding', false, false);
+const publishChanges = lib_1.getInputAsBool('publish-changes', false, false);
+core.info(`solution import: ${solutionFile}`);
+core.info(`  activatePlugins: ${activatePlugins} - forceOverwrite: ${forceOverwrite}`);
+core.info(`  skipDependencyCheck: ${skipDepCheck} - importAsHolding: ${importAsHolding}`);
+core.info(`  publishChanges: ${publishChanges}`);
 const logger = new lib_1.ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const sopa = new lib_1.SopaRunner(workingDir, logger);
-    const unpackArgs = ['/action:extract', `/packageType:${solutionType}`, `/zipFile:${solutionZipFile}`, `/folder:${targetFolder}`, '/clobber', '/allowDelete:yes', '/allowWrite:yes'];
-    yield sopa.run(unpackArgs);
-    core.info(`unpacked solution to: ${targetFolder}`);
+    const pac = new lib_1.PacAccess(workingDir, logger);
+    yield pac.run(['auth', 'clear']);
+    yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+    const importArgs = ['solution', 'import', '--path', solutionFile];
+    if (activatePlugins) {
+        importArgs.push('--activate-plugins');
+    }
+    if (forceOverwrite) {
+        importArgs.push('--force-overwrite');
+    }
+    if (skipDepCheck) {
+        importArgs.push('--skip-dependency-check');
+    }
+    if (importAsHolding) {
+        importArgs.push('--import-as-holding');
+    }
+    if (publishChanges) {
+        importArgs.push('--publish-changes');
+    }
+    yield pac.run(importArgs);
+    core.info(`imported solution from: ${solutionFile}`);
     core.endGroup();
 }))().catch(error => {
     core.setFailed(`failed: ${error}`);
@@ -3780,6 +3801,6 @@ module.exports = require("util");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(400);
+/******/ 	return __webpack_require__(9351);
 /******/ })()
 ;
