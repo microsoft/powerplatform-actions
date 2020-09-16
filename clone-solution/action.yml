@@ -1,0 +1,37 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'clone-solution'
+description: 'Power Platform Clone Solution'
+inputs:
+  environment-url:
+    description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
+    required: true
+
+  user-name:
+    description: 'Power Platform user name, e.g. myname@my-org.onmicrosoft.com'
+    required: true
+
+  password-secret:
+    description: 'Power Platform password. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: true
+
+  solution-name:
+    description: 'Name of solution to clone'
+    required: true
+
+  solution-version:
+    description: 'Version of solution to clone'
+    required: false
+
+  target-folder:
+    description: 'Target folder to place the extracted solution into'
+    required: false
+
+  working-directory:
+    description: 'Working directory; default: root of repository'
+    required: false
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/clone-solution/index.js'
+  # main: '../out/actions/clone-solution/index.js'
