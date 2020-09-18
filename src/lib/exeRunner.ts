@@ -12,7 +12,7 @@ export class ExeRunner {
     public constructor(private readonly _workingDir: string, private readonly logger: Logger, exeRelativePath: string[]) {
         const platform = os.platform();
         if (platform !== 'win32') {
-            throw Error(`Unsupported Action runner os: '${platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
+            throw Error(`Unsupported Action runner os: ${platform}; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
         }
         this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
     }
