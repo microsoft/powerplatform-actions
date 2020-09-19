@@ -45,6 +45,7 @@ Windows, macOS or Linux:
   - [markdownlint (davidanson.vscode-markdownlint)](https://github.com/DavidAnson/vscode-markdownlint)
   - [Mocha sidebar (maty.vscode-mocha-sidebar)](https://github.com/maty21/mocha-sidebar)
 - TEMPORARY: create a PAT for the Azure DevOps org ```msazure``` with scope: package(read) and add it as local environment variable:
+
 ```Powershell
 [Environment]::SetEnvironmentVariable('AZ_DevOps_Read_PAT', '<yourPAT>', [EnvironmentVariableTarget]::User)
 ```
