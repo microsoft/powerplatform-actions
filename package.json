@@ -39,7 +39,8 @@
     "node-fetch": "^2.6.1",
     "ps-list": "^7.2.0",
     "ts-node": "^9.0.0",
-    "unzip-stream": "^0.3.0"
+    "unzip-stream": "^0.3.0",
+    "winston": "^3.3.3"
   },
   "dependencies": {
     "@actions/core": "^1.2.5",
