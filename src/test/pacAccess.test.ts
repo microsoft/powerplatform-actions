@@ -8,7 +8,7 @@ import { TestLog } from './testLog';
 
 describe('PacAccess', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const pac = new PacAccess(workDir, new TestLog());
+    const pac = new PacAccess(workDir, new TestLog('pac-tests.log'));
 
     before(() => {
         fs.emptyDirSync(workDir);
