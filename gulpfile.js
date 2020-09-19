@@ -15,6 +15,7 @@ const fetch = require('node-fetch');
 const fs = require('fs-extra');
 const log = require('fancy-log');
 const path = require('path');
+const pslist = require('ps-list');
 const unzip = require('unzip-stream');
 const { glob } = require('glob');
 
@@ -24,7 +25,13 @@ const outdir = path.resolve(tsconfig.compilerOptions.outDir);
 const distdir = path.resolve('./dist');
 const readPAT = process.env['AZ_DevOps_Read_PAT'];
 
-function clean() {
+async function clean() {
+    (await pslist())
+        .filter((info) => info.name.startsWith('pacTelemetryUpload'))
+        .forEach(info => {
+            log.info(`Terminating: ${info.name} - ${info.pid}...`)
+            process.kill(info.pid);
+        });
     return fs.emptyDir(outdir);
 }
 
