@@ -23459,11 +23459,15 @@ const currDir = process.cwd();
 (() => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     process.chdir(stagingDir);
-    core.startGroup('... prepare staging with git repo');
+    core.startGroup('... prepare staging');
     const git = new lib_1.GitRunner(stagingDir, logger);
+    // to stage the unpacked solution, use a separate repo:
+    //  this action runs as part of a GH workflow which runs e.g. a PR in a detached branch
+    //  hence a simple "just branch off" won't work and negatively impact the rest of the workflow
+    //  Approach: create a shallow clone of the solution target repo in a staging subfolder
     yield git.run(['init']);
     yield git.run(['remote', 'add', 'origin', repoUrl]);
-    yield git.run(['config', '--local', 'user.email', "bot@davidjend365.onmicrosoft.com"]);
+    yield git.run(['config', '--local', 'user.email', "bot@Ah6cCGKjYf.onmicrosoft.com"]);
     yield git.run(['config', '--local', 'user.name', `${(_a = process.env.GITHUB_ACTOR) !== null && _a !== void 0 ? _a : 'branch-solution-bot'}`]);
     yield git.run(['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${Buffer.from(`PAT:${token}`).toString('base64')}`]);
     yield git.run(['fetch', '--no-tags', '--prune', '--depth=1', 'origin']);

@@ -38,11 +38,15 @@ const currDir = process.cwd();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     process.chdir(stagingDir);
-    core.startGroup('... prepare staging with git repo');
+    core.startGroup('... prepare staging');
     const git = new GitRunner(stagingDir, logger);
+    // to stage the unpacked solution, use a separate repo:
+    //  this action runs as part of a GH workflow which runs e.g. a PR in a detached branch
+    //  hence a simple "just branch off" won't work and negatively impact the rest of the workflow
+    //  Approach: create a shallow clone of the solution target repo in a staging subfolder
     await git.run(['init']);
     await git.run(['remote', 'add', 'origin', repoUrl]);
-    await git.run(['config', '--local', 'user.email', "bot@davidjend365.onmicrosoft.com"]);
+    await git.run(['config', '--local', 'user.email', "bot@Ah6cCGKjYf.onmicrosoft.com"]);
     await git.run(['config', '--local', 'user.name', `${process.env.GITHUB_ACTOR ?? 'branch-solution-bot'}`]);
     await git.run(['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${Buffer.from(`PAT:${token}`).toString('base64')}`]);
     await git.run(['fetch', '--no-tags', '--prune', '--depth=1', 'origin']);
