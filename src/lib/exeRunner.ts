@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import { spawn } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import os = require('os');
 import path = require("path");
 import { Logger } from "./logger";
@@ -67,6 +67,22 @@ export class ExeRunner {
                 }
             });
         });
+    }
+
+    public runSync(args: string[]): string[] {
+        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
+        const proc = spawnSync(this._exePath, args, { cwd: this.workingDir });
+        if (proc.status === 0) {
+            const output = proc.output
+                .filter(line => !!line)     // can have null entries
+                .map(line => line.toString());
+            this.logger.info(`success: ${output.join(os.EOL)}`);
+            return output;
+        } else {
+            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
+            this.logger.error(`error: ${proc.status}: ${allOutput}`);
+            throw new RunnerError(proc.status ?? 99999, allOutput);
+        }
     }
 }
 
