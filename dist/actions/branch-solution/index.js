@@ -23463,7 +23463,7 @@ const currDir = process.cwd();
     const git = new lib_1.GitRunner(stagingDir, logger);
     yield git.run(['init']);
     yield git.run(['remote', 'add', 'origin', repoUrl]);
-    // await git.run(['config', '--local', 'user.email', "davidjen@davidjend365.onmicrosoft.com"]);
+    yield git.run(['config', '--local', 'user.email', "bot@davidjend365.onmicrosoft.com"]);
     yield git.run(['config', '--local', 'user.name', `${(_a = process.env.GITHUB_ACTOR) !== null && _a !== void 0 ? _a : 'branch-solution-bot'}`]);
     yield git.run(['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${Buffer.from(`PAT:${token}`).toString('base64')}`]);
     yield git.run(['fetch', '--no-tags', '--prune', '--depth=1', 'origin']);
