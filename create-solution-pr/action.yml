@@ -1,0 +1,33 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'create-solution-pr'
+description: 'Power Platform Create solution branch in git branch, ready for PullRequest'
+inputs:
+  solution-folder:
+    description: 'Source folder with unpacked solution'
+    required: true
+
+  solution-target-folder:
+    description: 'Target folder in "repo-url" into which to copy the unpacked solution and to create a PR branch for'
+    required: true
+
+  repo-url:
+    description: 'Git repository url where to push the PR branch to'
+    required: true
+
+  token:
+    description: 'Token to origin of git repo. Do NOT checkin token, instead create a GitHub secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: false
+
+  branch-name:
+    description: 'Branch name to hold the change PR; if none given, action will form one like: "<solution-unique-name>-<yyyyMMDD-HHmm"'
+    required: false
+
+  working-directory:
+    description: 'Working directory; default: root of repository'
+    required: false
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/create-solution-pr/index.js'
+  # main: '../out/actions/create-solution-pr/index.js'
