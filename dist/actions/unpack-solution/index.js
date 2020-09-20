@@ -3536,10 +3536,20 @@ const child_process_1 = __webpack_require__(3129);
 const os = __webpack_require__(2087);
 const path = __webpack_require__(5622);
 class ExeRunner {
-    constructor(_workingDir, logger, exeRelativePath) {
+    constructor(_workingDir, logger, exeName, exeRelativePath) {
         this._workingDir = _workingDir;
         this.logger = logger;
-        this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
+        const platform = os.platform();
+        if (platform !== 'win32') {
+            throw Error(`Unsupported Action runner os: '${platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
+        }
+        if (exeRelativePath) {
+            exeRelativePath.push(exeName);
+            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
+        }
+        else {
+            this._exePath = exeName;
+        }
     }
     get workingDir() {
         return this._workingDir;
@@ -3587,6 +3597,23 @@ class ExeRunner {
             });
         });
     }
+    runSync(args) {
+        var _a;
+        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
+        const proc = child_process_1.spawnSync(this._exePath, args, { cwd: this.workingDir });
+        if (proc.status === 0) {
+            const output = proc.output
+                .filter(line => !!line) // can have null entries
+                .map(line => line.toString());
+            this.logger.info(`success: ${output.join(os.EOL)}`);
+            return output;
+        }
+        else {
+            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
+            this.logger.error(`error: ${proc.status}: ${allOutput}`);
+            throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
+        }
+    }
 }
 exports.ExeRunner = ExeRunner;
 class RunnerError extends Error {
@@ -3602,22 +3629,48 @@ exports.RunnerError = RunnerError;
 
 /***/ }),
 
+/***/ 5973:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GitRunner = void 0;
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+const exeRunner_1 = __webpack_require__(7021);
+class GitRunner extends exeRunner_1.ExeRunner {
+    constructor(workingDir, logger) {
+        super(workingDir, logger, 'git');
+    }
+}
+exports.GitRunner = GitRunner;
+
+//# sourceMappingURL=gitRunner.js.map
+
+
+/***/ }),
+
 /***/ 2806:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SopaRunner = exports.PacAccess = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = exports.ActionLogger = void 0;
-var actionLogger_1 = __webpack_require__(3970);
-Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
+exports.SopaRunner = exports.RunnerError = exports.PacAccess = exports.GitRunner = exports.ActionLogger = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 var actionInput_1 = __webpack_require__(1434);
 Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
 Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
-var exeRunner_1 = __webpack_require__(7021);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
+var actionLogger_1 = __webpack_require__(3970);
+Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
+var gitRunner_1 = __webpack_require__(5973);
+Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
 var pacAccess_1 = __webpack_require__(4399);
 Object.defineProperty(exports, "PacAccess", ({ enumerable: true, get: function () { return pacAccess_1.PacAccess; } }));
+var exeRunner_1 = __webpack_require__(7021);
+Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
 var sopaRunner_1 = __webpack_require__(3653);
 Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
 
@@ -3638,7 +3691,7 @@ exports.PacAccess = void 0;
 const exeRunner_1 = __webpack_require__(7021);
 class PacAccess extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
-        super(workingDir, logger, ['pac', 'tools', 'pac.exe']);
+        super(workingDir, logger, 'pac.exe', ['pac', 'tools']);
     }
 }
 exports.PacAccess = PacAccess;
@@ -3660,7 +3713,7 @@ exports.SopaRunner = void 0;
 const exeRunner_1 = __webpack_require__(7021);
 class SopaRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
-        super(workingDir, logger, ['sopa', 'content', 'bin', 'coretools', 'SolutionPackager.exe']);
+        super(workingDir, logger, 'SolutionPackager.exe', ['sopa', 'content', 'bin', 'coretools']);
     }
 }
 exports.SopaRunner = SopaRunner;
