@@ -43,6 +43,12 @@ jobs:
 
 [![CI](https://github.com/microsoft/powerplatform-actions/workflows/CI/badge.svg)](https://github.com/microsoft/powerplatform-actions/actions?query=workflow%3ACI)
 
+## Documentation
+
+Documentation to each of the actions and their input parameters can be found at: <https://aka.ms/PowerActionsDocs>
+
+There is also a lab available that offers a tutorial and sample workflows: <https://aka.ms/PowerActionsLab>
+
 ## Contributing
 
 **PRE-RELEASE SOFTWARE.**
