@@ -9,7 +9,7 @@ import { TestLog } from './testLog';
 
 describe('SoPa', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const sopa = new SopaRunner(workDir, new TestLog());
+    const sopa = new SopaRunner(workDir, new TestLog('sopa-tests.log'));
 
     before(() => {
         fs.emptyDirSync(workDir);

@@ -8,7 +8,7 @@ import { TestLog } from './testLog';
 
 describe('PacAccess', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const pac = new PacAccess(workDir, new TestLog());
+    const pac = new PacAccess(workDir, new TestLog('pac-tests.log'));
 
     before(() => {
         fs.emptyDirSync(workDir);
@@ -22,10 +22,10 @@ describe('PacAccess', () => {
         expect(res).to.be.not.empty;
     }).timeout(10*1000);
 
-    it.skip('can clone emptySolution, implicit login', async() => {
+    it('can list auth profiles', async() => {
         expect(pac.workingDir).to.be.equal(workDir);
 
-        const res = await pac.run([ 'solution', 'clone', '--name', 'emptySolution' ]);
+        const res = await pac.run(['auth', 'list']);
         expect(res).to.be.not.empty;
     }).timeout(30*1000);
 });

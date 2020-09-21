@@ -1,0 +1,33 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'branch-solution'
+description: 'Power Platform Branch solution: stage solution into git branch'
+inputs:
+  solution-folder:
+    description: 'Source folder with unpacked solution'
+    required: true
+
+  solution-target-folder:
+    description: 'Target folder in "repo-url" into which to copy the unpacked solution and to create a PR branch for'
+    required: true
+
+  repo-url:
+    description: 'Git repository url where to push the PR branch to; default: "origin" remote repo of workflow'
+    required: false
+
+  repo-token:
+    description: 'Token to git repo. Do NOT checkin token, instead use secrets.GITHUB_TOKEN or create a GitHub secret and reference it here; see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: false
+
+  branch-name:
+    description: 'Branch base name to hold the commited solution; if none given, action will form one like: "<basename-of-solution-target-folder>-<yyyyMMDD-HHmm"'
+    required: false
+
+  working-directory:
+    description: 'Working directory; default: root of repository'
+    required: false
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/branch-solution/index.js'
+  # main: '../out/actions/branch-solution/index.js'

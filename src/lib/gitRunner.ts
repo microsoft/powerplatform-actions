@@ -3,10 +3,9 @@
 import { ExeRunner } from './exeRunner';
 import { Logger } from './logger';
 
-
-export class SopaRunner extends ExeRunner {
+export class GitRunner extends ExeRunner {
 
     public constructor(workingDir: string, logger: Logger) {
-        super(workingDir, logger, 'SolutionPackager.exe', ['sopa', 'content', 'bin', 'coretools']);
+        super(workingDir, logger, 'git');
     }
 }
