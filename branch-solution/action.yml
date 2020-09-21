@@ -15,8 +15,8 @@ inputs:
     description: 'Git repository url where to push the PR branch to; default: "origin" remote repo of workflow'
     required: false
 
-  token:
-    description: 'Token to origin of git repo. Do NOT checkin token, instead create a GitHub secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+  repo-token:
+    description: 'Token to git repo. Do NOT checkin token, instead use secrets.GITHUB_TOKEN or create a GitHub secret and reference it here; see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: false
 
   branch-name:
