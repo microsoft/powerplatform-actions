@@ -1,8 +1,9 @@
 # Power Platform Actions
 
-**PRE-RELEASE SOFTWARE.** The software is a pre-release version. It may not work the way a final version of the software will. We may change it for the final, commercial version. We also may not release a commercial version.
+**PRE-RELEASE SOFTWARE.** The software is a pre-release version. It may not work the way a final version of the software will.
+We may change it for the final, commercial version. We also may not release a commercial version.
 
-This repo provides multiple [GitHub Action](https://help.github.com/en/actions) for Power Platform.
+This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for Power Platform.
 Each GH Power Platform Action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli)
 
 To run tasks from this offering, add the following to your existing Actions workflow; also add the secret `mypassword` to your repo's 'Settings' | 'Secrets'
@@ -34,14 +35,6 @@ To run tasks from this offering, add the following to your existing Actions work
 
 **PRE-RELEASE SOFTWARE.**
 This project will welcome contributions and suggestions in the near future. But in this early preview stage, we're not ready for contributions.
-
-Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
@@ -87,7 +80,7 @@ Run ```npm run dist``` and commit and push the updates in the ```./dist``` folde
 
 ## References
 
-### ADAL
+### ADAL/MSAL
 
 ### CustomerEngagement API
 
@@ -96,6 +89,6 @@ Run ```npm run dist``` and commit and push the updates in the ```./dist``` folde
 - [OrgService](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/org-service/overview)
 - [Org url discovery](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/webapi/discover-url-organization-web-api)
 
-### PowerApp Environemnt (BAP)
+### Power Platform Environment Admin (BAP)
 
 - [Environments Overview](https://docs.microsoft.com/en-us/power-platform/admin/environments-overview)
