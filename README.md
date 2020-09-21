@@ -6,16 +6,21 @@ We may change it for the final, commercial version. We also may not release a co
 This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for Power Platform.
 Each GH Power Platform Action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli)
 
-To run tasks from this offering, add the following to your existing Actions workflow; also add the secret `mypassword` to your repo's 'Settings' | 'Secrets'
+To run tasks from this offering, add the following to your existing Actions workflow; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
 
 ```yaml
+jobs:
+  build:
+
+    runs-on: windows-latest   # For now, only Windows runners are supported.
+
     steps:
     - name: Export Solution
       uses: microsoft/powerplatform-actions/export-solution@v0
       with:
         environment-url: 'https://myenv.crm.dynamics.com'
         user-name: 'me@myenv.onmicrosoft.com'
-        password-secret: ${{ secrets.mypassword }}
+        password-secret: ${{ secrets.MYPASSWORD }}
         solution-name: aSolution
         solution-output-file: 'aSolution.zip'
         working-directory: 'out'
@@ -24,9 +29,16 @@ To run tasks from this offering, add the following to your existing Actions work
       uses: microsoft/powerplatform-actions/unpack-solution@v0
       with:
         solution-file: 'out/aSolution1.zip'
-        solution-folder: 'src/solutions/solution one'
+        solution-folder: 'out/solutions/solution one'
         solution-type: 'Unmanaged'
         overwrite-files: true
+
+    - name: Prepare solution changes for checkin into source control
+      uses: microsoft/powerplatform-actions/branch-solution@v0
+      with:
+        solution-folder: 'out/solutions/solution one'
+        solution-target-folder: 'src/solutions/solution1'
+        token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 [![CI](https://github.com/microsoft/powerplatform-actions/workflows/CI/badge.svg)](https://github.com/microsoft/powerplatform-actions/actions?query=workflow%3ACI)
