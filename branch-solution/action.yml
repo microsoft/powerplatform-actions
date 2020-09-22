@@ -27,6 +27,11 @@ inputs:
     description: 'Working directory; default: root of repository'
     required: false
 
+  allow-empty-commit:
+    description: 'Even if there are no changes in the solution, make a commit and continue this action'
+    required: false
+    default: 'false'
+
 runs:
   using: 'node12'
   main: '../dist/actions/branch-solution/index.js'
