@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, getWorkingDirectory, GitRunner } from '../../lib';
+import { ActionLogger, getInputAsBool, getWorkingDirectory, GitRunner } from '../../lib';
 import { format } from 'date-fns';
 import fs = require('fs-extra');
 import path = require('path');
@@ -26,6 +26,7 @@ const branchNameCand = core.getInput('branch-name', { required: false })
     || path.basename(solutionTargetFolder)
     || 'branch';
 const branchName = `${branchNameCand}-${format(Date.now(), 'yyyyMMdd-HHmm')}`;
+const allowEmpty = getInputAsBool('allow-empty-commit', false, false);
 
 const stagingDir = path.resolve(workingDir, 'staging');
 fs.ensureDirSync(stagingDir);
@@ -73,7 +74,11 @@ const currDir = process.cwd();
     await git.run(['status', '--branch', '--short']);
 
     core.startGroup(`... commit solution into ${branchName} and push to ${repoUrl}`);
-    await git.run(['commit', '-m', `PR for exported solution ${branchName}`]);
+    const commitArgs = ['commit', '-m', `PR for exported solution ${branchName}` ];
+    if (allowEmpty) {
+        commitArgs.push('--allow-empty');
+    }
+    await git.run(commitArgs);
     await git.run(['push', 'origin', branchName]);
 
     process.chdir(currDir);

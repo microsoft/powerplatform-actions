@@ -23450,6 +23450,7 @@ const branchNameCand = core.getInput('branch-name', { required: false })
     || path.basename(solutionTargetFolder)
     || 'branch';
 const branchName = `${branchNameCand}-${date_fns_1.format(Date.now(), 'yyyyMMdd-HHmm')}`;
+const allowEmpty = lib_1.getInputAsBool('allow-empty-commit', false, false);
 const stagingDir = path.resolve(workingDir, 'staging');
 fs.ensureDirSync(stagingDir);
 fs.emptyDirSync(stagingDir);
@@ -23491,7 +23492,11 @@ const currDir = process.cwd();
     yield git.run(['add', solutionTargetFolder]);
     yield git.run(['status', '--branch', '--short']);
     core.startGroup(`... commit solution into ${branchName} and push to ${repoUrl}`);
-    yield git.run(['commit', '-m', `PR for exported solution ${branchName}`]);
+    const commitArgs = ['commit', '-m', `PR for exported solution ${branchName}`];
+    if (allowEmpty) {
+        commitArgs.push('--allow-empty');
+    }
+    yield git.run(commitArgs);
     yield git.run(['push', 'origin', branchName]);
     process.chdir(currDir);
     fs.emptyDirSync(stagingDir);
