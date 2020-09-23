@@ -9,6 +9,8 @@
 *.sh text eol=lf
 
 # LFS config:
+# tar/zipball config:
+# https://docs.github.com/en/github/administering-a-repository/managing-git-lfs-objects-in-archives-of-your-repository
 # Archives
 *.7z filter=lfs diff=lfs merge=lfs -text
 *.br filter=lfs diff=lfs merge=lfs -text
@@ -31,8 +33,8 @@
 *.webp filter=lfs diff=lfs merge=lfs -text
 
 # Executables
-# *.exe filter=lfs diff=lfs merge=lfs -text
-# *.dll filter=lfs diff=lfs merge=lfs -text
-# *.dynlib filter=lfs diff=lfs merge=lfs -text
-# *.pdb filter=lfs diff=lfs merge=lfs -text
-# *.so filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.dynlib filter=lfs diff=lfs merge=lfs -text
+*.pdb filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
