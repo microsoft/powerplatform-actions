@@ -3,10 +3,10 @@
 **PRE-RELEASE SOFTWARE.** The software is a pre-release version. It may not work the way a final version of the software will.
 We may change it for the final, commercial version. We also may not release a commercial version.
 
-This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for Power Platform.
-Each GH Power Platform Action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli)
+This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for the Power Platform.
+Each action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli). Detailed documentation on GitHub actions for Power Platform is available [here](https://aka.ms/poweractionsdocs). 
 
-To run tasks from this offering, add the following to your existing Actions workflow; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
+Sample workflows and detailed instructions are available in our [GitHub actions lab repo](https://github.com/microsoft/powerplatform-actions-lab) but if you are already familiar with GitHub actions and Power Platform solutions, simply add below to your existing workflows; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
 
 ```yaml
 jobs:
