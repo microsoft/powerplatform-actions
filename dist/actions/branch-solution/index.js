@@ -23446,10 +23446,10 @@ if (!repoUrl) {
     repoUrl = url[0].trim();
 }
 const repoToken = core.getInput('repo-token', { required: true });
-const branchNameCand = core.getInput('branch-name', { required: false })
-    || path.basename(solutionTargetFolder)
-    || 'branch';
-const branchName = `${branchNameCand}-${date_fns_1.format(Date.now(), 'yyyyMMdd-HHmm')}`;
+const branchNameCand = core.getInput('branch-name', { required: false });
+const branchName = (!branchNameCand)
+    ? `${path.basename(solutionTargetFolder) || 'branch'}-${date_fns_1.format(Date.now(), 'yyyyMMdd-HHmm')}`
+    : branchNameCand;
 const allowEmpty = lib_1.getInputAsBool('allow-empty-commit', false, false);
 const stagingDir = path.resolve(workingDir, 'staging');
 fs.ensureDirSync(stagingDir);

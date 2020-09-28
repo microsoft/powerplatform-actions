@@ -23,9 +23,10 @@ if (!repoUrl) {
 const repoToken = core.getInput('repo-token', { required: true });
 
 const branchNameCand = core.getInput('branch-name', { required: false })
-    || path.basename(solutionTargetFolder)
-    || 'branch';
-const branchName = `${branchNameCand}-${format(Date.now(), 'yyyyMMdd-HHmm')}`;
+const branchName = (!branchNameCand)
+    ? `${path.basename(solutionTargetFolder) || 'branch'}-${format(Date.now(), 'yyyyMMdd-HHmm')}`
+    : branchNameCand;
+
 const allowEmpty = getInputAsBool('allow-empty-commit', false, false);
 
 const stagingDir = path.resolve(workingDir, 'staging');
