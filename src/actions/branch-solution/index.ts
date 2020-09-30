@@ -28,6 +28,7 @@ const branchName = (!branchNameCand)
     : branchNameCand;
 
 const allowEmpty = getInputAsBool('allow-empty-commit', false, false);
+const clobberBranch = getInputAsBool('clobber-branch', false, false);
 
 const stagingDir = path.resolve(workingDir, 'staging');
 fs.ensureDirSync(stagingDir);
@@ -40,7 +41,7 @@ const currDir = process.cwd();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     process.chdir(stagingDir);
-    core.startGroup('... prepare staging');
+    core.startGroup('... prepare staging branch');
     const git = new GitRunner(stagingDir, logger);
     // to stage the unpacked solution, use a separate repo:
     //  this action runs as part of a GH workflow which runs e.g. a PR in a detached branch
@@ -60,9 +61,12 @@ const currDir = process.cwd();
         }
     });
     if (!head || head.length < 1 || head.length > 1 || !head[0]) {
-        throw Error(`Cannot determine HEAD from remote: ${repoUrl}`);
+        throw new Error(`Cannot determine HEAD from remote: ${repoUrl}`);
     }
     const headBranch = head[0];
+    if (headBranch === branchName) {
+        throw new Error(`Cannot use the default head branch ${headBranch} to stage solution changes!`);
+    }
     await git.run(['checkout', '--progress', '--force', headBranch]);
 
     core.startGroup(`... stage solution into branch ${branchName}`);
@@ -80,7 +84,11 @@ const currDir = process.cwd();
         commitArgs.push('--allow-empty');
     }
     await git.run(commitArgs);
-    await git.run(['push', 'origin', branchName]);
+    const pushArgs = ['push', 'origin', branchName];
+    if (clobberBranch) {
+        pushArgs.push('--force');
+    }
+    await git.run(pushArgs);
 
     process.chdir(currDir);
     fs.emptyDirSync(stagingDir);

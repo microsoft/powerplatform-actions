@@ -32,6 +32,11 @@ inputs:
     required: false
     default: 'false'
 
+  clobber-branch:
+    description: 'If true, the staged changes will clobber any existing changes in the same branch in the origin (central) repo'
+    required: false
+    default: 'false'
+
 runs:
   using: 'node12'
   main: '../dist/actions/branch-solution/index.js'
