@@ -12,6 +12,7 @@ process.env['INPUT_SOLUTION-TARGET-FOLDER'] = path.join('solutions', 'emptySolut
 process.env['INPUT_REPO-TOKEN'] = process.env.GITHUB_TOKEN;
 // process.env['INPUT_BRANCH-NAME'] = 'branch1';
 process.env['INPUT_WORKING-DIRECTORY'] = path.resolve(__dirname, '..', '..', '..', 'out');
+// process.env['INPUT_CLOBBER-BRANCH'] = 'true';
 
 const pathToAction = path.join(__dirname, 'index.js');
 process.env['RUNNER_DEBUG'] = '1';
