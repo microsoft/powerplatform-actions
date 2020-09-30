@@ -23451,6 +23451,7 @@ const branchName = (!branchNameCand)
     ? `${path.basename(solutionTargetFolder) || 'branch'}-${date_fns_1.format(Date.now(), 'yyyyMMdd-HHmm')}`
     : branchNameCand;
 const allowEmpty = lib_1.getInputAsBool('allow-empty-commit', false, false);
+const clobberBranch = lib_1.getInputAsBool('clobber-branch', false, false);
 const stagingDir = path.resolve(workingDir, 'staging');
 fs.ensureDirSync(stagingDir);
 fs.emptyDirSync(stagingDir);
@@ -23460,7 +23461,7 @@ const currDir = process.cwd();
 (() => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     process.chdir(stagingDir);
-    core.startGroup('... prepare staging');
+    core.startGroup('... prepare staging branch');
     const git = new lib_1.GitRunner(stagingDir, logger);
     // to stage the unpacked solution, use a separate repo:
     //  this action runs as part of a GH workflow which runs e.g. a PR in a detached branch
@@ -23480,9 +23481,12 @@ const currDir = process.cwd();
         }
     });
     if (!head || head.length < 1 || head.length > 1 || !head[0]) {
-        throw Error(`Cannot determine HEAD from remote: ${repoUrl}`);
+        throw new Error(`Cannot determine HEAD from remote: ${repoUrl}`);
     }
     const headBranch = head[0];
+    if (headBranch === branchName) {
+        throw new Error(`Cannot use the default head branch ${headBranch} to stage solution changes!`);
+    }
     yield git.run(['checkout', '--progress', '--force', headBranch]);
     core.startGroup(`... stage solution into branch ${branchName}`);
     yield git.run(['checkout', '-B', branchName]);
@@ -23497,7 +23501,11 @@ const currDir = process.cwd();
         commitArgs.push('--allow-empty');
     }
     yield git.run(commitArgs);
-    yield git.run(['push', 'origin', branchName]);
+    const pushArgs = ['push', 'origin', branchName];
+    if (clobberBranch) {
+        pushArgs.push('--force');
+    }
+    yield git.run(pushArgs);
     process.chdir(currDir);
     fs.emptyDirSync(stagingDir);
     core.endGroup();
