@@ -56,7 +56,7 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
         'CAP_ISVExp_Tools_Daily': {
             authenticated: true,
             // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
-            baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/d3fb5788-d047-47f9-9aba-76890f5cecf0/nuget/v3/flat2/'
+            baseUrl: 'https://dev.azure.com/msazure/One/_packaging?_a=package&feed=CAP_ISVExp_Tools_Daily&package=Microsoft.PowerApps.CLI&version=1.3.8-daily-20102005%2Bg75af546&protocolType=NuGet'
         },
     }
 
