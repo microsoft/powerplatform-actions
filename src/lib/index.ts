@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 export { getInputAsBool, getWorkingDirectory } from './actionInput';
+export { Logger } from './logger';
+export { RunnerError } from './exeRunner';
+export { DefaultRunnerFactory, Runner, RunnerFactory } from './runnerFactory';
+
+// TODO: delete exports once all actions are converted:
 export { ActionLogger } from './actionLogger';
 export { GitRunner } from './gitRunner';
-export { Logger } from './logger';
 export { PacAccess } from './pacAccess';
-export { RunnerError } from './exeRunner';
 export { SopaRunner } from './sopaRunner';
