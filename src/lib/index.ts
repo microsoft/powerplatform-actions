@@ -8,5 +8,5 @@ export { DefaultRunnerFactory, Runner, RunnerFactory } from './runnerFactory';
 // TODO: delete exports once all actions are converted:
 export { ActionLogger } from './actionLogger';
 export { GitRunner } from './gitRunner';
-export { PacAccess } from './pacAccess';
+export { PacRunner as PacRunner } from './pacRunner';
 export { SopaRunner } from './sopaRunner';

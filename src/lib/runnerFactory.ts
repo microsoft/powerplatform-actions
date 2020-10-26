@@ -4,7 +4,7 @@
 import { ActionLogger } from "./actionLogger";
 import { GitRunner } from "./gitRunner";
 import { Logger } from "./logger";
-import { PacAccess } from "./pacAccess";
+import { PacRunner } from "./pacRunner";
 import { SopaRunner } from "./sopaRunner";
 
 export interface Runner {
@@ -22,7 +22,7 @@ class RealRunnerFactory implements RunnerFactory {
     getRunner(runnerName: string, workingDir: string): Runner {
         switch (runnerName) {
             case 'pac':
-                return new PacAccess(workingDir, this._logger);
+                return new PacRunner(workingDir, this._logger);
             case 'git':
                 return new GitRunner(workingDir, this._logger);
             case 'sopa':

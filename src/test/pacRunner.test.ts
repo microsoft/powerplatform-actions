@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import { expect } from 'chai';
-import { PacAccess } from '../lib'
+import { PacRunner } from '../lib'
 import path = require('path');
 import fs = require('fs-extra');
 import { TestLog } from './testLog';
 
 describe('PacAccess', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const pac = new PacAccess(workDir, new TestLog('pac-tests.log'));
+    const pac = new PacRunner(workDir, new TestLog('pac-tests.log'));
 
     before(() => {
         fs.emptyDirSync(workDir);
