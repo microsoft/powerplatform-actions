@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, PacAccess } from '../../lib';
+import { ActionLogger, PacRunner } from '../../lib';
 import { exit } from 'process';
 
 core.startGroup('publish-solution:');
@@ -20,7 +20,7 @@ const logger = new ActionLogger();
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    const pac = new PacAccess(workingDir, logger);
+    const pac = new PacRunner(workingDir, logger);
     await pac.run(['auth', 'clear']);
     await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
 
