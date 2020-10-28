@@ -8,29 +8,25 @@ This hand-on lab will give you an opportunity to get hands on with the best prac
 
 You will need to create three environments in your demo or customer tenant.  To do this follow these instructions:
 1.	Login to a tenant that you have access to and that minimum 3GB available capacity which is required to create 3 environments.
-2.	Go to https://admin.powerapps.com , this will take you to the admin center
-3.	Select Environments in the navigation area
+2.	Go to https://admin.powerplatform.microsoft.com, this will take you to the admin center
+3.	Select Environments in the navigation area and click "new"
 
-![Select environment](media/gh-lab-0.30.png "Select environment")
+![Select environment and new environment](media/gh-lab-0.10.png "Select environment and new environment")
 
-4.	Select “+ New Environment” to create your first new environment
-
-![New environment](media/gh-lab-0.40.png "New environment")
-
-5.	The first environment should be named “Your Name – dev”, set the region to “United States (default)”, set the Environment type to “Production” (if available) if not use “Trial”
+4.	The first environment should be named “Your Name – dev”, set the region to “United States (default)”, set the Environment type to “Production” (if available) if not use “Trial”
 
 ![Create environment](media/gh-lab-0.50.png "Create environment")
 
-6.	Select “Create environment”
+5.	Select “Create environment”
 
-7.	Now that your environment has been created select “Create database”
+6.	Now that your environment has been created select “Create database”
 
 ![Select environment](media/gh-lab-0.70.png "Select environment")
 
-8.	Set the Currency to “USD” and Language to “English”, Include the sample apps and data then select “Create database”
+7.	Set the Currency to “USD” and Language to “English”, Include the sample apps and data then select “Create database”
 
 ![Set currency](media/gh-lab-0.80.png "Set currency")
 
-9.	Your development environment has been created, follow steps 4 – 8 above to create a second environment called “Your Name – build” , and then finally, create a third environment called “Your Name – prod” – NOTE the third environment can be a trial environment type.
+8.	Your development environment has been created, follow steps 4 – 8 above to create a second environment called “Your Name – build” , and then finally, create a third environment called “Your Name – prod” – NOTE the third environment can be a trial environment type.
 
-10.	Now you have the environments that we will need for this and ready to begin the next modules of this Hands-on lab
+9.	Now you have the environments that we will need for this and ready to begin the next modules of this Hands-on lab
