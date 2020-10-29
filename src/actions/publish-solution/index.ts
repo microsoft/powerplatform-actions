@@ -1,35 +1,36 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, PacRunner } from '../../lib';
-import { exit } from 'process';
+import { DefaultRunnerFactory, RunnerFactory } from '../../lib';
 
-core.startGroup('publish-solution:');
-const envUrl = core.getInput('environment-url', { required: true });
-const username = core.getInput('user-name', { required: true });
-core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
-
-const password = core.getInput('password-secret', { required: true });
-if (!password || password.length === 0) {
-    core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
-    exit();
-}
-
-const workingDir = process.cwd();
-const logger = new ActionLogger();
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    const pac = new PacRunner(workingDir, logger);
-    await pac.run(['auth', 'clear']);
-    await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+    if (process.env.GITHUB_ACTIONS) {
+        await main(DefaultRunnerFactory);
+    }
+})();
 
-    const publishArgs = ['solution', 'publish'];
-    await pac.run(publishArgs);
-    core.info('published solution customizations');
-    core.endGroup();
+export async function main(factory: RunnerFactory): Promise<void> {
+    try {
+        core.startGroup('publish-solution:');
+        const envUrl = core.getInput('environment-url', { required: true });
+        const username = core.getInput('user-name', { required: true });
+        core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
 
-})().catch(error => {
-    core.setFailed(`failed: ${error}`);
-    core.endGroup();
-});
+        const password = core.getInput('password-secret', { required: true });
+        if (!password || password.length === 0) {
+            return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
+        }
+
+        const pac = factory.getRunner('pac', process.cwd());
+        await pac.run(['auth', 'clear']);
+        await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+
+        const publishArgs = ['solution', 'publish'];
+        await pac.run(publishArgs);
+        core.info('published solution customizations');
+        core.endGroup();
+    } catch (error) {
+        core.setFailed(`failed: ${error.message}`);
+        throw error;
+    }
+}

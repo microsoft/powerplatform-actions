@@ -343,35 +343,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.main = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __webpack_require__(186);
 const lib_1 = __webpack_require__(806);
-const process_1 = __webpack_require__(765);
-core.startGroup('publish-solution:');
-const envUrl = core.getInput('environment-url', { required: true });
-const username = core.getInput('user-name', { required: true });
-core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
-const password = core.getInput('password-secret', { required: true });
-if (!password || password.length === 0) {
-    core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
-    process_1.exit();
-}
-const workingDir = process.cwd();
-const logger = new lib_1.ActionLogger();
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const pac = new lib_1.PacAccess(workingDir, logger);
-    yield pac.run(['auth', 'clear']);
-    yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
-    const publishArgs = ['solution', 'publish'];
-    yield pac.run(publishArgs);
-    core.info('published solution customizations');
-    core.endGroup();
-}))().catch(error => {
-    core.setFailed(`failed: ${error}`);
-    core.endGroup();
-});
+    if (process.env.GITHUB_ACTIONS) {
+        yield main(lib_1.DefaultRunnerFactory);
+    }
+}))();
+function main(factory) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            core.startGroup('publish-solution:');
+            const envUrl = core.getInput('environment-url', { required: true });
+            const username = core.getInput('user-name', { required: true });
+            core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
+            const password = core.getInput('password-secret', { required: true });
+            if (!password || password.length === 0) {
+                return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
+            }
+            const pac = factory.getRunner('pac', process.cwd());
+            yield pac.run(['auth', 'clear']);
+            yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+            const publishArgs = ['solution', 'publish'];
+            yield pac.run(publishArgs);
+            core.info('published solution customizations');
+            core.endGroup();
+        }
+        catch (error) {
+            core.setFailed(`failed: ${error.message}`);
+            throw error;
+        }
+    });
+}
+exports.main = main;
 
 //# sourceMappingURL=index.js.map
 
@@ -570,20 +577,23 @@ exports.GitRunner = GitRunner;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SopaRunner = exports.RunnerError = exports.PacAccess = exports.GitRunner = exports.ActionLogger = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
+exports.SopaRunner = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 var actionInput_1 = __webpack_require__(434);
 Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
 Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
+var exeRunner_1 = __webpack_require__(21);
+Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
+var runnerFactory_1 = __webpack_require__(147);
+Object.defineProperty(exports, "DefaultRunnerFactory", ({ enumerable: true, get: function () { return runnerFactory_1.DefaultRunnerFactory; } }));
+// TODO: delete exports once all actions are converted:
 var actionLogger_1 = __webpack_require__(970);
 Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
 var gitRunner_1 = __webpack_require__(973);
 Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
-var pacAccess_1 = __webpack_require__(399);
-Object.defineProperty(exports, "PacAccess", ({ enumerable: true, get: function () { return pacAccess_1.PacAccess; } }));
-var exeRunner_1 = __webpack_require__(21);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
+var pacRunner_1 = __webpack_require__(366);
+Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
 var sopaRunner_1 = __webpack_require__(653);
 Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
 
@@ -592,23 +602,59 @@ Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function 
 
 /***/ }),
 
-/***/ 399:
+/***/ 366:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PacAccess = void 0;
+exports.PacRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __webpack_require__(21);
-class PacAccess extends exeRunner_1.ExeRunner {
+class PacRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
         super(workingDir, logger, 'pac.exe', ['pac', 'tools']);
     }
 }
-exports.PacAccess = PacAccess;
+exports.PacRunner = PacRunner;
 
-//# sourceMappingURL=pacAccess.js.map
+//# sourceMappingURL=pacRunner.js.map
+
+
+/***/ }),
+
+/***/ 147:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DefaultRunnerFactory = void 0;
+const actionLogger_1 = __webpack_require__(970);
+const gitRunner_1 = __webpack_require__(973);
+const pacRunner_1 = __webpack_require__(366);
+const sopaRunner_1 = __webpack_require__(653);
+class RealRunnerFactory {
+    constructor() {
+        this._logger = new actionLogger_1.ActionLogger();
+    }
+    getRunner(runnerName, workingDir) {
+        switch (runnerName) {
+            case 'pac':
+                return new pacRunner_1.PacRunner(workingDir, this._logger);
+            case 'git':
+                return new gitRunner_1.GitRunner(workingDir, this._logger);
+            case 'sopa':
+                return new sopaRunner_1.SopaRunner(workingDir, this._logger);
+            default:
+                throw new Error(`Unknown runner type requested: ${runnerName}`);
+        }
+    }
+}
+exports.DefaultRunnerFactory = new RealRunnerFactory();
+
+//# sourceMappingURL=runnerFactory.js.map
 
 
 /***/ }),
@@ -652,13 +698,6 @@ module.exports = require("os");
 /***/ ((module) => {
 
 module.exports = require("path");
-
-/***/ }),
-
-/***/ 765:
-/***/ ((module) => {
-
-module.exports = require("process");
 
 /***/ })
 

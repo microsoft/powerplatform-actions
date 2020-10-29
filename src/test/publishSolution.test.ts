@@ -4,11 +4,11 @@ import path = require('path');
 import { forEachOf } from 'async';
 import { expect } from 'chai';
 
-import { main as whoAmI } from '../actions/who-am-i';
+import { main as publishSolution } from '../actions/publish-solution';
 import { MockedRunners } from './mockedRunners';
 import { ActionInputsEmulator } from './actionInputsEmulator';
 
-describe('who-am-i#input validation', () => {
+describe('publish-solution#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
     const mockFactory: MockedRunners = new MockedRunners(workDir);
     // TODO: read in params and their required state from the action.yml
@@ -24,7 +24,7 @@ describe('who-am-i#input validation', () => {
             actionInputs.defineInputsExcept(inputParam.Name);
             let res, err;
             try {
-                res = await whoAmI(mockFactory);
+                res = await publishSolution(mockFactory);
             }
             catch (error) {
                 err = error;
@@ -38,7 +38,7 @@ describe('who-am-i#input validation', () => {
         actionInputs.defineInputs();
         let err;
         try {
-            await whoAmI(mockFactory);
+            await publishSolution(mockFactory);
         }
         catch (error) {
             err = error;
@@ -46,6 +46,6 @@ describe('who-am-i#input validation', () => {
         expect(err).to.be.undefined;
         const loggedCommands = mockFactory.loggedCommands;
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--url', 'aUrl', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'org', 'who' ] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'solution', 'publish' ] });
     });
 });
