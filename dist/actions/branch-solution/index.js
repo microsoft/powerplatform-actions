@@ -23718,20 +23718,23 @@ exports.GitRunner = GitRunner;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SopaRunner = exports.RunnerError = exports.PacAccess = exports.GitRunner = exports.ActionLogger = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
+exports.SopaRunner = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 var actionInput_1 = __webpack_require__(1434);
 Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
 Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
+var exeRunner_1 = __webpack_require__(7021);
+Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
+var runnerFactory_1 = __webpack_require__(7147);
+Object.defineProperty(exports, "DefaultRunnerFactory", ({ enumerable: true, get: function () { return runnerFactory_1.DefaultRunnerFactory; } }));
+// TODO: delete exports once all actions are converted:
 var actionLogger_1 = __webpack_require__(3970);
 Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
 var gitRunner_1 = __webpack_require__(5973);
 Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
-var pacAccess_1 = __webpack_require__(4399);
-Object.defineProperty(exports, "PacAccess", ({ enumerable: true, get: function () { return pacAccess_1.PacAccess; } }));
-var exeRunner_1 = __webpack_require__(7021);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
+var pacRunner_1 = __webpack_require__(7366);
+Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
 var sopaRunner_1 = __webpack_require__(3653);
 Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
 
@@ -23740,24 +23743,61 @@ Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function 
 
 /***/ }),
 
-/***/ 4399:
+/***/ 7366:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PacAccess = void 0;
+exports.PacRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __webpack_require__(7021);
-class PacAccess extends exeRunner_1.ExeRunner {
+class PacRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
         super(workingDir, logger, 'pac.exe', ['pac', 'tools']);
     }
 }
-exports.PacAccess = PacAccess;
+exports.PacRunner = PacRunner;
 
-//# sourceMappingURL=pacAccess.js.map
+//# sourceMappingURL=pacRunner.js.map
+
+
+/***/ }),
+
+/***/ 7147:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DefaultRunnerFactory = void 0;
+const actionLogger_1 = __webpack_require__(3970);
+const gitRunner_1 = __webpack_require__(5973);
+const pacRunner_1 = __webpack_require__(7366);
+const sopaRunner_1 = __webpack_require__(3653);
+class RealRunnerFactory {
+    constructor() {
+        this._logger = new actionLogger_1.ActionLogger();
+    }
+    getRunner(runnerName, workingDir) {
+        switch (runnerName) {
+            case 'pac':
+                return new pacRunner_1.PacRunner(workingDir, this._logger);
+            case 'git':
+                return new gitRunner_1.GitRunner(workingDir, this._logger);
+            case 'sopa':
+                return new sopaRunner_1.SopaRunner(workingDir, this._logger);
+            default:
+                throw new Error(`Unknown runner type requested: ${runnerName}`);
+        }
+    }
+}
+exports.DefaultRunnerFactory = new RealRunnerFactory();
+
+//# sourceMappingURL=runnerFactory.js.map
 
 
 /***/ }),
