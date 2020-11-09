@@ -86,3 +86,11 @@ jobs:
         environment-url: 'https://davidjenD365-1.crm.dynamics.com'
         user-name: 'davidjen@davidjenD365.onmicrosoft.com'
         password-secret: ${{ secrets.password }}
+
+    - name: Test upgrade-solution action
+      uses: ./upgrade-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        solution-name: emptySolution
