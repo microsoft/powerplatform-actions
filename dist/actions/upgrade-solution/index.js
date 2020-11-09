@@ -432,7 +432,7 @@ function main(factory) {
             const pac = factory.getRunner('pac', process.cwd());
             yield pac.run(['auth', 'clear']);
             yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
-            const upgradeArgs = ['solution', 'upgrade', '--name', solutionName];
+            const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
             yield pac.run(upgradeArgs);
             core.info('upgraded solution');
             core.endGroup();
