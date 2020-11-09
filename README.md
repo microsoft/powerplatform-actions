@@ -40,6 +40,14 @@ jobs:
         user-name: 'me@myenv.onmicrosoft.com'
         password-secret: ${{ secrets.MYPASSWORD }}
 
+    - name: Upgrade Solution
+      uses: microsoft/powerplatform-actions/upgrade-solution@v0
+      with:
+        environment-url: 'https://myenv.crm.dynamics.com'
+        user-name: 'me@myenv.onmicrosoft.com'
+        password-secret: ${{ secrets.MYPASSWORD }}
+        solution-name: aSolution
+
     - name: Prepare solution changes for checkin into source control
       uses: microsoft/powerplatform-actions/branch-solution@v0
       with:
