@@ -47,6 +47,6 @@ describe('upgrade-solution#input validation', () => {
         expect(err).to.be.undefined;
         const loggedCommands = mockFactory.loggedCommands;
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--url', 'aUrl', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'solution', 'upgrade', '--name', 'emptySolution' ] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'solution', 'upgrade', '--solution-name', 'emptySolution' ] });
     });
 });

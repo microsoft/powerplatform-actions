@@ -28,7 +28,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         await pac.run(['auth', 'clear']);
         await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
 
-        const upgradeArgs = ['solution', 'upgrade', '--name', solutionName];
+        const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
         await pac.run(upgradeArgs);
         core.info('upgraded solution');
         core.endGroup();
