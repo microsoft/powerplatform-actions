@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { DefaultRunnerFactory, RunnerFactory } from '../../lib';
+import { DefaultRunnerFactory, getInputAsBool, RunnerFactory } from '../../lib';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
@@ -24,11 +24,17 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const solutionName = core.getInput('solution-name', { required: true });
         core.info(`solution: ${solutionName}`);
 
+        const performAsync = getInputAsBool('async', false, false);
+        const maxAsyncWaitTime = core.getInput('max-async-wait-time', { required: false });
+
         const pac = factory.getRunner('pac', process.cwd());
         await pac.run(['auth', 'clear']);
         await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
 
         const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
+        if (performAsync) { upgradeArgs.push('--async'); }
+        if (maxAsyncWaitTime) { upgradeArgs.push('--max-async-wait-time', maxAsyncWaitTime); }
+
         await pac.run(upgradeArgs);
         core.info('upgraded solution');
         core.endGroup();

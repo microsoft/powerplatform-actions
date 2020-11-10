@@ -13,6 +13,8 @@ if (!password || password.length === 0) {
 }
 process.env['INPUT_PASSWORD-SECRET'] = password;
 process.env['INPUT_SOLUTION-NAME'] = 'emptySolution';
+process.env['INPUT_ASYNC'] = 'false';
+process.env['INPUT_MAX-ASYNC-WAIT-TIME'] = '60';
 
 process.env['RUNNER_DEBUG'] = '1';
 process.env['GITHUB_ACTIONS'] = '1';

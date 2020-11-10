@@ -19,6 +19,14 @@ inputs:
     description: 'Name of solution to upgrade'
     required: true
 
+  async:
+    description: 'Upgrades solution asynchronously'
+    required: false
+
+  max-async-wait-time:
+    description: 'Max asynchronous wait time in minutes. Default value is 60 mintues'
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/upgrade-solution/index.js'
