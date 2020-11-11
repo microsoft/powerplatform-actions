@@ -91,4 +91,3 @@ jobs:
       uses: ./update-solution-version
       with:
         solution-patch-version: '10'
-        solution-version-update-strategy: 'solution'
