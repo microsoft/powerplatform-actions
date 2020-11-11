@@ -33,6 +33,13 @@ jobs:
         solution-type: 'Unmanaged'
         overwrite-files: true
 
+    - name: Update Solution Version
+      uses: microsoft/powerplatform-actions/update-solution-version@v0
+      with:
+        solution-patch-version: '10'
+        solution-version-update-strategy: 'solution'
+        solution-patch-version-file: 'controlsStateVersionInfo.csv'
+
     - name: Publish Solution
       uses: microsoft/powerplatform-actions/publish-solution@v0
       with:
