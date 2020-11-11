@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import process = require('process');\
+import process = require('process');
 import { DefaultRunnerFactory } from '../../lib';
 import { main } from './index';
 
