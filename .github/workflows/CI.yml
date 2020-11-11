@@ -86,3 +86,9 @@ jobs:
         environment-url: 'https://davidjenD365-1.crm.dynamics.com'
         user-name: 'davidjen@davidjenD365.onmicrosoft.com'
         password-secret: ${{ secrets.password }}
+
+    - name: Test update-solution-version action
+      uses: ./update-solution-version
+      with:
+        solution-patch-version: '10'
+        solution-version-update-strategy: 'solution'
