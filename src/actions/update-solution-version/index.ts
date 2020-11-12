@@ -13,14 +13,25 @@ import path = require('path');
 export async function main(factory: RunnerFactory): Promise<void> {
     try {
         core.startGroup('update-solution-version:');
-        const solutionPatchVersion = core.getInput('solution-patch-version', { required: true });
-        const solutionVersionUpdateStrategy = core.getInput('solution-version-update-strategy', { required: true });
+        const solutionPatchVersion = core.getInput('solution-patch-version', { required: false });
+        const solutionVersionUpdateStrategy = core.getInput('solution-version-update-strategy', { required: false });
 
-        core.info(`solutionPatchVersion: ${solutionPatchVersion}; solutionVersionUpdateStrategy: ${solutionVersionUpdateStrategy}`);
+        if (!!solutionPatchVersion === !!solutionVersionUpdateStrategy) {
+            const error = new Error('Either provide solution-patch-version or solution-version-update-strategy');
+            core.setFailed(error);
+            throw error;
+        }
 
         const pac = factory.getRunner('pac', process.cwd());
+        const updateSolutionVersionArgs = ['solution', 'version'];
 
-        const updateSolutionVersionArgs = ['solution', 'version', '--patchversion', solutionPatchVersion, '--strategy', solutionVersionUpdateStrategy];
+        if (solutionPatchVersion) {
+            updateSolutionVersionArgs.push('--patchversion', solutionPatchVersion);
+        }
+
+        if (solutionVersionUpdateStrategy) {
+            updateSolutionVersionArgs.push('--strategy', solutionVersionUpdateStrategy);
+        }
 
         const workingDir = getWorkingDirectory('working-directory', false);
         const solutionPatchVersionFileCandidate = core.getInput('solution-patch-version-file', { required: false });

@@ -5,11 +5,11 @@ description: 'Power Platform Update Solution Version'
 inputs:
   solution-patch-version:
     description: 'Patch version for solution'
-    required: true
+    required: false
 
   solution-version-update-strategy:
     description: 'Strategy to update patch version for Solution.xml file: "gittags", "filetracking" or "solution"'
-    required: true
+    required: false
 
   solution-patch-version-file:
     description: 'Name of Tracker CSV file to be used when using filetracking as a strategy. Default value is ControlsStateVersionInfo.csv'
