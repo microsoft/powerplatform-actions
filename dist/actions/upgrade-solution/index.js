@@ -430,16 +430,16 @@ function main(factory) {
             const solutionName = core.getInput('solution-name', { required: true });
             core.info(`solution: ${solutionName}`);
             const performAsync = lib_1.getInputAsBool('async', false, false);
-            const maxAsyncWaitTime = core.getInput('max-async-wait-time', { required: false });
             const pac = factory.getRunner('pac', process.cwd());
             yield pac.run(['auth', 'clear']);
             yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
             const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
             if (performAsync) {
                 upgradeArgs.push('--async');
-            }
-            if (maxAsyncWaitTime) {
-                upgradeArgs.push('--max-async-wait-time', maxAsyncWaitTime);
+                const maxAsyncWaitTime = core.getInput('max-async-wait-time', { required: false });
+                if (maxAsyncWaitTime) {
+                    upgradeArgs.push('--max-async-wait-time', maxAsyncWaitTime);
+                }
             }
             yield pac.run(upgradeArgs);
             core.info('upgraded solution');

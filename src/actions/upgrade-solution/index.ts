@@ -25,15 +25,18 @@ export async function main(factory: RunnerFactory): Promise<void> {
         core.info(`solution: ${solutionName}`);
 
         const performAsync = getInputAsBool('async', false, false);
-        const maxAsyncWaitTime = core.getInput('max-async-wait-time', { required: false });
 
         const pac = factory.getRunner('pac', process.cwd());
         await pac.run(['auth', 'clear']);
         await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
 
         const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
-        if (performAsync) { upgradeArgs.push('--async'); }
-        if (maxAsyncWaitTime) { upgradeArgs.push('--max-async-wait-time', maxAsyncWaitTime); }
+        if (performAsync) {
+            upgradeArgs.push('--async');
+
+            const maxAsyncWaitTime = core.getInput('max-async-wait-time', { required: false });
+            if (maxAsyncWaitTime) { upgradeArgs.push('--max-async-wait-time', maxAsyncWaitTime); }
+        }
 
         await pac.run(upgradeArgs);
         core.info('upgraded solution');
