@@ -5,7 +5,7 @@ import { forEachOf } from 'async';
 import { expect } from 'chai';
 
 import { main as whoAmI } from '../actions/who-am-i';
-import { LoggedCommands, MockedRunners } from './mockedRunners';
+import { MockedRunners } from './mockedRunners';
 import { ActionInputsEmulator } from './actionInputsEmulator';
 
 describe('who-am-i#input validation', () => {

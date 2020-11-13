@@ -18,5 +18,8 @@
   "verbPlugin": "on",
   "verbPcfPush": "on",
   "verbPortal": "on",
-  "treatValidationErrorsAsWarnings": "off"
+  "treatValidationErrorsAsWarnings": "off",
+  "moduleAdmin": "on",
+  "verbSolutionUpgrade": "on",
+  "verbSolutionPublish": "on"
 }

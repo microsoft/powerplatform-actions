@@ -4,7 +4,7 @@
 We may change it for the final, commercial version. We also may not release a commercial version.
 
 This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for the Power Platform.
-Each action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli). Detailed documentation on GitHub actions for Power Platform is available [here](https://aka.ms/poweractionsdocs). 
+Each action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli). Detailed documentation on GitHub actions for Power Platform is available [here](https://aka.ms/poweractionsdocs).
 
 Sample workflows and detailed instructions are available in our [GitHub actions lab repo](https://github.com/microsoft/powerplatform-actions-lab) but if you are already familiar with GitHub actions and Power Platform solutions, simply add below to your existing workflows; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
 
@@ -32,6 +32,13 @@ jobs:
         solution-folder: 'out/solutions/solution one'
         solution-type: 'Unmanaged'
         overwrite-files: true
+
+    - name: Publish Solution
+      uses: microsoft/powerplatform-actions/publish-solution@v0
+      with:
+        environment-url: 'https://myenv.crm.dynamics.com'
+        user-name: 'me@myenv.onmicrosoft.com'
+        password-secret: ${{ secrets.MYPASSWORD }}
 
     - name: Prepare solution changes for checkin into source control
       uses: microsoft/powerplatform-actions/branch-solution@v0

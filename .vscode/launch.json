@@ -37,7 +37,7 @@
             "cwd": "${workspaceFolder}",
             "outFiles": ["${workspaceFolder}/out/**/*.js"],
             "preLaunchTask": "gulp: compile",
-            "sourceMaps": true,
+            "sourceMaps": true
         },
         {
             "type": "node",
@@ -56,7 +56,7 @@
             "cwd": "${workspaceFolder}",
             "outFiles": ["${workspaceFolder}/out/**/*.js"],
             "preLaunchTask": "gulp: compile",
-            "sourceMaps": true,
+            "sourceMaps": true
         },
         {
             "type": "node",
