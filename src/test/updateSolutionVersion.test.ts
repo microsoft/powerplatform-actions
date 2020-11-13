@@ -23,11 +23,11 @@ describe('update-solution-version#input validation', () => {
             err = error;
         }
         expect(res).to.be.undefined;
-        expect(err.message).to.match(new RegExp('Either provide solution-patch-version or solution-version-update-strategy'));
+        expect(err.message).to.match(new RegExp("Input 'patch-version': not allowed with input 'strategy'"));
     });
 
-    it('call action with solution-patch-version', async() => {
-        const actionInputs = new ActionInputsEmulator([{ Name: 'solution-patch-version', Value: '10' }]);
+    it('call action with patch-version', async() => {
+        const actionInputs = new ActionInputsEmulator([{ Name: 'patch-version', Value: '10' }]);
         actionInputs.defineInputs();
         let err;
         try {

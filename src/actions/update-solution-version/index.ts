@@ -13,11 +13,11 @@ import path = require('path');
 export async function main(factory: RunnerFactory): Promise<void> {
     try {
         core.startGroup('update-solution-version:');
-        const solutionPatchVersion = core.getInput('solution-patch-version', { required: false });
-        const solutionVersionUpdateStrategy = core.getInput('solution-version-update-strategy', { required: false });
+        const patchVersion = core.getInput('patch-version', { required: false });
+        const strategy = core.getInput('strategy', { required: false });
 
-        if (!!solutionPatchVersion === !!solutionVersionUpdateStrategy) {
-            const error = new Error('Either provide solution-patch-version or solution-version-update-strategy');
+        if (!!patchVersion === !!strategy) {
+            const error = new Error("Input 'patch-version': not allowed with input 'strategy'");
             core.setFailed(error);
             throw error;
         }
@@ -25,22 +25,22 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const pac = factory.getRunner('pac', process.cwd());
         const updateSolutionVersionArgs = ['solution', 'version'];
 
-        if (solutionPatchVersion) {
-            updateSolutionVersionArgs.push('--patchversion', solutionPatchVersion);
+        if (patchVersion) {
+            updateSolutionVersionArgs.push('--patchversion', patchVersion);
         }
 
-        if (solutionVersionUpdateStrategy) {
-            updateSolutionVersionArgs.push('--strategy', solutionVersionUpdateStrategy);
+        if (strategy) {
+            updateSolutionVersionArgs.push('--strategy', strategy);
         }
 
         const workingDir = getWorkingDirectory('working-directory', false);
-        const solutionPatchVersionFileCandidate = core.getInput('solution-patch-version-file', { required: false });
-        if (solutionPatchVersionFileCandidate) {
-            const solutionPatchVersionFile = path.isAbsolute(solutionPatchVersionFileCandidate)
-                ? solutionPatchVersionFileCandidate
-                : path.resolve(workingDir, solutionPatchVersionFileCandidate);
+        const trackerFileCandidate = core.getInput('tracker-file', { required: false });
+        if (trackerFileCandidate) {
+            const trackerFile = path.isAbsolute(trackerFileCandidate)
+                ? trackerFileCandidate
+                : path.resolve(workingDir, trackerFileCandidate);
 
-            updateSolutionVersionArgs.push('--filename', solutionPatchVersionFile);
+            updateSolutionVersionArgs.push('--filename', trackerFile);
         }
 
         await pac.run(updateSolutionVersionArgs);
