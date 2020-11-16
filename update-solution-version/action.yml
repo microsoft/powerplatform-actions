@@ -1,0 +1,21 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'update-solution-version'
+description: 'Power Platform Update Solution Version'
+inputs:
+  patch-version:
+    description: 'Patch version for solution'
+    required: false
+
+  strategy:
+    description: 'Strategy to update patch version for Solution.xml file: "gittags", "filetracking" or "solution"'
+    required: false
+
+  tracker-file:
+    description: 'Name of Tracker CSV file to be used when using filetracking as a strategy. Default value is ControlsStateVersionInfo.csv'
+    required: false
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/update-solution-version/index.js'
+  # main: '../out/actions/update-solution-version/index.js'
