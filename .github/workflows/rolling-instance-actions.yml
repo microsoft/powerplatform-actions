@@ -1,5 +1,5 @@
 # actions workflow for PRs
-name: actions
+name: rolling-instance-actions
 
 on:
   pull_request:
