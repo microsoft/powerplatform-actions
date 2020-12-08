@@ -1,12 +1,12 @@
-# CI workflow on pull request to main
-name: CI
+# workflow on pull request to main
+name: pull-request-validation
 
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: windows-latest
     env:
       RUNNER_DEBUG: 1
