@@ -1,8 +1,8 @@
-# CI workflow for merges to master
+# CI workflow on pull request to main
 name: CI
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -27,3 +27,17 @@ jobs:
         npm run ci
       env:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
+
+    - name: Test who-am-i action
+      uses: ./who-am-i
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+
+    - name: Test pack-solution action
+      uses: ./pack-solution
+      with:
+        solution-folder: 'src/test/data/emptySolution'
+        solution-file: 'out/CI/emptySolution.zip'
+        solution-type: 'Unmanaged'

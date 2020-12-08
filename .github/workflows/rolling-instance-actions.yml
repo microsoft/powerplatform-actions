@@ -1,8 +1,8 @@
-# actions workflow for PRs
+# Actions workflow for merges to main
 name: rolling-instance-actions
 
 on:
-  pull_request:
+  push:
     branches: [ main ]
 
 jobs:
@@ -15,20 +15,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         lfs: true
-
-    - name: Test who-am-i action
-      uses: ./who-am-i
-      with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
-
-    - name: Test pack-solution action
-      uses: ./pack-solution
-      with:
-        solution-folder: 'src/test/data/emptySolution'
-        solution-file: 'out/CI/emptySolution.zip'
-        solution-type: 'Unmanaged'
 
     - name: Test import-solution action
       uses: ./import-solution
