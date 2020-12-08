@@ -70,7 +70,6 @@ jobs:
     - name: Test create-environment action
       uses: ./create-environment
       with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
         user-name: 'davidjen@davidjenD365.onmicrosoft.com'
         password-secret: ${{ secrets.password }}
         name: newEnvironment

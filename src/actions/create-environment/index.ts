@@ -11,11 +11,8 @@ import { DefaultRunnerFactory, RunnerFactory } from '../../lib';
 
 export async function main(factory: RunnerFactory): Promise<void> {
     try {
-        core.startGroup('create-environment');
-        const envUrl = core.getInput('environment-url', { required: true });
+        core.startGroup('create-environment:');
         const username = core.getInput('user-name', { required: true });
-        core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
-
         const password = core.getInput('password-secret', { required: true });
         if (!password || password.length === 0) {
             return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
@@ -26,7 +23,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const envType = core.getInput('type', {required: true});
 
         const pac = factory.getRunner('pac', process.cwd());
-        await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+        await pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType];
         await pac.run(createEnvironmentArgs);
