@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "clean": "scorch",
-    "build": "gulp",
-    "test": "gulp test",
+    "build": "node node_modules/gulp/bin/gulp.js",
+    "test": "node node_modules/gulp/bin/gulp.js test",
     "ci": "node node_modules/gulp/bin/gulp.js ci",
-    "dist": "gulp recompile && gulp dist && git add -f -- ./dist"
+    "dist": "node node_modules/gulp/bin/gulp.js recompile && node node_modules/gulp/bin/gulp.js dist && git add -f -- ./dist"
   },
   "author": "PowerApps-ISV-Tools",
   "license": "MIT",
