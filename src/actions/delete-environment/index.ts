@@ -23,20 +23,11 @@ export async function main(factory: RunnerFactory): Promise<void> {
             return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
         }
 
-        const performAsync = getInputAsBool('async', false, false);
-
         const pac = factory.getRunner('pac', process.cwd());
         await pac.run(['auth', 'clear']);
-        await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+        pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
-        if (performAsync) {
-            deleteEnvArgs.push('--async');
-
-            const maxAsyncWaitTime = core.getInput('max-async-wait-time', { required: false });
-            if (maxAsyncWaitTime) { deleteEnvArgs.push('--max-async-wait-time', maxAsyncWaitTime); }
-        }
-
         await pac.run(deleteEnvArgs);
         core.info('delete environment');
         core.endGroup();
