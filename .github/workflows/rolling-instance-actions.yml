@@ -2,6 +2,7 @@
 name: rolling-instance-actions
 
 on:
+  workflow_dispatch:    # allow for manual workflow triggering as needed
   push:
     branches: [ main ]
 
