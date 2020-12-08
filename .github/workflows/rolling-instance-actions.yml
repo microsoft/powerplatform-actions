@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  actions:
+  instance-actions:
     runs-on: windows-latest
     env:
       RUNNER_DEBUG: 1
