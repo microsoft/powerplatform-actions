@@ -1,0 +1,60 @@
+# Actions workflow for merges to main
+name: rolling-instance-actions
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  actions:
+    runs-on: windows-latest
+    env:
+      RUNNER_DEBUG: 1
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    - name: Test import-solution action
+      uses: ./import-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        solution-file: 'out/CI/emptySolution.zip'
+        force-overwrite: true
+
+    - name: Test export-solution action
+      uses: ./export-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        solution-name: emptySolution
+        solution-output-file: 'solution1.zip'
+        working-directory: 'out/CI'
+
+    - name: Test unpack-solution action
+      uses: ./unpack-solution
+      with:
+        solution-file: 'out/CI/solution1.zip'
+        solution-folder: 'out/CI/solution one'
+        solution-type: 'Unmanaged'
+        overwrite-files: true
+
+    - name: Test clone-solution action
+      uses: ./clone-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        solution-name: emptySolution
+        target-folder: 'out/CI/cloned'
+
+    - name: Test publish-solution action
+      uses: ./publish-solution
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
