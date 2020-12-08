@@ -16,6 +16,13 @@ jobs:
       with:
         lfs: true
 
+    - name: Test pack-solution action
+      uses: ./pack-solution
+      with:
+        solution-folder: 'src/test/data/emptySolution'
+        solution-file: 'out/CI/emptySolution.zip'
+        solution-type: 'Unmanaged'
+
     - name: Test import-solution action
       uses: ./import-solution
       with:
