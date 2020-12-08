@@ -2,6 +2,7 @@
 name: rolling-instance-actions
 
 on:
+  workflow_dispatch:    # allow for manual workflow triggering as needed
   push:
     branches: [ main ]
 
@@ -15,6 +16,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         lfs: true
+
+    - name: Test pack-solution action
+      uses: ./pack-solution
+      with:
+        solution-folder: 'src/test/data/emptySolution'
+        solution-file: 'out/CI/emptySolution.zip'
+        solution-type: 'Unmanaged'
 
     - name: Test import-solution action
       uses: ./import-solution
