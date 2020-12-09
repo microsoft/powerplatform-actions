@@ -392,7 +392,7 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 274:
+/***/ 18:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -419,19 +419,20 @@ const lib_1 = __webpack_require__(806);
 function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.startGroup('who-am-i');
-            const envUrl = core.getInput('environment-url', { required: true });
+            core.startGroup('create-environment:');
             const username = core.getInput('user-name', { required: true });
-            core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
             const password = core.getInput('password-secret', { required: true });
             if (!password || password.length === 0) {
                 return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
             }
+            const envName = core.getInput('name', { required: true });
+            const envRegion = core.getInput('region', { required: true });
+            const envType = core.getInput('type', { required: true });
             const pac = factory.getRunner('pac', process.cwd());
             yield pac.run(['auth', 'clear']);
-            yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
-            const whoArgs = ['org', 'who'];
-            yield pac.run(whoArgs);
+            yield pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
+            const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType];
+            yield pac.run(createEnvironmentArgs);
             core.endGroup();
         }
         catch (error) {
@@ -808,6 +809,6 @@ module.exports = require("path");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(274);
+/******/ 	return __webpack_require__(18);
 /******/ })()
 ;

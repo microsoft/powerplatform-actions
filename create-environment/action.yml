@@ -1,0 +1,50 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'create-environment'
+description: 'Power Platform Admin Create Environment'
+inputs:
+  user-name:
+    description: 'Power Platform user name, e.g. myname@my-org.onmicrosoft.com'
+    required: true
+
+  password-secret:
+    description: 'Power Platform password. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: true
+
+  name:
+    description: 'The name of the environment you are creating.'
+    required: true
+
+  region:
+    description: 'The name of the region for your environment.'
+    required: true
+    default: 'unitedstates'
+
+  type:
+    description: 'The type of environment (Trial, Sandbox, Production, SubscriptionBasedTrial).'
+    required: true
+    default: 'Sandbox'
+
+  currency:
+    description: 'The currency to use for the environment.'
+    required: false
+    default: 'USD'
+
+  language:
+    description: 'The language to use for the environment.'
+    required: false
+    default: 'English'
+
+  templates:
+    description: 'The Dynamics 365 that needs to be deployed to the environment. Passed as comma separated values.'
+    required: false
+
+  domain:
+    description: 'The domain name of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
+    required: false
+
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/create-environment/index.js'
+  # main: '../out/actions/create-environment/index.js'
