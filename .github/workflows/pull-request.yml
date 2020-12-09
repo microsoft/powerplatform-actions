@@ -1,0 +1,43 @@
+# workflow on pull request to main
+name: pull-request-validation
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    env:
+      RUNNER_DEBUG: 1
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 12.x
+
+    - name: Build and test
+      run: |
+        npm i
+        npm run ci
+      env:
+        AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
+
+    - name: Test who-am-i action
+      uses: ./who-am-i
+      with:
+        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+
+    - name: Test pack-solution action
+      uses: ./pack-solution
+      with:
+        solution-folder: 'src/test/data/emptySolution'
+        solution-file: 'out/CI/emptySolution.zip'
+        solution-type: 'Unmanaged'

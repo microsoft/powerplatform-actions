@@ -1,14 +1,13 @@
-# CI workflow for PRs and merges to master
-name: CI
+# Actions workflow for merges to main
+name: rolling-instance-actions
 
 on:
+  workflow_dispatch:    # allow for manual workflow triggering as needed
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
-  build:
+  instance-actions:
     runs-on: windows-latest
     env:
       RUNNER_DEBUG: 1
@@ -17,25 +16,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         lfs: true
-
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v2-beta
-      with:
-        node-version: 12.x
-
-    - name: Build and test
-      run: |
-        npm i
-        npm run ci
-      env:
-        AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
-
-    - name: Test who-am-i action
-      uses: ./who-am-i
-      with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
 
     - name: Test pack-solution action
       uses: ./pack-solution
