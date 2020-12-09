@@ -13,7 +13,6 @@ describe('create-environment#input validation', () => {
     const mockFactory: MockedRunners = new MockedRunners(workDir);
     // TODO: read in params and their required state from the action.yml
     const inputParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
         { Name: 'user-name', Value: 'aUserName' },
         { Name: 'password-secret', Value: 'aSecret' },
         { Name: 'name', Value: 'newEnvironment'},
@@ -48,7 +47,7 @@ describe('create-environment#input validation', () => {
         }
         expect(err).to.be.undefined;
         const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--url', 'aUrl', '--username', 'aUserName', '--password', 'aSecret'] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'create', '--name', 'newEnvironment', '--region', 'unitedstates', '--type', 'Sandbox' ] });
     });
 });

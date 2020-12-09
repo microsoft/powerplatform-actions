@@ -14,10 +14,9 @@ inputs:
   name:
     description: 'The name of the environment you are creating.'
     required: true
-    default: 'new-environment'
 
   region:
-    description: 'The name of the region for your environment.
+    description: 'The name of the region for your environment.'
     required: true
     default: 'unitedstates'
 
@@ -28,21 +27,21 @@ inputs:
 
   currency:
     description: 'The currency to use for the environment.'
-    requried: false
+    required: false
     default: 'USD'
 
   language:
     description: 'The language to use for the environment.'
-    requried: false
+    required: false
     default: 'English'
 
   templates:
-    description: 'The Dynamics 365 apps that needs to be deployed to the environment. Passed as comma separated values.'
-    requried: false
+    description: 'The Dynamics 365 that needs to be deployed to the environment. Passed as comma separated values.'
+    required: false
 
   domain:
-    description: 'The domain name is of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
-    requried: false
+    description: 'The domain name of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
+    required: false
 
 
 runs:

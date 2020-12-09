@@ -429,6 +429,7 @@ function main(factory) {
             const envRegion = core.getInput('region', { required: true });
             const envType = core.getInput('type', { required: true });
             const pac = factory.getRunner('pac', process.cwd());
+            yield pac.run(['auth', 'clear']);
             yield pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
             const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType];
             yield pac.run(createEnvironmentArgs);

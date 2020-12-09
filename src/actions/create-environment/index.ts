@@ -23,6 +23,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const envType = core.getInput('type', {required: true});
 
         const pac = factory.getRunner('pac', process.cwd());
+        await pac.run(['auth', 'clear']);
         await pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType];
