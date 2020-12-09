@@ -17,6 +17,23 @@ jobs:
       with:
         lfs: true
 
+    - name: Test create-environment action
+      uses: ./create-environment
+      with:
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        name: newEnvironment
+        type: Sandbox
+        region: unitedstates
+        domain: test-rolling123
+
+    - name: Test delete-environment action
+      uses: ./delete-environment
+      with:
+        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
+        password-secret: ${{ secrets.password }}
+        environment-url: https://test-rolling123.crm.dynamics.com
+
     - name: Test pack-solution action
       uses: ./pack-solution
       with:
@@ -66,12 +83,3 @@ jobs:
         environment-url: 'https://davidjenD365-1.crm.dynamics.com'
         user-name: 'davidjen@davidjenD365.onmicrosoft.com'
         password-secret: ${{ secrets.password }}
-
-    - name: Test create-environment action
-      uses: ./create-environment
-      with:
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
-        name: newEnvironment
-        type: Sandbox
-        region: unitedstates
