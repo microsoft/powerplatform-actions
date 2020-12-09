@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import cp = require('child_process');
-import path = require('path');
 import process = require('process');
 import { DefaultRunnerFactory } from '../../lib';
 import { main } from './index';

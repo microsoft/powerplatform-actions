@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { DefaultRunnerFactory, ActionLogger, getInputAsBool, getWorkingDirectory, PacRunner, RunnerFactory} from '../../lib';
-import path = require('path');
-import fs = require('fs-extra');
+import { DefaultRunnerFactory, RunnerFactory} from '../../lib';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
@@ -29,7 +27,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
 
         const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
         await pac.run(deleteEnvArgs);
-        core.info('delete environment');
+        core.info('environment deleted');
         core.endGroup();
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
