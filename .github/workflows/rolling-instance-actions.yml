@@ -25,14 +25,14 @@ jobs:
         name: newEnvironment
         type: Sandbox
         region: unitedstates
-        domain: test-pizza123
+        domain: test-rolling-action123
 
     - name: Test delete-environment action
       uses: ./delete-environment
       with:
         user-name: 'davidjen@ppdevtools.onmicrosoft.com'
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        environment-url: https://test-pizza123.crm.dynamics.com/
+        environment-url: https://test-rolling-action123.crm.dynamics.com/
 
     - name: Test pack-solution action
       uses: ./pack-solution
