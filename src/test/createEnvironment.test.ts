@@ -13,11 +13,13 @@ describe('create-environment#input validation', () => {
     const mockFactory: MockedRunners = new MockedRunners(workDir);
     // TODO: read in params and their required state from the action.yml
     const inputParams = [
-        { Name: 'user-name', Value: 'aUserName' },
-        { Name: 'password-secret', Value: 'aSecret' },
-        { Name: 'name', Value: 'newEnvironment'},
-        { Name: 'region', Value: 'unitedstates'},
-        { Name: 'type', Value: 'Sandbox'}
+        { Name: 'user-name', Value: 'aUserName', requried: true},
+        { Name: 'password-secret', Value: 'aSecret', requried: true},
+        { Name: 'name', Value: 'newEnvironment', requried: true},
+        { Name: 'region', Value: 'unitedstates', requried: true},
+        { Name: 'type', Value: 'Sandbox', requried: true},
+        { Name: 'domain', Value: 'test-rolling123', required: false}
+
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
 
@@ -32,7 +34,8 @@ describe('create-environment#input validation', () => {
                 err = error;
             }
             expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
+            if(inputParam.required)
+                expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
         });
     });
 
@@ -48,6 +51,6 @@ describe('create-environment#input validation', () => {
         expect(err).to.be.undefined;
         const loggedCommands = mockFactory.loggedCommands;
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'create', '--name', 'newEnvironment', '--region', 'unitedstates', '--type', 'Sandbox' ] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'create', '--name', 'newEnvironment', '--region', 'unitedstates', '--type', 'Sandbox', '--domain', 'test-rolling123'] });
     });
 });

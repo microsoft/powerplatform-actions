@@ -21,12 +21,13 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const envName = core.getInput('name', { required: true});
         const envRegion = core.getInput('region', {required: true});
         const envType = core.getInput('type', {required: true});
+        const domain = core.getInput('domain', {required: false});
 
         const pac = factory.getRunner('pac', process.cwd());
         await pac.run(['auth', 'clear']);
         await pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
-        const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType];
+        const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
         await pac.run(createEnvironmentArgs);
         core.endGroup();
     } catch (error) {
