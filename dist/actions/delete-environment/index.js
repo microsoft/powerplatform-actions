@@ -392,7 +392,7 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 18:
+/***/ 697:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -419,21 +419,22 @@ const lib_1 = __webpack_require__(806);
 function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.startGroup('create-environment:');
+            core.startGroup('delete-environment:');
+            const envUrl = core.getInput('environment-url', { required: true });
             const username = core.getInput('user-name', { required: true });
+            core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
             const password = core.getInput('password-secret', { required: true });
             if (!password || password.length === 0) {
                 return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
             }
-            const envName = core.getInput('name', { required: true });
-            const envRegion = core.getInput('region', { required: true });
-            const envType = core.getInput('type', { required: true });
-            const domain = core.getInput('domain', { required: false });
             const pac = factory.getRunner('pac', process.cwd());
             yield pac.run(['auth', 'clear']);
-            yield pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
-            const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
-            yield pac.run(createEnvironmentArgs);
+            pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
+            const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
+            // TODO: HACK!!!!! We need to remove below line. This should be removed once bug 2120751 in PAC CLI is fixed
+            yield sleep(2000);
+            yield pac.run(deleteEnvArgs);
+            core.info('environment deleted');
             core.endGroup();
         }
         catch (error) {
@@ -443,6 +444,11 @@ function main(factory) {
     });
 }
 exports.main = main;
+function sleep(ms) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    });
+}
 
 //# sourceMappingURL=index.js.map
 
@@ -810,6 +816,6 @@ module.exports = require("path");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(18);
+/******/ 	return __webpack_require__(697);
 /******/ })()
 ;

@@ -17,6 +17,23 @@ jobs:
       with:
         lfs: true
 
+    - name: Test create-environment action
+      uses: ./create-environment
+      with:
+        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        name: newEnvironment
+        type: Sandbox
+        region: unitedstates
+        domain: test-rolling-action123
+
+    - name: Test delete-environment action
+      uses: ./delete-environment
+      with:
+        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        environment-url: https://test-rolling-action123.crm.dynamics.com/
+
     - name: Test pack-solution action
       uses: ./pack-solution
       with:
@@ -67,11 +84,9 @@ jobs:
         user-name: 'davidjen@davidjenD365.onmicrosoft.com'
         password-secret: ${{ secrets.password }}
 
-    - name: Test create-environment action
-      uses: ./create-environment
+    - name: Upload pac CLI logs
+      if: always()
+      uses: actions/upload-artifact@v2
       with:
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
-        name: newEnvironment
-        type: Sandbox
-        region: unitedstates
+        name: pac-cli-log
+        path: ./dist/pac/tools/logs/pac-log.txt
