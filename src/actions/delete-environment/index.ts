@@ -27,7 +27,8 @@ export async function main(factory: RunnerFactory): Promise<void> {
         pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
-        await sleep(5000);
+        // TODO: HACK!!!!! We need to remove below line. This should be removed once bug 2120751 in PAC CLI is fixed
+        await sleep(2000);
         await pac.run(deleteEnvArgs);
         core.info('environment deleted');
         core.endGroup();
