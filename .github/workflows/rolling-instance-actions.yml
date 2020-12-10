@@ -20,8 +20,8 @@ jobs:
     - name: Test create-environment action
       uses: ./create-environment
       with:
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         name: newEnvironment
         type: Sandbox
         region: unitedstates
@@ -30,8 +30,8 @@ jobs:
     - name: Test delete-environment action
       uses: ./delete-environment
       with:
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         environment-url: https://test-rolling123.crm.dynamics.com
 
     - name: Test pack-solution action
