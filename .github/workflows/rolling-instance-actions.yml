@@ -17,15 +17,15 @@ jobs:
       with:
         lfs: true
 
-    - name: Test create-environment action
-      uses: ./create-environment
-      with:
-        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        name: newEnvironment
-        type: Sandbox
-        region: unitedstates
-        domain: test-pizza123
+    # - name: Test create-environment action
+    #   uses: ./create-environment
+    #   with:
+    #     user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+    #     password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+    #     name: newEnvironment
+    #     type: Sandbox
+    #     region: unitedstates
+    #     domain: test-pizza123
 
     - name: Test delete-environment action
       uses: ./delete-environment
