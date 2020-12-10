@@ -410,7 +410,6 @@ exports.main = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __webpack_require__(186);
-const os = __webpack_require__(87);
 const lib_1 = __webpack_require__(806);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.GITHUB_ACTIONS) {
@@ -440,7 +439,6 @@ function main(factory) {
             const envUrl = (_a = result
                 .filter(l => l.length > 0)
                 .pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/).shift();
-            core.info(result.join(os.EOL));
             core.setOutput('environment-url', envUrl);
             core.endGroup();
         }

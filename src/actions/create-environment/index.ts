@@ -37,7 +37,6 @@ export async function main(factory: RunnerFactory): Promise<void> {
             ?.trim()
             .split(/\s+/)
             .shift();
-        core.info(result.join(os.EOL));
         core.setOutput('environment-url', envUrl);
         core.endGroup();
     } catch (error) {
