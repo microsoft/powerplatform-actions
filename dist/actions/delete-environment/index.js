@@ -431,6 +431,7 @@ function main(factory) {
             yield pac.run(['auth', 'clear']);
             pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
             const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
+            yield sleep(5000);
             yield pac.run(deleteEnvArgs);
             core.info('environment deleted');
             core.endGroup();
@@ -442,6 +443,11 @@ function main(factory) {
     });
 }
 exports.main = main;
+function sleep(ms) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    });
+}
 
 //# sourceMappingURL=index.js.map
 

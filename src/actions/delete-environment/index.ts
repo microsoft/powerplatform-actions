@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
+import { waitForDebugger } from 'inspector';
 import { DefaultRunnerFactory, RunnerFactory} from '../../lib';
 
 (async () => {
@@ -26,6 +27,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
+        await sleep(5000);
         await pac.run(deleteEnvArgs);
         core.info('environment deleted');
         core.endGroup();
@@ -34,3 +36,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         throw error;
     }
 }
+
+async function sleep(ms: number): Promise<void> {​​
+    return new Promise(resolve => setTimeout(resolve, ms));
+}​​
