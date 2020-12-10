@@ -428,10 +428,11 @@ function main(factory) {
             const envName = core.getInput('name', { required: true });
             const envRegion = core.getInput('region', { required: true });
             const envType = core.getInput('type', { required: true });
+            const domain = core.getInput('domain', { required: false });
             const pac = factory.getRunner('pac', process.cwd());
             yield pac.run(['auth', 'clear']);
             yield pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
-            const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType];
+            const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
             yield pac.run(createEnvironmentArgs);
             core.endGroup();
         }
