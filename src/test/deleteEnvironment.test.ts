@@ -47,5 +47,5 @@ describe('delete-environment#input validation', () => {
         const loggedCommands = mockFactory.loggedCommands;
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'delete', '--url', 'aUrl' ] });
-    });
+    }).timeout(5000);
 });
