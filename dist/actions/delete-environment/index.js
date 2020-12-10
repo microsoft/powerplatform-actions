@@ -431,7 +431,8 @@ function main(factory) {
             yield pac.run(['auth', 'clear']);
             pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
             const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
-            yield sleep(5000);
+            // TODO: HACK!!!!! We need to remove below line. This should be removed once bug 2120751 in PAC CLI is fixed
+            yield sleep(2000);
             yield pac.run(deleteEnvArgs);
             core.info('environment deleted');
             core.endGroup();
