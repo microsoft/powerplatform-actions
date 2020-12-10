@@ -47,7 +47,6 @@ outputs:
   environment-url:
     description: URL of the freshly created environment
 
-
 runs:
   using: 'node12'
   main: '../dist/actions/create-environment/index.js'

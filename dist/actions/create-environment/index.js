@@ -410,6 +410,7 @@ exports.main = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __webpack_require__(186);
+const os = __webpack_require__(87);
 const lib_1 = __webpack_require__(806);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.GITHUB_ACTIONS) {
@@ -417,6 +418,7 @@ const lib_1 = __webpack_require__(806);
     }
 }))();
 function main(factory) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.startGroup('create-environment:');
@@ -433,7 +435,13 @@ function main(factory) {
             yield pac.run(['auth', 'clear']);
             yield pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
             const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
-            yield pac.run(createEnvironmentArgs);
+            const result = yield pac.run(createEnvironmentArgs);
+            // HACK TODO: Need structured output from pac CLI to make parsing out of the resulting env URL more robust
+            const envUrl = (_a = result
+                .filter(l => l.length > 0)
+                .pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/).shift();
+            core.info(result.join(os.EOL));
+            core.setOutput('environment-url', envUrl);
             core.endGroup();
         }
         catch (error) {
