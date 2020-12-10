@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { waitForDebugger } from 'inspector';
 import { DefaultRunnerFactory, RunnerFactory} from '../../lib';
 
 (async () => {
@@ -38,6 +37,6 @@ export async function main(factory: RunnerFactory): Promise<void> {
     }
 }
 
-async function sleep(ms: number): Promise<void> {​​
+async function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
-}​​
+}
