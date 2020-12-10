@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
+import os = require('os');
 import { DefaultRunnerFactory, RunnerFactory } from '../../lib';
 
 (async () => {
@@ -28,7 +29,15 @@ export async function main(factory: RunnerFactory): Promise<void> {
         await pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
-        await pac.run(createEnvironmentArgs);
+        const result = await pac.run(createEnvironmentArgs);
+        // HACK TODO: Need structured output from pac CLI to make parsing out of the resulting env URL more robust
+        const envUrl = result
+            .filter(l => l.length > 0)
+            .pop()
+            ?.trim()
+            .split(/\s+/)
+            .shift();
+        core.setOutput('environment-url', envUrl);
         core.endGroup();
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);

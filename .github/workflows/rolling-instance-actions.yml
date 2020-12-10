@@ -11,6 +11,7 @@ jobs:
     runs-on: windows-latest
     env:
       RUNNER_DEBUG: 1
+      WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
 
     steps:
     - uses: actions/checkout@v2
@@ -19,20 +20,21 @@ jobs:
 
     - name: Test create-environment action
       uses: ./create-environment
+      id: create-test-pizza
       with:
-        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+        user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         name: newEnvironment
         type: Sandbox
         region: unitedstates
-        domain: test-rolling-action123
+        domain: test-pizza
 
-    - name: Test delete-environment action
-      uses: ./delete-environment
+    - name: Test who-am-i action
+      uses: ./who-am-i
       with:
-        user-name: 'davidjen@ppdevtools.onmicrosoft.com'
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        environment-url: https://test-rolling-action123.crm.dynamics.com/
 
     - name: Test pack-solution action
       uses: ./pack-solution
@@ -44,18 +46,18 @@ jobs:
     - name: Test import-solution action
       uses: ./import-solution
       with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-file: 'out/CI/emptySolution.zip'
         force-overwrite: true
 
     - name: Test export-solution action
       uses: ./export-solution
       with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-name: emptySolution
         solution-output-file: 'solution1.zip'
         working-directory: 'out/CI'
@@ -71,18 +73,25 @@ jobs:
     - name: Test clone-solution action
       uses: ./clone-solution
       with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-name: emptySolution
         target-folder: 'out/CI/cloned'
 
     - name: Test publish-solution action
       uses: ./publish-solution
       with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Test delete-environment action
+      uses: ./delete-environment
+      with:
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Upload pac CLI logs
       if: always()
