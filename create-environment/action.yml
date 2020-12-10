@@ -43,6 +43,10 @@ inputs:
     description: 'The domain name of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
     required: false
 
+outputs:
+  environment-url:
+    description: URL of the freshly created environment
+
 
 runs:
   using: 'node12'
