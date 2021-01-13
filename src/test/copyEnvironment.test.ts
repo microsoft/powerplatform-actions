@@ -4,22 +4,19 @@ import path = require('path');
 import { forEachOf } from 'async';
 import { expect } from 'chai';
 
-import { main as createEnvironment } from '../actions/create-environment';
+import { main as copyEnvironment } from '../actions/copy-environment';
 import { MockedRunners } from './mockedRunners';
 import { ActionInputsEmulator } from './actionInputsEmulator';
 
-describe('create-environment#input validation', () => {
+describe('copy-environment#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
     const mockFactory: MockedRunners = new MockedRunners(workDir);
     // TODO: read in params and their required state from the action.yml
     const inputParams = [
         { Name: 'user-name', Value: 'aUserName', required: true},
         { Name: 'password-secret', Value: 'aSecret', required: true},
-        { Name: 'name', Value: 'newEnvironment', required: true},
-        { Name: 'region', Value: 'unitedstates', required: true},
-        { Name: 'type', Value: 'Sandbox', required: true},
-        { Name: 'domain', Value: 'test-rolling123', required: false}
-
+        { Name: 'source-url', Value: 'sourceUrl', required: true},
+        { Name: 'target-url', Value: 'targetUrl', required: true},
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
 
@@ -28,7 +25,7 @@ describe('create-environment#input validation', () => {
             actionInputs.defineInputsExcept(inputParam.Name);
             let res, err;
             try {
-                res = await createEnvironment(mockFactory);
+                res = await copyEnvironment(mockFactory);
             }
             catch (error) {
                 err = error;
@@ -43,7 +40,7 @@ describe('create-environment#input validation', () => {
         actionInputs.defineInputs();
         let err;
         try {
-            await createEnvironment(mockFactory);
+            await copyEnvironment(mockFactory);
         }
         catch (error) {
             err = error;
@@ -51,6 +48,6 @@ describe('create-environment#input validation', () => {
         expect(err).to.be.undefined;
         const loggedCommands = mockFactory.loggedCommands;
         expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'create', '--name', 'newEnvironment', '--region', 'unitedstates', '--type', 'Sandbox', '--domain', 'test-rolling123'] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'copy', '--source-url', 'sourceUrl', '--target-url', 'targetUrl'] });
     });
 });
