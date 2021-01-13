@@ -120,15 +120,23 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test delete-source-environment action
+    - name: Test restore-environment action
+      uses: ./restore-environment
+      with:
+        source-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        target-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        selected-backup: latest
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Test delete-target-environment action
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-
-    - name: Test delete-target-environment action
+    - name: Test delete-source-environment action
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
