@@ -86,6 +86,14 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
+    - name: Test backup-environment action
+      uses: ./backup-environment
+      with:
+        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        backup-label: test-backup-label
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
     - name: Test delete-environment action
       uses: ./delete-environment
       with:
