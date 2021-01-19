@@ -24,8 +24,8 @@
   "verbSolutionUpgrade": "on",
   "verbSolutionPublish": "on",
   "verbSolutionVersion": "on",
-  "VerbPAPortal": "on",
-  "VerbPAPortalList": "on",
-  "VerbPAPortalUpload": "on",
-  "VerbPAPortalDownload": "on"
+  "verbPAPortal": "on",
+  "verbPAPortalList": "on",
+  "verbPAPortalUpload": "on",
+  "verbPAPortalDownload": "on"
 }

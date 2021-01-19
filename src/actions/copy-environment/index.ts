@@ -26,7 +26,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         await pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
 
         const copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
-        const result = await pac.run(copyEnvironmentArgs);
+        await pac.run(copyEnvironmentArgs);
         core.endGroup();
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
