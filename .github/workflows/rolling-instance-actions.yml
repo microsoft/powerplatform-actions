@@ -18,21 +18,32 @@ jobs:
       with:
         lfs: true
 
-    - name: Test create-environment action
+    - name: Test create-source-environment action
       uses: ./create-environment
-      id: create-test-pizza
+      id: create-source-environment
       with:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        name: newEnvironment
+        name: sourceEnvironment
         type: Sandbox
         region: unitedstates
-        domain: test-pizza
+        domain: test-source
+
+    - name: Test create-target-environment action
+      uses: ./create-environment
+      id: create-target-environment
+      with:
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        name: targetEnvironment
+        type: Sandbox
+        region: unitedstates
+        domain: test-target
 
     - name: Test who-am-i action
       uses: ./who-am-i
       with:
-        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
@@ -46,7 +57,7 @@ jobs:
     - name: Test import-solution action
       uses: ./import-solution
       with:
-        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-file: 'out/CI/emptySolution.zip'
@@ -55,7 +66,7 @@ jobs:
     - name: Test export-solution action
       uses: ./export-solution
       with:
-        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-name: emptySolution
@@ -73,7 +84,7 @@ jobs:
     - name: Test clone-solution action
       uses: ./clone-solution
       with:
-        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-name: emptySolution
@@ -82,7 +93,15 @@ jobs:
     - name: Test publish-solution action
       uses: ./publish-solution
       with:
-        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Test copy-environment action
+      uses: ./copy-environment
+      with:
+        source-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        target-url: ${{ steps.create-target-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
@@ -94,10 +113,18 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test delete-environment action
+    - name: Test delete-source-environment action
       uses: ./delete-environment
       with:
-        environment-url: ${{ steps.create-test-pizza.outputs.environment-url }}
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+
+    - name: Test delete-target-environment action
+      uses: ./delete-environment
+      with:
+        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 

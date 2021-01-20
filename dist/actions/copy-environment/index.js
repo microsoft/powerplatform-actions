@@ -392,7 +392,7 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 697:
+/***/ 445:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -419,20 +419,19 @@ const lib_1 = __webpack_require__(806);
 function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.startGroup('delete-environment:');
-            const envUrl = core.getInput('environment-url', { required: true });
+            core.startGroup('copy-environment:');
             const username = core.getInput('user-name', { required: true });
-            core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
             const password = core.getInput('password-secret', { required: true });
             if (!password || password.length === 0) {
                 return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
             }
+            const sourceUrl = core.getInput('source-url', { required: true });
+            const targetUrl = core.getInput('target-url', { required: true });
             const pac = factory.getRunner('pac', process.cwd());
             yield pac.run(['auth', 'clear']);
             yield pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', username, '--password', password]);
-            const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
-            yield pac.run(deleteEnvArgs);
-            core.info('environment deleted');
+            const copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
+            yield pac.run(copyEnvironmentArgs);
             core.endGroup();
         }
         catch (error) {
@@ -809,6 +808,6 @@ module.exports = require("path");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(697);
+/******/ 	return __webpack_require__(445);
 /******/ })()
 ;
