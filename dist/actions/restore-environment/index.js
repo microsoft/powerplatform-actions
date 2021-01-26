@@ -434,8 +434,6 @@ function main(factory) {
             const restoreEnvArgs = ['admin', 'restore', '--source-url', sourceUrl, '--target-url', targetUrl, '--selected-backup', selectedBackup];
             yield pac.run(restoreEnvArgs);
             core.info('environment restored');
-            core.info('listing environments after restore...');
-            yield pac.run(['admin', 'list']);
             core.endGroup();
         }
         catch (error) {
