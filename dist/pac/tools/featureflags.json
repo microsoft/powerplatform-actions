@@ -27,5 +27,6 @@
   "verbPAPortal": "on",
   "verbPAPortalList": "on",
   "verbPAPortalUpload": "on",
-  "verbPAPortalDownload": "on"
+  "verbPAPortalDownload": "on",
+  "componentSettings": "off"
 }
