@@ -11,6 +11,18 @@ inputs:
     description: 'Power Platform password. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: true
 
+  app-id:
+    description: 'Optional: The application id to authenticate with.'
+    required: false
+
+  client-secret:
+    description: 'Optional: The client secret to authenticate with.'
+    required: false
+
+  tenant-id:
+    description: 'Tenant id if using application id & secret.'
+    required: false
+
   name:
     description: 'The name of the environment you are creating.'
     required: true

@@ -9,11 +9,23 @@ inputs:
 
   user-name:
     description: 'Power Platform user name, e.g. myname@my-org.onmicrosoft.com'
-    required: true
+    required: false
 
   password-secret:
     description: 'Power Platform password. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
-    required: true
+    required: false
+
+  app-id:
+    description: 'Optional: The application id to authenticate with.'
+    required: false
+
+  client-secret:
+    description: 'Optional: The client secret to authenticate with.'
+    required: false
+
+  tenant-id:
+    description: 'Tenant id if using application id & secret.'
+    required: false
 
 runs:
   using: 'node12'
