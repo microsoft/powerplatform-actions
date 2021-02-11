@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { AuthHandler, DefaultRunnerFactory, RunnerFactory } from '../../lib';
-import { AuthKind } from '../../lib/authHandler';
+import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory } from '../../lib';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
@@ -20,8 +19,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const envRegion = core.getInput('region', {required: false});
         const domain = core.getInput('domain', {required: false});
 
-        const authHandler = new AuthHandler(factory);
-        await authHandler.authenticate(AuthKind.ADMIN);
+        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
         const result = await pac.run(createEnvironmentArgs);

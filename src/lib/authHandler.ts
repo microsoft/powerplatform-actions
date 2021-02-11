@@ -1,21 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { Runner, RunnerFactory } from '.';
+import { Runner } from '.';
 
 export class AuthHandler {
 
-
-    private _envUrl: string | undefined;
-    private _username: string | undefined;
-    private _password: string | undefined;
-    private _appId: string | undefined;
-    private _clientSecret: string | undefined;
-    private _tenantId: string | undefined;
+    private _envUrl!: string;
+    private _username!: string;
+    private _password!: string;
+    private _appId!: string;
+    private _clientSecret!: string;
+    private _tenantId!: string;
     private _pac: Runner;
 
-    constructor(private readonly factory: RunnerFactory) {
-        this._pac = factory.getRunner('pac', process.cwd());
+    constructor(private readonly pac: Runner) {
+        this._pac = pac;
     }
 
     public async authenticate(authKind : AuthKind) : Promise<void> {
@@ -28,7 +27,7 @@ export class AuthHandler {
         } else if (authType == AuthTypes.APPID_SECRET) {
             await this.authenticateWithClientCredentials(authKind);
         } else {
-            throw new Error('Must provide either username/password or client credential for authentication!');
+            throw new Error('Must provide either username/password or app-id/client-secret/tenant-id for authentication!');
         }
         core.endGroup();
     }
@@ -40,7 +39,7 @@ export class AuthHandler {
 
         try{
             if (validUsernameAuth && validSPNAuth) {
-                throw new Error('Must pick either username/password or client credential as the authentication flow.');
+                throw new Error('Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.');
             }
 
             if (validUsernameAuth) {
@@ -59,18 +58,14 @@ export class AuthHandler {
 
     private isValidUsernameAuth(): boolean {
         this._username = core.getInput('user-name', { required: false });
-        if (this._username) {
-            this._password = core.getInput('password-secret', { required: true});
-        }
+        this._password = core.getInput('password-secret', { required: false});
         return (!!this._username && !!this._password);
     }
 
     private isValidSPNAuth(): boolean {
         this._appId = core.getInput('app-id', {required: false});
-        if (this._appId) {
-            this._clientSecret = core.getInput('client-secret', {required: true});
-            this._tenantId = core.getInput('tenant-id', {required: true});
-        }
+        this._clientSecret = core.getInput('client-secret', {required: false});
+        this._tenantId = core.getInput('tenant-id', {required: false});
         return (!!this._appId && !!this._clientSecret && !!this._tenantId)
     }
 
@@ -78,9 +73,9 @@ export class AuthHandler {
         core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
         await this._pac.run(['auth', 'clear']);
         if (authKind === AuthKind.CDS) {
-            await this._pac.run(['auth', 'create', '--url', this._envUrl!, '--applicationId', this._appId!, '--clientSecret', this._clientSecret!, '--tenant', this._tenantId!]);
+            await this._pac.run(['auth', 'create', '--url', this._envUrl, '--applicationId', this._appId, '--clientSecret', this._clientSecret, '--tenant', this._tenantId]);
         } else {
-            await this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--applicationId', this._appId!, '--clientSecret', this._clientSecret!, '--tenant', this._tenantId!]);
+            await this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--applicationId', this._appId, '--clientSecret', this._clientSecret, '--tenant', this._tenantId]);
         }
     }
 
@@ -88,9 +83,9 @@ export class AuthHandler {
         core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
         await this._pac.run(['auth', 'clear']);
         if (authKind == AuthKind.CDS) {
-            await this._pac.run(['auth', 'create', '--url', this._envUrl!, '--username', this._username!, '--password', this._password!]);
+            await this._pac.run(['auth', 'create', '--url', this._envUrl, '--username', this._username, '--password', this._password]);
         } else {
-            await this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', this._username!, '--password', this._password!]);
+            await this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', this._username, '--password', this._password]);
         }
     }
 }
