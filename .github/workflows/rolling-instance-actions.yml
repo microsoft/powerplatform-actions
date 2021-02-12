@@ -62,6 +62,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-file: 'out/CI/emptySolution.zip'
         force-overwrite: true
+        run-asynchronously: true
 
     - name: Test export-solution action
       uses: ./export-solution
@@ -72,6 +73,7 @@ jobs:
         solution-name: emptySolution
         solution-output-file: 'solution1.zip'
         working-directory: 'out/CI'
+        run-asynchronously: true
 
     - name: Test unpack-solution action
       uses: ./unpack-solution

@@ -17,6 +17,7 @@ if (!password || password.length === 0) {
 const solutionName = core.getInput('solution-name', { required: true });
 const solutionVersion = core.getInput('solution-version', { required: false });
 const isManaged = getInputAsBool('managed', false, false);
+const isAsync = getInputAsBool('run-asynchronously', false, false);
 core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged}`);
 
 const workingDir = getWorkingDirectory('working-directory', false);
@@ -33,12 +34,9 @@ const logger = new ActionLogger();
     await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
 
     const exportArgs = ['solution', 'export', '--name', solutionName, '--path', outputFile];
-    if (solutionVersion) {
-        exportArgs.push('--targetVersion', solutionVersion);
-    }
-    if (isManaged) {
-        exportArgs.push('--managed');
-    }
+    if (solutionVersion) { exportArgs.push('--targetVersion', solutionVersion); }
+    if (isManaged) { exportArgs.push('--managed'); }
+    if (isAsync) { exportArgs.push('--async'); }
     await pac.run(exportArgs);
     core.info(`exported solution to: ${outputFile}`);
     core.endGroup();

@@ -30,8 +30,9 @@ const forceOverwrite = getInputAsBool('force-overwrite', false, true);
 const skipDepCheck = getInputAsBool('skip-dependency-check', false, false);
 const importAsHolding = getInputAsBool('import-as-holding', false, false);
 const publishChanges = getInputAsBool('publish-changes', false, false);
+const isAsync = getInputAsBool('run-asynchronously', false, false);
 
-core.info(`solution import: ${solutionFile}`);
+core.info(`  solution import: ${solutionFile}`);
 core.info(`  activatePlugins: ${activatePlugins} - forceOverwrite: ${forceOverwrite}`);
 core.info(`  skipDependencyCheck: ${skipDepCheck} - importAsHolding: ${importAsHolding}`);
 core.info(`  publishChanges: ${publishChanges}`);
@@ -50,6 +51,7 @@ const logger = new ActionLogger();
     if (skipDepCheck) { importArgs.push('--skip-dependency-check'); }
     if (importAsHolding) { importArgs.push('--import-as-holding'); }
     if (publishChanges) { importArgs.push('--publish-changes'); }
+    if (isAsync) {  importArgs.push('--async'); }
 
     await pac.run(importArgs);
     core.info(`imported solution from: ${solutionFile}`);

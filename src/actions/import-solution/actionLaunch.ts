@@ -20,6 +20,7 @@ process.env['INPUT_FORCE-OVERWRITE'] = 'true';
 // process.env['INPUT_SKIP-DEPENDENCY-CHECK'] = 'false';
 // process.env['INPUT_IMPORT-AS-HOLDING'] = 'false';
 // process.env['INPUT_PUBLISH-CHANGES'] = 'true';
+process.env['INPUT_RUN-ASYNCHRONOUSLY'] = 'false';
 
 const pathToAction = path.join(__dirname, 'index.js');
 process.env['RUNNER_DEBUG'] = '1';
