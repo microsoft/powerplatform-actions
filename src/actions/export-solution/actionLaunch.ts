@@ -15,6 +15,7 @@ process.env['INPUT_PASSWORD-SECRET'] = password;
 process.env['INPUT_SOLUTION-NAME'] = 'emptySolution';
 process.env['INPUT_WORKING-DIRECTORY'] = path.resolve(__dirname, '..', '..', '..', 'out', 'launch');
 process.env['INPUT_SOLUTION-OUTPUT-FILE'] = path.resolve(__dirname, '..', '..', '..', 'out', 'launch', 'emptySolution.zip');
+process.env['INPUT_RUN-ASYNCHRONOUSLY'] = 'false';
 
 const pathToAction = path.join(__dirname, 'index.js');
 process.env['RUNNER_DEBUG'] = '1';

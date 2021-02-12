@@ -3496,6 +3496,7 @@ if (!password || password.length === 0) {
 const solutionName = core.getInput('solution-name', { required: true });
 const solutionVersion = core.getInput('solution-version', { required: false });
 const isManaged = lib_1.getInputAsBool('managed', false, false);
+const isAsync = lib_1.getInputAsBool('run-asynchronously', false, false);
 core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged}`);
 const workingDir = lib_1.getWorkingDirectory('working-directory', false);
 const outputFileCandidate = core.getInput('solution-output-file', { required: true });
@@ -3513,6 +3514,9 @@ const logger = new lib_1.ActionLogger();
     }
     if (isManaged) {
         exportArgs.push('--managed');
+    }
+    if (isAsync) {
+        exportArgs.push('--async');
     }
     yield pac.run(exportArgs);
     core.info(`exported solution to: ${outputFile}`);

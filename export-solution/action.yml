@@ -35,6 +35,10 @@ inputs:
     description: 'Working directory; default: root of repository'
     required: false
 
+  run-asynchronously:
+    description: 'Exports solution asynchronously'
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/export-solution/index.js'
