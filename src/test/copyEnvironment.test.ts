@@ -11,6 +11,11 @@ import { ActionInputsEmulator } from './actionInputsEmulator';
 describe('copy-environment#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
     const mockFactory: MockedRunners = new MockedRunners(workDir);
+
+    const requiredParams = [
+        { Name: 'source-url', Value: 'sourceUrl', required: true},
+        { Name: 'target-url', Value: 'targetUrl', required: true},
+    ];
     // TODO: read in params and their required state from the action.yml
     const inputParams = [
         { Name: 'user-name', Value: 'aUserName', required: true},
@@ -20,7 +25,7 @@ describe('copy-environment#input validation', () => {
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
 
-    forEachOf(inputParams, (inputParam) => {
+    forEachOf(requiredParams, (inputParam) => {
         it(`required parameter - ${inputParam.Name}`, async() => {
             actionInputs.defineInputsExcept(inputParam.Name);
             let res, err;

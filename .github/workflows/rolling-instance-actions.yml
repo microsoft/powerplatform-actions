@@ -79,8 +79,9 @@ jobs:
       uses: ./export-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        app-id: ${{ env.WF_APPID }}
+        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
         solution-name: emptySolution
         solution-output-file: 'solution1.zip'
         working-directory: 'out/CI'
@@ -107,8 +108,9 @@ jobs:
       uses: ./publish-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        app-id: ${{ env.WF_APPID }}
+        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test copy-environment action
       uses: ./copy-environment
@@ -123,8 +125,9 @@ jobs:
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         backup-label: test-backup-label
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        app-id: ${{ env.WF_APPID }}
+        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test reset-environment action
       uses: ./reset-environment
@@ -139,22 +142,24 @@ jobs:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
         target-url: ${{ steps.create-target-environment.outputs.environment-url }}
         selected-backup: latest
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        app-id: ${{ env.WF_APPID }}
+        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
 
-    - name: Test delete-target-environment action
+    - name: Test delete-source-environment action with SPN authentication
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test delete-source-environment action
+    - name: Test delete-target-environment action with username/password
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        app-id: ${{ env.WF_APPID }}
+        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Upload pac CLI logs
       if: always()

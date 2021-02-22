@@ -19,21 +19,6 @@ describe('publish-solution#input validation', () => {
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
 
-    forEachOf(inputParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                res = await publishSolution(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
-    });
-
     it('call action', async() => {
         actionInputs.defineInputs();
         let err;

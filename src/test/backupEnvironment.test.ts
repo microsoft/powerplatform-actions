@@ -11,6 +11,12 @@ import { ActionInputsEmulator } from './actionInputsEmulator';
 describe('backup-environment#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
     const mockFactory: MockedRunners = new MockedRunners(workDir);
+
+    const requiredParams = [
+        { Name: 'environment-url', Value: 'aUrl' },
+        { Name: 'backup-label', Value: 'aLabel' }
+    ];
+
     // TODO: read in params and their required state from the action.yml
     const inputParams = [
         { Name: 'environment-url', Value: 'aUrl' },
@@ -20,7 +26,7 @@ describe('backup-environment#input validation', () => {
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
 
-    forEachOf(inputParams, (inputParam) => {
+    forEachOf(requiredParams, (inputParam) => {
         it(`required parameter - ${inputParam.Name}`, async() => {
             actionInputs.defineInputsExcept(inputParam.Name);
             let res, err;
