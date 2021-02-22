@@ -16,7 +16,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const backupLabel = core.getInput('backup-label', {required: true });
 
         const pac = factory.getRunner('pac', process.cwd());
-        new AuthHandler(pac).authenticate(AuthKind.ADMIN);
+        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
         const backupEnvArgs = ['admin', 'backup', '--url', envUrl, '--label', backupLabel];
         await pac.run(backupEnvArgs);
         core.info('environment backup complete');

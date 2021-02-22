@@ -14,7 +14,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         core.startGroup('reset-environment:');
         const envUrl = core.getInput('environment-url', { required: true });
         const pac = factory.getRunner('pac', process.cwd());
-        new AuthHandler(pac).authenticate(AuthKind.ADMIN);
+        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         const resetEnvArgs = ['admin', 'reset', '--url', envUrl];
         await pac.run(resetEnvArgs);

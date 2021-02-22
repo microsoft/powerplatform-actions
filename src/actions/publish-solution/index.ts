@@ -13,7 +13,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     try {
         core.startGroup('publish-solution:');
         const pac = factory.getRunner('pac', process.cwd());
-        new AuthHandler(pac).authenticate(AuthKind.CDS);
+        await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
         const publishArgs = ['solution', 'publish'];
         await pac.run(publishArgs);

@@ -22,7 +22,7 @@ const logger = new ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     const pac = new PacRunner(workingDir, logger);
-    new AuthHandler(pac).authenticate(AuthKind.CDS);
+    await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const exportArgs = ['solution', 'export', '--name', solutionName, '--path', outputFile];
     if (solutionVersion) { exportArgs.push('--targetVersion', solutionVersion); }

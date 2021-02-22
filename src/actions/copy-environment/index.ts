@@ -17,7 +17,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const targetUrl = core.getInput('target-url', { required: true});
 
         const pac = factory.getRunner('pac', process.cwd());
-        new AuthHandler(pac).authenticate(AuthKind.ADMIN);
+        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         const copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
         await pac.run(copyEnvironmentArgs);

@@ -20,7 +20,7 @@ jobs:
       with:
         lfs: true
 
-    - name: Test create-source-environment action with SPN authentication
+    - name: Test create-source-environment action with appId-clientSecret
       uses: ./create-environment
       id: create-source-environment
       with:
@@ -65,7 +65,7 @@ jobs:
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
 
-    - name: Test import-solution action
+    - name: Test import-solution action with username/password
       uses: ./import-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -75,7 +75,7 @@ jobs:
         force-overwrite: true
         run-asynchronously: true
 
-    - name: Test export-solution action
+    - name: Test export-solution action with appId-clientSecret
       uses: ./export-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -95,7 +95,7 @@ jobs:
         solution-type: 'Unmanaged'
         overwrite-files: true
 
-    - name: Test clone-solution action
+    - name: Test clone-solution action with username/password
       uses: ./clone-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -104,7 +104,7 @@ jobs:
         solution-name: emptySolution
         target-folder: 'out/CI/cloned'
 
-    - name: Test publish-solution action
+    - name: Test publish-solution action with appId-clientSecret
       uses: ./publish-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -112,7 +112,7 @@ jobs:
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
 
-    - name: Test copy-environment action
+    - name: Test copy-environment action with username/password
       uses: ./copy-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -120,7 +120,7 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test backup-environment action
+    - name: Test backup-environment action with appId-clientSecret
       uses: ./backup-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -129,14 +129,14 @@ jobs:
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
 
-    - name: Test reset-environment action
+    - name: Test reset-environment action with username/password
       uses: ./reset-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test restore-environment action
+    - name: Test restore-environment action with appId-clientSecret
       uses: ./restore-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -146,7 +146,7 @@ jobs:
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
 
-    - name: Test delete-source-environment action with SPN authentication
+    - name: Test delete-source-environment action with appId-clientSecret
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}

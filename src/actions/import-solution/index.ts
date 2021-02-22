@@ -33,7 +33,7 @@ const logger = new ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     const pac = new PacRunner(workingDir, logger);
-    new AuthHandler(pac).authenticate(AuthKind.CDS);
+    await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const importArgs = ['solution', 'import', '--path', solutionFile];
     if (activatePlugins) { importArgs.push('--activate-plugins'); }

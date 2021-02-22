@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import path = require('path');
-import { forEachOf } from 'async';
 import { expect } from 'chai';
 
 import { main as publishSolution } from '../actions/publish-solution';

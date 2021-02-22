@@ -18,7 +18,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const performAsync = getInputAsBool('async', false, false);
 
         const pac = factory.getRunner('pac', process.cwd());
-        new AuthHandler(pac).authenticate(AuthKind.CDS);
+        await new AuthHandler(pac).authenticate(AuthKind.CDS);
         const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
         if (performAsync) {
             upgradeArgs.push('--async');

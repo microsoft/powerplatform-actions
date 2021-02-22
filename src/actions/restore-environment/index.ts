@@ -17,7 +17,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const selectedBackup = core.getInput('selected-backup', { required: true});
 
         const pac = factory.getRunner('pac', process.cwd());
-        new AuthHandler(pac).authenticate(AuthKind.ADMIN);
+        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         const restoreEnvArgs = ['admin', 'restore', '--source-url', sourceUrl, '--target-url', targetUrl, '--selected-backup', selectedBackup];
         await pac.run(restoreEnvArgs);
