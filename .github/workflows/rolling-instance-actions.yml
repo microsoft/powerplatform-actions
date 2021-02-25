@@ -136,15 +136,14 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test restore-environment action with appId-clientSecret
+    - name: Test restore-environment action with username/password
       uses: ./restore-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
         target-url: ${{ steps.create-target-environment.outputs.environment-url }}
         selected-backup: latest
-        app-id: ${{ env.WF_APPID }}
-        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
-        tenant-id: ${{ env.WF_TENANT_ID }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test delete-source-environment action with appId-clientSecret
       uses: ./delete-environment
