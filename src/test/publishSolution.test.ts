@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import path = require('path');
-import { forEachOf } from 'async';
 import { expect } from 'chai';
 
 import { main as publishSolution } from '../actions/publish-solution';
@@ -18,21 +17,6 @@ describe('publish-solution#input validation', () => {
         { Name: 'password-secret', Value: 'aSecret' }
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
-
-    forEachOf(inputParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                res = await publishSolution(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
-    });
 
     it('call action', async() => {
         actionInputs.defineInputs();

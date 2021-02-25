@@ -420,19 +420,11 @@ function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.startGroup('upgrade-solution:');
-            const envUrl = core.getInput('environment-url', { required: true });
-            const username = core.getInput('user-name', { required: true });
-            core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
-            const password = core.getInput('password-secret', { required: true });
-            if (!password || password.length === 0) {
-                return core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
-            }
             const solutionName = core.getInput('solution-name', { required: true });
             core.info(`solution: ${solutionName}`);
             const performAsync = lib_1.getInputAsBool('async', false, false);
             const pac = factory.getRunner('pac', process.cwd());
-            yield pac.run(['auth', 'clear']);
-            yield pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+            yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.CDS);
             const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
             if (performAsync) {
                 upgradeArgs.push('--async');
@@ -529,9 +521,9 @@ exports.AuthKind = exports.AuthHandler = void 0;
 // Licensed under the MIT License.
 const core = __webpack_require__(186);
 class AuthHandler {
-    constructor(factory) {
-        this.factory = factory;
-        this._pac = factory.getRunner('pac', process.cwd());
+    constructor(pac) {
+        this.pac = pac;
+        this._pac = pac;
     }
     authenticate(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -545,7 +537,7 @@ class AuthHandler {
                 yield this.authenticateWithClientCredentials(authKind);
             }
             else {
-                throw new Error('Must provide either username/password or client credential for authentication!');
+                throw new Error('Must provide either username/password or app-id/client-secret/tenant-id for authentication!');
             }
             core.endGroup();
         });
@@ -555,7 +547,7 @@ class AuthHandler {
         const validSPNAuth = this.isValidSPNAuth();
         try {
             if (validUsernameAuth && validSPNAuth) {
-                throw new Error('Must pick either username/password or client credential as the authentication flow.');
+                throw new Error('Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.');
             }
             if (validUsernameAuth) {
                 return AuthTypes.USERNAME_PASSWORD;
@@ -572,17 +564,13 @@ class AuthHandler {
     }
     isValidUsernameAuth() {
         this._username = core.getInput('user-name', { required: false });
-        if (this._username) {
-            this._password = core.getInput('password-secret', { required: true });
-        }
+        this._password = core.getInput('password-secret', { required: false });
         return (!!this._username && !!this._password);
     }
     isValidSPNAuth() {
         this._appId = core.getInput('app-id', { required: false });
-        if (this._appId) {
-            this._clientSecret = core.getInput('client-secret', { required: true });
-            this._tenantId = core.getInput('tenant-id', { required: true });
-        }
+        this._clientSecret = core.getInput('client-secret', { required: false });
+        this._tenantId = core.getInput('tenant-id', { required: false });
         return (!!this._appId && !!this._clientSecret && !!this._tenantId);
     }
     authenticateWithClientCredentials(authKind) {
@@ -768,7 +756,7 @@ exports.GitRunner = GitRunner;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthHandler = exports.SopaRunner = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
+exports.AuthKind = exports.AuthHandler = exports.SopaRunner = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 var actionInput_1 = __webpack_require__(434);
@@ -789,6 +777,7 @@ var sopaRunner_1 = __webpack_require__(653);
 Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
 var authHandler_1 = __webpack_require__(883);
 Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
+Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
 
 //# sourceMappingURL=index.js.map
 

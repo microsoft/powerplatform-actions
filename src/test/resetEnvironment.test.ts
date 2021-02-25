@@ -12,14 +12,18 @@ describe('reset-environment#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
     const mockFactory: MockedRunners = new MockedRunners(workDir)
 
+    const requiredParams = [
+        { Name: 'environment-url', Value: 'aUrl', required: true}
+    ];
+
     const inputParams = [
         { Name: 'environment-url', Value: 'aUrl', required: true},
-        { Name: 'user-name', Value: 'aUserName', requried: true},
-        { Name: 'password-secret', Value: 'aSecret', required: true},
+        { Name: 'user-name', Value: 'aUserName', required: false},
+        { Name: 'password-secret', Value: 'aSecret', required: false},
     ];
     const actionsInput = new ActionInputsEmulator(inputParams);
 
-    forEachOf(inputParams, (inputParam) => {
+    forEachOf(requiredParams, (inputParam) => {
         it(`required parameter - ${inputParam.Name}`, async() => {
             actionsInput.defineInputsExcept(inputParam.Name);
             let res, err;

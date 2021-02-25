@@ -1,19 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, getInputAsBool, getWorkingDirectory, PacRunner } from '../../lib';
+import { ActionLogger, AuthHandler, AuthKind, getInputAsBool, getWorkingDirectory, PacRunner } from '../../lib';
 import path = require('path');
 import fs = require('fs-extra');
 
 core.startGroup('export-solution:');
-const envUrl = core.getInput('environment-url', { required: true });
-const username = core.getInput('user-name', { required: true });
-core.info(`environmentUrl: ${envUrl}; login as user: ${username}`);
-
-const password = core.getInput('password-secret', { required: true });
-if (!password || password.length === 0) {
-    core.setFailed('Missing password! Specify one by setting input: \'password-secret\'');
-}
 const solutionName = core.getInput('solution-name', { required: true });
 const solutionVersion = core.getInput('solution-version', { required: false });
 const isManaged = getInputAsBool('managed', false, false);
@@ -30,8 +22,7 @@ const logger = new ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     const pac = new PacRunner(workingDir, logger);
-    await pac.run(['auth', 'clear']);
-    await pac.run(['auth', 'create', '--url', envUrl, '--username', username, '--password', password]);
+    await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const exportArgs = ['solution', 'export', '--name', solutionName, '--path', outputFile];
     if (solutionVersion) { exportArgs.push('--targetVersion', solutionVersion); }
