@@ -39,7 +39,7 @@ export class AuthHandler {
 
         try{
             if (validUsernameAuth && validSPNAuth) {
-                throw new Error('Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.');
+                throw new Error('Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.');
             }
 
             if (validUsernameAuth) {
