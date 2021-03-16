@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/microsoft/powerplatform-cli-wrapper.git
+	branch = tyhogset/setup-dist-folder
+	commit = e7b6addcf36e859135cedeffd16513049d2caf45
+	parent = e4be44046994c3585d620a6cf01c3646af7bf8a8
+	method = merge
+	cmdver = 0.4.3
