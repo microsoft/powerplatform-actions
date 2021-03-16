@@ -10,10 +10,6 @@ export class ExeRunner {
     private _outDirRoot!: string;
 
     public constructor(private readonly _workingDir: string, private readonly logger: Logger, exeName: string, exeRelativePath?: string[]) {
-        const platform = os.platform();
-        if (platform !== 'win32') {
-            throw Error(`Unsupported Action runner os: '${platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
-        }
         if (exeRelativePath) {
             exeRelativePath.push(exeName);
             this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
@@ -51,12 +47,12 @@ export class ExeRunner {
             const stderr = new Array<string>();
 
             this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
-            const pac = spawn(this._exePath, args, { cwd: this.workingDir });
+            const process = spawn(this._exePath, args, { cwd: this.workingDir });
 
-            pac.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
-            pac.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
+            process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
+            process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
 
-            pac.on('close', (code) => {
+            process.on('close', (code) => {
                 if (code === 0) {
                     this.logger.info(`success: ${stdout.join(os.EOL)}`);
                     resolve(stdout);

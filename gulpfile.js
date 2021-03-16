@@ -160,6 +160,7 @@ async function createDist() {
 
 const recompile = gulp.series(
     clean,
+    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.5-daily-21022605', path.resolve(outdir, 'pac_linux')),
     async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.5.3-daily-21021001', path.resolve(outdir, 'pac')),
     async () => nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.49', path.resolve(outdir, 'sopa')),
     compile
