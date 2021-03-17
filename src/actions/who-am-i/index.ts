@@ -4,23 +4,22 @@ import * as core from "@actions/core";
 import { AuthKind, AuthHandler } from "../../lib";
 import createActionsPacRunner from "../../lib/createActionsPacRunner";
 import createCliWrapperPacAuthenticator from "../../lib/auth/createCliWrapperPacAuthenticator";
+import { PacRunner } from "powerplatform-cli-wrapper";
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main();
+        await main(createActionsPacRunner());
     }
 })();
 
-export async function main(): Promise<void> {
+export async function main(pac: PacRunner): Promise<void> {
     try {
         core.startGroup("who-am-i");
-
-        const pac = createActionsPacRunner();
 
         const authenticator = createCliWrapperPacAuthenticator(pac);
         await new AuthHandler(authenticator).authenticate(AuthKind.CDS);
 
-        await pac.org.who();
+        await pac.whoAmI();
         core.endGroup();
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);

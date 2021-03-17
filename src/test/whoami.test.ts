@@ -1,36 +1,40 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { expect } from 'chai';
+import { expect, use } from "chai";
+import { main as whoAmI } from "../actions/who-am-i";
+import { stubInterface } from "ts-sinon";
+import { ActionInputsEmulator } from "./actionInputsEmulator";
+import { PacRunner } from "powerplatform-cli-wrapper";
+import * as sinonChai from "sinon-chai";
+use(sinonChai);
 
-import { main as whoAmI } from '../actions/who-am-i';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
-
-describe('who-am-i#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
+describe("who-am-i#input validation", () => {
+    const pac = stubInterface<PacRunner>();
     // TODO: read in params and their required state from the action.yml
 
     const inputParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
-        { Name: 'user-name', Value: 'aUserName' },
-        { Name: 'password-secret', Value: 'aSecret' },
+        { Name: "environment-url", Value: "aUrl" },
+        { Name: "user-name", Value: "aUserName" },
+        { Name: "password-secret", Value: "aSecret" },
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
 
-    it('call action', async() => {
+    it("call action", async () => {
         actionInputs.defineInputs();
         let err;
         try {
-            await whoAmI();
-        }
-        catch (error) {
+            await whoAmI(pac);
+        } catch (error) {
             err = error;
         }
         expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--url', 'aUrl', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'org', 'who' ] });
+        expect(
+            pac.authenticateCdsWithUsernamePassword
+        ).to.have.been.calledOnceWith({
+            envUrl: "aUrl",
+            username: "aUserName",
+            password: "aSecret",
+        });
+        expect(pac.whoAmI).to.have.been.calledOnce;
     });
 });

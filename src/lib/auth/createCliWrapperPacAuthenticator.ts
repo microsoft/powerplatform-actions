@@ -13,26 +13,26 @@ export default function createCliWrapperPacAuthenticator(
         authenticateCdsWithClientCredentials: async (
             parameters: ClientCredentials & CdsEnvironment
         ) => {
-            await pac.auth.clear();
-            await pac.auth.createCdsClientCredentials(parameters);
+            await pac.clearAuthenticationProfiles();
+            await pac.authenticateCdsWithClientCredentials(parameters);
         },
         authenticateAdminWithClientCredentials: async (
             parameters: ClientCredentials
         ) => {
-            await pac.auth.clear();
-            await pac.auth.createAdminClientCredentials(parameters);
+            await pac.clearAuthenticationProfiles();
+            await pac.authenticateAdminWithClientCredentials(parameters);
         },
         authenticateCdsWithUsernamePassword: async (
             parameters: UsernamePassword & CdsEnvironment
         ) => {
-            await pac.auth.clear();
-            await pac.auth.createCdsUsernamePassword(parameters);
+            await pac.clearAuthenticationProfiles();
+            await pac.authenticateCdsWithUsernamePassword(parameters);
         },
         authenticateAdminWithUsernamePassword: async (
             parameters: UsernamePassword
         ) => {
-            await pac.auth.clear();
-            await pac.auth.createAdminUsernamePassword(parameters);
+            await pac.clearAuthenticationProfiles();
+            await pac.authenticateAdminWithUsernamePassword(parameters);
         },
     };
 }
