@@ -12,18 +12,3 @@ export interface PacAuthenticator {
         parameters: UsernamePassword
     ): Promise<void>;
 }
-
-export interface ClientCredentials {
-    appId: string;
-    clientSecret: string;
-    tenantId: string;
-}
-
-export interface CdsEnvironment {
-    envUrl: string;
-}
-
-export interface UsernamePassword {
-    username: string;
-    password: string;
-}
