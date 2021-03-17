@@ -492,7 +492,7 @@ exports.ActionLogger = ActionLogger;
 
 /***/ }),
 
-/***/ 883:
+/***/ 677:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -510,15 +510,20 @@ exports.AuthKind = exports.AuthHandler = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __webpack_require__(186);
+const createLegacyRunnerPacAuthenticator_1 = __webpack_require__(687);
 class AuthHandler {
     constructor(pac) {
-        this.pac = pac;
-        this._pac = pac;
+        if ("run" in pac) {
+            this._pacAuthenticator = createLegacyRunnerPacAuthenticator_1.default(pac);
+        }
+        else {
+            this._pacAuthenticator = pac;
+        }
     }
     authenticate(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
-            core.startGroup('authentication');
-            this._envUrl = core.getInput('environment-url', { required: false });
+            core.startGroup("authentication");
+            this._envUrl = core.getInput("environment-url", { required: false });
             const authType = this.determineAuthType();
             if (authType === AuthTypes.USERNAME_PASSWORD) {
                 yield this.authenticateWithUsernamePassword(authKind);
@@ -527,7 +532,7 @@ class AuthHandler {
                 yield this.authenticateWithClientCredentials(authKind);
             }
             else {
-                throw new Error('Must provide either username/password or app-id/client-secret/tenant-id for authentication!');
+                throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
             }
             core.endGroup();
         });
@@ -537,7 +542,7 @@ class AuthHandler {
         const validSPNAuth = this.isValidSPNAuth();
         try {
             if (validUsernameAuth && validSPNAuth) {
-                throw new Error('Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.');
+                throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
             }
             if (validUsernameAuth) {
                 return AuthTypes.USERNAME_PASSWORD;
@@ -553,37 +558,53 @@ class AuthHandler {
         return AuthTypes.INVALID_AUTH_TYPE;
     }
     isValidUsernameAuth() {
-        this._username = core.getInput('user-name', { required: false });
-        this._password = core.getInput('password-secret', { required: false });
-        return (!!this._username && !!this._password);
+        this._username = core.getInput("user-name", { required: false });
+        this._password = core.getInput("password-secret", { required: false });
+        return !!this._username && !!this._password;
     }
     isValidSPNAuth() {
-        this._appId = core.getInput('app-id', { required: false });
-        this._clientSecret = core.getInput('client-secret', { required: false });
-        this._tenantId = core.getInput('tenant-id', { required: false });
-        return (!!this._appId && !!this._clientSecret && !!this._tenantId);
+        this._appId = core.getInput("app-id", { required: false });
+        this._clientSecret = core.getInput("client-secret", {
+            required: false,
+        });
+        this._tenantId = core.getInput("tenant-id", { required: false });
+        return !!this._appId && !!this._clientSecret && !!this._tenantId;
     }
     authenticateWithClientCredentials(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
             core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
-            yield this._pac.run(['auth', 'clear']);
             if (authKind === AuthKind.CDS) {
-                yield this._pac.run(['auth', 'create', '--url', this._envUrl, '--applicationId', this._appId, '--clientSecret', this._clientSecret, '--tenant', this._tenantId]);
+                yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
+                    envUrl: this._envUrl,
+                    tenantId: this._tenantId,
+                    appId: this._appId,
+                    clientSecret: this._clientSecret,
+                });
             }
             else {
-                yield this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--applicationId', this._appId, '--clientSecret', this._clientSecret, '--tenant', this._tenantId]);
+                yield this._pacAuthenticator.authenticateAdminWithClientCredentials({
+                    tenantId: this._tenantId,
+                    appId: this._appId,
+                    clientSecret: this._clientSecret,
+                });
             }
         });
     }
     authenticateWithUsernamePassword(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
             core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
-            yield this._pac.run(['auth', 'clear']);
             if (authKind == AuthKind.CDS) {
-                yield this._pac.run(['auth', 'create', '--url', this._envUrl, '--username', this._username, '--password', this._password]);
+                yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
+                    envUrl: this._envUrl,
+                    username: this._username,
+                    password: this._password,
+                });
             }
             else {
-                yield this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', this._username, '--password', this._password]);
+                yield this._pacAuthenticator.authenticateAdminWithUsernamePassword({
+                    username: this._username,
+                    password: this._password,
+                });
             }
         });
     }
@@ -602,6 +623,92 @@ var AuthKind;
 })(AuthKind = exports.AuthKind || (exports.AuthKind = {}));
 
 //# sourceMappingURL=authHandler.js.map
+
+
+/***/ }),
+
+/***/ 687:
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function createLegacyRunnerPacAuthenticator(pac) {
+    return {
+        authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--url",
+                parameters.envUrl,
+                "--applicationId",
+                parameters.appId,
+                "--clientSecret",
+                parameters.clientSecret,
+                "--tenant",
+                parameters.tenantId,
+            ]);
+        }),
+        authenticateAdminWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--kind",
+                "ADMIN",
+                "--applicationId",
+                parameters.appId,
+                "--clientSecret",
+                parameters.clientSecret,
+                "--tenant",
+                parameters.tenantId,
+            ]);
+        }),
+        authenticateCdsWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--url",
+                parameters.envUrl,
+                "--username",
+                parameters.username,
+                "--password",
+                parameters.password,
+            ]);
+        }),
+        authenticateAdminWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--kind",
+                "ADMIN",
+                "--username",
+                parameters.username,
+                "--password",
+                parameters.password,
+            ]);
+        }),
+    };
+    function clearAuth() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield pac.run(["auth", "clear"]);
+        });
+    }
+}
+exports.default = createLegacyRunnerPacAuthenticator;
+
+//# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
 
 
 /***/ }),
@@ -625,56 +732,35 @@ exports.RunnerError = exports.ExeRunner = void 0;
 // Licensed under the MIT License.
 const child_process_1 = __webpack_require__(129);
 const os = __webpack_require__(87);
-const path = __webpack_require__(622);
+const getExePath_1 = __webpack_require__(309);
 class ExeRunner {
-    constructor(_workingDir, logger, exeName, exeRelativePath) {
+    constructor(_workingDir, logger, exeRelativePath) {
         this._workingDir = _workingDir;
         this.logger = logger;
         const platform = os.platform();
-        if (platform !== 'win32') {
+        if (platform !== "win32") {
             throw Error(`Unsupported Action runner os: '${platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
         }
-        if (exeRelativePath) {
-            exeRelativePath.push(exeName);
-            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
+        if (Array.isArray(exeRelativePath)) {
+            this._exePath = getExePath_1.default(...exeRelativePath);
         }
         else {
-            this._exePath = exeName;
+            this._exePath = exeRelativePath;
         }
     }
     get workingDir() {
         return this._workingDir;
-    }
-    get outDirRoot() {
-        if (!this._outDirRoot) {
-            // in mocha, __dirname resolves to the src folder of the .ts file,
-            // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
-            const dirname = path.resolve(__dirname);
-            const parentDir = path.dirname(dirname);
-            // /dist/actions/<action-name>/index.js:
-            // /out/actions/<action-name>/index.js:
-            if (path.basename(parentDir) === 'actions') {
-                this._outDirRoot = path.resolve(path.dirname(parentDir));
-            }
-            else if (path.basename(parentDir) === 'src' || path.basename(parentDir) === 'out') {
-                this._outDirRoot = path.resolve(parentDir, '..', 'out');
-            }
-            else {
-                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${dirname}`);
-            }
-        }
-        return this._outDirRoot;
     }
     run(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 const stdout = new Array();
                 const stderr = new Array();
-                this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
+                this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
                 const pac = child_process_1.spawn(this._exePath, args, { cwd: this.workingDir });
-                pac.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
-                pac.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
-                pac.on('close', (code) => {
+                pac.stdout.on("data", (data) => stdout.push(...data.toString().split(os.EOL)));
+                pac.stderr.on("data", (data) => stderr.push(...data.toString().split(os.EOL)));
+                pac.on("close", (code) => {
                     if (code === 0) {
                         this.logger.info(`success: ${stdout.join(os.EOL)}`);
                         resolve(stdout);
@@ -682,7 +768,7 @@ class ExeRunner {
                     else {
                         const allOutput = stderr.concat(stdout);
                         this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                        reject(new RunnerError(code, allOutput.join()));
+                        reject(new RunnerError(code !== null && code !== void 0 ? code : 99999, allOutput.join()));
                     }
                 });
             });
@@ -690,17 +776,19 @@ class ExeRunner {
     }
     runSync(args) {
         var _a;
-        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
+        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
         const proc = child_process_1.spawnSync(this._exePath, args, { cwd: this.workingDir });
         if (proc.status === 0) {
             const output = proc.output
-                .filter(line => !!line) // can have null entries
-                .map(line => line.toString());
+                .filter((line) => !!line) // can have null entries
+                .map((line) => line.toString());
             this.logger.info(`success: ${output.join(os.EOL)}`);
             return output;
         }
         else {
-            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
+            const allOutput = proc.stderr
+                .toString()
+                .concat(proc.stdout.toString());
             this.logger.error(`error: ${proc.status}: ${allOutput}`);
             throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
         }
@@ -716,6 +804,40 @@ class RunnerError extends Error {
 exports.RunnerError = RunnerError;
 
 //# sourceMappingURL=exeRunner.js.map
+
+
+/***/ }),
+
+/***/ 309:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const path_1 = __webpack_require__(622);
+function getExePath(...relativePath) {
+    // in mocha, __dirname resolves to the src folder of the .ts file,
+    // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
+    const currentDirectory = path_1.resolve(__dirname);
+    const parentDir = path_1.dirname(currentDirectory);
+    // /dist/actions/<action-name>/index.js:
+    // /out/actions/<action-name>/index.js:
+    let outDirRoot;
+    switch (path_1.basename(parentDir)) {
+        case "actions":
+            outDirRoot = path_1.resolve(path_1.dirname(parentDir));
+            break;
+        case "src":
+        case "out":
+            outDirRoot = path_1.resolve(parentDir, "..", "out");
+            break;
+        default:
+            throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${path_1.dirname}`);
+    }
+    return path_1.resolve(outDirRoot, ...relativePath);
+}
+exports.default = getExePath;
+
+//# sourceMappingURL=getExePath.js.map
 
 
 /***/ }),
@@ -765,11 +887,23 @@ var pacRunner_1 = __webpack_require__(366);
 Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
 var sopaRunner_1 = __webpack_require__(653);
 Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
-var authHandler_1 = __webpack_require__(883);
+var authHandler_1 = __webpack_require__(677);
 Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
 Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
 
 //# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 749:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.default = ["pac", "tools", "pac.exe"];
+
+//# sourceMappingURL=pacRelativePath.js.map
 
 
 /***/ }),
@@ -783,9 +917,10 @@ exports.PacRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __webpack_require__(21);
+const pacRelativePath_1 = __webpack_require__(749);
 class PacRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
-        super(workingDir, logger, 'pac.exe', ['pac', 'tools']);
+        super(workingDir, logger, pacRelativePath_1.default);
     }
 }
 exports.PacRunner = PacRunner;
@@ -831,6 +966,18 @@ exports.DefaultRunnerFactory = new RealRunnerFactory();
 
 /***/ }),
 
+/***/ 165:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.default = ["sopa", "content", "bin", "coretools", "SolutionPackager.exe"];
+
+//# sourceMappingURL=sopaRelativePath.js.map
+
+
+/***/ }),
+
 /***/ 653:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -840,9 +987,10 @@ exports.SopaRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __webpack_require__(21);
+const sopaRelativePath_1 = __webpack_require__(165);
 class SopaRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
-        super(workingDir, logger, 'SolutionPackager.exe', ['sopa', 'content', 'bin', 'coretools']);
+        super(workingDir, logger, sopaRelativePath_1.default);
     }
 }
 exports.SopaRunner = SopaRunner;
