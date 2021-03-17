@@ -1,4 +1,8 @@
-import { ClientCredentials, CdsEnvironment, UsernamePassword } from "powerplatform-cli-wrapper";
+import {
+    ClientCredentials,
+    CdsEnvironment,
+    UsernamePassword,
+} from "powerplatform-cli-wrapper";
 
 export interface PacAuthenticator {
     authenticateCdsWithClientCredentials(
