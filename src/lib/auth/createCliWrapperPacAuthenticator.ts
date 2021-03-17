@@ -6,7 +6,7 @@ import {
     UsernamePassword,
 } from "powerplatform-cli-wrapper";
 
-export default function createLegacyRunnerPacAuthenticator(
+export default function createCliWrapperPacAuthenticator(
     pac: PacRunner
 ): PacAuthenticator {
     return {

@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from "@actions/core";
+import { PacRunner } from "../pacRunner";
+import { Runner } from "../runnerFactory";
+import createLegacyRunnerPacAuthenticator from "./createLegacyRunnerPacAuthenticator";
 import { PacAuthenticator } from "./PacAuthenticator";
 
 export class AuthHandler {
@@ -10,8 +13,17 @@ export class AuthHandler {
     private _appId!: string;
     private _clientSecret!: string;
     private _tenantId!: string;
+    private _pacAuthenticator: PacAuthenticator;
 
-    constructor(private readonly pacAuthenticator: PacAuthenticator) {}
+    constructor(pac: PacAuthenticator | Runner) {
+        if ("run" in pac) {
+            this._pacAuthenticator = createLegacyRunnerPacAuthenticator(
+                pac as PacRunner
+            );
+        } else {
+            this._pacAuthenticator = pac;
+        }
+    }
 
     public async authenticate(authKind: AuthKind): Promise<void> {
         core.startGroup("authentication");
@@ -76,18 +88,20 @@ export class AuthHandler {
             `SPN Authentication : Authenticating with appId: ${this._appId}`
         );
         if (authKind === AuthKind.CDS) {
-            await this.pacAuthenticator.authenticateCdsWithClientCredentials({
+            await this._pacAuthenticator.authenticateCdsWithClientCredentials({
                 envUrl: this._envUrl,
                 tenantId: this._tenantId,
                 appId: this._appId,
                 clientSecret: this._clientSecret,
             });
         } else {
-            await this.pacAuthenticator.authenticateAdminWithClientCredentials({
-                tenantId: this._tenantId,
-                appId: this._appId,
-                clientSecret: this._clientSecret,
-            });
+            await this._pacAuthenticator.authenticateAdminWithClientCredentials(
+                {
+                    tenantId: this._tenantId,
+                    appId: this._appId,
+                    clientSecret: this._clientSecret,
+                }
+            );
         }
     }
 
@@ -98,13 +112,13 @@ export class AuthHandler {
             `Username/password Authentication : Authenticating with user: ${this._username}`
         );
         if (authKind == AuthKind.CDS) {
-            await this.pacAuthenticator.authenticateCdsWithUsernamePassword({
+            await this._pacAuthenticator.authenticateCdsWithUsernamePassword({
                 envUrl: this._envUrl,
                 username: this._username,
                 password: this._password,
             });
         } else {
-            await this.pacAuthenticator.authenticateAdminWithUsernamePassword({
+            await this._pacAuthenticator.authenticateAdminWithUsernamePassword({
                 username: this._username,
                 password: this._password,
             });
