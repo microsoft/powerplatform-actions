@@ -27,7 +27,7 @@ describe("PacAccess", () => {
   }).timeout(10 * 1000);
 
   it("can list auth profiles", async () => {
-    const res = await pac.auth.list();
+    const res = await pac.getAuthenticationProfiles();
     expect(res).to.be.not.empty;
   }).timeout(30 * 1000);
 });

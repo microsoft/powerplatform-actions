@@ -9,46 +9,42 @@ export function createPacRunner(
   const runCommand = createCommandRunner(workingDir, exePath, logger);
   const admin = ["--kind", "ADMIN"];
   return {
-    org: {
-      who: () => runCommand("org", "who"),
-    },
     help: () => runCommand(),
-    auth: {
-      list: () => runCommand("auth", "list"),
-      createCdsClientCredentials: (
-        parameters: CdsEnvironment & ClientCredentials
-      ) =>
-        runCommand(
-          "auth",
-          "create",
-          ...addUrl(parameters),
-          ...addClientCredentials(parameters)
-        ),
-      createAdminClientCredentials: (parameters: ClientCredentials) =>
-        runCommand(
-          "auth",
-          "create",
-          ...admin,
-          ...addClientCredentials(parameters)
-        ),
-      createCdsUsernamePassword: (
-        parameters: CdsEnvironment & UsernamePassword
-      ) =>
-        runCommand(
-          "auth",
-          "create",
-          ...addUrl(parameters),
-          ...addUsernamePassword(parameters)
-        ),
-      createAdminUsernamePassword: (parameters: UsernamePassword) =>
-        runCommand(
-          "auth",
-          "create",
-          ...admin,
-          ...addUsernamePassword(parameters)
-        ),
-      clear: () => runCommand("auth", "clear"),
-    },
+    whoAmI: () => runCommand("org", "who"),
+    getAuthenticationProfiles: () => runCommand("auth", "list"),
+    clearAuthenticationProfiles: () => runCommand("auth", "clear"),
+    authenticateCdsWithClientCredentials: (
+      parameters: CdsEnvironment & ClientCredentials
+    ) =>
+      runCommand(
+        "auth",
+        "create",
+        ...addUrl(parameters),
+        ...addClientCredentials(parameters)
+      ),
+    authenticateAdminWithClientCredentials: (parameters: ClientCredentials) =>
+      runCommand(
+        "auth",
+        "create",
+        ...admin,
+        ...addClientCredentials(parameters)
+      ),
+    authenticateCdsWithUsernamePassword: (
+      parameters: CdsEnvironment & UsernamePassword
+    ) =>
+      runCommand(
+        "auth",
+        "create",
+        ...addUrl(parameters),
+        ...addUsernamePassword(parameters)
+      ),
+    authenticateAdminWithUsernamePassword: (parameters: UsernamePassword) =>
+      runCommand(
+        "auth",
+        "create",
+        ...admin,
+        ...addUsernamePassword(parameters)
+      ),
   };
 
   function addUrl(parameters: CdsEnvironment) {
@@ -77,26 +73,22 @@ export function createPacRunner(
 }
 
 export interface PacRunner {
-  org: {
-    who: () => Promise<string[]>;
-  };
-  auth: {
-    list: () => Promise<string[]>;
-    createCdsClientCredentials: (
-      parameters: CdsEnvironment & ClientCredentials
-    ) => Promise<string[]>;
-    createAdminClientCredentials: (
-      parameters: ClientCredentials
-    ) => Promise<string[]>;
-    createCdsUsernamePassword: (
-      parameters: CdsEnvironment & UsernamePassword
-    ) => Promise<string[]>;
-    createAdminUsernamePassword: (
-      parameters: UsernamePassword
-    ) => Promise<string[]>;
-    clear: () => Promise<string[]>;
-  };
   help: () => Promise<string[]>;
+  whoAmI: () => Promise<string[]>;
+  getAuthenticationProfiles: () => Promise<string[]>;
+  clearAuthenticationProfiles: () => Promise<string[]>;
+  authenticateCdsWithClientCredentials: (
+    parameters: CdsEnvironment & ClientCredentials
+  ) => Promise<string[]>;
+  authenticateAdminWithClientCredentials: (
+    parameters: ClientCredentials
+  ) => Promise<string[]>;
+  authenticateCdsWithUsernamePassword: (
+    parameters: CdsEnvironment & UsernamePassword
+  ) => Promise<string[]>;
+  authenticateAdminWithUsernamePassword: (
+    parameters: UsernamePassword
+  ) => Promise<string[]>;
 }
 
 export interface ClientCredentials {
