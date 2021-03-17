@@ -1,23 +1,33 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import * as core from '@actions/core';
-import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory } from '../../lib';
+import * as core from "@actions/core";
+import { AuthKind, AuthHandler, ActionLogger } from "../../lib";
+import { createPacRunner } from "powerplatform-cli-wrapper";
+import getExePath from "../../lib/getExePath";
+import pacRelativePath from "../../lib/pacRelativePath";
+import { cwd } from "process";
+import { Runner } from "../../lib";
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
 })();
 
-export async function main(factory: RunnerFactory): Promise<void> {
+export async function main(): Promise<void> {
     try {
-        core.startGroup('who-am-i');
+        core.startGroup("who-am-i");
 
-        const pac = factory.getRunner('pac', process.cwd());
-        await new AuthHandler(pac).authenticate(AuthKind.CDS);
+        const pac = createPacRunner(
+            cwd(),
+            getExePath(...pacRelativePath),
+            new ActionLogger()
+        );
+        await new AuthHandler((pac as unknown) as Runner).authenticate(
+            AuthKind.CDS
+        );
 
-        const whoArgs = ['org', 'who'];
-        await pac.run(whoArgs);
+        await pac.org.who();
         core.endGroup();
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
