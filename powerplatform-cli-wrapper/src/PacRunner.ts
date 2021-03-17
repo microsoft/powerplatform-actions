@@ -18,7 +18,7 @@ export function createPacRunner(
   };
 }
 
-interface PacRunner {
+export interface PacRunner {
   org: {
     who: () => Promise<string[]>;
   };

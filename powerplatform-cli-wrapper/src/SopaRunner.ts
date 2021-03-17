@@ -20,7 +20,7 @@ export function createSopaRunner(
   };
 }
 
-interface SopaRunner {
+export interface SopaRunner {
   help: () => Promise<string[]>;
   pack: (parameters: PackParameters) => Promise<string[]>;
 }

@@ -5,7 +5,7 @@ import { createSopaRunner } from "../src";
 import { createTestLog } from "./createTestLogger";
 
 describe("SoPa", () => {
-  const workDir = path.resolve(__dirname, "..", "out", "test");
+  const workDir = path.resolve(__dirname, "..", "bin", "test");
   const sopaExePath = path.resolve(
     __dirname,
     "..",
@@ -41,7 +41,7 @@ describe("SoPa", () => {
     const solutionPath = path.resolve(workDir, "emptySolution.zip");
     const stagedDir = path.resolve(__dirname, "data", "emptySolution");
 
-    const res = await sopa.pack({ folder: stagedDir, zipFile: solutionPath});
+    const res = await sopa.pack({ folder: stagedDir, zipFile: solutionPath });
     expect(res).to.contain("Unmanaged Pack complete.");
-  }).timeout(20 * 1000);
+  }).timeout(30 * 1000);
 });

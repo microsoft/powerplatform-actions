@@ -8,6 +8,6 @@ export function createGitRunner(workingDir: string, logger: Logger): GitRunner {
   };
 }
 
-interface GitRunner {
+export interface GitRunner {
   log(): Promise<string[]>;
 }

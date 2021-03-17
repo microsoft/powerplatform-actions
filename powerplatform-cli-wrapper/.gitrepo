@@ -5,8 +5,8 @@
 ;
 [subrepo]
 	remote = https://github.com/microsoft/powerplatform-cli-wrapper.git
-	branch = tyhogset/setup-dist-folder
-	commit = e7b6addcf36e859135cedeffd16513049d2caf45
-	parent = e4be44046994c3585d620a6cf01c3646af7bf8a8
+	branch = tyhogset/expose-runners
+	commit = 19af0d02412d68b054dba8bd48822a17f24975bc
+	parent = 48708cfd91c3cbf542280ad1bc718976d17e4f3f
 	method = merge
 	cmdver = 0.4.3

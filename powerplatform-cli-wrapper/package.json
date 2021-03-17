@@ -7,10 +7,10 @@
   "description": "JavaScript wrapper for Power Platform CLI (pac)",
   "main": "dist/index.js",
   "scripts": {
-    "build": "gulp",
-    "test": "gulp restore && gulp test",
-    "ci": "gulp ci",
-    "dist": "gulp dist && git add -f -- ./dist"
+    "build": "node node_modules/gulp/bin/gulp.js",
+    "test": "node node_modules/gulp/bin/gulp.js test",
+    "ci": "node node_modules/gulp/bin/gulp.js ci",
+    "dist": "node node_modules/gulp/bin/gulp.js dist && git add -f -- ./dist"
   },
   "author": "PowerApps-ISV-Tools",
   "license": "MIT",
