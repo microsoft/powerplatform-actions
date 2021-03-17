@@ -47,6 +47,7 @@ export function createPacRunner(
           ...admin,
           ...addUsernamePassword(parameters)
         ),
+      clear: () => runCommand("auth", "clear"),
     },
   };
 
@@ -93,6 +94,7 @@ export interface PacRunner {
     createAdminUsernamePassword: (
       parameters: UsernamePassword
     ) => Promise<string[]>;
+    clear: () => Promise<string[]>;
   };
   help: () => Promise<string[]>;
 }
