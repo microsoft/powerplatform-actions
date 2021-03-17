@@ -5,8 +5,8 @@
 ;
 [subrepo]
 	remote = https://github.com/microsoft/powerplatform-cli-wrapper.git
-	branch = tyhogset/expose-runners
-	commit = 19af0d02412d68b054dba8bd48822a17f24975bc
-	parent = 48708cfd91c3cbf542280ad1bc718976d17e4f3f
+	branch = tyhogset/pac-auth
+	commit = 16ea4564eb2669223cc442c967c7ed309b9cc49e
+	parent = 8e275fe856b051c1bf5b06913f53466094fce50e
 	method = merge
 	cmdver = 0.4.3
