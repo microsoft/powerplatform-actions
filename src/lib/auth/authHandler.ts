@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from "@actions/core";
-import { PacAuthenticator } from "../PacAuthenticator";
+import { PacAuthenticator } from "./PacAuthenticator";
 
 export class AuthHandler {
     private _envUrl!: string;

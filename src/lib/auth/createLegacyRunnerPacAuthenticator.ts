@@ -1,8 +1,13 @@
-import { PacRunner } from "powerplatform-cli-wrapper";
-import { PacRunner as LegacyRunner } from "./pacRunner";
+import { PacRunner } from "../pacRunner";
+import {
+    CdsEnvironment,
+    ClientCredentials,
+    PacAuthenticator,
+    UsernamePassword,
+} from "./PacAuthenticator";
 
-export function createLegacyRunnerPacAuthenticator(
-    pac: LegacyRunner
+export default function createLegacyRunnerPacAuthenticator(
+    pac: PacRunner
 ): PacAuthenticator {
     return {
         authenticateCdsWithClientCredentials: async (
@@ -74,34 +79,4 @@ export function createLegacyRunnerPacAuthenticator(
     async function clearAuth() {
         await pac.run(["auth", "clear"]);
     }
-}
-
-export interface PacAuthenticator {
-    authenticateCdsWithClientCredentials(
-        parameters: ClientCredentials & CdsEnvironment
-    ): Promise<void>;
-    authenticateAdminWithClientCredentials(
-        parameters: ClientCredentials
-    ): Promise<void>;
-    authenticateCdsWithUsernamePassword(
-        parameters: UsernamePassword & CdsEnvironment
-    ): Promise<void>;
-    authenticateAdminWithUsernamePassword(
-        parameters: UsernamePassword
-    ): Promise<void>;
-}
-
-export interface ClientCredentials {
-    appId: string;
-    clientSecret: string;
-    tenantId: string;
-}
-
-export interface CdsEnvironment {
-    envUrl: string;
-}
-
-export interface UsernamePassword {
-    username: string;
-    password: string;
 }
