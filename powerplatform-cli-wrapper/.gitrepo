@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/microsoft/powerplatform-cli-wrapper.git
 	branch = tyhogset/pac-auth
-	commit = 16ea4564eb2669223cc442c967c7ed309b9cc49e
-	parent = 8e275fe856b051c1bf5b06913f53466094fce50e
+	commit = 57a0b0ce5c0bead8d293967ca84f41a40662e515
+	parent = c3a51ae1d566fe71899770299a8a84f528ca47da
 	method = merge
 	cmdver = 0.4.3
