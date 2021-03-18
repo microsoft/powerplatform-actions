@@ -20,16 +20,14 @@ jobs:
       uses: actions/setup-node@v2-beta
       with:
         node-version: 14.x
-        registry-url: https://npm.pkg.github.com
-        scope: '@microsoft'
 
     - name: Build and test
       run: |
+        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}" >> ".npmrc"
         npm i
         npm run ci
       env:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
-        NODE_AUTH_TOKEN: ${{ secrets.GPR_ACCESS_TOKEN }}
 
     - name: Test who-am-i action
       uses: ./who-am-i
