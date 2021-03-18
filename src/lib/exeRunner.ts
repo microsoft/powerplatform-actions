@@ -10,12 +10,6 @@ export class ExeRunner {
     private _outDirRoot!: string;
 
     public constructor(private readonly _workingDir: string, private readonly logger: Logger, exeName: string, exeRelativePath?: string[]) {
-
-        // Debugging: The pathing is working differently within the GithubActions workflow and local
-        // Revert prior to merge with main
-        this.logger.info("Debugging - exeName: ", exeName);
-        this.logger.info("Debugging - exeRelativePath: ", ...(exeRelativePath ? exeRelativePath : []));
-
         if (exeRelativePath) {
             this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath, exeName);
         } else {
@@ -33,11 +27,8 @@ export class ExeRunner {
             // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
             const dirname = path.resolve(__dirname);
             const parentDir = path.dirname(dirname);
-            this.logger.info("Debugging - dirname: ", dirname);
-            this.logger.info("Debugging - parentDir: ", parentDir);
             // /dist/actions/<action-name>/index.js:
             // /out/actions/<action-name>/index.js:
-            this.logger.info("Debugging - basename of parentDir: ", path.basename(parentDir));
             if (path.basename(parentDir) === 'actions') {
                 this._outDirRoot = path.resolve(path.dirname(parentDir));
             } else if (path.basename(parentDir) === 'src' || path.basename(parentDir) === 'out') {
@@ -46,7 +37,6 @@ export class ExeRunner {
                 throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${dirname}`);
             }
         }
-        this.logger.info("Debugging - _outDirRootparentDir: ", this._outDirRoot);
         return this._outDirRoot;
     }
 
