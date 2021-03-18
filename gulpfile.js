@@ -141,6 +141,7 @@ async function createDist() {
     fs.emptyDirSync(distdir);
     binplace('SoPa', path.join('sopa', 'content', 'bin', 'coretools'));
     binplace('pac CLI', path.join('pac', 'tools'));
+    binplace('pac CLI', path.join('pac_linux', 'tools'));
 
     glob.sync('**/action.yml', {
             cwd: __dirname
@@ -161,7 +162,7 @@ async function createDist() {
 
 const recompile = gulp.series(
     clean,
-    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.5-daily-21022605', path.resolve(outdir, 'pac_linux')),
+    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.6-daily-21031515', path.resolve(outdir, 'pac_linux')),
     async () => { if (os.platform() === 'linux') { return fs.chmod(path.resolve(outdir, 'pac_linux', 'tools', 'pac'), 0o711) } },
     async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.5.3-daily-21021001', path.resolve(outdir, 'pac')),
     async () => nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.49', path.resolve(outdir, 'sopa')),
