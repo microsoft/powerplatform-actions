@@ -17,8 +17,7 @@ export class ExeRunner {
         this.logger.info("Debugging - exeRelativePath: ", ...(exeRelativePath ? exeRelativePath : []));
 
         if (exeRelativePath) {
-            exeRelativePath.push(exeName);
-            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
+            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath, exeName);
         } else {
             this._exePath = exeName;
         }
