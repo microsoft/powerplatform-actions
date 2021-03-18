@@ -51,14 +51,14 @@ export class ExeRunner {
             process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
             process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
 
-            process.on('close', (code) => {
+            process.on('exit', (code) => {
                 if (code === 0) {
                     this.logger.info(`success: ${stdout.join(os.EOL)}`);
                     resolve(stdout);
                 } else {
                     const allOutput = stderr.concat(stdout);
                     this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                    reject(new RunnerError(code, allOutput.join()));
+                    reject(new RunnerError(code ?? 99999, allOutput.join()));
                 }
             });
         });
