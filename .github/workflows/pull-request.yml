@@ -45,3 +45,10 @@ jobs:
         solution-folder: 'src/test/data/emptySolution'
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
+
+    - name: Upload test logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Test Logs ${{ matrix.os }}
+        path: ./out/logs/*-tests.log
