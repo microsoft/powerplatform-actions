@@ -4,7 +4,7 @@ import * as core from "@actions/core";
 import { AuthKind, AuthHandler } from "../../lib";
 import createActionsPacRunner from "../../lib/createActionsPacRunner";
 import createCliWrapperPacAuthenticator from "../../lib/auth/createCliWrapperPacAuthenticator";
-import { PacRunner } from "powerplatform-cli-wrapper";
+import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {

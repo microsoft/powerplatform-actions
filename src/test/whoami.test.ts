@@ -4,7 +4,7 @@ import { expect, use } from "chai";
 import { main as whoAmI } from "../actions/who-am-i";
 import { stubInterface } from "ts-sinon";
 import { ActionInputsEmulator } from "./actionInputsEmulator";
-import { PacRunner } from "powerplatform-cli-wrapper";
+import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
 import * as sinonChai from "sinon-chai";
 use(sinonChai);
 

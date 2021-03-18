@@ -1,4 +1,7 @@
-import { createPacRunner, PacRunner } from "powerplatform-cli-wrapper";
+import {
+    createPacRunner,
+    PacRunner,
+} from "@microsoft/powerplatform-cli-wrapper";
 import { cwd } from "process";
 import { ActionLogger } from "./actionLogger";
 import getExePath from "./getExePath";

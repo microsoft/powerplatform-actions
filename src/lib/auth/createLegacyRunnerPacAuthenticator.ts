@@ -4,7 +4,7 @@ import {
     ClientCredentials,
     CdsEnvironment,
     UsernamePassword,
-} from "powerplatform-cli-wrapper";
+} from "@microsoft/powerplatform-cli-wrapper";
 
 export default function createLegacyRunnerPacAuthenticator(
     pac: PacRunner
