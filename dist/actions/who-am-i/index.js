@@ -392,6 +392,213 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
+/***/ 771:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RunnerError = exports.createCommandRunner = void 0;
+const child_process_1 = __webpack_require__(129);
+const process_1 = __webpack_require__(765);
+const os_1 = __webpack_require__(87);
+const restrictPlatformToWindows_1 = __webpack_require__(953);
+function createCommandRunner(workingDir, commandPath, logger) {
+    restrictPlatformToWindows_1.default();
+    return function run(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                logInitialization(...args);
+                const stdout = [];
+                const stderr = [];
+                const process = child_process_1.spawn(commandPath, args, {
+                    cwd: workingDir,
+                    env: { PATH: process_1.env.PATH },
+                });
+                process.stdout.on("data", (data) => stdout.push(...data.toString().split(os_1.EOL)));
+                process.stderr.on("data", (data) => stderr.push(...data.toString().split(os_1.EOL)));
+                process.on("close", (code) => {
+                    if (code === 0) {
+                        logSuccess(stdout);
+                        resolve(stdout);
+                    }
+                    else {
+                        const allOutput = stderr.concat(stdout);
+                        logger.error(`error: ${code}: ${allOutput.join(os_1.EOL)}`);
+                        reject(new RunnerError(code, allOutput.join()));
+                    }
+                });
+            });
+        });
+    };
+    function logInitialization(...args) {
+        logger.info(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
+    }
+    function logSuccess(output) {
+        logger.info(`success: ${output.join(os_1.EOL)}`);
+    }
+}
+exports.createCommandRunner = createCommandRunner;
+class RunnerError extends Error {
+    constructor(exitCode, message) {
+        super(message);
+        this.exitCode = exitCode;
+    }
+}
+exports.RunnerError = RunnerError;
+
+//# sourceMappingURL=CommandRunner.js.map
+
+
+/***/ }),
+
+/***/ 286:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createGitRunner = void 0;
+const CommandRunner_1 = __webpack_require__(771);
+function createGitRunner(workingDir, logger) {
+    const runCommand = CommandRunner_1.createCommandRunner(workingDir, "git", logger);
+    return {
+        log: () => __awaiter(this, void 0, void 0, function* () { return runCommand("log"); }),
+    };
+}
+exports.createGitRunner = createGitRunner;
+
+//# sourceMappingURL=GitRunner.js.map
+
+
+/***/ }),
+
+/***/ 124:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createSopaRunner = exports.createPacRunner = exports.createGitRunner = exports.RunnerError = void 0;
+var CommandRunner_1 = __webpack_require__(771);
+Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return CommandRunner_1.RunnerError; } }));
+// TODO: delete exports once all actions are converted:
+var gitRunner_1 = __webpack_require__(286);
+Object.defineProperty(exports, "createGitRunner", ({ enumerable: true, get: function () { return gitRunner_1.createGitRunner; } }));
+var pacRunner_1 = __webpack_require__(488);
+Object.defineProperty(exports, "createPacRunner", ({ enumerable: true, get: function () { return pacRunner_1.createPacRunner; } }));
+var sopaRunner_1 = __webpack_require__(996);
+Object.defineProperty(exports, "createSopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.createSopaRunner; } }));
+
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 488:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createPacRunner = void 0;
+const CommandRunner_1 = __webpack_require__(771);
+function createPacRunner(workingDir, exePath, logger) {
+    const runCommand = CommandRunner_1.createCommandRunner(workingDir, exePath, logger);
+    const admin = ["--kind", "ADMIN"];
+    return {
+        help: () => runCommand(),
+        whoAmI: () => runCommand("org", "who"),
+        getAuthenticationProfiles: () => runCommand("auth", "list"),
+        clearAuthenticationProfiles: () => runCommand("auth", "clear"),
+        authenticateCdsWithClientCredentials: (parameters) => runCommand("auth", "create", ...addUrl(parameters), ...addClientCredentials(parameters)),
+        authenticateAdminWithClientCredentials: (parameters) => runCommand("auth", "create", ...admin, ...addClientCredentials(parameters)),
+        authenticateCdsWithUsernamePassword: (parameters) => runCommand("auth", "create", ...addUrl(parameters), ...addUsernamePassword(parameters)),
+        authenticateAdminWithUsernamePassword: (parameters) => runCommand("auth", "create", ...admin, ...addUsernamePassword(parameters)),
+    };
+    function addUrl(parameters) {
+        return ["--url", parameters.envUrl];
+    }
+    function addClientCredentials(parameters) {
+        return [
+            "--tenant",
+            parameters.tenantId,
+            "--applicationId",
+            parameters.appId,
+            "--clientSecret",
+            parameters.clientSecret,
+        ];
+    }
+    function addUsernamePassword(parameters) {
+        return [
+            "--username",
+            parameters.username,
+            "--password",
+            parameters.password,
+        ];
+    }
+}
+exports.createPacRunner = createPacRunner;
+
+//# sourceMappingURL=pacRunner.js.map
+
+
+/***/ }),
+
+/***/ 953:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const os_1 = __webpack_require__(87);
+function restrictPlatformToWindows() {
+    const currentPlatform = os_1.platform();
+    if (currentPlatform !== "win32") {
+        throw Error(`Unsupported Action runner os: '${os_1.platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
+    }
+}
+exports.default = restrictPlatformToWindows;
+
+//# sourceMappingURL=restrictPlatformToWindows.js.map
+
+
+/***/ }),
+
+/***/ 996:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createSopaRunner = void 0;
+const CommandRunner_1 = __webpack_require__(771);
+function createSopaRunner(workingDir, sopaExePath, logger) {
+    const runCommand = CommandRunner_1.createCommandRunner(workingDir, sopaExePath, logger);
+    return {
+        help: () => runCommand(),
+        pack: (parameters) => runCommand("/nologo", "/action:pack", `/folder:${parameters.folder}`, `/zipFile:${parameters.zipFile}`),
+    };
+}
+exports.createSopaRunner = createSopaRunner;
+
+//# sourceMappingURL=sopaRunner.js.map
+
+
+/***/ }),
+
 /***/ 274:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -759,7 +966,7 @@ exports.default = createLegacyRunnerPacAuthenticator;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const powerplatform_cli_wrapper_1 = __webpack_require__(344);
+const powerplatform_cli_wrapper_1 = __webpack_require__(124);
 const process_1 = __webpack_require__(765);
 const actionLogger_1 = __webpack_require__(970);
 const getExePath_1 = __webpack_require__(309);
@@ -1055,213 +1262,6 @@ class SopaRunner extends exeRunner_1.ExeRunner {
     }
 }
 exports.SopaRunner = SopaRunner;
-
-//# sourceMappingURL=sopaRunner.js.map
-
-
-/***/ }),
-
-/***/ 901:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RunnerError = exports.createCommandRunner = void 0;
-const child_process_1 = __webpack_require__(129);
-const process_1 = __webpack_require__(765);
-const os_1 = __webpack_require__(87);
-const restrictPlatformToWindows_1 = __webpack_require__(177);
-function createCommandRunner(workingDir, commandPath, logger) {
-    restrictPlatformToWindows_1.default();
-    return function run(...args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                logInitialization(...args);
-                const stdout = [];
-                const stderr = [];
-                const process = child_process_1.spawn(commandPath, args, {
-                    cwd: workingDir,
-                    env: { PATH: process_1.env.PATH },
-                });
-                process.stdout.on("data", (data) => stdout.push(...data.toString().split(os_1.EOL)));
-                process.stderr.on("data", (data) => stderr.push(...data.toString().split(os_1.EOL)));
-                process.on("close", (code) => {
-                    if (code === 0) {
-                        logSuccess(stdout);
-                        resolve(stdout);
-                    }
-                    else {
-                        const allOutput = stderr.concat(stdout);
-                        logger.error(`error: ${code}: ${allOutput.join(os_1.EOL)}`);
-                        reject(new RunnerError(code, allOutput.join()));
-                    }
-                });
-            });
-        });
-    };
-    function logInitialization(...args) {
-        logger.info(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
-    }
-    function logSuccess(output) {
-        logger.info(`success: ${output.join(os_1.EOL)}`);
-    }
-}
-exports.createCommandRunner = createCommandRunner;
-class RunnerError extends Error {
-    constructor(exitCode, message) {
-        super(message);
-        this.exitCode = exitCode;
-    }
-}
-exports.RunnerError = RunnerError;
-
-//# sourceMappingURL=CommandRunner.js.map
-
-
-/***/ }),
-
-/***/ 987:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createGitRunner = void 0;
-const CommandRunner_1 = __webpack_require__(901);
-function createGitRunner(workingDir, logger) {
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, "git", logger);
-    return {
-        log: () => __awaiter(this, void 0, void 0, function* () { return runCommand("log"); }),
-    };
-}
-exports.createGitRunner = createGitRunner;
-
-//# sourceMappingURL=GitRunner.js.map
-
-
-/***/ }),
-
-/***/ 344:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createSopaRunner = exports.createPacRunner = exports.createGitRunner = exports.RunnerError = void 0;
-var CommandRunner_1 = __webpack_require__(901);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return CommandRunner_1.RunnerError; } }));
-// TODO: delete exports once all actions are converted:
-var gitRunner_1 = __webpack_require__(987);
-Object.defineProperty(exports, "createGitRunner", ({ enumerable: true, get: function () { return gitRunner_1.createGitRunner; } }));
-var pacRunner_1 = __webpack_require__(387);
-Object.defineProperty(exports, "createPacRunner", ({ enumerable: true, get: function () { return pacRunner_1.createPacRunner; } }));
-var sopaRunner_1 = __webpack_require__(686);
-Object.defineProperty(exports, "createSopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.createSopaRunner; } }));
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 387:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createPacRunner = void 0;
-const CommandRunner_1 = __webpack_require__(901);
-function createPacRunner(workingDir, exePath, logger) {
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, exePath, logger);
-    const admin = ["--kind", "ADMIN"];
-    return {
-        help: () => runCommand(),
-        whoAmI: () => runCommand("org", "who"),
-        getAuthenticationProfiles: () => runCommand("auth", "list"),
-        clearAuthenticationProfiles: () => runCommand("auth", "clear"),
-        authenticateCdsWithClientCredentials: (parameters) => runCommand("auth", "create", ...addUrl(parameters), ...addClientCredentials(parameters)),
-        authenticateAdminWithClientCredentials: (parameters) => runCommand("auth", "create", ...admin, ...addClientCredentials(parameters)),
-        authenticateCdsWithUsernamePassword: (parameters) => runCommand("auth", "create", ...addUrl(parameters), ...addUsernamePassword(parameters)),
-        authenticateAdminWithUsernamePassword: (parameters) => runCommand("auth", "create", ...admin, ...addUsernamePassword(parameters)),
-    };
-    function addUrl(parameters) {
-        return ["--url", parameters.envUrl];
-    }
-    function addClientCredentials(parameters) {
-        return [
-            "--tenant",
-            parameters.tenantId,
-            "--applicationId",
-            parameters.appId,
-            "--clientSecret",
-            parameters.clientSecret,
-        ];
-    }
-    function addUsernamePassword(parameters) {
-        return [
-            "--username",
-            parameters.username,
-            "--password",
-            parameters.password,
-        ];
-    }
-}
-exports.createPacRunner = createPacRunner;
-
-//# sourceMappingURL=pacRunner.js.map
-
-
-/***/ }),
-
-/***/ 177:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os_1 = __webpack_require__(87);
-function restrictPlatformToWindows() {
-    const currentPlatform = os_1.platform();
-    if (currentPlatform !== "win32") {
-        throw Error(`Unsupported Action runner os: '${os_1.platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
-    }
-}
-exports.default = restrictPlatformToWindows;
-
-//# sourceMappingURL=restrictPlatformToWindows.js.map
-
-
-/***/ }),
-
-/***/ 686:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createSopaRunner = void 0;
-const CommandRunner_1 = __webpack_require__(901);
-function createSopaRunner(workingDir, sopaExePath, logger) {
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, sopaExePath, logger);
-    return {
-        help: () => runCommand(),
-        pack: (parameters) => runCommand("/nologo", "/action:pack", `/folder:${parameters.folder}`, `/zipFile:${parameters.zipFile}`),
-    };
-}
-exports.createSopaRunner = createSopaRunner;
 
 //# sourceMappingURL=sopaRunner.js.map
 
