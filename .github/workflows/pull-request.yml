@@ -24,7 +24,7 @@ jobs:
 
     - name: Build and test
       run: |
-        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}" >> ".npmrc"
+        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
         npm i
         npm run ci
       env:
