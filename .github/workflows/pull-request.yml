@@ -40,7 +40,7 @@ jobs:
         password-secret: ${{ secrets.password }}
 
     - name: Test pack-solution action
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
