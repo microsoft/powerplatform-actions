@@ -8,12 +8,7 @@ on:
 
 jobs:
   instance-actions:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-      fail-fast: false
-      max-parallel: 1   # Both OS runs create/use/delete the same resources, so we can only run one at timey
+    runs-on: windows-latest
     env:
       RUNNER_DEBUG: 1
       WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
@@ -64,7 +59,6 @@ jobs:
         tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test pack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
@@ -94,7 +88,6 @@ jobs:
         run-asynchronously: true
 
     - name: Test unpack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./unpack-solution
       with:
         solution-file: 'out/CI/solution1.zip'
