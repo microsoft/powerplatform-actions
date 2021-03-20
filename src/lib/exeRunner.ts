@@ -43,7 +43,7 @@ export class ExeRunner {
                 } else {
                     const allOutput = stderr.concat(stdout);
                     this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                    reject(new RunnerError(code, allOutput.join()));
+                    reject(new RunnerError(code ?? 99999, allOutput.join()));
                 }
             });
         });
