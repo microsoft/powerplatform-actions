@@ -624,7 +624,9 @@ const createCliWrapperPacAuthenticator_1 = __webpack_require__(705);
     if (process.env.GITHUB_ACTIONS) {
         yield main(createActionsPacRunner_1.default());
     }
-}))();
+}))().catch((error) => {
+    throw error;
+});
 function main(pac) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
