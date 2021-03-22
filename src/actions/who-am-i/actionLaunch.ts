@@ -16,4 +16,4 @@ process.env['INPUT_PASSWORD-SECRET'] = password;
 process.env['RUNNER_DEBUG'] = '1';
 process.env['GITHUB_ACTIONS'] = '1';
 
-main(createActionsPacRunner()).catch(error => { throw error });
+main(() => createActionsPacRunner());

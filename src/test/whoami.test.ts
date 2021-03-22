@@ -23,7 +23,7 @@ describe("who-am-i#input validation", () => {
         actionInputs.defineInputs();
         let err;
         try {
-            await whoAmI(pac);
+            await whoAmI(() => pac);
         } catch (error) {
             err = error;
         }

@@ -6,18 +6,17 @@ import createActionsPacRunner from "../../lib/createActionsPacRunner";
 import createCliWrapperPacAuthenticator from "../../lib/auth/createCliWrapperPacAuthenticator";
 import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
 
-(async () => {
+async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(createActionsPacRunner());
+        await main(() => createActionsPacRunner());
     }
-})().catch((error) => {
-    console.log(`Error occurred: ${error}`);
-    throw error;
-});
+};
 
-export async function main(pac: PacRunner): Promise<void> {
+export async function main(pacFactory: () => PacRunner): Promise<void> {
     try {
         core.startGroup("who-am-i");
+
+        const pac = pacFactory();
 
         const authenticator = createCliWrapperPacAuthenticator(pac);
         await new AuthHandler(authenticator).authenticate(AuthKind.CDS);
