@@ -694,18 +694,15 @@ class ExeRunner {
                     if (code === 0) {
                         this.logger.info(`success: ${stdout.join(os.EOL)}`);
                         resolve(stdout);
-                        // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
-                        process.stdout.destroy();
-                        process.stderr.destroy();
                     }
                     else {
                         const allOutput = stderr.concat(stdout);
                         this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
                         reject(new RunnerError(code !== null && code !== void 0 ? code : 99999, allOutput.join()));
-                        // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
-                        process.stdout.destroy();
-                        process.stderr.destroy();
                     }
+                    // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
+                    process.stdout.destroy();
+                    process.stderr.destroy();
                 });
             });
         });
