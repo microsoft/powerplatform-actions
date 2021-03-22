@@ -633,8 +633,7 @@ class ExeRunner {
         this._workingDir = _workingDir;
         this.logger = logger;
         if (exeRelativePath) {
-            exeRelativePath.push(exeName);
-            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath);
+            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath, exeName);
         }
         else {
             this._exePath = exeName;
@@ -672,15 +671,21 @@ class ExeRunner {
                 const process = child_process_1.spawn(this._exePath, args, { cwd: this.workingDir });
                 process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
                 process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
-                process.on('close', (code) => {
+                process.on('exit', (code) => {
                     if (code === 0) {
                         this.logger.info(`success: ${stdout.join(os.EOL)}`);
                         resolve(stdout);
+                        // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
+                        process.stdout.destroy();
+                        process.stderr.destroy();
                     }
                     else {
                         const allOutput = stderr.concat(stdout);
                         this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                        reject(new RunnerError(code, allOutput.join()));
+                        reject(new RunnerError(code !== null && code !== void 0 ? code : 99999, allOutput.join()));
+                        // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
+                        process.stdout.destroy();
+                        process.stderr.destroy();
                     }
                 });
             });
