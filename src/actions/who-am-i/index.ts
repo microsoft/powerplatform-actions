@@ -10,7 +10,9 @@ import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
     if (process.env.GITHUB_ACTIONS) {
         await main(createActionsPacRunner());
     }
-})();
+})().catch((error) => {
+    throw error;
+});
 
 export async function main(pac: PacRunner): Promise<void> {
     try {
