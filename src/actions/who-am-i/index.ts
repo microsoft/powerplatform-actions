@@ -5,6 +5,7 @@ import { AuthKind, AuthHandler } from "../../lib";
 import createActionsPacRunner from "../../lib/createActionsPacRunner";
 import createCliWrapperPacAuthenticator from "../../lib/auth/createCliWrapperPacAuthenticator";
 import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
+import { EOL } from "os";
 
 async () => {
     if (process.env.GITHUB_ACTIONS) {
@@ -21,7 +22,8 @@ export async function main(pacFactory: () => PacRunner): Promise<void> {
         const authenticator = createCliWrapperPacAuthenticator(pac);
         await new AuthHandler(authenticator).authenticate(AuthKind.CDS);
 
-        await pac.whoAmI();
+        console.log((await pac.whoAmI()).join(EOL));
+
         core.endGroup();
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
