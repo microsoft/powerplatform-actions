@@ -22,7 +22,7 @@ export async function main(pacFactory: () => PacRunner): Promise<void> {
         const authenticator = createCliWrapperPacAuthenticator(pac);
         await new AuthHandler(authenticator).authenticate(AuthKind.CDS);
 
-        console.log((await pac.whoAmI()).join(EOL));
+        await pac.whoAmI();
 
         core.endGroup();
     } catch (error) {
