@@ -11,7 +11,6 @@ import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
         await main(createActionsPacRunner());
     }
 })().catch((error) => {
-    console.log(`Error was thrown: ${error}`);
     throw error;
 });
 
