@@ -620,18 +620,16 @@ const core = __webpack_require__(186);
 const lib_1 = __webpack_require__(806);
 const createActionsPacRunner_1 = __webpack_require__(184);
 const createCliWrapperPacAuthenticator_1 = __webpack_require__(705);
-(() => __awaiter(void 0, void 0, void 0, function* () {
+() => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.GITHUB_ACTIONS) {
-        yield main(createActionsPacRunner_1.default());
+        yield main(() => createActionsPacRunner_1.default());
     }
-}))().catch((error) => {
-    console.log(`Error occurred: ${error}`);
-    throw error;
 });
-function main(pac) {
+function main(pacFactory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.startGroup("who-am-i");
+            const pac = pacFactory();
             const authenticator = createCliWrapperPacAuthenticator_1.default(pac);
             yield new lib_1.AuthHandler(authenticator).authenticate(lib_1.AuthKind.CDS);
             yield pac.whoAmI();
