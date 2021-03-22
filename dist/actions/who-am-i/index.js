@@ -625,6 +625,7 @@ const createCliWrapperPacAuthenticator_1 = __webpack_require__(705);
         yield main(createActionsPacRunner_1.default());
     }
 }))().catch((error) => {
+    console.log(`Error occurred: ${error}`);
     throw error;
 });
 function main(pac) {
