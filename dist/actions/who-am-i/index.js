@@ -621,11 +621,11 @@ const lib_1 = __webpack_require__(806);
 const createActionsPacRunner_1 = __webpack_require__(184);
 const createCliWrapperPacAuthenticator_1 = __webpack_require__(705);
 const os_1 = __webpack_require__(87);
-() => __awaiter(void 0, void 0, void 0, function* () {
+(() => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.GITHUB_ACTIONS) {
         yield main(() => createActionsPacRunner_1.default());
     }
-});
+}))();
 function main(pacFactory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -637,8 +637,14 @@ function main(pacFactory) {
             core.endGroup();
         }
         catch (error) {
-            core.setFailed(`failed: ${error.message}`);
-            throw error;
+            if (error instanceof Error) {
+                core.setFailed(`failed: ${error.message}`);
+                console.error(error.stack);
+            }
+            else {
+                core.setFailed(`failed: ${error}`);
+                core.error(error);
+            }
         }
     });
 }

@@ -7,11 +7,11 @@ import createCliWrapperPacAuthenticator from "../../lib/auth/createCliWrapperPac
 import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
 import { EOL } from "os";
 
-async () => {
+(async () => {
     if (process.env.GITHUB_ACTIONS) {
         await main(() => createActionsPacRunner());
     }
-};
+})();
 
 export async function main(pacFactory: () => PacRunner): Promise<void> {
     try {
@@ -26,7 +26,12 @@ export async function main(pacFactory: () => PacRunner): Promise<void> {
 
         core.endGroup();
     } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
+        if (error instanceof Error) {
+            core.setFailed(`failed: ${error.message}`);
+            console.error(error.stack);
+        } else {
+            core.setFailed(`failed: ${error}`);
+            core.error(error);
+        }
     }
 }
