@@ -734,23 +734,14 @@ const child_process_1 = __webpack_require__(129);
 const os = __webpack_require__(87);
 const getExePath_1 = __webpack_require__(309);
 class ExeRunner {
-    constructor(_workingDir, logger, exeRelativePath) {
+    constructor(_workingDir, logger, exeName, exeRelativePath) {
         this._workingDir = _workingDir;
         this.logger = logger;
-<<<<<<< HEAD
-        const platform = os.platform();
-        if (platform !== "win32") {
-            throw Error(`Unsupported Action runner os: '${platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
-        }
-        if (Array.isArray(exeRelativePath)) {
-            this._exePath = getExePath_1.default(...exeRelativePath);
-=======
         if (exeRelativePath) {
-            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath, exeName);
->>>>>>> main
+            this._exePath = getExePath_1.default(...exeRelativePath, exeName);
         }
         else {
-            this._exePath = exeRelativePath;
+            this._exePath = exeName;
         }
     }
     get workingDir() {
@@ -761,19 +752,11 @@ class ExeRunner {
             return new Promise((resolve, reject) => {
                 const stdout = new Array();
                 const stderr = new Array();
-<<<<<<< HEAD
-                this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
-                const pac = child_process_1.spawn(this._exePath, args, { cwd: this.workingDir });
-                pac.stdout.on("data", (data) => stdout.push(...data.toString().split(os.EOL)));
-                pac.stderr.on("data", (data) => stderr.push(...data.toString().split(os.EOL)));
-                pac.on("close", (code) => {
-=======
                 this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
                 const process = child_process_1.spawn(this._exePath, args, { cwd: this.workingDir });
                 process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
                 process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
                 process.on('exit', (code) => {
->>>>>>> main
                     if (code === 0) {
                         this.logger.info(`success: ${stdout.join(os.EOL)}`);
                         resolve(stdout);
@@ -792,19 +775,17 @@ class ExeRunner {
     }
     runSync(args) {
         var _a;
-        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
+        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
         const proc = child_process_1.spawnSync(this._exePath, args, { cwd: this.workingDir });
         if (proc.status === 0) {
             const output = proc.output
-                .filter((line) => !!line) // can have null entries
-                .map((line) => line.toString());
+                .filter(line => !!line) // can have null entries
+                .map(line => line.toString());
             this.logger.info(`success: ${output.join(os.EOL)}`);
             return output;
         }
         else {
-            const allOutput = proc.stderr
-                .toString()
-                .concat(proc.stdout.toString());
+            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
             this.logger.error(`error: ${proc.status}: ${allOutput}`);
             throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
         }
@@ -912,18 +893,6 @@ Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function ()
 
 /***/ }),
 
-/***/ 749:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.default = ["pac", "tools", "pac.exe"];
-
-//# sourceMappingURL=pacRelativePath.js.map
-
-
-/***/ }),
-
 /***/ 366:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -933,12 +902,6 @@ exports.PacRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __webpack_require__(21);
-<<<<<<< HEAD
-const pacRelativePath_1 = __webpack_require__(749);
-class PacRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, pacRelativePath_1.default);
-=======
 const os = __webpack_require__(87);
 const platform = os.platform();
 const programName = platform === "win32" ? 'pac.exe' : 'pac';
@@ -946,7 +909,6 @@ const programPath = platform === "win32" ? ['pac', 'tools'] : ['pac_linux', 'too
 class PacRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
         super(workingDir, logger, programName, programPath);
->>>>>>> main
     }
 }
 exports.PacRunner = PacRunner;
@@ -992,18 +954,6 @@ exports.DefaultRunnerFactory = new RealRunnerFactory();
 
 /***/ }),
 
-/***/ 165:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.default = ["sopa", "content", "bin", "coretools", "SolutionPackager.exe"];
-
-//# sourceMappingURL=sopaRelativePath.js.map
-
-
-/***/ }),
-
 /***/ 653:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -1013,12 +963,6 @@ exports.SopaRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __webpack_require__(21);
-<<<<<<< HEAD
-const sopaRelativePath_1 = __webpack_require__(165);
-class SopaRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, sopaRelativePath_1.default);
-=======
 const os = __webpack_require__(87);
 class SopaRunner extends exeRunner_1.ExeRunner {
     constructor(workingDir, logger) {
@@ -1027,7 +971,6 @@ class SopaRunner extends exeRunner_1.ExeRunner {
         if (platform !== 'win32') {
             throw Error(`Unsupported SoPa runner os: '${platform}'; the standalone SoPa executable is only available on Windows`);
         }
->>>>>>> main
     }
 }
 exports.SopaRunner = SopaRunner;
