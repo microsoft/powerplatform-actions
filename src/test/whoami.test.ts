@@ -10,6 +10,7 @@ use(sinonChai);
 
 describe("who-am-i#input validation", () => {
     const pac = stubInterface<PacRunner>();
+    pac.whoAmI.returns(Promise.resolve([]));
     // TODO: read in params and their required state from the action.yml
 
     const inputParams = [
