@@ -7,7 +7,11 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+      fail-fast: false
     env:
       RUNNER_DEBUG: 1
 
@@ -38,8 +42,16 @@ jobs:
         password-secret: ${{ secrets.password }}
 
     - name: Test pack-solution action
+      if: matrix.os == 'windows-latest'
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
+
+    - name: Upload test logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Test Logs ${{ matrix.os }}
+        path: ./out/logs/*-tests.log
