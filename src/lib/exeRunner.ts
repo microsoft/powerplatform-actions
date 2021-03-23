@@ -2,16 +2,15 @@
 // Licensed under the MIT License.
 import { spawn, spawnSync } from "child_process";
 import os = require('os');
-import path = require("path");
+import getExePath from "./getExePath";
 import { Logger } from "./logger";
 
 export class ExeRunner {
     private readonly _exePath: string;
-    private _outDirRoot!: string;
 
     public constructor(private readonly _workingDir: string, private readonly logger: Logger, exeName: string, exeRelativePath?: string[]) {
         if (exeRelativePath) {
-            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath, exeName);
+            this._exePath = getExePath(...exeRelativePath, exeName);
         } else {
             this._exePath = exeName;
         }
@@ -19,25 +18,6 @@ export class ExeRunner {
 
     public get workingDir(): string {
         return this._workingDir;
-    }
-
-    private get outDirRoot(): string {
-        if (!this._outDirRoot) {
-            // in mocha, __dirname resolves to the src folder of the .ts file,
-            // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
-            const dirname = path.resolve(__dirname);
-            const parentDir = path.dirname(dirname);
-            // /dist/actions/<action-name>/index.js:
-            // /out/actions/<action-name>/index.js:
-            if (path.basename(parentDir) === 'actions') {
-                this._outDirRoot = path.resolve(path.dirname(parentDir));
-            } else if (path.basename(parentDir) === 'src' || path.basename(parentDir) === 'out') {
-                this._outDirRoot = path.resolve(parentDir, '..', 'out');
-            } else {
-                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${dirname}`);
-            }
-        }
-        return this._outDirRoot;
     }
 
     public async run(args: string[]): Promise<string[]> {
