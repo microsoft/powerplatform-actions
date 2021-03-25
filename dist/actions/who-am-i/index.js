@@ -410,9 +410,7 @@ exports.RunnerError = exports.createCommandRunner = void 0;
 const child_process_1 = __webpack_require__(129);
 const process_1 = __webpack_require__(765);
 const os_1 = __webpack_require__(87);
-const restrictPlatformToWindows_1 = __webpack_require__(771);
 function createCommandRunner(workingDir, commandPath, logger) {
-    restrictPlatformToWindows_1.default();
     return function run(...args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
@@ -425,7 +423,7 @@ function createCommandRunner(workingDir, commandPath, logger) {
                 });
                 process.stdout.on("data", (data) => stdout.push(...data.toString().split(os_1.EOL)));
                 process.stderr.on("data", (data) => stderr.push(...data.toString().split(os_1.EOL)));
-                process.on("close", (code) => {
+                process.on("exit", (code) => {
                     if (code === 0) {
                         logSuccess(stdout);
                         resolve(stdout);
@@ -435,6 +433,10 @@ function createCommandRunner(workingDir, commandPath, logger) {
                         logger.error(`error: ${code}: ${allOutput.join(os_1.EOL)}`);
                         reject(new RunnerError(code, allOutput.join()));
                     }
+                    /* Close out handles to the output streams so that we don't wait on
+                        grandchild processes like pacTelemetryUpload */
+                    process.stdout.destroy();
+                    process.stderr.destroy();
                 });
             });
         });
@@ -460,7 +462,7 @@ exports.RunnerError = RunnerError;
 
 /***/ }),
 
-/***/ 197:
+/***/ 91:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -479,7 +481,13 @@ const CommandRunner_1 = __webpack_require__(892);
 function createGitRunner(workingDir, logger) {
     const runCommand = CommandRunner_1.createCommandRunner(workingDir, "git", logger);
     return {
-        log: () => __awaiter(this, void 0, void 0, function* () { return runCommand("log"); }),
+        log: (limit) => __awaiter(this, void 0, void 0, function* () {
+            const args = ["log"];
+            if (limit !== undefined) {
+                args.push(`-${limit}`);
+            }
+            return runCommand(...args);
+        }),
     };
 }
 exports.createGitRunner = createGitRunner;
@@ -489,28 +497,7 @@ exports.createGitRunner = createGitRunner;
 
 /***/ }),
 
-/***/ 470:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createSopaRunner = exports.createPacRunner = exports.createGitRunner = exports.RunnerError = void 0;
-var CommandRunner_1 = __webpack_require__(892);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return CommandRunner_1.RunnerError; } }));
-// TODO: delete exports once all actions are converted:
-var gitRunner_1 = __webpack_require__(197);
-Object.defineProperty(exports, "createGitRunner", ({ enumerable: true, get: function () { return gitRunner_1.createGitRunner; } }));
-var pacRunner_1 = __webpack_require__(313);
-Object.defineProperty(exports, "createPacRunner", ({ enumerable: true, get: function () { return pacRunner_1.createPacRunner; } }));
-var sopaRunner_1 = __webpack_require__(878);
-Object.defineProperty(exports, "createSopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.createSopaRunner; } }));
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 313:
+/***/ 671:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -554,7 +541,85 @@ function createPacRunner(workingDir, exePath, logger) {
 }
 exports.createPacRunner = createPacRunner;
 
-//# sourceMappingURL=pacRunner.js.map
+//# sourceMappingURL=PacRunner.js.map
+
+
+/***/ }),
+
+/***/ 382:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PackageType = exports.createSopaRunner = void 0;
+const CommandRunner_1 = __webpack_require__(892);
+const restrictPlatformToWindows_1 = __webpack_require__(771);
+function createSopaRunner(workingDir, sopaExePath, logger) {
+    restrictPlatformToWindows_1.default();
+    const runCommand = CommandRunner_1.createCommandRunner(workingDir, sopaExePath, logger);
+    return {
+        help: () => runCommand(),
+        pack: (parameters) => runCommand(...buildCommandLineArguments(Object.assign({ action: "Pack" }, parameters))),
+        extract: (parameters) => runCommand(...buildCommandLineArguments(Object.assign({ action: "Extract" }, parameters))),
+    };
+}
+exports.createSopaRunner = createSopaRunner;
+function buildCommandLineArguments(parameters) {
+    const args = [];
+    addArgument("action", "action");
+    addArgument("zipfile", "zipFile");
+    addArgument("folder", "folder");
+    addArgument("packagetype", "packageType");
+    addArgument("allowWrite", "allowWrite");
+    addArgument("allowDelete", "allowDelete");
+    addSwitchArgument("clobber", "clobber");
+    addArgument("map", "map");
+    addSwitchArgument("nologo", "noLogo");
+    addArgument("log", "log");
+    addArgument("@", "@");
+    addArgument("sourceLoc", "sourceLocale");
+    addSwitchArgument("localize", "localize");
+    return args;
+    function addArgument(argumentName, parameterName) {
+        if (parameterName in parameters) {
+            args.push(`/${argumentName}:${parameters[parameterName]}`);
+        }
+    }
+    function addSwitchArgument(argumentName, parameterName) {
+        if (parameters[parameterName]) {
+            args.push(`/${argumentName}`);
+        }
+    }
+}
+var PackageType;
+(function (PackageType) {
+    PackageType["Unmanaged"] = "unmanaged";
+    PackageType["Managed"] = "managed";
+    PackageType["Both"] = "both";
+})(PackageType = exports.PackageType || (exports.PackageType = {}));
+
+//# sourceMappingURL=SopaRunner.js.map
+
+
+/***/ }),
+
+/***/ 470:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createSopaRunner = exports.createPacRunner = exports.createGitRunner = exports.RunnerError = void 0;
+var CommandRunner_1 = __webpack_require__(892);
+Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return CommandRunner_1.RunnerError; } }));
+// TODO: delete exports once all actions are converted:
+var GitRunner_1 = __webpack_require__(91);
+Object.defineProperty(exports, "createGitRunner", ({ enumerable: true, get: function () { return GitRunner_1.createGitRunner; } }));
+var PacRunner_1 = __webpack_require__(671);
+Object.defineProperty(exports, "createPacRunner", ({ enumerable: true, get: function () { return PacRunner_1.createPacRunner; } }));
+var SopaRunner_1 = __webpack_require__(382);
+Object.defineProperty(exports, "createSopaRunner", ({ enumerable: true, get: function () { return SopaRunner_1.createSopaRunner; } }));
+
+//# sourceMappingURL=index.js.map
 
 
 /***/ }),
@@ -574,27 +639,6 @@ function restrictPlatformToWindows() {
 exports.default = restrictPlatformToWindows;
 
 //# sourceMappingURL=restrictPlatformToWindows.js.map
-
-
-/***/ }),
-
-/***/ 878:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createSopaRunner = void 0;
-const CommandRunner_1 = __webpack_require__(892);
-function createSopaRunner(workingDir, sopaExePath, logger) {
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, sopaExePath, logger);
-    return {
-        help: () => runCommand(),
-        pack: (parameters) => runCommand("/nologo", "/action:pack", `/folder:${parameters.folder}`, `/zipFile:${parameters.zipFile}`),
-    };
-}
-exports.createSopaRunner = createSopaRunner;
-
-//# sourceMappingURL=sopaRunner.js.map
 
 
 /***/ }),
@@ -975,10 +1019,13 @@ exports.default = createLegacyRunnerPacAuthenticator;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const powerplatform_cli_wrapper_1 = __webpack_require__(470);
 const process_1 = __webpack_require__(765);
+const os_1 = __webpack_require__(87);
 const actionLogger_1 = __webpack_require__(970);
 const getExePath_1 = __webpack_require__(309);
 function createActionsPacRunner() {
-    return powerplatform_cli_wrapper_1.createPacRunner(process_1.cwd(), getExePath_1.default("pac", "tools", "pac.exe"), new actionLogger_1.ActionLogger());
+    return powerplatform_cli_wrapper_1.createPacRunner(process_1.cwd(), (os_1.platform() === "win32"
+        ? getExePath_1.default("pac", "tools", "pac.exe")
+        : getExePath_1.default("pac_linux", "tools", "pac")), new actionLogger_1.ActionLogger());
 }
 exports.default = createActionsPacRunner;
 
