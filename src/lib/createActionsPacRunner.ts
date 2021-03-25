@@ -3,13 +3,16 @@ import {
     PacRunner,
 } from "@microsoft/powerplatform-cli-wrapper";
 import { cwd } from "process";
+import { platform } from "os";
 import { ActionLogger } from "./actionLogger";
 import getExePath from "./getExePath";
 
 export default function createActionsPacRunner(): PacRunner {
     return createPacRunner(
         cwd(),
-        getExePath("pac", "tools", "pac.exe"),
+        (platform() === "win32" 
+            ? getExePath("pac", "tools", "pac.exe")
+            : getExePath("pac_linux", "tools", "pac")),
         new ActionLogger()
     );
 }

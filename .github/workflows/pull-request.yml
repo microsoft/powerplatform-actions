@@ -35,7 +35,6 @@ jobs:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
 
     - name: Test who-am-i action
-      if: matrix.os == 'windows-latest'
       uses: ./who-am-i
       with:
         environment-url: 'https://davidjenD365-1.crm.dynamics.com'
