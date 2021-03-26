@@ -1335,6 +1335,7 @@ const api = [
   'readlink',
   'realpath',
   'rename',
+  'rm',
   'rmdir',
   'stat',
   'symlink',
@@ -1345,6 +1346,7 @@ const api = [
 ].filter(key => {
   // Some commands are not available on some systems. Ex:
   // fs.opendir was added in Node.js v12.12.0
+  // fs.rm was added in Node.js v14.14.0
   // fs.lchown is not available on at least some Linux
   return typeof fs[key] === 'function'
 })
@@ -2462,12 +2464,16 @@ module.exports = {
 
 module.exports = clone
 
+var getPrototypeOf = Object.getPrototypeOf || function (obj) {
+  return obj.__proto__
+}
+
 function clone (obj) {
   if (obj === null || typeof obj !== 'object')
     return obj
 
   if (obj instanceof Object)
-    var copy = { __proto__: obj.__proto__ }
+    var copy = { __proto__: getPrototypeOf(obj) }
   else
     var copy = Object.create(null)
 
@@ -2654,6 +2660,25 @@ function patch (fs) {
         }
       })
     }
+  }
+
+  var fs$copyFile = fs.copyFile
+  if (fs$copyFile)
+    fs.copyFile = copyFile
+  function copyFile (src, dest, flags, cb) {
+    if (typeof flags === 'function') {
+      cb = flags
+      flags = 0
+    }
+    return fs$copyFile(src, dest, flags, function (err) {
+      if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+        enqueue([fs$copyFile, [src, dest, flags, cb]])
+      else {
+        if (typeof cb === 'function')
+          cb.apply(this, arguments)
+        retry()
+      }
+    })
   }
 
   var fs$readdir = fs.readdir
@@ -2986,10 +3011,14 @@ try {
   process.cwd()
 } catch (er) {}
 
-var chdir = process.chdir
-process.chdir = function(d) {
-  cwd = null
-  chdir.call(process, d)
+// This check is needed until node.js 12 is required
+if (typeof process.chdir === 'function') {
+  var chdir = process.chdir
+  process.chdir = function (d) {
+    cwd = null
+    chdir.call(process, d)
+  }
+  if (Object.setPrototypeOf) Object.setPrototypeOf(process.chdir, chdir)
 }
 
 module.exports = patch
@@ -3104,7 +3133,7 @@ function patch (fs) {
     }
 
     // This ensures `util.promisify` works as it does for native `fs.read`.
-    read.__proto__ = fs$read
+    if (Object.setPrototypeOf) Object.setPrototypeOf(read, fs$read)
     return read
   })(fs.read)
 
@@ -3414,12 +3443,11 @@ module.exports = jsonfile
 /***/ 5902:
 /***/ ((module) => {
 
-function stringify (obj, options = {}) {
-  const EOL = options.EOL || '\n'
+function stringify (obj, { EOL = '\n', finalEOL = true, replacer = null, spaces } = {}) {
+  const EOF = finalEOL ? EOL : ''
+  const str = JSON.stringify(obj, replacer, spaces)
 
-  const str = JSON.stringify(obj, options ? options.replacer : null, options.spaces)
-
-  return str.replace(/\n/g, EOL) + EOL
+  return str.replace(/\n/g, EOL) + EOF
 }
 
 function stripBom (content) {
@@ -3444,9 +3472,10 @@ exports.fromCallback = function (fn) {
     if (typeof args[args.length - 1] === 'function') fn.apply(this, args)
     else {
       return new Promise((resolve, reject) => {
-        fn.apply(
+        fn.call(
           this,
-          args.concat([(err, res) => err ? reject(err) : resolve(res)])
+          ...args,
+          (err, res) => (err != null) ? reject(err) : resolve(res)
         )
       })
     }
@@ -3577,7 +3606,7 @@ exports.ActionLogger = ActionLogger;
 
 /***/ }),
 
-/***/ 7883:
+/***/ 3677:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3596,15 +3625,20 @@ exports.AuthKind = exports.AuthHandler = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __webpack_require__(2186);
+const createLegacyRunnerPacAuthenticator_1 = __webpack_require__(6687);
 class AuthHandler {
     constructor(pac) {
-        this.pac = pac;
-        this._pac = pac;
+        if ("run" in pac) {
+            this._pacAuthenticator = createLegacyRunnerPacAuthenticator_1.default(pac);
+        }
+        else {
+            this._pacAuthenticator = pac;
+        }
     }
     authenticate(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
-            core.startGroup('authentication');
-            this._envUrl = core.getInput('environment-url', { required: false });
+            core.startGroup("authentication");
+            this._envUrl = core.getInput("environment-url", { required: false });
             const authType = this.determineAuthType();
             if (authType === AuthTypes.USERNAME_PASSWORD) {
                 yield this.authenticateWithUsernamePassword(authKind);
@@ -3613,7 +3647,7 @@ class AuthHandler {
                 yield this.authenticateWithClientCredentials(authKind);
             }
             else {
-                throw new Error('Must provide either username/password or app-id/client-secret/tenant-id for authentication!');
+                throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
             }
             core.endGroup();
         });
@@ -3623,7 +3657,7 @@ class AuthHandler {
         const validSPNAuth = this.isValidSPNAuth();
         try {
             if (validUsernameAuth && validSPNAuth) {
-                throw new Error('Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.');
+                throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
             }
             if (validUsernameAuth) {
                 return AuthTypes.USERNAME_PASSWORD;
@@ -3639,37 +3673,53 @@ class AuthHandler {
         return AuthTypes.INVALID_AUTH_TYPE;
     }
     isValidUsernameAuth() {
-        this._username = core.getInput('user-name', { required: false });
-        this._password = core.getInput('password-secret', { required: false });
-        return (!!this._username && !!this._password);
+        this._username = core.getInput("user-name", { required: false });
+        this._password = core.getInput("password-secret", { required: false });
+        return !!this._username && !!this._password;
     }
     isValidSPNAuth() {
-        this._appId = core.getInput('app-id', { required: false });
-        this._clientSecret = core.getInput('client-secret', { required: false });
-        this._tenantId = core.getInput('tenant-id', { required: false });
-        return (!!this._appId && !!this._clientSecret && !!this._tenantId);
+        this._appId = core.getInput("app-id", { required: false });
+        this._clientSecret = core.getInput("client-secret", {
+            required: false,
+        });
+        this._tenantId = core.getInput("tenant-id", { required: false });
+        return !!this._appId && !!this._clientSecret && !!this._tenantId;
     }
     authenticateWithClientCredentials(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
             core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
-            yield this._pac.run(['auth', 'clear']);
             if (authKind === AuthKind.CDS) {
-                yield this._pac.run(['auth', 'create', '--url', this._envUrl, '--applicationId', this._appId, '--clientSecret', this._clientSecret, '--tenant', this._tenantId]);
+                yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
+                    envUrl: this._envUrl,
+                    tenantId: this._tenantId,
+                    appId: this._appId,
+                    clientSecret: this._clientSecret,
+                });
             }
             else {
-                yield this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--applicationId', this._appId, '--clientSecret', this._clientSecret, '--tenant', this._tenantId]);
+                yield this._pacAuthenticator.authenticateAdminWithClientCredentials({
+                    tenantId: this._tenantId,
+                    appId: this._appId,
+                    clientSecret: this._clientSecret,
+                });
             }
         });
     }
     authenticateWithUsernamePassword(authKind) {
         return __awaiter(this, void 0, void 0, function* () {
             core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
-            yield this._pac.run(['auth', 'clear']);
             if (authKind == AuthKind.CDS) {
-                yield this._pac.run(['auth', 'create', '--url', this._envUrl, '--username', this._username, '--password', this._password]);
+                yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
+                    envUrl: this._envUrl,
+                    username: this._username,
+                    password: this._password,
+                });
             }
             else {
-                yield this._pac.run(['auth', 'create', '--kind', 'ADMIN', '--username', this._username, '--password', this._password]);
+                yield this._pacAuthenticator.authenticateAdminWithUsernamePassword({
+                    username: this._username,
+                    password: this._password,
+                });
             }
         });
     }
@@ -3688,6 +3738,93 @@ var AuthKind;
 })(AuthKind = exports.AuthKind || (exports.AuthKind = {}));
 
 //# sourceMappingURL=authHandler.js.map
+
+
+/***/ }),
+
+/***/ 6687:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function createLegacyRunnerPacAuthenticator(pac) {
+    return {
+        authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--url",
+                parameters.envUrl,
+                "--applicationId",
+                parameters.appId,
+                "--clientSecret",
+                parameters.clientSecret,
+                "--tenant",
+                parameters.tenantId,
+            ]);
+        }),
+        authenticateAdminWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--kind",
+                "ADMIN",
+                "--applicationId",
+                parameters.appId,
+                "--clientSecret",
+                parameters.clientSecret,
+                "--tenant",
+                parameters.tenantId,
+            ]);
+        }),
+        authenticateCdsWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--url",
+                parameters.envUrl,
+                "--username",
+                parameters.username,
+                "--password",
+                parameters.password,
+            ]);
+        }),
+        authenticateAdminWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
+            yield clearAuth();
+            yield pac.run([
+                "auth",
+                "create",
+                "--kind",
+                "ADMIN",
+                "--username",
+                parameters.username,
+                "--password",
+                parameters.password,
+            ]);
+        }),
+    };
+    function clearAuth() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield pac.run(["auth", "clear"]);
+        });
+    }
+}
+exports.default = createLegacyRunnerPacAuthenticator;
+
+//# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
 
 
 /***/ }),
@@ -3712,13 +3849,13 @@ exports.RunnerError = exports.ExeRunner = void 0;
 // Licensed under the MIT License.
 const child_process_1 = __webpack_require__(3129);
 const os = __webpack_require__(2087);
-const path = __webpack_require__(5622);
+const getExePath_1 = __webpack_require__(309);
 class ExeRunner {
     constructor(_workingDir, logger, exeName, exeRelativePath) {
         this._workingDir = _workingDir;
         this.logger = logger;
         if (exeRelativePath) {
-            this._exePath = path.resolve(this.outDirRoot, ...exeRelativePath, exeName);
+            this._exePath = getExePath_1.default(...exeRelativePath, exeName);
         }
         else {
             this._exePath = exeName;
@@ -3726,26 +3863,6 @@ class ExeRunner {
     }
     get workingDir() {
         return this._workingDir;
-    }
-    get outDirRoot() {
-        if (!this._outDirRoot) {
-            // in mocha, __dirname resolves to the src folder of the .ts file,
-            // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
-            const dirname = path.resolve(__dirname);
-            const parentDir = path.dirname(dirname);
-            // /dist/actions/<action-name>/index.js:
-            // /out/actions/<action-name>/index.js:
-            if (path.basename(parentDir) === 'actions') {
-                this._outDirRoot = path.resolve(path.dirname(parentDir));
-            }
-            else if (path.basename(parentDir) === 'src' || path.basename(parentDir) === 'out') {
-                this._outDirRoot = path.resolve(parentDir, '..', 'out');
-            }
-            else {
-                throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${dirname}`);
-            }
-        }
-        return this._outDirRoot;
     }
     run(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -3805,6 +3922,41 @@ exports.RunnerError = RunnerError;
 
 /***/ }),
 
+/***/ 309:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const path_1 = __webpack_require__(5622);
+function getExePath(...relativePath) {
+    // in mocha, __dirname resolves to the src folder of the .ts file,
+    // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
+    const currentDirectory = path_1.resolve(__dirname);
+    const parentDir = path_1.dirname(currentDirectory);
+    // /dist/actions/<action-name>/index.js:
+    // /out/actions/<action-name>/index.js:
+    let outDirRoot;
+    switch (path_1.basename(parentDir)) {
+        case "actions":
+            outDirRoot = path_1.resolve(path_1.dirname(parentDir));
+            break;
+        case "src":
+        case "out":
+            outDirRoot = path_1.resolve(parentDir, "..", "out");
+            break;
+        default:
+            throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${path_1.dirname}`);
+    }
+    return path_1.resolve(outDirRoot, ...relativePath);
+}
+exports.default = getExePath;
+
+//# sourceMappingURL=getExePath.js.map
+
+
+/***/ }),
+
 /***/ 5973:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3852,7 +4004,7 @@ var pacRunner_1 = __webpack_require__(7366);
 Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
 var sopaRunner_1 = __webpack_require__(3653);
 Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
-var authHandler_1 = __webpack_require__(7883);
+var authHandler_1 = __webpack_require__(3677);
 Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
 Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
 
