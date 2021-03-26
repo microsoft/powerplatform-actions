@@ -4,6 +4,41 @@
         <name>CrmSvcUtil</name>
     </assembly>
     <members>
+        <member name="T:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters">
+            <summary>
+            Command Line Properties for the CrmSvcUtil Instance. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.SuppressGenVersionAttribute">
+            <summary>
+            Suppresses the GeneratedCodeAttribute on all classes.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.NoLogo">
+            <summary>
+            Suppresses the banner.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.Language">
+            <summary>
+            The language to use for the generated proxy code.  This can be either 'CS' or 'VB'.  The default language is 'CS'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.Url">
+            <summary>
+            A url or path to the SDK endpoint to contact for metadata
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.OutputFile">
+            <summary>
+            The filename for the generated proxy code
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.Namespace">
+            <summary>
+            The namespace for the generated proxy code.  The default namespace is the global namespace.
+            </summary>
+        </member>
         <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.UseInteractiveLogin">
             <summary>
             Used to raise the interactive dialog to login. 
@@ -19,15 +54,101 @@
             Used to login via OAuth to CRM Online, Hidden for initial ship... but here to allow for complex auth situations. 
             </summary>
         </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.UserName">
+            <summary>
+            Username to use when connecting to the server for authentication.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.Password">
+            <summary>
+            Password to use when connecting to the server for authentication.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.Domain">
+            <summary>
+            Domain to authenticate against when connecting to the server.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.ServiceContextName">
+            <summary>
+            The name for the generated service context. If a value is passed in, it will be used for the Service Context.  If not, no Service Context will be generated
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.MessageNamespace">
+            <summary>
+            Namespace of messages to generate.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.ShowHelp">
+            <summary>
+            Show this usage message.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.CodeCustomizationService">
+            <summary>
+            Full name of the type to use as the ICustomizeCodeDomService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.CodeWriterFilterService">
+            <summary>
+            Full name of the type to use as the ICodeWriterFilterService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.CodeWriterMessageFilterService">
+            <summary>
+            Full name of the type to use as the ICodeWriterMessageFilterService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.MetadataProviderService">
+            <summary>
+            Full name of the type to use as the IMetadataProviderService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.MetadataQueryProvider">
+            <summary>
+            Full name of the type to use as the IMetaDataProviderQueryService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.CodeGenerationService">
+            <summary>
+            Full name of the type to use as the ICodeGenerationService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.NamingService">
+            <summary>
+            Full name of the type to use as the INamingService
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.Private">
+            <summary>
+            Generate unsupported classes
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.GenerateCustomActions">
+            <summary>
+            Generate wrapper classes for custom actions
+            </summary>
+        </member>
+        <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.GenerateMessages">
+            <summary>
+            Generate messages
+            </summary>
+        </member>
         <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.ConnectionProfileName">
             <summary>
-            Hidden... Used by devToolkit to set the Connection profile to use for this call. 
+            Used by devToolkit to set the Connection profile to use for this call. 
             </summary>
         </member>
         <member name="P:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.ConnectionAppName">
             <summary>
-            Hidden... Used by the devToolkit to set the appName whos connection is being used. 
+            Used by the devToolkit to set the appName whos connection is being used. 
             </summary>
+        </member>
+        <member name="M:Microsoft.Crm.Services.Utility.CrmSvcUtilParameters.ToDictionary">
+            <summary>
+            Gets Dictionary of parameters 
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.Crm.Services.Utility.ArgumentType">
             <remarks>
@@ -950,6 +1071,11 @@
         <member name="M:Microsoft.Crm.Services.Utility.StaticNamingService.#cctor">
             <summary>
             Static constructor.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Crm.Services.Utility.NamingService._reservedSystemAttributeNames">
+            <summary>
+            List of attribute names that will conflict with system properties. 
             </summary>
         </member>
         <member name="M:Microsoft.Crm.Services.Utility.SdkMetadataProviderService.SetConnectionTimeoutValues">
