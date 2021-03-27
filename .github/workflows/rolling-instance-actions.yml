@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
       fail-fast: false
       max-parallel: 1   # Both OS runs create/use/delete the same resources, so we can only run one at time
     env:
@@ -72,6 +72,7 @@ jobs:
         solution-type: 'Unmanaged'
 
     - name: Test import-solution action with username/password
+      if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./import-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -82,6 +83,7 @@ jobs:
         run-asynchronously: true
 
     - name: Test export-solution action with appId-clientSecret
+      if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./export-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
