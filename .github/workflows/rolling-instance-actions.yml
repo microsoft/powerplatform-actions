@@ -105,6 +105,7 @@ jobs:
         overwrite-files: true
 
     - name: Test clone-solution action with username/password
+      if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./clone-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
