@@ -14,6 +14,7 @@ jobs:
       fail-fast: false
     env:
       RUNNER_DEBUG: 1
+      WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
 
     steps:
     - uses: actions/checkout@v2
@@ -34,12 +35,23 @@ jobs:
       env:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
 
+    - name: Test create-environment action with username/password
+      uses: ./create-environment
+      id: create-environment
+      with:
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        name: pullRequestTestEnv
+        type: Sandbox
+        region: unitedstates
+        domain: pp-actions-pr
+
     - name: Test who-am-i action
       uses: ./who-am-i
       with:
-        environment-url: 'https://davidjenD365-1.crm.dynamics.com'
-        user-name: 'davidjen@davidjenD365.onmicrosoft.com'
-        password-secret: ${{ secrets.password }}
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test pack-solution action
       if: matrix.os == 'windows-latest'
@@ -48,6 +60,13 @@ jobs:
         solution-folder: 'src/test/data/emptySolution'
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
+
+    - name: Test delete-environment action with username/password
+      uses: ./delete-environment
+      with:
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Upload test logs
       if: always()
