@@ -14,6 +14,7 @@ jobs:
       fail-fast: false
     env:
       RUNNER_DEBUG: 1
+      WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
 
     steps:
     - uses: actions/checkout@v2
