@@ -174,5 +174,5 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: pac-cli-log
-        path: ./dist/pac/tools/logs/pac-log.txt
+        name: pac-cli-log ${{ matrix.os }}
+        path: ./dist/pac*/tools/logs/pac-log.txt
