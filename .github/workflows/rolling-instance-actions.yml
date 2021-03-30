@@ -13,7 +13,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
       fail-fast: false
-      max-parallel: 1   # Both OS runs create/use/delete the same resources, so we can only run one at time
     env:
       RUNNER_DEBUG: 1
       WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
