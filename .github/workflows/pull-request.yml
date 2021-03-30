@@ -44,7 +44,7 @@ jobs:
         name: pullRequestTestEnv
         type: Sandbox
         region: unitedstates
-        domain: test-target
+        domain: pp-actions-pr
 
     - name: Test who-am-i action
       uses: ./who-am-i
