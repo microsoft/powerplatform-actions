@@ -62,6 +62,7 @@ jobs:
         solution-type: 'Unmanaged'
 
     - name: Test delete-environment action with username/password
+      if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-environment.outputs.environment-url }}

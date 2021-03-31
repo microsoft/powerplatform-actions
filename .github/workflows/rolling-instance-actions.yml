@@ -155,6 +155,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test delete-source-environment action with appId-clientSecret
+      if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -162,6 +163,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test delete-target-environment action with username/password
+      if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
         environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
