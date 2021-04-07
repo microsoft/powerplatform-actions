@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "略過僅匯出資料表: {0}",
   "PortalUploadInvalidJsonEditorType": "類型: {0} 無效，無法上傳",
   "PortalUploadMultipleEntityDataFilesDetected": "偵測到多個資料表資料檔案",
+  "PortalUploadRecordFailure": "使用記錄識別碼:{1} 更新資料表 {0} 失敗，因為 {2}",
   "PortalWebsiteContentOverwrite": "要覆寫的入口網站內容",
   "PortalWebsiteDownloadPathHelp": "即將下載網站內容的路徑",
   "PortalWebsiteDownloadProcessStart": "已開始下載網站 {0}",

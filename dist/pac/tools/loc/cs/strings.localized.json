@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Vynechání tabulky jen pro export: {0}",
   "PortalUploadInvalidJsonEditorType": "Typ {0} není platný k nahrání.",
   "PortalUploadMultipleEntityDataFilesDetected": "Bylo zjištěno více datových souborů tabulky.",
+  "PortalUploadRecordFailure": "Tabulku {0} s ID záznamu {1} se NEPODAŘILO zaktualizovat kvůli {2}.",
   "PortalWebsiteContentOverwrite": "Obsah portálového webu, který se má přepsat",
   "PortalWebsiteDownloadPathHelp": "Cesta, kam bude obsah webu stažen",
   "PortalWebsiteDownloadProcessStart": "Stahování webu {0} bylo zahájeno.",

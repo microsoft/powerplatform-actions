@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Melewatkan tabel khusus ekspor: {0}",
   "PortalUploadInvalidJsonEditorType": "Jenis:{0} tidak valid untuk diunggah",
   "PortalUploadMultipleEntityDataFilesDetected": "Lebih dari satu file data tabel terdeteksi",
+  "PortalUploadRecordFailure": "Memperbarui tabel {0} dengan ID rekaman:{1} GAGAL karena {2}",
   "PortalWebsiteContentOverwrite": "Konten situs web portal untuk ditimpa",
   "PortalWebsiteDownloadPathHelp": "Jalur tempat konten situs web akan diunduh",
   "PortalWebsiteDownloadProcessStart": "Mulai mengunduh situs web {0}",

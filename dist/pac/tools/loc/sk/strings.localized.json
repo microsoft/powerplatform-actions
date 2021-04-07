@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Vynecháva sa tabuľka iba na export: {0}",
   "PortalUploadInvalidJsonEditorType": "Typ: {0} nie je platný typ na nahranie",
   "PortalUploadMultipleEntityDataFilesDetected": "Zistilo sa viac údajových súborov tabuľky",
+  "PortalUploadRecordFailure": "Aktualizácia tabuľky {0} s ID záznamu: {1} ZLYHALA pre chybu {2}",
   "PortalWebsiteContentOverwrite": "Obsah webovej lokality portálu na prepísanie",
   "PortalWebsiteDownloadPathHelp": "Cesta, kam sa stiahne obsah webovej lokality",
   "PortalWebsiteDownloadProcessStart": "Spustilo sa sťahovanie webovej lokality {0}",

@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Überspringen der „Nur Export“-Tabelle: {0}",
   "PortalUploadInvalidJsonEditorType": "Typ: {0} ist zum Hochladen nicht gültig",
   "PortalUploadMultipleEntityDataFilesDetected": "Mehrere Tabellendatendateien erkannt",
+  "PortalUploadRecordFailure": "FEHLER bei der Aktualisierung der Tabelle {0} mit der Datensatz-ID: {1} aufgrund von {2}",
   "PortalWebsiteContentOverwrite": "Portalwebsite-Inhalte zum Überschreiben",
   "PortalWebsiteDownloadPathHelp": "Pfad, in dem die Websiteinhalte heruntergeladen werden",
   "PortalWebsiteDownloadProcessStart": "Download der Website {0} gestartet",

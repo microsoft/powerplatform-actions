@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Omitiendo la tabla Exportar solamente: {0}",
   "PortalUploadInvalidJsonEditorType": "El tipo {0} no se puede cargar",
   "PortalUploadMultipleEntityDataFilesDetected": "Se detectaron archivos de datos de varias tablas",
+  "PortalUploadRecordFailure": "NO SE PUDO actualizar la tabla {0} con el id. de registro {1} debido a {2}",
   "PortalWebsiteContentOverwrite": "Contenido del sitio web del portal que se sobrescribirá",
   "PortalWebsiteDownloadPathHelp": "Ruta de acceso en la que se descargará el contenido del sitio web",
   "PortalWebsiteDownloadProcessStart": "Se inició la descarga del sitio web {0}",

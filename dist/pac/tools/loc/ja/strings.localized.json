@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "次のテーブルのみエクスポートをスキップします: {0}",
   "PortalUploadInvalidJsonEditorType": "種類: {0} はアップロードが無効です",
   "PortalUploadMultipleEntityDataFilesDetected": "複数のテーブル データ ファイルが検出されました",
+  "PortalUploadRecordFailure": "レコード ID: {1} のテーブル {0} の更新が {2} で失敗しました",
   "PortalWebsiteContentOverwrite": "上書きするポータル Web サイトのコンテンツ",
   "PortalWebsiteDownloadPathHelp": "Web サイトのコンテンツをダウンロードするパス",
   "PortalWebsiteDownloadProcessStart": "Web サイト {0} のダウンロードを開始しました",

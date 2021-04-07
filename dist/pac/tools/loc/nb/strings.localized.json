@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Hopper over bare eksport-tabell: {0}",
   "PortalUploadInvalidJsonEditorType": "Type:{0} kan ikke lastes opp",
   "PortalUploadMultipleEntityDataFilesDetected": "Datafil med flere tabeller er oppdaget",
+  "PortalUploadRecordFailure": "Oppdatering av tabellen {0} med oppførings-ID {1} MISLYKTES på grunn av {2}",
   "PortalWebsiteContentOverwrite": "Innhold på portalnettsted som skal overskrives",
   "PortalWebsiteDownloadPathHelp": "Banen der nettstedsinnholdet blir lastet ned",
   "PortalWebsiteDownloadProcessStart": "Startet nedlasting av nettstedet {0}",

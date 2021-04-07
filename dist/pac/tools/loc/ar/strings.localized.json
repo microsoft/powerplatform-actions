@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "تخطي تصدير الجدول فقط: {0}",
   "PortalUploadInvalidJsonEditorType": "النوع: {0} غير صالح للتحميل",
   "PortalUploadMultipleEntityDataFilesDetected": "تم الكشف عن ملف بيانات جداول متعددة",
+  "PortalUploadRecordFailure": "تحديث الجدول {0} مع معرف السجل:{1} فشلت العملية بسبب {2}",
   "PortalWebsiteContentOverwrite": "محتوى موقع ويب المدخل لاستبداله",
   "PortalWebsiteDownloadPathHelp": "المسار حيث سيتم تنزيل محتوى موقع الويب",
   "PortalWebsiteDownloadProcessStart": "بدأ تنزيل موقع الويب {0}",

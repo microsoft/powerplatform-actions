@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Omitindo táboa só de exportación: {0}",
   "PortalUploadInvalidJsonEditorType": "O tipo {0} non é válido para a carga",
   "PortalUploadMultipleEntityDataFilesDetected": "Detectáronse varios ficheiros de datos de táboas",
+  "PortalUploadRecordFailure": "Actualizando a táboa {0} co ID de rexistro:{1} ERRO debido a {2}",
   "PortalWebsiteContentOverwrite": "Contido do sitio web do portal que se vai sobrescribir",
   "PortalWebsiteDownloadPathHelp": "Camiño onde se descargará o contido do sitio web",
   "PortalWebsiteDownloadProcessStart": "Iniciouse a descarga do sitio web {0}",

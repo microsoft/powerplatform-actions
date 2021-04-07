@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Tabel voor alleen exporteren wordt overgeslagen: {0}",
   "PortalUploadInvalidJsonEditorType": "Type {0} is niet geldig voor upload",
   "PortalUploadMultipleEntityDataFilesDetected": "Er zijn meerdere bestanden met tabelgegevens gedetecteerd",
+  "PortalUploadRecordFailure": "Tabel {0} bijwerken met record-id: {1} is mislukt vanwege {2}",
   "PortalWebsiteContentOverwrite": "Te overschrijven inhoud van portalwebsite",
   "PortalWebsiteDownloadPathHelp": "Pad waarnaar de inhoud van de website wordt gedownload",
   "PortalWebsiteDownloadProcessStart": "Downloaden van website {0} is gestart",

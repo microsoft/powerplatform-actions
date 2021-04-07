@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Yalnızca tablo dışarı aktarma işlemi atlanıyor: {0}",
   "PortalUploadInvalidJsonEditorType": "Tür:{0} yükleme için geçerli değil",
   "PortalUploadMultipleEntityDataFilesDetected": "Birden çok tablo veri dosyası algılandı",
+  "PortalUploadRecordFailure": "{1} kayıt kimliğine sahip {0} tablosu güncelleştiriliyor: {2} nedeniyle BAŞARISIZ OLDU",
   "PortalWebsiteContentOverwrite": "Üzerine yazılacak portal web sitesi içeriği",
   "PortalWebsiteDownloadPathHelp": "Web sitesi içeriğinin indirileceği yol",
   "PortalWebsiteDownloadProcessStart": "Web sitesi indirilmeye başlandı {0}",

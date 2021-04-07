@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "ข้ามการส่งออกตารางเท่านั้น: {0}",
   "PortalUploadInvalidJsonEditorType": "ชนิด:{0} ไม่ใช่ชนิดที่ถูกต้องในการอัปโหลด",
   "PortalUploadMultipleEntityDataFilesDetected": "ตรวจพบไฟล์ข้อมูลตารางหลายรายการ",
+  "PortalUploadRecordFailure": "การปรับปรุงตาราง {0} ที่มีรหัสเรกคอร์ด:{1} ล้มเหลวเนื่องจาก {2}",
   "PortalWebsiteContentOverwrite": "เนื้อหาเว็บไซต์พอร์ทัลที่จะเขียนทับ",
   "PortalWebsiteDownloadPathHelp": "พาธที่จะดาวน์โหลดเนื้อหาเว็บไซต์",
   "PortalWebsiteDownloadProcessStart": "การดาวน์โหลดเว็บไซต์ {0} เริ่มต้นแล้ว",

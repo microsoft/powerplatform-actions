@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Praleidžiama tik eksportuojama lentelė: {0}",
   "PortalUploadInvalidJsonEditorType": "Tipas: {0} netinkamas nusiųsti",
   "PortalUploadMultipleEntityDataFilesDetected": "Aptiktas kelių lentelių duomenų failas",
+  "PortalUploadRecordFailure": "Lentelės {0} su įrašo ID {1} naujinti NEPAVYKO dėl {2}",
   "PortalWebsiteContentOverwrite": "Perrašytinas portalo svetainės turinys",
   "PortalWebsiteDownloadPathHelp": "Kelias, kur bus atsisiųstas svetainės turinys",
   "PortalWebsiteDownloadProcessStart": "Pradėta atsisiųsti svetainę „{0}“",

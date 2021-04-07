@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Ohitetaan vain vienti -taulukko: {0}",
   "PortalUploadInvalidJsonEditorType": "Tyyppi {0} ei ole sovellu ladattavaksi palvelimeen",
   "PortalUploadMultipleEntityDataFilesDetected": "Havaittiin useita taulukon datatiedostoja",
+  "PortalUploadRecordFailure": "Taulukon {0} (tietuetunnus {1}) päivitys EPÄONNISTUI; syy: {2}",
   "PortalWebsiteContentOverwrite": "Korvattava portaalisivuston sisältö",
   "PortalWebsiteDownloadPathHelp": "Polku, johon sivuston sisältö ladataan",
   "PortalWebsiteDownloadProcessStart": "Aloitettiin sivuston {0} lataus",

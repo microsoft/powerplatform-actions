@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Esportatzeko soilik den taula saltatzen: {0}",
   "PortalUploadInvalidJsonEditorType": "{0} mota ezin da kargatu",
   "PortalUploadMultipleEntityDataFilesDetected": "Taula-datuen fitxategi anitz hauteman dira",
+  "PortalUploadRecordFailure": "EZIN IZAN DA prozesatu {1} erregistro IDa duen eta {0} taula arrazoi honengatik: {2}",
   "PortalWebsiteContentOverwrite": "Gainidatzi beharreko atari-webguneko edukia",
   "PortalWebsiteDownloadPathHelp": "Webguneko edukia deskargatuko den bide-izena",
   "PortalWebsiteDownloadProcessStart": "{0} webgunea deskargatzen hasi da",

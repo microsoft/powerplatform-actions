@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Springer over tabellen kun til eksport: {0}",
   "PortalUploadInvalidJsonEditorType": "Typen: {0} er ikke gyldig til upload",
   "PortalUploadMultipleEntityDataFilesDetected": "Der blev fundet en datafil med flere tabeller",
+  "PortalUploadRecordFailure": "Opdatering af tabellen {0} med post-id'et:{1} MISLYKKEDES på grund af {2}",
   "PortalWebsiteContentOverwrite": "Indhold for portalwebsted, der skal overskrives",
   "PortalWebsiteDownloadPathHelp": "Sti, hvor webstedsindholdet skal hentes",
   "PortalWebsiteDownloadProcessStart": "Startet download af webstedet {0}",

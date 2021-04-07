@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "מדלג על טבלת ייצוא בלבד: {0}",
   "PortalUploadInvalidJsonEditorType": "סוג:{0} לא חוקי להעלאה",
   "PortalUploadMultipleEntityDataFilesDetected": "זוהו קבצי נתוני טבלה מרובים",
+  "PortalUploadRecordFailure": "עיבוד הטבלה {0} עם מזהה רשומה:{1} נכשל עקב {2}",
   "PortalWebsiteContentOverwrite": "תוכן אתר הפורטל להחלפה",
   "PortalWebsiteDownloadPathHelp": "נתיב שאליו תוריד את תוכן האתר",
   "PortalWebsiteDownloadProcessStart": "החלה הורדת האתר {0}",

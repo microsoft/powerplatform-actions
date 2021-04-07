@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Melangkau jadual eksport sahaja: {0}",
   "PortalUploadInvalidJsonEditorType": "Taip:{0} tidak sah untuk dimuat naik",
   "PortalUploadMultipleEntityDataFilesDetected": "Berbilang fail data jadual telah dikesan",
+  "PortalUploadRecordFailure": "Pengemaskinian jadual {0} dengan id rekod:{1} TELAH GAGAL disebabkan {2}",
   "PortalWebsiteContentOverwrite": "Kandungan tapak web portal untuk ditulis ganti",
   "PortalWebsiteDownloadPathHelp": "Laluan yang kandungan tapak web akan dimuat turun",
   "PortalWebsiteDownloadProcessStart": "Muat turun tapak web {0} telah bermula",

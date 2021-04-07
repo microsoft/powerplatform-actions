@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Пропуск таблицы только для экспорта: {0}",
   "PortalUploadInvalidJsonEditorType": "Тип {0} не является допустимым типом для отправки",
   "PortalUploadMultipleEntityDataFilesDetected": "Обнаружено несколько файлов с данными таблиц",
+  "PortalUploadRecordFailure": "Не удалось обновить таблицу {0} с ИД записи {1}. Причина: {2}.",
   "PortalWebsiteContentOverwrite": "Содержимое веб-сайта портала для перезаписи",
   "PortalWebsiteDownloadPathHelp": "Путь, по которому будет загружено содержимое веб-сайта",
   "PortalWebsiteDownloadProcessStart": "Началась загрузка веб-сайта {0}",

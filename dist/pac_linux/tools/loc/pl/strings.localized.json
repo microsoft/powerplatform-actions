@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Pomijanie tabeli tylko do eksportu: {0}",
   "PortalUploadInvalidJsonEditorType": "Typ {0} nie jest prawidłowym typem do przekazania",
   "PortalUploadMultipleEntityDataFilesDetected": "Wykryto wiele plików danych tabel",
+  "PortalUploadRecordFailure": "Aktualizowanie tabeli {0} z użyciem rekordu o identyfikatorze {1} nie powiodło się; przyczyna: {2}",
   "PortalWebsiteContentOverwrite": "Zawartość witryny internetowej portalu do zastąpienia",
   "PortalWebsiteDownloadPathHelp": "Ścieżka lokalizacji, do której zostanie pobrana zawartość witryny internetowej",
   "PortalWebsiteDownloadProcessStart": "Rozpoczęto pobieranie witryny internetowej {0}",
