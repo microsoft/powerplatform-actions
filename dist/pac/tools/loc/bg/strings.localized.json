@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Пропускане на таблица само за експортиране: {0}",
   "PortalUploadInvalidJsonEditorType": "Тип: {0} не е валиден за качване",
   "PortalUploadMultipleEntityDataFilesDetected": "Намерени са множество файлове с данни на таблица",
+  "PortalUploadRecordFailure": "Актуализирането на таблица {0} с ИД на запис {1} е НЕУСПЕШНО поради {2}",
   "PortalWebsiteContentOverwrite": "Съдържание на уеб сайт на портал за презаписване",
   "PortalWebsiteDownloadPathHelp": "Път, където ще бъде изтеглено съдържанието на уеб сайта",
   "PortalWebsiteDownloadProcessStart": "Изтеглянето на уеб сайт {0} започна",

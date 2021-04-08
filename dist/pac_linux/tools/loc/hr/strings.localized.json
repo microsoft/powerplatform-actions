@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Preskakanje tablice samo za izvoz: {0}",
   "PortalUploadInvalidJsonEditorType": "Vrsta: {0} nije valjana za prijenos",
   "PortalUploadMultipleEntityDataFilesDetected": "Otkriveno je više datoteka s podacima o tablici",
+  "PortalUploadRecordFailure": "Tablica {0} ažurira se uz ID zapisa:{1} NEUSPJEŠNO zbog {2}",
   "PortalWebsiteContentOverwrite": "Sadržaj web-mjesta portala za zamjenu",
   "PortalWebsiteDownloadPathHelp": "Put s kojeg će se sadržaj web mjesta preuzeti",
   "PortalWebsiteDownloadProcessStart": "Počelo je preuzimanje web-mjesta {0}",

@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Παράλειψη πίνακα μόνο εξαγωγής: {0}",
   "PortalUploadInvalidJsonEditorType": "Τύπος: Το \"{0}\" δεν είναι έγκυρο για αποστολή",
   "PortalUploadMultipleEntityDataFilesDetected": "Εντοπίστηκαν πολλά αρχεία δεδομένων πίνακα",
+  "PortalUploadRecordFailure": "Ενημέρωση πίνακα {0} με αναγνωριστικό καρτέλας:{1} ΑΠΕΤΥΧΕ λόγω {2}",
   "PortalWebsiteContentOverwrite": "Περιεχόμενο τοποθεσίας Web πύλης για αντικατάσταση",
   "PortalWebsiteDownloadPathHelp": "Διαδρομή όπου θα γίνει λήψη του περιεχομένου της τοποθεσίας Web",
   "PortalWebsiteDownloadProcessStart": "Ξεκίνησε η λήψη της τοποθεσίας Web {0}",

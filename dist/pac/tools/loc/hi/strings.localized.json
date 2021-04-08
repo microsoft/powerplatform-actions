@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "केवल तालिका निर्यात को छोड़ना: {0}",
   "PortalUploadInvalidJsonEditorType": "प्रकार:{0} अपलोड करने के लिए मान्य नहीं है",
   "PortalUploadMultipleEntityDataFilesDetected": "एकाधिक तालिका डेटा फ़ाइल का पता लगाया गया",
+  "PortalUploadRecordFailure": "तालिका {0} को रिकॉर्ड id: {1} से अपडेट करना {2} की वजह से विफल हो गया",
   "PortalWebsiteContentOverwrite": "अधिलेखित करने के लिए पोर्टल वेबसाइट सामग्री",
   "PortalWebsiteDownloadPathHelp": "वह पथ, जहां वेबसाइट सामग्री डाउनलोड की जाएगी",
   "PortalWebsiteDownloadProcessStart": "वेबसाइट डाउनलोड करना शुरू किया गया {0}",

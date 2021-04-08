@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "내보내기 전용 테이블 건너뛰기: {0}",
   "PortalUploadInvalidJsonEditorType": "유형:{0}을(를) 업로드할 수 없음",
   "PortalUploadMultipleEntityDataFilesDetected": "여러 테이블 데이터 파일이 검색됨",
+  "PortalUploadRecordFailure": "테이블 {0}(레코드 ID: {1})의 업데이트가 {2}(으)로 인해 실패했습니다",
   "PortalWebsiteContentOverwrite": "덮어쓸 포털 웹 사이트 콘텐츠",
   "PortalWebsiteDownloadPathHelp": "웹 사이트 콘텐츠를 다운로드할 경로",
   "PortalWebsiteDownloadProcessStart": "웹 사이트 다운로드 시작 {0}",

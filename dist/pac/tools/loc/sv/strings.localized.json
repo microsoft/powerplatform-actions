@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Hoppar över tabell endast för export: {0}",
   "PortalUploadInvalidJsonEditorType": "Typen {0} går inte att ladda upp",
   "PortalUploadMultipleEntityDataFilesDetected": "Flera tabelldatafiler identifierades",
+  "PortalUploadRecordFailure": "Uppdatering av tabell {0} med post-ID: {1} MISSLYCKADES på grund av {2}",
   "PortalWebsiteContentOverwrite": "Portalwebbplatsinnehåll som ska skrivas över",
   "PortalWebsiteDownloadPathHelp": "Sökväg där webbplatsinnehållet ska laddas ned",
   "PortalWebsiteDownloadProcessStart": "Webbplatsen {0} har börjat laddas ned",

@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Bỏ qua bảng chỉ xuất: {0}",
   "PortalUploadInvalidJsonEditorType": "Loại:{0} không còn hợp lệ để tải lên",
   "PortalUploadMultipleEntityDataFilesDetected": "Đã phát hiện thấy nhiều tệp dữ liệu bảng",
+  "PortalUploadRecordFailure": "Đang cập nhật bảng {0} với ID bản ghi: {1} KHÔNG THÀNH CÔNG do {2}",
   "PortalWebsiteContentOverwrite": "Nội dung trang web cổng thông tin để ghi đè",
   "PortalWebsiteDownloadPathHelp": "Đường dẫn đến vị trí nội dung trang web sẽ được tải xuống",
   "PortalWebsiteDownloadProcessStart": "Đã bắt đầu tải trang web {0} xuống",

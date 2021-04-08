@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "正在跳过仅导出表: {0}",
   "PortalUploadInvalidJsonEditorType": "类型 {0} 无效，无法上传",
   "PortalUploadMultipleEntityDataFilesDetected": "检测到多个表数据文件",
+  "PortalUploadRecordFailure": "由于 {2}，更新记录 ID 为 {1} 的表 {0} 失败",
   "PortalWebsiteContentOverwrite": "要覆盖的门户网站内容",
   "PortalWebsiteDownloadPathHelp": "将下载网站内容的路径",
   "PortalWebsiteDownloadProcessStart": "已开始下载网站 {0}",

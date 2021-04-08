@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Пропуск експорту лише таблиці {0}",
   "PortalUploadInvalidJsonEditorType": "Не підтримується передавання типу \"{0}\"",
   "PortalUploadMultipleEntityDataFilesDetected": "Виявлено кілька файлів із даними таблиці",
+  "PortalUploadRecordFailure": "Не вдалось оновити таблицю \"{0}\" з ідентифікатором {1} через {2}",
   "PortalWebsiteContentOverwrite": "Вміст веб-сайту порталу для перезаписування",
   "PortalWebsiteDownloadPathHelp": "Шлях, за яким буде завантажено вміст веб-сайту",
   "PortalWebsiteDownloadProcessStart": "Розпочато завантаження веб-сайту {0}",

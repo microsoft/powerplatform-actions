@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Экспорттау кестесін өткізіп жіберу: {0}",
   "PortalUploadInvalidJsonEditorType": "Түрі: жүктеп салу үшін {0} жарамды емес",
   "PortalUploadMultipleEntityDataFilesDetected": "Бірнеше кесте деректерінің файлы анықталды",
+  "PortalUploadRecordFailure": "{0} кестесі жазба идентификаторымен жаңартылуда:{1} {2} байланысты СӘТСІЗ АЯҚТАЛДЫ",
   "PortalWebsiteContentOverwrite": "Қайта жазуға арналған портал веб-сайтының мазмұны",
   "PortalWebsiteDownloadPathHelp": "Веб-сайт мазмұны жүктелетін жол",
   "PortalWebsiteDownloadProcessStart": "{0} веб-сайтын жүктеу басталды",

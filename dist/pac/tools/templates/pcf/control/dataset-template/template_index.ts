@@ -20,7 +20,7 @@ export class $controlnameplaceholder$ implements ComponentFramework.StandardCont
 	 * @param state A piece of data that persists in one session for a single user. Can be set at any point in a controls life cycle by calling 'setControlState' in the Mode interface.
 	 * @param container If a control is marked control-type='standard', it will receive an empty div element within which it can render its content.
 	 */
-	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
+	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement): void
 	{
 		// Add control initialization code
 	}
@@ -35,8 +35,8 @@ export class $controlnameplaceholder$ implements ComponentFramework.StandardCont
 		// Add code to update control view
 	}
 
-	/** 
-	 * It is called by the framework prior to a control receiving new data. 
+	/**
+	 * It is called by the framework prior to a control receiving new data.
 	 * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as “bound” or “output”
 	 */
 	public getOutputs(): IOutputs
@@ -44,7 +44,7 @@ export class $controlnameplaceholder$ implements ComponentFramework.StandardCont
 		return {};
 	}
 
-	/** 
+	/**
 	 * Called when the control is to be removed from the DOM tree. Controls should use this call for cleanup.
 	 * i.e. cancelling any pending remote calls, removing listeners, etc.
 	 */

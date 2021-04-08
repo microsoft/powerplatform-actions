@@ -22,7 +22,7 @@ export class $controlnameplaceholder$ implements ComponentFramework.VirtualContr
 		notifyOutputChanged: () => void,
 		state: ComponentFramework.Dictionary,
 		container: HTMLDivElement
-	) {
+	): void {
 	}
 
 	/**

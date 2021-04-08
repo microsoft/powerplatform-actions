@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Se omite tabelul doar pentru export: {0}",
   "PortalUploadInvalidJsonEditorType": "Tipul: {0} nu este valid pentru încărcare",
   "PortalUploadMultipleEntityDataFilesDetected": "Au fost detectate mai multe fișiere de date în tabel",
+  "PortalUploadRecordFailure": "Se actualizează tabelul {0} cu ID-ul de înregistrare:{1} NU A REUȘIT din cauza {2}",
   "PortalWebsiteContentOverwrite": "Conținutul site-ului web portal de suprascris",
   "PortalWebsiteDownloadPathHelp": "Calea unde va fi descărcat conținutul site-ului web",
   "PortalWebsiteDownloadProcessStart": "A început descărcarea site-ului web {0}",

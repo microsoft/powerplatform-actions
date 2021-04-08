@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Csak exportálható tábla kihagyása: {0}",
   "PortalUploadInvalidJsonEditorType": "Típus: {0} nem érvényes feltöltéshez",
   "PortalUploadMultipleEntityDataFilesDetected": "A rendszer több táblaadatfájlt észlelt",
+  "PortalUploadRecordFailure": "NEM SIKERÜLT frissíteni a(z) {0} táblát a(z) {1} rekordazonosítóval a következő miatt: {2}",
   "PortalWebsiteContentOverwrite": "A felülírandó portálwebhely-tartalom",
   "PortalWebsiteDownloadPathHelp": "Erre az elérési útra lesz letöltve a webhely tartalma",
   "PortalWebsiteDownloadProcessStart": "Megkezdődött a(z) {0} webhely letöltése",

@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Izlaiž tikai eksportēšanas tabulu: {0}",
   "PortalUploadInvalidJsonEditorType": "Tips:{0} nav derīgs augšupielādei",
   "PortalUploadMultipleEntityDataFilesDetected": "Noteikts vairāku tabulu datu fails",
+  "PortalUploadRecordFailure": "Tabulas {0} ar ieraksta ID: {1} atjaunināšana NEIZDEVĀS šī iemesla dēļ: {2}",
   "PortalWebsiteContentOverwrite": "Pārrakstāmais portāla tīmekļa vietnes saturs",
   "PortalWebsiteDownloadPathHelp": "Ceļš, kurā tiks lejupielādēts tīmekļa vietnes saturs",
   "PortalWebsiteDownloadProcessStart": "Sākta tīmekļa vietnes {0} lejupielāde",

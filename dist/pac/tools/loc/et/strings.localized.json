@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "Ainult eksporditabeli vahelejätmine: {0}",
   "PortalUploadInvalidJsonEditorType": "Tüüpi {0} ei saa üles laadida",
   "PortalUploadMultipleEntityDataFilesDetected": "Tuvastati mitu tabeliandmefaili",
+  "PortalUploadRecordFailure": "Tabeli {0} kirje ID-ga {1} värskendamine NURJUS; põhjus {2}",
   "PortalWebsiteContentOverwrite": "Portaali veebisaidi ülekirjutatav sisu",
   "PortalWebsiteDownloadPathHelp": "Veebisaidi sisu allalaadimise tee",
   "PortalWebsiteDownloadProcessStart": "Veebisaidi {0} allalaadimine algas",

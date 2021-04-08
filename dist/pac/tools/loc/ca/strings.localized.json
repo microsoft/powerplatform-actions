@@ -327,6 +327,7 @@
   "PortalSkipExportOnlyEntity": "S’està saltant la taula de només exportació: {0}",
   "PortalUploadInvalidJsonEditorType": "Tipus:{0} no és vàlid per a la pujada",
   "PortalUploadMultipleEntityDataFilesDetected": "S’han detectat diversos fitxers de dades de taula",
+  "PortalUploadRecordFailure": "S’està actualitzant la taula {0} amb l’identificador de registre:{1} HA FALLAT a causa de {2}",
   "PortalWebsiteContentOverwrite": "Contingut del lloc web del portal per sobreescriure",
   "PortalWebsiteDownloadPathHelp": "Camí en què es baixaran els continguts del lloc web",
   "PortalWebsiteDownloadProcessStart": "S’ha iniciat la baixada del lloc web {0}",
