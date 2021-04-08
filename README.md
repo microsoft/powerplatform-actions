@@ -80,6 +80,8 @@ Windows, macOS or Linux:
   ```
   - Create a PAT in GitHub to read packages, and enable SSO for the microsoft organization. Then add it to your *~/.npmrc* file or use the `npm login` command as documented [here](https://docs.github.com/en/packages/guides/configuring-npm-for-use-with-github-packages#authenticating-with-a-personal-access-token). This will only be needed until the `@microsoft/powerplatform-cli-wrapper` repo is made public.
 
+If developing on Linux or macOS, you will also need to install `git-lfs`.  (It is prepackaged with the Git installer for Windows.)  Follow the [instructions here](https://docs.github.com/en/github/managing-large-files/installing-git-large-file-storage) for your environment.
+
 ## Getting Started
 
 Clone, restore modules, build and run:
@@ -95,6 +97,19 @@ gulp
 
 Run ```npm run dist``` and commit and push the updates in the ```./dist``` folder.
 
+If you have updated the Linux PAC package version (especially from a Windows host), double check that the `pac` executable has the execute flag set.  Run
+```bash
+git ls-tree HEAD dist/pac_linux/tools/pac
+```
+and check that the leftmost value should be `100755`.  Example output:
+```bash
+100755 blob 00034fe2fe80faca43030481877760674409d739    dist/pac_linux/tools/pac
+```
+If the file mode does not match, run
+```bash
+git update-index --chmod=+x dist/pac_linux/tools/pac
+```
+prior to commiting the changes.
 ## Details
 
 [CLI command for pac](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli#solution)

@@ -162,6 +162,8 @@ async function createDist() {
 
 const recompile = gulp.series(
     clean,
+    // See the README.me for instructions on updating the dist folder when these packages are updated,
+    // especially if you are updating the Linux package from a Windows machine.
     async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.6-daily-21040700', path.resolve(outdir, 'pac_linux')),
     async () => fs.chmod(path.resolve(outdir, 'pac_linux', 'tools', 'pac'), 0o711),
     async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.5.6-daily-21040700', path.resolve(outdir, 'pac')),
