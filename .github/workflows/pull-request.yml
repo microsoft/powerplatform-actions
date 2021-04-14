@@ -27,6 +27,14 @@ jobs:
         node-version: 14.x
         registry-url: https://npm.pkg.github.com
 
+    - name: Build and test
+      run: |
+        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
+        npm i
+        npm run ci
+      env:
+        AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
+
     - name: Check Execute Permissions
       if: matrix.os == 'ubuntu-latest'
       run: |
@@ -35,14 +43,6 @@ jobs:
             echo "dist/pac_linux/tools/pac is not executable.  See \"Refreshing actions in dist folder\" in README.md" 1>&2
             exit 1
         fi
-
-    - name: Build and test
-      run: |
-        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
-        npm i
-        npm run ci
-      env:
-        AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
 
     - name: Test create-environment action with username/password
       uses: ./create-environment
