@@ -32,10 +32,7 @@ jobs:
       run: |
         if [ ! -x dist/pac_linux/tools/pac ]
         then
-            echo "dist/pac_linux/tools/pac is not executable" 1>&2
-            exit 2
-        else
-            echo "File has execute permission.  This is not an error, but testing that the GithubActions work as expected." 1>&2
+            echo "dist/pac_linux/tools/pac is not executable.  See \"Refreshing actions in dist folder\" in README.md" 1>&2
             exit 1
         fi
 
