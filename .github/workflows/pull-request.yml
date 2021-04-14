@@ -27,6 +27,18 @@ jobs:
         node-version: 14.x
         registry-url: https://npm.pkg.github.com
 
+    - name: Check Execute Permissions
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        if [ ! -x dist/pac_linux/tools/pac ]
+        then
+            echo "dist/pac_linux/tools/pac is not executable" 1>&2
+            exit 2
+        else
+            echo "File has execute permission.  This is not an error, but testing that the GithubActions work as expected." 1>&2
+            exit 1
+        fi
+
     - name: Build and test
       run: |
         npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
