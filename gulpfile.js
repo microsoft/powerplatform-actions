@@ -19,6 +19,7 @@ const path = require('path');
 const pslist = require('ps-list');
 const unzip = require('unzip-stream');
 const { glob } = require('glob');
+const { exec } = require("child_process");
 
 const tsConfigFile = './tsconfig.json';
 const tsconfig = require(tsConfigFile);
@@ -160,10 +161,21 @@ async function createDist() {
         });
 }
 
+// Unzipping the pac program from the nuget package does not set the
+// Execute flag on non-Windows platforms.  Thus, we need to set it ourselves.
+async function setExecuteFlag(path) {
+    // chmod sets the execute flag on the filesystem, but is a no-op on windows
+    fs.chmod(path, 0o711)
+        .then(() =>{
+            // Git tracks the execute flag as well, so make sure we set that *esepcially* on Windows
+            exec("git update-index --chmod=+x " + path);
+        });
+}
+
 const recompile = gulp.series(
     clean,
     async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.6-daily-21040700', path.resolve(outdir, 'pac_linux')),
-    async () => fs.chmod(path.resolve(outdir, 'pac_linux', 'tools', 'pac'), 0o711),
+    async () => setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac')),
     async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.5.6-daily-21040700', path.resolve(outdir, 'pac')),
     async () => nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.68', path.resolve(outdir, 'sopa')),
     compile
