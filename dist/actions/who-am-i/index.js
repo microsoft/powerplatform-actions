@@ -410,7 +410,9 @@ exports.RunnerError = exports.createCommandRunner = void 0;
 const child_process_1 = __webpack_require__(129);
 const process_1 = __webpack_require__(765);
 const os_1 = __webpack_require__(87);
+const restrictPlatformToWindows_1 = __webpack_require__(771);
 function createCommandRunner(workingDir, commandPath, logger) {
+    restrictPlatformToWindows_1.default();
     return function run(...args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
@@ -423,7 +425,7 @@ function createCommandRunner(workingDir, commandPath, logger) {
                 });
                 process.stdout.on("data", (data) => stdout.push(...data.toString().split(os_1.EOL)));
                 process.stderr.on("data", (data) => stderr.push(...data.toString().split(os_1.EOL)));
-                process.on("exit", (code) => {
+                process.on("close", (code) => {
                     if (code === 0) {
                         logSuccess(stdout);
                         resolve(stdout);
@@ -433,10 +435,6 @@ function createCommandRunner(workingDir, commandPath, logger) {
                         logger.error(`error: ${code}: ${allOutput.join(os_1.EOL)}`);
                         reject(new RunnerError(code, allOutput.join()));
                     }
-                    /* Close out handles to the output streams so that we don't wait on
-                        grandchild processes like pacTelemetryUpload */
-                    process.stdout.destroy();
-                    process.stderr.destroy();
                 });
             });
         });
@@ -481,13 +479,7 @@ const CommandRunner_1 = __webpack_require__(892);
 function createGitRunner(workingDir, logger) {
     const runCommand = CommandRunner_1.createCommandRunner(workingDir, "git", logger);
     return {
-        log: (limit) => __awaiter(this, void 0, void 0, function* () {
-            const args = ["log"];
-            if (limit !== undefined) {
-                args.push(`-${limit}`);
-            }
-            return runCommand(...args);
-        }),
+        log: () => __awaiter(this, void 0, void 0, function* () { return runCommand("log"); }),
     };
 }
 exports.createGitRunner = createGitRunner;
@@ -551,52 +543,16 @@ exports.createPacRunner = createPacRunner;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PackageType = exports.createSopaRunner = void 0;
+exports.createSopaRunner = void 0;
 const CommandRunner_1 = __webpack_require__(892);
-const restrictPlatformToWindows_1 = __webpack_require__(771);
 function createSopaRunner(workingDir, sopaExePath, logger) {
-    restrictPlatformToWindows_1.default();
     const runCommand = CommandRunner_1.createCommandRunner(workingDir, sopaExePath, logger);
     return {
         help: () => runCommand(),
-        pack: (parameters) => runCommand(...buildCommandLineArguments(Object.assign({ action: "Pack" }, parameters))),
-        extract: (parameters) => runCommand(...buildCommandLineArguments(Object.assign({ action: "Extract" }, parameters))),
+        pack: (parameters) => runCommand("/nologo", "/action:pack", `/folder:${parameters.folder}`, `/zipFile:${parameters.zipFile}`),
     };
 }
 exports.createSopaRunner = createSopaRunner;
-function buildCommandLineArguments(parameters) {
-    const args = [];
-    addArgument("action", "action");
-    addArgument("zipfile", "zipFile");
-    addArgument("folder", "folder");
-    addArgument("packagetype", "packageType");
-    addArgument("allowWrite", "allowWrite");
-    addArgument("allowDelete", "allowDelete");
-    addSwitchArgument("clobber", "clobber");
-    addArgument("map", "map");
-    addSwitchArgument("nologo", "noLogo");
-    addArgument("log", "log");
-    addArgument("@", "@");
-    addArgument("sourceLoc", "sourceLocale");
-    addSwitchArgument("localize", "localize");
-    return args;
-    function addArgument(argumentName, parameterName) {
-        if (parameterName in parameters) {
-            args.push(`/${argumentName}:${parameters[parameterName]}`);
-        }
-    }
-    function addSwitchArgument(argumentName, parameterName) {
-        if (parameters[parameterName]) {
-            args.push(`/${argumentName}`);
-        }
-    }
-}
-var PackageType;
-(function (PackageType) {
-    PackageType["Unmanaged"] = "unmanaged";
-    PackageType["Managed"] = "managed";
-    PackageType["Both"] = "both";
-})(PackageType = exports.PackageType || (exports.PackageType = {}));
 
 //# sourceMappingURL=SopaRunner.js.map
 
