@@ -174,10 +174,10 @@ async function setExecuteFlag(path) {
 
 const recompile = gulp.series(
     clean,
-    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.6-daily-21040700', path.resolve(outdir, 'pac_linux')),
+    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.5.6-daily-21042022', path.resolve(outdir, 'pac_linux')),
     async () => setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac')),
-    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.5.6-daily-21040700', path.resolve(outdir, 'pac')),
-    async () => nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.68', path.resolve(outdir, 'sopa')),
+    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.5.6-daily-21042022', path.resolve(outdir, 'pac')),
+    async () => nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.77', path.resolve(outdir, 'sopa')),
     compile
 );
 
