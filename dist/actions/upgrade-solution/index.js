@@ -492,7 +492,15 @@ class ActionLogger {
         core.warning(args.join());
     }
     error(...args) {
-        core.error(args.join());
+        const errorMessage = args.join();
+        core.setFailed(errorMessage);
+        core.error(errorMessage);
+    }
+    debug(...args) {
+        core.debug(args.join());
+    }
+    log(...args) {
+        console.log(args.join());
     }
 }
 exports.ActionLogger = ActionLogger;
@@ -585,7 +593,7 @@ class AuthHandler {
             core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
             if (authKind === AuthKind.CDS) {
                 yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
-                    envUrl: this._envUrl,
+                    environmentUrl: this._envUrl,
                     tenantId: this._tenantId,
                     appId: this._appId,
                     clientSecret: this._clientSecret,
@@ -605,7 +613,7 @@ class AuthHandler {
             core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
             if (authKind == AuthKind.CDS) {
                 yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-                    envUrl: this._envUrl,
+                    environmentUrl: this._envUrl,
                     username: this._username,
                     password: this._password,
                 });
@@ -659,7 +667,7 @@ function createLegacyRunnerPacAuthenticator(pac) {
                 "auth",
                 "create",
                 "--url",
-                parameters.envUrl,
+                parameters.environmentUrl,
                 "--applicationId",
                 parameters.appId,
                 "--clientSecret",
@@ -689,7 +697,7 @@ function createLegacyRunnerPacAuthenticator(pac) {
                 "auth",
                 "create",
                 "--url",
-                parameters.envUrl,
+                parameters.environmentUrl,
                 "--username",
                 parameters.username,
                 "--password",
