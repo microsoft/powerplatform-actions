@@ -2,3 +2,5 @@
 /coverage/
 /out/
 /dist/
+.env
+.npmrc

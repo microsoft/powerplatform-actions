@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
