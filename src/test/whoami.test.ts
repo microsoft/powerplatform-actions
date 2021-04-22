@@ -1,41 +1,49 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import { expect, use } from "chai";
-import { main as whoAmI } from "../actions/who-am-i";
+import { should, use } from "chai";
 import { stubInterface } from "ts-sinon";
-import { ActionInputsEmulator } from "./actionInputsEmulator";
-import { PacRunner } from "@microsoft/powerplatform-cli-wrapper";
 import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { spy, stub } from "sinon";
+import {
+    Logger,
+    RunnerParameters,
+    UsernamePassword,
+} from "@microsoft/powerplatform-cli-wrapper";
+should();
 use(sinonChai);
 
-describe("who-am-i#input validation", () => {
-    const pac = stubInterface<PacRunner>();
-    pac.whoAmI.returns(Promise.resolve([]));
-    // TODO: read in params and their required state from the action.yml
+describe("WhoAmI tests", () => {
+    it("calls whoAmI", async () => {
+        const whoAmIStub = stub();
+        const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+        const environmentUrl = "environment url";
+        const runnerParameters = stubInterface<RunnerParameters>();
 
-    const inputParams = [
-        { Name: "environment-url", Value: "aUrl" },
-        { Name: "user-name", Value: "aUserName" },
-        { Name: "password-secret", Value: "aSecret" },
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+        await rewiremock.around(
+            () => import("../actions/who-am-i/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper")).with(
+                    {
+                        whoAmI: whoAmIStub,
+                    }
+                );
+                mock(() => import("../lib/auth/getCredentials")).withDefault(
+                    () => credentials
+                );
+                mock(() => import("../lib/auth/getEnvironmentUrl")).withDefault(
+                    () => environmentUrl
+                );
+                mock(() => import("../lib/runnerParameters")).withDefault(
+                    runnerParameters
+                );
+            }
+        );
 
-    it("call action", async () => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await whoAmI(() => pac);
-        } catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        expect(
-            pac.authenticateCdsWithUsernamePassword
-        ).to.have.been.calledOnceWith({
-            envUrl: "aUrl",
-            username: "aUserName",
-            password: "aSecret",
+        whoAmIStub.should.have.been.calledOnceWithExactly({
+            credentials: credentials,
+            environmentUrl: environmentUrl,
+            ...runnerParameters,
         });
-        expect(pac.whoAmI).to.have.been.calledOnce;
     });
 });
