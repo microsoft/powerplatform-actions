@@ -4,9 +4,8 @@ import { should, use } from "chai";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import rewiremock from "./rewiremock";
-import { spy, stub } from "sinon";
+import { stub } from "sinon";
 import {
-    Logger,
     RunnerParameters,
     UsernamePassword,
 } from "@microsoft/powerplatform-cli-wrapper";
