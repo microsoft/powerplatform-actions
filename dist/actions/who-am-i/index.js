@@ -410,28 +410,30 @@ exports.RunnerError = exports.createCommandRunner = void 0;
 const child_process_1 = __webpack_require__(129);
 const process_1 = __webpack_require__(765);
 const os_1 = __webpack_require__(87);
-function createCommandRunner(workingDir, commandPath, logger) {
+function createCommandRunner(workingDir, commandPath, logger, options) {
     return function run(...args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 logInitialization(...args);
-                const stdout = [];
-                const stderr = [];
-                const process = child_process_1.spawn(commandPath, args, {
-                    cwd: workingDir,
-                    env: { PATH: process_1.env.PATH },
-                });
-                process.stdout.on("data", (data) => stdout.push(...data.toString().split(os_1.EOL)));
-                process.stderr.on("data", (data) => stderr.push(...data.toString().split(os_1.EOL)));
+                const allOutput = [];
+                const process = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: { PATH: process_1.env.PATH } }, options));
+                process.stdout.on("data", logData(logger.log));
+                process.stderr.on("data", logData(logger.error));
+                function logData(logFunction) {
+                    return (data) => {
+                        `${data}`.split(os_1.EOL).forEach((line) => {
+                            allOutput.push(line);
+                            logFunction(line);
+                        });
+                    };
+                }
                 process.on("exit", (code) => {
                     if (code === 0) {
-                        logSuccess(stdout);
-                        resolve(stdout);
+                        resolve(allOutput);
                     }
                     else {
-                        const allOutput = stderr.concat(stdout);
-                        logger.error(`error: ${code}: ${allOutput.join(os_1.EOL)}`);
-                        reject(new RunnerError(code, allOutput.join()));
+                        logger.error(`error: ${code}`);
+                        reject(new RunnerError(code, allOutput.join(os_1.EOL)));
                     }
                     /* Close out handles to the output streams so that we don't wait on
                         grandchild processes like pacTelemetryUpload */
@@ -442,10 +444,7 @@ function createCommandRunner(workingDir, commandPath, logger) {
         });
     };
     function logInitialization(...args) {
-        logger.info(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
-    }
-    function logSuccess(output) {
-        logger.info(`success: ${output.join(os_1.EOL)}`);
+        logger.debug(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
     }
 }
 exports.createCommandRunner = createCommandRunner;
@@ -462,7 +461,7 @@ exports.RunnerError = RunnerError;
 
 /***/ }),
 
-/***/ 91:
+/***/ 302:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -476,129 +475,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createGitRunner = void 0;
-const CommandRunner_1 = __webpack_require__(892);
-function createGitRunner(workingDir, logger) {
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, "git", logger);
-    return {
-        log: (limit) => __awaiter(this, void 0, void 0, function* () {
-            const args = ["log"];
-            if (limit !== undefined) {
-                args.push(`-${limit}`);
-            }
-            return runCommand(...args);
-        }),
-    };
+const authenticate_1 = __webpack_require__(192);
+const createPacRunner_1 = __webpack_require__(226);
+const whoAmI_1 = __webpack_require__(436);
+function default_1(parameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pac = createPacRunner_1.default(parameters);
+        yield authenticate_1.authenticateEnvironment(pac, parameters);
+        yield whoAmI_1.default(pac);
+    });
 }
-exports.createGitRunner = createGitRunner;
+exports.default = default_1;
 
-//# sourceMappingURL=GitRunner.js.map
-
-
-/***/ }),
-
-/***/ 671:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createPacRunner = void 0;
-const CommandRunner_1 = __webpack_require__(892);
-function createPacRunner(workingDir, exePath, logger) {
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, exePath, logger);
-    const admin = ["--kind", "ADMIN"];
-    return {
-        help: () => runCommand(),
-        whoAmI: () => runCommand("org", "who"),
-        getAuthenticationProfiles: () => runCommand("auth", "list"),
-        clearAuthenticationProfiles: () => runCommand("auth", "clear"),
-        authenticateCdsWithClientCredentials: (parameters) => runCommand("auth", "create", ...addUrl(parameters), ...addClientCredentials(parameters)),
-        authenticateAdminWithClientCredentials: (parameters) => runCommand("auth", "create", ...admin, ...addClientCredentials(parameters)),
-        authenticateCdsWithUsernamePassword: (parameters) => runCommand("auth", "create", ...addUrl(parameters), ...addUsernamePassword(parameters)),
-        authenticateAdminWithUsernamePassword: (parameters) => runCommand("auth", "create", ...admin, ...addUsernamePassword(parameters)),
-    };
-    function addUrl(parameters) {
-        return ["--url", parameters.envUrl];
-    }
-    function addClientCredentials(parameters) {
-        return [
-            "--tenant",
-            parameters.tenantId,
-            "--applicationId",
-            parameters.appId,
-            "--clientSecret",
-            parameters.clientSecret,
-        ];
-    }
-    function addUsernamePassword(parameters) {
-        return [
-            "--username",
-            parameters.username,
-            "--password",
-            parameters.password,
-        ];
-    }
-}
-exports.createPacRunner = createPacRunner;
-
-//# sourceMappingURL=PacRunner.js.map
-
-
-/***/ }),
-
-/***/ 382:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PackageType = exports.createSopaRunner = void 0;
-const CommandRunner_1 = __webpack_require__(892);
-const restrictPlatformToWindows_1 = __webpack_require__(771);
-function createSopaRunner(workingDir, sopaExePath, logger) {
-    restrictPlatformToWindows_1.default();
-    const runCommand = CommandRunner_1.createCommandRunner(workingDir, sopaExePath, logger);
-    return {
-        help: () => runCommand(),
-        pack: (parameters) => runCommand(...buildCommandLineArguments(Object.assign({ action: "Pack" }, parameters))),
-        extract: (parameters) => runCommand(...buildCommandLineArguments(Object.assign({ action: "Extract" }, parameters))),
-    };
-}
-exports.createSopaRunner = createSopaRunner;
-function buildCommandLineArguments(parameters) {
-    const args = [];
-    addArgument("action", "action");
-    addArgument("zipfile", "zipFile");
-    addArgument("folder", "folder");
-    addArgument("packagetype", "packageType");
-    addArgument("allowWrite", "allowWrite");
-    addArgument("allowDelete", "allowDelete");
-    addSwitchArgument("clobber", "clobber");
-    addArgument("map", "map");
-    addSwitchArgument("nologo", "noLogo");
-    addArgument("log", "log");
-    addArgument("@", "@");
-    addArgument("sourceLoc", "sourceLocale");
-    addSwitchArgument("localize", "localize");
-    return args;
-    function addArgument(argumentName, parameterName) {
-        if (parameterName in parameters) {
-            args.push(`/${argumentName}:${parameters[parameterName]}`);
-        }
-    }
-    function addSwitchArgument(argumentName, parameterName) {
-        if (parameters[parameterName]) {
-            args.push(`/${argumentName}`);
-        }
-    }
-}
-var PackageType;
-(function (PackageType) {
-    PackageType["Unmanaged"] = "unmanaged";
-    PackageType["Managed"] = "managed";
-    PackageType["Both"] = "both";
-})(PackageType = exports.PackageType || (exports.PackageType = {}));
-
-//# sourceMappingURL=SopaRunner.js.map
+//# sourceMappingURL=whoAmI.js.map
 
 
 /***/ }),
@@ -608,117 +497,129 @@ var PackageType;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createSopaRunner = exports.createPacRunner = exports.createGitRunner = exports.RunnerError = void 0;
-var CommandRunner_1 = __webpack_require__(892);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return CommandRunner_1.RunnerError; } }));
-// TODO: delete exports once all actions are converted:
-var GitRunner_1 = __webpack_require__(91);
-Object.defineProperty(exports, "createGitRunner", ({ enumerable: true, get: function () { return GitRunner_1.createGitRunner; } }));
-var PacRunner_1 = __webpack_require__(671);
-Object.defineProperty(exports, "createPacRunner", ({ enumerable: true, get: function () { return PacRunner_1.createPacRunner; } }));
-var SopaRunner_1 = __webpack_require__(382);
-Object.defineProperty(exports, "createSopaRunner", ({ enumerable: true, get: function () { return SopaRunner_1.createSopaRunner; } }));
+exports.exportSolution = exports.whoAmI = exports.createCommandRunner = void 0;
+const whoAmI_1 = __webpack_require__(302);
+exports.whoAmI = whoAmI_1.default;
+const CommandRunner_1 = __webpack_require__(892);
+Object.defineProperty(exports, "createCommandRunner", ({ enumerable: true, get: function () { return CommandRunner_1.createCommandRunner; } }));
+const exportSolution_1 = __webpack_require__(787);
+Object.defineProperty(exports, "exportSolution", ({ enumerable: true, get: function () { return exportSolution_1.exportSolution; } }));
 
 //# sourceMappingURL=index.js.map
 
 
 /***/ }),
 
-/***/ 771:
+/***/ 192:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.authenticateEnvironment = exports.authenticateAdmin = void 0;
+function authenticateAdmin(pac, { credentials }) {
+    return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials));
+}
+exports.authenticateAdmin = authenticateAdmin;
+function authenticateEnvironment(pac, { credentials, environmentUrl, }) {
+    return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials));
+}
+exports.authenticateEnvironment = authenticateEnvironment;
+function addUrl(url) {
+    return ["--url", url];
+}
+function addCredentials(credentials) {
+    return isUsernamePassword(credentials)
+        ? addUsernamePassword(credentials)
+        : addClientCredentials(credentials);
+}
+function isUsernamePassword(credentials) {
+    return "username" in credentials;
+}
+function addClientCredentials(parameters) {
+    return [
+        "--tenant",
+        parameters.tenantId,
+        "--applicationId",
+        parameters.appId,
+        "--clientSecret",
+        parameters.clientSecret,
+    ];
+}
+function addUsernamePassword(parameters) {
+    return ["--username", parameters.username, "--password", parameters.password];
+}
+
+//# sourceMappingURL=authenticate.js.map
+
+
+/***/ }),
+
+/***/ 226:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const os_1 = __webpack_require__(87);
-function restrictPlatformToWindows() {
-    const currentPlatform = os_1.platform();
-    if (currentPlatform !== "win32") {
-        throw Error(`Unsupported Action runner os: '${os_1.platform}'; for the time being, only Windows runners are supported (cross-platform support work is in progress)`);
-    }
+const path_1 = __webpack_require__(622);
+const CommandRunner_1 = __webpack_require__(892);
+function createPacRunner({ workingDir, runnersDir, logger, }) {
+    return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32"
+        ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe")
+        : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger);
 }
-exports.default = restrictPlatformToWindows;
+exports.default = createPacRunner;
 
-//# sourceMappingURL=restrictPlatformToWindows.js.map
+//# sourceMappingURL=createPacRunner.js.map
+
+
+/***/ }),
+
+/***/ 787:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.exportSolution = void 0;
+function exportSolution(pac, { actionParameters: { name, path } }) {
+    // Handle export parameters
+    return pac("solution", "export", "--name", name, "--path", path);
+}
+exports.exportSolution = exportSolution;
+
+//# sourceMappingURL=exportSolution.js.map
+
+
+/***/ }),
+
+/***/ 436:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function whoAmI(pac) {
+    return pac("org", "who");
+}
+exports.default = whoAmI;
+
+//# sourceMappingURL=whoAmI.js.map
 
 
 /***/ }),
 
 /***/ 274:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.main = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const core = __webpack_require__(186);
-const lib_1 = __webpack_require__(806);
-const createActionsPacRunner_1 = __webpack_require__(184);
-const createCliWrapperPacAuthenticator_1 = __webpack_require__(705);
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    if (process.env.GITHUB_ACTIONS) {
-        yield main(() => createActionsPacRunner_1.default());
-    }
-}))();
-function main(pacFactory) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            core.startGroup("who-am-i");
-            const pac = pacFactory();
-            const authenticator = createCliWrapperPacAuthenticator_1.default(pac);
-            yield new lib_1.AuthHandler(authenticator).authenticate(lib_1.AuthKind.CDS);
-            yield pac.whoAmI();
-            core.endGroup();
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                core.setFailed(`failed: ${error.message}`);
-                console.error(error.stack);
-            }
-            else {
-                core.setFailed(`failed: ${error}`);
-                core.error(error);
-            }
-        }
-    });
-}
-exports.main = main;
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 434:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkingDirectory = exports.getInputAsBool = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-const core = __webpack_require__(186);
-function getInputAsBool(name, required, defaultValue) {
-    const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? defaultValue : textValue.toLowerCase() === 'true';
-}
-exports.getInputAsBool = getInputAsBool;
-function getWorkingDirectory(name, required, defaultValue) {
-    const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? (defaultValue !== null && defaultValue !== void 0 ? defaultValue : process.cwd()) : textValue;
-}
-exports.getWorkingDirectory = getWorkingDirectory;
+const powerplatform_cli_wrapper_1 = __webpack_require__(470);
+const getCredentials_1 = __webpack_require__(429);
+const getEnvironmentUrl_1 = __webpack_require__(699);
+const runnerParameters_1 = __webpack_require__(727);
+powerplatform_cli_wrapper_1.whoAmI(Object.assign({ credentials: getCredentials_1.default(), environmentUrl: getEnvironmentUrl_1.default() }, runnerParameters_1.default));
 
-//# sourceMappingURL=actionInput.js.map
+//# sourceMappingURL=index.js.map
 
 
 /***/ }),
@@ -740,7 +641,15 @@ class ActionLogger {
         core.warning(args.join());
     }
     error(...args) {
-        core.error(args.join());
+        const errorMessage = args.join();
+        core.setFailed(errorMessage);
+        core.error(errorMessage);
+    }
+    debug(...args) {
+        core.debug(args.join());
+    }
+    log(...args) {
+        console.log(args.join());
     }
 }
 exports.ActionLogger = ActionLogger;
@@ -750,378 +659,65 @@ exports.ActionLogger = ActionLogger;
 
 /***/ }),
 
-/***/ 677:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const core = __webpack_require__(186);
-const createLegacyRunnerPacAuthenticator_1 = __webpack_require__(687);
-class AuthHandler {
-    constructor(pac) {
-        if ("run" in pac) {
-            this._pacAuthenticator = createLegacyRunnerPacAuthenticator_1.default(pac);
-        }
-        else {
-            this._pacAuthenticator = pac;
-        }
-    }
-    authenticate(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.startGroup("authentication");
-            this._envUrl = core.getInput("environment-url", { required: false });
-            const authType = this.determineAuthType();
-            if (authType === AuthTypes.USERNAME_PASSWORD) {
-                yield this.authenticateWithUsernamePassword(authKind);
-            }
-            else if (authType == AuthTypes.APPID_SECRET) {
-                yield this.authenticateWithClientCredentials(authKind);
-            }
-            else {
-                throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
-            }
-            core.endGroup();
-        });
-    }
-    determineAuthType() {
-        const validUsernameAuth = this.isValidUsernameAuth();
-        const validSPNAuth = this.isValidSPNAuth();
-        try {
-            if (validUsernameAuth && validSPNAuth) {
-                throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
-            }
-            if (validUsernameAuth) {
-                return AuthTypes.USERNAME_PASSWORD;
-            }
-            else if (validSPNAuth) {
-                return AuthTypes.APPID_SECRET;
-            }
-        }
-        catch (error) {
-            core.setFailed(`failed: ${error.message}`);
-            throw error;
-        }
-        return AuthTypes.INVALID_AUTH_TYPE;
-    }
-    isValidUsernameAuth() {
-        this._username = core.getInput("user-name", { required: false });
-        this._password = core.getInput("password-secret", { required: false });
-        return !!this._username && !!this._password;
-    }
-    isValidSPNAuth() {
-        this._appId = core.getInput("app-id", { required: false });
-        this._clientSecret = core.getInput("client-secret", {
-            required: false,
-        });
-        this._tenantId = core.getInput("tenant-id", { required: false });
-        return !!this._appId && !!this._clientSecret && !!this._tenantId;
-    }
-    authenticateWithClientCredentials(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
-            if (authKind === AuthKind.CDS) {
-                yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
-                    envUrl: this._envUrl,
-                    tenantId: this._tenantId,
-                    appId: this._appId,
-                    clientSecret: this._clientSecret,
-                });
-            }
-            else {
-                yield this._pacAuthenticator.authenticateAdminWithClientCredentials({
-                    tenantId: this._tenantId,
-                    appId: this._appId,
-                    clientSecret: this._clientSecret,
-                });
-            }
-        });
-    }
-    authenticateWithUsernamePassword(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
-            if (authKind == AuthKind.CDS) {
-                yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-                    envUrl: this._envUrl,
-                    username: this._username,
-                    password: this._password,
-                });
-            }
-            else {
-                yield this._pacAuthenticator.authenticateAdminWithUsernamePassword({
-                    username: this._username,
-                    password: this._password,
-                });
-            }
-        });
-    }
-}
-exports.AuthHandler = AuthHandler;
-var AuthTypes;
-(function (AuthTypes) {
-    AuthTypes[AuthTypes["USERNAME_PASSWORD"] = 0] = "USERNAME_PASSWORD";
-    AuthTypes[AuthTypes["APPID_SECRET"] = 1] = "APPID_SECRET";
-    AuthTypes[AuthTypes["INVALID_AUTH_TYPE"] = 2] = "INVALID_AUTH_TYPE";
-})(AuthTypes || (AuthTypes = {}));
-var AuthKind;
-(function (AuthKind) {
-    AuthKind[AuthKind["CDS"] = 0] = "CDS";
-    AuthKind[AuthKind["ADMIN"] = 1] = "ADMIN";
-})(AuthKind = exports.AuthKind || (exports.AuthKind = {}));
-
-//# sourceMappingURL=authHandler.js.map
-
-
-/***/ }),
-
-/***/ 705:
-/***/ (function(__unused_webpack_module, exports) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-function createCliWrapperPacAuthenticator(pac) {
-    return {
-        authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield pac.clearAuthenticationProfiles();
-            yield pac.authenticateCdsWithClientCredentials(parameters);
-        }),
-        authenticateAdminWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield pac.clearAuthenticationProfiles();
-            yield pac.authenticateAdminWithClientCredentials(parameters);
-        }),
-        authenticateCdsWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield pac.clearAuthenticationProfiles();
-            yield pac.authenticateCdsWithUsernamePassword(parameters);
-        }),
-        authenticateAdminWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield pac.clearAuthenticationProfiles();
-            yield pac.authenticateAdminWithUsernamePassword(parameters);
-        }),
-    };
-}
-exports.default = createCliWrapperPacAuthenticator;
-
-//# sourceMappingURL=createCliWrapperPacAuthenticator.js.map
-
-
-/***/ }),
-
-/***/ 687:
-/***/ (function(__unused_webpack_module, exports) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-function createLegacyRunnerPacAuthenticator(pac) {
-    return {
-        authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--url",
-                parameters.envUrl,
-                "--applicationId",
-                parameters.appId,
-                "--clientSecret",
-                parameters.clientSecret,
-                "--tenant",
-                parameters.tenantId,
-            ]);
-        }),
-        authenticateAdminWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--kind",
-                "ADMIN",
-                "--applicationId",
-                parameters.appId,
-                "--clientSecret",
-                parameters.clientSecret,
-                "--tenant",
-                parameters.tenantId,
-            ]);
-        }),
-        authenticateCdsWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--url",
-                parameters.envUrl,
-                "--username",
-                parameters.username,
-                "--password",
-                parameters.password,
-            ]);
-        }),
-        authenticateAdminWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--kind",
-                "ADMIN",
-                "--username",
-                parameters.username,
-                "--password",
-                parameters.password,
-            ]);
-        }),
-    };
-    function clearAuth() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield pac.run(["auth", "clear"]);
-        });
-    }
-}
-exports.default = createLegacyRunnerPacAuthenticator;
-
-//# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
-
-
-/***/ }),
-
-/***/ 184:
+/***/ 429:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const powerplatform_cli_wrapper_1 = __webpack_require__(470);
-const process_1 = __webpack_require__(765);
-const os_1 = __webpack_require__(87);
-const actionLogger_1 = __webpack_require__(970);
-const getExePath_1 = __webpack_require__(309);
-function createActionsPacRunner() {
-    return powerplatform_cli_wrapper_1.createPacRunner(process_1.cwd(), (os_1.platform() === "win32"
-        ? getExePath_1.default("pac", "tools", "pac.exe")
-        : getExePath_1.default("pac_linux", "tools", "pac")), new actionLogger_1.ActionLogger());
+const core_1 = __webpack_require__(186);
+function getCredentials() {
+    const usernamePassword = {
+        username: getInput("user-name"),
+        password: getInput("password-secret"),
+    };
+    const isUpValid = isUsernamePasswordValid(usernamePassword);
+    const clientCredentials = {
+        appId: getInput("app-id"),
+        clientSecret: getInput("client-secret"),
+        tenantId: getInput("tenant-id"),
+    };
+    const isCcValid = isClientCredentialsValid(clientCredentials);
+    if (isUpValid && isCcValid) {
+        throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
+    }
+    if (isUpValid) {
+        return usernamePassword;
+    }
+    if (isCcValid) {
+        return clientCredentials;
+    }
+    throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
 }
-exports.default = createActionsPacRunner;
+exports.default = getCredentials;
+function getInput(name) {
+    return core_1.getInput(name, { required: false });
+}
+function isUsernamePasswordValid(usernamePassword) {
+    return !!usernamePassword.username && !!usernamePassword.password;
+}
+function isClientCredentialsValid(clientCredentials) {
+    return (!!clientCredentials.appId &&
+        !!clientCredentials.clientSecret &&
+        !!clientCredentials.tenantId);
+}
 
-//# sourceMappingURL=createActionsPacRunner.js.map
+//# sourceMappingURL=getCredentials.js.map
 
 
 /***/ }),
 
-/***/ 21:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ 699:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RunnerError = exports.ExeRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const child_process_1 = __webpack_require__(129);
-const os = __webpack_require__(87);
-const getExePath_1 = __webpack_require__(309);
-class ExeRunner {
-    constructor(_workingDir, logger, exeName, exeRelativePath) {
-        this._workingDir = _workingDir;
-        this.logger = logger;
-        if (exeRelativePath) {
-            this._exePath = getExePath_1.default(...exeRelativePath, exeName);
-        }
-        else {
-            this._exePath = exeName;
-        }
-    }
-    get workingDir() {
-        return this._workingDir;
-    }
-    run(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                const stdout = new Array();
-                const stderr = new Array();
-                this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
-                const process = child_process_1.spawn(this._exePath, args, { cwd: this.workingDir });
-                process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
-                process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
-                process.on('exit', (code) => {
-                    if (code === 0) {
-                        this.logger.info(`success: ${stdout.join(os.EOL)}`);
-                        resolve(stdout);
-                    }
-                    else {
-                        const allOutput = stderr.concat(stdout);
-                        this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                        reject(new RunnerError(code !== null && code !== void 0 ? code : 99999, allOutput.join()));
-                    }
-                    // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
-                    process.stdout.destroy();
-                    process.stderr.destroy();
-                });
-            });
-        });
-    }
-    runSync(args) {
-        var _a;
-        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
-        const proc = child_process_1.spawnSync(this._exePath, args, { cwd: this.workingDir });
-        if (proc.status === 0) {
-            const output = proc.output
-                .filter(line => !!line) // can have null entries
-                .map(line => line.toString());
-            this.logger.info(`success: ${output.join(os.EOL)}`);
-            return output;
-        }
-        else {
-            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
-            this.logger.error(`error: ${proc.status}: ${allOutput}`);
-            throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
-        }
-    }
+const core_1 = __webpack_require__(186);
+function getEnvironmentUrl() {
+    return core_1.getInput("environment-url", { required: false });
 }
-exports.ExeRunner = ExeRunner;
-class RunnerError extends Error {
-    constructor(exitCode, message) {
-        super(message);
-        this.exitCode = exitCode;
-    }
-}
-exports.RunnerError = RunnerError;
+exports.default = getEnvironmentUrl;
 
-//# sourceMappingURL=exeRunner.js.map
+//# sourceMappingURL=getEnvironmentUrl.js.map
 
 
 /***/ }),
@@ -1160,143 +756,22 @@ exports.default = getExePath;
 
 /***/ }),
 
-/***/ 973:
+/***/ 727:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GitRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __webpack_require__(21);
-class GitRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, 'git');
-    }
-}
-exports.GitRunner = GitRunner;
-
-//# sourceMappingURL=gitRunner.js.map
-
-
-/***/ }),
-
-/***/ 806:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = exports.SopaRunner = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-var actionInput_1 = __webpack_require__(434);
-Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
-Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
-var exeRunner_1 = __webpack_require__(21);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
-var runnerFactory_1 = __webpack_require__(147);
-Object.defineProperty(exports, "DefaultRunnerFactory", ({ enumerable: true, get: function () { return runnerFactory_1.DefaultRunnerFactory; } }));
-// TODO: delete exports once all actions are converted:
-var actionLogger_1 = __webpack_require__(970);
-Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
-var gitRunner_1 = __webpack_require__(973);
-Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
-var pacRunner_1 = __webpack_require__(366);
-Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
-var sopaRunner_1 = __webpack_require__(653);
-Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
-var authHandler_1 = __webpack_require__(677);
-Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
-Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 366:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PacRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __webpack_require__(21);
-const os = __webpack_require__(87);
-const platform = os.platform();
-const programName = platform === "win32" ? 'pac.exe' : 'pac';
-const programPath = platform === "win32" ? ['pac', 'tools'] : ['pac_linux', 'tools'];
-class PacRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, programName, programPath);
-    }
-}
-exports.PacRunner = PacRunner;
-
-//# sourceMappingURL=pacRunner.js.map
-
-
-/***/ }),
-
-/***/ 147:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DefaultRunnerFactory = void 0;
+const process_1 = __webpack_require__(765);
 const actionLogger_1 = __webpack_require__(970);
-const gitRunner_1 = __webpack_require__(973);
-const pacRunner_1 = __webpack_require__(366);
-const sopaRunner_1 = __webpack_require__(653);
-class RealRunnerFactory {
-    constructor() {
-        this._logger = new actionLogger_1.ActionLogger();
-    }
-    getRunner(runnerName, workingDir) {
-        switch (runnerName) {
-            case 'pac':
-                return new pacRunner_1.PacRunner(workingDir, this._logger);
-            case 'git':
-                return new gitRunner_1.GitRunner(workingDir, this._logger);
-            case 'sopa':
-                return new sopaRunner_1.SopaRunner(workingDir, this._logger);
-            default:
-                throw new Error(`Unknown runner type requested: ${runnerName}`);
-        }
-    }
-}
-exports.DefaultRunnerFactory = new RealRunnerFactory();
+const getExePath_1 = __webpack_require__(309);
+const runnerParameters = {
+    runnersDir: getExePath_1.default(),
+    workingDir: process_1.cwd(),
+    logger: new actionLogger_1.ActionLogger(),
+};
+exports.default = runnerParameters;
 
-//# sourceMappingURL=runnerFactory.js.map
-
-
-/***/ }),
-
-/***/ 653:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SopaRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __webpack_require__(21);
-const os = __webpack_require__(87);
-class SopaRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, 'SolutionPackager.exe', ['sopa', 'content', 'bin', 'coretools']);
-        const platform = os.platform();
-        if (platform !== 'win32') {
-            throw Error(`Unsupported SoPa runner os: '${platform}'; the standalone SoPa executable is only available on Windows`);
-        }
-    }
-}
-exports.SopaRunner = SopaRunner;
-
-//# sourceMappingURL=sopaRunner.js.map
+//# sourceMappingURL=runnerParameters.js.map
 
 
 /***/ }),
