@@ -2,6 +2,9 @@
 # Licensed under the MIT License.
 name: 'powerplatform-actions'
 description: 'Power Platform Getting started with Who Am I'
+branding:
+  icon: 'cloud'
+  color: 'white'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
