@@ -78,6 +78,13 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
+    - name: Upload pac CLI logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: pac-cli-log ${{ matrix.os }}
+        path: ./dist/pac*/tools/logs/pac-log.txt
+
     - name: Upload test logs
       if: always()
       uses: actions/upload-artifact@v2
