@@ -10,7 +10,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        # disable linux for now, see bug: https://dev.azure.com/dynamicscrm/ALM/_workitems/edit/2268297
+        os: [windows-latest]
+        # os: [windows-latest, ubuntu-latest]
       fail-fast: false
     env:
       RUNNER_DEBUG: 1
