@@ -149,6 +149,8 @@ async function createDist() {
     glob.sync('**/action.yml', {
             cwd: __dirname
         })
+        // ignore the toplevel action.yml that is needed for GH Marketplace
+        .filter(actionYaml => path.dirname(actionYaml) !== '.')
         .map(actionYaml => path.basename(path.dirname(actionYaml)))
         .forEach((actionName, idx) => {
             const actionDir = path.resolve(distdir, 'actions', actionName)
