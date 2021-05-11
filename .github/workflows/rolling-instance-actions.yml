@@ -119,38 +119,50 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test copy-environment action with username/password
-      uses: ./copy-environment
-      with:
-        source-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        target-url: ${{ steps.create-target-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-
-    - name: Test backup-environment action with appId-clientSecret
-      uses: ./backup-environment
+    - name: Test deploy-package action with username-password
+      if: matrix.os == 'windows-latest'
+      uses: ./deploy-package
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        backup-label: test-backup-label
-        app-id: ${{ env.WF_APPID }}
-        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
+        package: 'src\test\data\pkgDeployTestData\CDSPackage.dll'
+        log-console: false
+        log-file: false
 
-    - name: Test reset-environment action with username/password
-      uses: ./reset-environment
-      with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+    # - name: Test copy-environment action with username/password
+    #   uses: ./copy-environment
+    #   with:
+    #     source-url: ${{ steps.create-source-environment.outputs.environment-url }}
+    #     target-url: ${{ steps.create-target-environment.outputs.environment-url }}
+    #     user-name: ${{ env.WF_USERNAME }}
+    #     password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test restore-environment action with username/password
-      uses: ./restore-environment
-      with:
-        source-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        target-url: ${{ steps.create-target-environment.outputs.environment-url }}
-        selected-backup: latest
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+    # - name: Test backup-environment action with appId-clientSecret
+    #   uses: ./backup-environment
+    #   with:
+    #     environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+    #     backup-label: test-backup-label
+    #     app-id: ${{ env.WF_APPID }}
+    #     client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+    #     tenant-id: ${{ env.WF_TENANT_ID }}
+
+    # - name: Test reset-environment action with username/password
+    #   uses: ./reset-environment
+    #   with:
+    #     environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+    #     user-name: ${{ env.WF_USERNAME }}
+    #     password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    # - name: Test restore-environment action with username/password
+    #   uses: ./restore-environment
+    #   with:
+    #     source-url: ${{ steps.create-source-environment.outputs.environment-url }}
+    #     target-url: ${{ steps.create-target-environment.outputs.environment-url }}
+    #     selected-backup: latest
+    #     user-name: ${{ env.WF_USERNAME }}
+    #     password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test delete-source-environment action with appId-clientSecret
       if: always() # Clean up created environments even on failed run
