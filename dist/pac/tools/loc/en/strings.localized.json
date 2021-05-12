@@ -355,6 +355,8 @@
   "AdminListEnvironmentNameHelp" : "List all environments that contain given string in their name.",
   "AdminListOrganizationIdHelp" : "List all environments that contain given string in their organization id.",
   "AdminEnvironmentMatchingFilterCriteriaNotFound" : "No environments were found in your tenant, matching specified filter criteria.",
+  "AdminEnvironmentIdWithBackups" : "Id of the environment that has backups.",
+  "AdminEnvironmentUrlWithBackups" : "Url of the environment that has backups.",
   "RestoreSourceIdHelp" : "Environment Id of source environment required for restore.",
   "RestoreTargetIdHelp" : "Environment Id of target environment required for restore. This would default to source Id if not provided.",
   "RestoredEnvironment" : "Restoring environment completed with status code : {0}",
@@ -446,5 +448,8 @@
   "MultipleSolutionRootsFound" : "Multiple solution root folders found under directory '{0}' (looking for .cdsproj or 'Other/solution.xml file to infer). Please specify the solution root to focus on. Found: {1}",
   "SolutionLicenseFileNotFound" : "Cannot find license file '{0}'",
   "SolutionLicenseMismatchedCsvFile" : "The service plan .csv file '{0}' has an unexpected number of columns, see help for 'pac solution add-license'; found this CSV header line: '{1}'",
-  "SolutionLicenseMismatchedSoPa" : "This pac CLI and the included SolutionPackager are mismatched. Please contact support."
+  "SolutionLicenseMismatchedSoPa" : "This pac CLI and the included SolutionPackager are mismatched. Please contact support.",
+  "SolutionCheckHelp" : "Upload a Dataverse Solution project to run against the PowerApps Checker Service",
+  "SolutionCheckPathHelp" : "Path where the solution zip file to be checked exists",
+  "SolutionCheckGeoHelp" : "Which geographical instance of the PowerApps Checker service to use."
 }

@@ -9,7 +9,7 @@
     ".NETCoreApp,Version=v3.1/linux-x64": {
       "pac/1.0.0": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.7",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.10",
           "StyleCop.Analyzers": "1.1.118",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "1.0.0",
@@ -83,7 +83,7 @@
       },
       "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.1": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.7",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.10",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Configuration.ConfigurationManager": "4.7.0",
           "System.IO.Packaging": "4.7.0",
@@ -269,7 +269,7 @@
       },
       "Microsoft.NETCore.Platforms/3.1.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
-      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.7": {
+      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.10": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.9.1",
           "Newtonsoft.Json": "12.0.2",
@@ -278,11 +278,23 @@
         "runtime": {
           "lib/netcoreapp3.1/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.7"
+            "fileVersion": "2.0.0.10"
           },
           "lib/netcoreapp3.1/pacTelemetryUpload.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.7"
+            "fileVersion": "2.0.0.10"
+          }
+        }
+      },
+      "Microsoft.PowerApps.Checker.Client/1.0.0.2": {
+        "dependencies": {
+          "Microsoft.Rest.ClientRuntime": "2.3.20",
+          "Newtonsoft.Json": "12.0.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.PowerApps.Checker.Client.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.34.0"
           }
         }
       },
@@ -1543,7 +1555,7 @@
           "Microsoft.Extensions.Configuration.Json": "3.1.8",
           "Microsoft.Extensions.DependencyInjection": "3.1.8",
           "Microsoft.Extensions.Logging": "3.1.8",
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.7",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.10",
           "NLog": "4.6.5",
           "NLog.Extensions.Logging": "1.5.1",
           "Newtonsoft.Json": "12.0.2",
@@ -1639,6 +1651,7 @@
         "dependencies": {
           "CsvHelper": "26.0.0",
           "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.1",
+          "Microsoft.PowerApps.Checker.Client": "1.0.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
           "bolt.cli": "1.0.0",
@@ -1651,7 +1664,6 @@
       },
       "bolt.system/1.0.0": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.7",
           "Newtonsoft.Json": "12.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
@@ -1855,12 +1867,19 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
-    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.7": {
+    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.10": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3XZ23CaVmWHyEIXV3XkjjbBHkO7MqRS1sMaGThU6X0YkcF7dBbrmgBQITefNRrlxnCTuMs08zq70OVr7fVAW5A==",
-      "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.7",
-      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.7.nupkg.sha512"
+      "sha512": "sha512-z9uZrIISA+qPJPpCqcFUpFteO1WVGOzGxDSho8z9NNus9OXEhKZT8LSOzmMjajwkWGonpkoCwDDAcK+8McwS/g==",
+      "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.10",
+      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.10.nupkg.sha512"
+    },
+    "Microsoft.PowerApps.Checker.Client/1.0.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-OC7L4jV6Fgp5XDpLnpPG2HpBx4epJ9XxOLrnLrsTuqHCe1AeKzcM7gFtP+OJf792+tFBtao86ZWm1/P1+k7oRA==",
+      "path": "microsoft.powerapps.checker.client/1.0.0.2",
+      "hashPath": "microsoft.powerapps.checker.client.1.0.0.2.nupkg.sha512"
     },
     "Microsoft.PowerPlatform.Dataverse.Client/0.4.11": {
       "type": "package",
