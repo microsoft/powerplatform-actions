@@ -30,7 +30,7 @@ jobs:
     - name: Build and test
       run: |
         npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
-        npm i
+        npm ci
         npm run ci
       env:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
@@ -77,6 +77,13 @@ jobs:
         environment-url: ${{ steps.create-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Upload pac CLI logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: pac-cli-log ${{ matrix.os }}
+        path: ./dist/pac*/tools/logs/pac-log.txt
 
     - name: Upload test logs
       if: always()
