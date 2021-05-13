@@ -146,10 +146,13 @@ async function createDist() {
     binplace('pac CLI', path.join('pac', 'tools'));
     binplace('pac CLI', path.join('pac_linux', 'tools'));
 
-    glob.sync('**/action.yml', {
+    glob.sync('*/**/action.yml', {
             cwd: __dirname
         })
-        .map(actionYaml => path.basename(path.dirname(actionYaml)))
+        .map(actionYaml => {
+            console.log(actionYaml);
+            return path.basename(path.dirname(actionYaml));
+        })
         .forEach((actionName, idx) => {
             const actionDir = path.resolve(distdir, 'actions', actionName)
             log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
