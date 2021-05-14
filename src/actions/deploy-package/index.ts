@@ -21,6 +21,9 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const packagePath = core.getInput('package', { required: true });
         const logToConsole = core.getInput('log-console', { required: false });
         const LogToFile = core.getInput('log-file', { required: false });
+        core.info('deploying package with file : ' + packagePath);
+        console.log('deploying package with file : ' + packagePath)
+
         await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
         const deployPackageArgs = ['package', 'deploy', '--package', packagePath, '--logFile', LogToFile, '--logConsole', logToConsole];
