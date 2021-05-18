@@ -1,15 +1,15 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v3.1/linux-x64",
+    "name": ".NETCoreApp,Version=v5.0/linux-x64",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v3.1": {},
-    ".NETCoreApp,Version=v3.1/linux-x64": {
+    ".NETCoreApp,Version=v5.0": {},
+    ".NETCoreApp,Version=v5.0/linux-x64": {
       "pac/1.0.0": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.10",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
           "StyleCop.Analyzers": "1.1.118",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "1.0.0",
@@ -30,11 +30,8 @@
         }
       },
       "CsvHelper/26.0.0": {
-        "dependencies": {
-          "Microsoft.CSharp": "4.5.0"
-        },
         "runtime": {
-          "lib/netstandard2.1/CsvHelper.dll": {
+          "lib/net5.0/CsvHelper.dll": {
             "assemblyVersion": "26.0.0.0",
             "fileVersion": "26.0.0.0"
           }
@@ -81,9 +78,9 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.1": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.4": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.10",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Configuration.ConfigurationManager": "4.7.0",
           "System.IO.Packaging": "4.7.0",
@@ -92,11 +89,10 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.1"
+            "fileVersion": "9.1.1.4"
           }
         }
       },
-      "Microsoft.CSharp/4.5.0": {},
       "Microsoft.Extensions.Configuration/3.1.8": {
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "3.1.8"
@@ -269,27 +265,27 @@
       },
       "Microsoft.NETCore.Platforms/3.1.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
-      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.10": {
+      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.14": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.9.1",
-          "Newtonsoft.Json": "12.0.2",
+          "Newtonsoft.Json": "11.0.2",
           "System.ValueTuple": "4.5.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll": {
+          "lib/net5.0/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.10"
+            "fileVersion": "2.0.0.14"
           },
-          "lib/netcoreapp3.1/pacTelemetryUpload.dll": {
+          "lib/net5.0/pacTelemetryUpload.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.10"
+            "fileVersion": "2.0.0.14"
           }
         }
       },
       "Microsoft.PowerApps.Checker.Client/1.0.0.2": {
         "dependencies": {
           "Microsoft.Rest.ClientRuntime": "2.3.20",
-          "Newtonsoft.Json": "12.0.2"
+          "Newtonsoft.Json": "11.0.2"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerApps.Checker.Client.dll": {
@@ -306,7 +302,7 @@
           "Microsoft.Identity.Client": "4.29.0",
           "Microsoft.Rest.ClientRuntime": "2.3.20",
           "Microsoft.VisualBasic": "10.3.0",
-          "Newtonsoft.Json": "12.0.2",
+          "Newtonsoft.Json": "11.0.2",
           "System.Collections": "4.3.0",
           "System.Configuration.ConfigurationManager": "4.7.0",
           "System.Globalization": "4.3.0",
@@ -354,7 +350,7 @@
       },
       "Microsoft.Rest.ClientRuntime/2.3.20": {
         "dependencies": {
-          "Newtonsoft.Json": "12.0.2"
+          "Newtonsoft.Json": "11.0.2"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Rest.ClientRuntime.dll": {
@@ -431,11 +427,11 @@
           "System.Xml.XDocument": "4.3.0"
         }
       },
-      "Newtonsoft.Json/12.0.2": {
+      "Newtonsoft.Json/11.0.2": {
         "runtime": {
           "lib/netstandard2.0/Newtonsoft.Json.dll": {
-            "assemblyVersion": "12.0.0.0",
-            "fileVersion": "12.0.2.23222"
+            "assemblyVersion": "11.0.0.0",
+            "fileVersion": "11.0.2.21924"
           }
         }
       },
@@ -1406,14 +1402,7 @@
           "runtime.any.System.Text.Encoding.Extensions": "4.3.0"
         }
       },
-      "System.Text.Json/4.7.2": {
-        "runtime": {
-          "lib/netcoreapp3.0/System.Text.Json.dll": {
-            "assemblyVersion": "4.0.1.2",
-            "fileVersion": "4.700.20.21406"
-          }
-        }
-      },
+      "System.Text.Json/4.7.2": {},
       "System.Text.RegularExpressions/4.3.0": {
         "dependencies": {
           "System.Runtime": "4.3.0"
@@ -1555,10 +1544,10 @@
           "Microsoft.Extensions.Configuration.Json": "3.1.8",
           "Microsoft.Extensions.DependencyInjection": "3.1.8",
           "Microsoft.Extensions.Logging": "3.1.8",
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.10",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
           "NLog": "4.6.5",
           "NLog.Extensions.Logging": "1.5.1",
-          "Newtonsoft.Json": "12.0.2",
+          "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.system": "1.0.0"
         },
@@ -1579,7 +1568,7 @@
       "bolt.module.auth/1.0.0": {
         "dependencies": {
           "Microsoft.Identity.Client": "4.29.0",
-          "Newtonsoft.Json": "12.0.2",
+          "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Security.Cryptography.ProtectedData": "4.7.0",
           "bolt.cli": "1.0.0",
@@ -1650,7 +1639,7 @@
       "bolt.module.solution/1.0.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.1",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.4",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
@@ -1664,7 +1653,7 @@
       },
       "bolt.system/1.0.0": {
         "dependencies": {
-          "Newtonsoft.Json": "12.0.2",
+          "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
         },
@@ -1727,19 +1716,12 @@
       "path": "microsoft.applicationinsights/2.9.1",
       "hashPath": "microsoft.applicationinsights.2.9.1.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.1": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-rIZsjZMUwNUuVqH75bkXrZbkCwO0FYwrlOMe90ITAYps0YBpgaN3NTJ5Zg0LyOIz/mjJxTE/kasdH/2sWzKQIg==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.1",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.1.nupkg.sha512"
-    },
-    "Microsoft.CSharp/4.5.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-kaj6Wb4qoMuH3HySFJhxwQfe8R/sJsNJnANrvv8WdFPMoNbKY5htfNscv+LHCu5ipz+49m2e+WQXpLXr9XYemQ==",
-      "path": "microsoft.csharp/4.5.0",
-      "hashPath": "microsoft.csharp.4.5.0.nupkg.sha512"
+      "sha512": "sha512-rPKViHB2cwCkKc+Srq5Mv/rOmic87s6hHUqcMVb8lFVqoM2Ivl8GW0T/20GNEK5QvJVXqlt0giOLV4mnBnDeuA==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.4",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.4.nupkg.sha512"
     },
     "Microsoft.Extensions.Configuration/3.1.8": {
       "type": "package",
@@ -1867,12 +1849,12 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
-    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.10": {
+    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.14": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-z9uZrIISA+qPJPpCqcFUpFteO1WVGOzGxDSho8z9NNus9OXEhKZT8LSOzmMjajwkWGonpkoCwDDAcK+8McwS/g==",
-      "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.10",
-      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.10.nupkg.sha512"
+      "sha512": "sha512-5drSSMlrNv3EnpOYiWlERoOPAzE3fJ80rgcABEE7OYfTsUl3fzz4Uzb6LLMKqeUljJODd4CrgIVz4uCdsVB5/w==",
+      "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.14",
+      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.14.nupkg.sha512"
     },
     "Microsoft.PowerApps.Checker.Client/1.0.0.2": {
       "type": "package",
@@ -1930,12 +1912,12 @@
       "path": "netstandard.library/1.6.1",
       "hashPath": "netstandard.library.1.6.1.nupkg.sha512"
     },
-    "Newtonsoft.Json/12.0.2": {
+    "Newtonsoft.Json/11.0.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-rTK0s2EKlfHsQsH6Yx2smvcTCeyoDNgCW7FEYyV01drPlh2T243PR2DiDXqtC5N4GDm4Ma/lkxfW5a/4793vbA==",
-      "path": "newtonsoft.json/12.0.2",
-      "hashPath": "newtonsoft.json.12.0.2.nupkg.sha512"
+      "sha512": "sha512-IvJe1pj7JHEsP8B8J8DwlMEx8UInrs/x+9oVY+oCD13jpLu4JbJU2WCIsMRn5C4yW9+DgkaO8uiVE5VHKjpmdQ==",
+      "path": "newtonsoft.json/11.0.2",
+      "hashPath": "newtonsoft.json.11.0.2.nupkg.sha512"
     },
     "NLog/4.6.5": {
       "type": "package",
@@ -2101,7 +2083,7 @@
     "runtime.native.System.IO.Compression/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-b+V9JC/Ii3sR659flBeaBJww111425tgjcDS1k+hqV4sGh9FALRDBvJnDtQ895gAzpPTUOFDHdqaZ2Et7BpZMg==",
+      "sha512": "sha512-INBPonS5QPEgn7naufQFXJEp3zX6L4bwHgJ/ZH78aBTpeNfQMtf7C6VrAFhlq2xxWBveIOWyFzQjJ8XzHMhdOQ==",
       "path": "runtime.native.system.io.compression/4.3.0",
       "hashPath": "runtime.native.system.io.compression.4.3.0.nupkg.sha512"
     },
@@ -2794,7 +2776,7 @@
     "System.Threading.ThreadPool/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-SrCOmTvvOOCmJT4BBxdZcwhz6XEMsjBGZvGSVorOxdCznaUNeVotEjDfXGIZ8gcGo00qgPbTV6puHDgcFYl6Iw==",
+      "sha512": "sha512-k/+g4b7vjdd4aix83sTgC9VG6oXYKAktSfNIJUNGxPEj7ryEOfzHHhfnmsZvjxawwcD9HyWXKCXmPjX8U4zeSw==",
       "path": "system.threading.threadpool/4.3.0",
       "hashPath": "system.threading.threadpool.4.3.0.nupkg.sha512"
     },
