@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 name: 'package-deploy'
-description: 'Power Platform package deploy - Deploys the package dll or the zip file with a package.'
+description: 'Power Platform package deploy - Deploys the package dll or the zip file with a package. Package deploy is only supported on Windows runner.'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
@@ -30,14 +30,6 @@ inputs:
   package:
     description: 'Path to a package dll or zip file with a package.'
     required: true
-
-  log-file:
-    description: 'Path to a log file location where the logs are redirected.'
-    required: false
-
-  log-console:
-    description: 'This option is used if you want to direct the logs to the console.'
-    required: false
 
 runs:
   using: 'node12'
