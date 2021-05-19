@@ -119,6 +119,16 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
+    - name: Test deploy-package action with username-password
+      if: matrix.os == 'windows-latest'
+      uses: ./deploy-package
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
+        package: 'src\test\data\pkgDeployTestData\CDSPackage.dll'
+
     - name: Test copy-environment action with username/password
       uses: ./copy-environment
       with:
