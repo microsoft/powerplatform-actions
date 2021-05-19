@@ -81,14 +81,13 @@ jobs:
         force-overwrite: true
         run-asynchronously: true
 
-    - name: Test export-solution action with appId-clientSecret
+    - name: Test export-solution action with username/password
       if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./export-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        app-id: ${{ env.WF_APPID }}
-        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
-        tenant-id: ${{ env.WF_TENANT_ID }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         solution-name: emptySolution
         solution-output-file: 'solution1.zip'
         working-directory: 'out/CI'
@@ -113,13 +112,12 @@ jobs:
         solution-name: emptySolution
         target-folder: 'out/CI/cloned'
 
-    - name: Test publish-solution action with appId-clientSecret
+    - name: Test publish-solution action with username/password
       uses: ./publish-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        app-id: ${{ env.WF_APPID }}
-        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
-        tenant-id: ${{ env.WF_TENANT_ID }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test copy-environment action with username/password
       uses: ./copy-environment
