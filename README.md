@@ -6,7 +6,7 @@ We may change it for the final, commercial version. We also may not release a co
 This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for the Power Platform.
 Each action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli). Detailed documentation on GitHub actions for Power Platform is available [here](https://aka.ms/poweractionsdocs).
 
-Sample workflows and detailed instructions are available in our [GitHub actions lab repo](https://github.com/microsoft/powerplatform-actions-lab) but if you are already familiar with GitHub actions and Power Platform solutions, simply add below to your existing workflows; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
+Sample workflows and detailed instructions are available in our [here](https://docs.microsoft.com/en-us/power-platform/alm/tutorials/github-actions-start) but if you are already familiar with GitHub actions and Power Platform solutions, simply add below to your existing workflows; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
 
 ```yaml
 jobs:
