@@ -7,6 +7,7 @@
   "verbSolutionExport": "on",
   "verbSolutionClone": "on",
   "pcfVirtualControl": "on",
+  "pcfTheming": "off",
   "pcfObjectType": "on",
   "pcfPropertyDependencies": "on",
   "pcfAllowLibraryResources": "on",
@@ -30,6 +31,7 @@
   "verbPAPortalList": "on",
   "verbPAPortalUpload": "on",
   "verbPAPortalDownload": "on",
+  "verbPAPortalBundle": "on",
   "componentSettings": "off",
   "verbCanvas": "on"
 }
