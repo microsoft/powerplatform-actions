@@ -1,0 +1,45 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'upload-paportal'
+description: 'Power Platform Export Solution'
+inputs:
+  environment-url:
+    description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
+    required: true
+
+  user-name:
+    description: 'Power Platform user name to authenticate with, e.g. myname@my-org.onmicrosoft.com. Setting this input makes user-name and password required; specifying alternate "app-id" credential set of inputs will result in an error.'
+    required: false
+
+  password-secret:
+    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: false
+
+  app-id:
+    description: 'The application id to authenticate with. Setting this input makes app-id, tenant-id and client-secret required; specifying alternate "username" credential set of inputs will result in an error.'
+    required: false
+
+  client-secret:
+    description: 'The client secret to authenticate with. Required if authenticating with app-id.'
+    required: false
+
+  tenant-id:
+    description: 'Tenant id if using app-id & client secret to authenticate.'
+    required: false
+
+  upload-path:
+    description: 'Path from where the website content will be uploaded'
+    required: true
+
+  deployment-tag:
+    description: 'Deployment tag which will be used to choose the deployment profile'
+    required: false
+
+  working-directory:
+    description: 'Working directory; default: root of repository'
+    required: false
+
+runs:
+  using: 'node12'
+  #main: '../dist/actions/upload-paportal/index.js'
+  main: '../out/actions/upload-paportal/index.js'
