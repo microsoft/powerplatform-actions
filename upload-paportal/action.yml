@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 name: 'upload-paportal'
-description: 'Power Platform Export Solution'
+description: 'Power Platform Upload Portal Data'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
