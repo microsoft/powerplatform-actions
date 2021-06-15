@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<design-map language="Fluent">
+    <ColorsPalettePrimary01>Colors.Palette.Primary01</ColorsPalettePrimary01>
+    <ColorsPalettePrimary02>Colors.Palette.Primary02</ColorsPalettePrimary02>
+    <ColorsPalettePrimary03>Colors.Palette.Primary03</ColorsPalettePrimary03>
+    <ColorsPalettePrimary04>Colors.Palette.Primary04</ColorsPalettePrimary04>
+    <ColorsPalettePrimary05>Colors.Palette.Primary05</ColorsPalettePrimary05>
+    <ColorsPalettePrimary06>Colors.Palette.Primary06</ColorsPalettePrimary06>
+  </design-map>
