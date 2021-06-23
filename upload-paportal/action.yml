@@ -31,8 +31,8 @@ inputs:
     description: 'Path from where the website content will be uploaded'
     required: true
 
-  deployment-tag:
-    description: 'Deployment tag which will be used to choose the deployment profile'
+  deployment-profile:
+    description: 'Deployment profile which will be used to choose the deployment profile. Will use "default" profile if not passed'
     required: false
 
   working-directory:
@@ -41,5 +41,5 @@ inputs:
 
 runs:
   using: 'node12'
-  #main: '../dist/actions/upload-paportal/index.js'
-  main: '../out/actions/upload-paportal/index.js'
+  main: '../dist/actions/upload-paportal/index.js'
+  #main: '../out/actions/upload-paportal/index.js'
