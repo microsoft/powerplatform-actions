@@ -31,10 +31,6 @@ inputs:
     description: 'Path to a solution zip file to check.'
     required: true
 
-  output-directory:
-    description: 'Target directory to place the Checker results in.'
-    required: true
-
   geo:
     description: 'Which geo location of the PowerPlatform Checker Service to use.  Default value is \'UnitedStates\'.'
     required: false

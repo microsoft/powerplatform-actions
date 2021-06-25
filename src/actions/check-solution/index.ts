@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
+import * as artifact from '@actions/artifact';
 import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner } from '../../lib';
 import path = require('path');
 import fs = require('fs-extra');
@@ -11,8 +12,7 @@ const solutionPathCandidate = core.getInput('path', { required: true });
 const solutionPath = path.isAbsolute(solutionPathCandidate) ? solutionPathCandidate : path.resolve(workingDir, solutionPathCandidate);
 core.info(`solution path: ${solutionPath}`);
 
-const outputDirectoryCandidate = core.getInput('output-directory', { required: true });
-const outputDirectory = path.isAbsolute(outputDirectoryCandidate) ? outputDirectoryCandidate : path.resolve(workingDir, outputDirectoryCandidate);
+const outputDirectory = path.join(process.env['RUNNER_TEMP'] || workingDir, "checker-output");
 fs.ensureDirSync(outputDirectory);
 core.info(`output directory: ${outputDirectory}`);
 
@@ -38,7 +38,13 @@ const logger = new ActionLogger();
         checkArgs.push('--ruleLevelOverride', ruleLevelOverride);
     }
     await pac.run(checkArgs);
-    core.info(`checked solution results in folder: ${outputDirectory}`);
+
+    const artifactClient = artifact.create();
+    const artifactName = 'pac-solution-check';
+    const files = fs.readdirSync(outputDirectory);
+    const options = { continueOnError: true };
+    await artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
+    core.info(`checked solution results in folder [${outputDirectory}] and uploaded as artifacts.`);
     core.endGroup();
 
 })().catch(error => {
