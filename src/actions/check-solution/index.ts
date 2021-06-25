@@ -9,13 +9,12 @@ core.startGroup('check-solution:');
 const workingDir = getWorkingDirectory('working-directory', false);
 const solutionPathCandidate = core.getInput('path', { required: true });
 const solutionPath = path.isAbsolute(solutionPathCandidate) ? solutionPathCandidate : path.resolve(workingDir, solutionPathCandidate);
-fs.ensureFileSync(solutionPath);
 core.info(`solution path: ${solutionPath}`);
 
 const outputDirectoryCandidate = core.getInput('output-directory', { required: true });
 const outputDirectory = path.isAbsolute(outputDirectoryCandidate) ? outputDirectoryCandidate : path.resolve(workingDir, outputDirectoryCandidate);
 fs.ensureDirSync(outputDirectory);
-core.info(`output directory: ${solutionPath}`);
+core.info(`output directory: ${outputDirectory}`);
 
 const geo = core.getInput('geo', { required: false });
 const ruleLevelOverride = core.getInput('rule-level-override', { required: false });
@@ -24,6 +23,10 @@ const logger = new ActionLogger();
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
+    if (!fs.existsSync(solutionPath)) {
+        throw new Error(`The solution file could not be found at ${solutionPath}`);
+    }
+
     const pac = new PacRunner(workingDir, logger);
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
