@@ -39,6 +39,10 @@ inputs:
     description: 'Path to a file containing a JSON array of rules and their levels to override.  Accepted values for OverrideLevel are: Critical, High, Medium, Low, Informational. Example: [{"Id":"meta-remove-dup-reg","OverrideLevel":"Medium"},{"Id":"il-avoid-specialized-update-ops","OverrideLevel":"Medium"}]'
     required: false
 
+  checker-logs-artifact-name:
+    description: 'The name of the artifact folder of which the PowerApps Checker logs will be uploaded.  Default value is \'CheckSolutionLogs\''
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/check-solution/index.js'

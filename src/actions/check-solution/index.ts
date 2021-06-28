@@ -19,6 +19,7 @@ core.info(`output directory: ${outputDirectory}`);
 
 const geo = core.getInput('geo', { required: false });
 const ruleLevelOverride = core.getInput('rule-level-override', { required: false });
+const artifactName = core.getInput('checker-logs-artifact-name', {required: false}) || 'CheckSolutionLogs';
 
 const logger = new ActionLogger();
 
@@ -41,7 +42,6 @@ const logger = new ActionLogger();
     await pac.run(checkArgs);
 
     const artifactClient = artifact.create();
-    const artifactName = 'pac-solution-check';
     const files = glob.sync('**/*', { cwd: outputDirectory });
     const options = { continueOnError: true };
     await artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);

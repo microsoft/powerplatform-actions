@@ -10739,6 +10739,7 @@ fs.ensureDirSync(outputDirectory);
 core.info(`output directory: ${outputDirectory}`);
 const geo = core.getInput('geo', { required: false });
 const ruleLevelOverride = core.getInput('rule-level-override', { required: false });
+const artifactName = core.getInput('checker-logs-artifact-name', { required: false }) || 'CheckSolutionLogs';
 const logger = new lib_1.ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
@@ -10756,7 +10757,6 @@ const logger = new lib_1.ActionLogger();
     }
     yield pac.run(checkArgs);
     const artifactClient = artifact.create();
-    const artifactName = 'pac-solution-check';
     const files = glob_1.glob.sync('**/*', { cwd: outputDirectory });
     const options = { continueOnError: true };
     yield artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
