@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 import * as core from '@actions/core';
 import * as artifact from '@actions/artifact';
+import { glob } from 'glob';
 import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner } from '../../lib';
 import path = require('path');
 import fs = require('fs-extra');
@@ -41,7 +42,7 @@ const logger = new ActionLogger();
 
     const artifactClient = artifact.create();
     const artifactName = 'pac-solution-check';
-    const files = fs.readdirSync(outputDirectory);
+    const files = glob.sync('**/*', { cwd: outputDirectory });
     const options = { continueOnError: true };
     await artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
     core.info(`checked solution results in folder [${outputDirectory}] and uploaded as artifacts.`);
