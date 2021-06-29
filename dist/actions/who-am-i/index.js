@@ -767,6 +767,7 @@ const process_1 = __webpack_require__(765);
 const actionLogger_1 = __webpack_require__(970);
 const getExePath_1 = __webpack_require__(309);
 function getAutomationAgent() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const jsonPackage = __webpack_require__(306);
     const productName = jsonPackage.name.split("/")[1];
     return productName + "/" + jsonPackage.version;
