@@ -3,16 +3,20 @@
 **PRE-RELEASE SOFTWARE.** The software is a pre-release version. It may not work the way a final version of the software will.
 We may change it for the final, commercial version. We also may not release a commercial version.
 
-This repo provides multiple [GitHub Actions](https://help.github.com/en/actions) for the Power Platform.
-Each action wraps the existing [Power Apps CLI](https://docs.microsoft.com/en-us/powerapps/developer/common-data-service/powerapps-cli). Detailed documentation on GitHub actions for Power Platform is available [here](https://aka.ms/poweractionsdocs).
+This repo provides multiple [GitHub Actions for the Power Platform](https://aka.ms/PowerPlatformGitHub); for more general info on [GitHub Actions](https://help.github.com/en/actions).
+Each action wraps the existing [Power Platform CLI](https://aka.ms/PowerPlatformCLI).
 
-Sample workflows and detailed instructions are available in our [GitHub actions lab repo](https://github.com/microsoft/powerplatform-actions-lab) but if you are already familiar with GitHub actions and Power Platform solutions, simply add below to your existing workflows; also add the secret `MYPASSWORD` to your repo's 'Settings' | 'Secrets'
+Detailed documentation on GitHub actions for Power Platform is available [here](https://aka.ms/poweractionsdocs).
+
+Sample workflows and detailed instructions are available in our [GitHub actions lab repo](https://github.com/microsoft/powerplatform-actions-lab)
+but if you are already familiar with GitHub actions and Power Platform solutions, simply add below to your existing workflows;
+also add the secret `MYPASSWORD` to your repository's 'Settings' | 'Secrets'
 
 ```yaml
 jobs:
   build:
 
-    runs-on: windows-latest   # For now, only Windows runners are supported.
+    runs-on: windows-latest   # alternate runner OS is: ubuntu-latest
 
     steps:
     - name: Export Solution
@@ -40,7 +44,7 @@ jobs:
         user-name: 'me@myenv.onmicrosoft.com'
         password-secret: ${{ secrets.MYPASSWORD }}
 
-    - name: Prepare solution changes for checkin into source control
+    - name: Prepare solution changes for check-in into source control
       uses: microsoft/powerplatform-actions/branch-solution@v0
       with:
         solution-folder: 'out/solutions/solution one'
