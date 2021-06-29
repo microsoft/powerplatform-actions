@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'package-deploy'
-description: 'Power Platform package deploy - Deploys the package dll or the zip file with a package. Package deploy is only supported on Windows runner.'
+name: 'deploy-package'
+description: 'Power Platform deploy package - Deploys the package dll or the zip file with a package. Deploy package is only supported on Windows runner.'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
