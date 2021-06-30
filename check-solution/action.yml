@@ -45,5 +45,5 @@ inputs:
 
 runs:
   using: 'node12'
-  # main: '../dist/actions/check-solution/index.js'
-  main: '../out/actions/check-solution/index.js'
+  main: '../dist/actions/check-solution/index.js'
+  # main: '../out/actions/check-solution/index.js'
