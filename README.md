@@ -53,8 +53,7 @@ jobs:
 
 ## Contributing
 
-**PRE-RELEASE SOFTWARE.**
-This project will welcome contributions and suggestions in the near future. But in this early preview stage, we're not ready for contributions.
+This project will welcome community contributions in the near future. For suggestions and ideas, please use the [Issues section](https://github.com/microsoft/powerplatform-actions/issues) of this repo.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
