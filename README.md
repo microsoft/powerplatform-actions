@@ -1,8 +1,5 @@
 # Power Platform Actions
 
-**PRE-RELEASE SOFTWARE.** The software is a pre-release version. It may not work the way a final version of the software will.
-We may change it for the final, commercial version. We also may not release a commercial version.
-
 This repo provides multiple [GitHub Actions for the Power Platform](https://aka.ms/PowerPlatformGitHub); for more general info on [GitHub Actions](https://help.github.com/en/actions).
 Each action wraps the existing [Power Platform CLI](https://aka.ms/PowerPlatformCLI).
 
