@@ -62,6 +62,15 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
+    ## REMOVE before merging!!!!!!!!!!
+    - name: Check solution
+      uses: ./check-solution
+      with:
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        path: 'src/test/data/singlePCF.zip'
+
     - name: Test pack-solution action
       if: matrix.os == 'windows-latest'
       uses: ./pack-solution
