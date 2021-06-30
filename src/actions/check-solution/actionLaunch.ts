@@ -11,7 +11,7 @@ process.env['INPUT_USER-NAME'] = process.env['PA_BT_ORG_USER'] ?? 'davidjen@ppde
 const password = process.env['PA_BT_ORG_PASSWORD'] ?? '';
 process.env['INPUT_PASSWORD-SECRET'] = password;
 
-process.env['INPUT_PATH'] = path.resolve(__dirname, '..', '..', '..', 'src', 'test', 'data', 'singlePCF.zip');
+process.env['INPUT_PATH'] = path.resolve(__dirname, '..', '..', '..', 'src', 'test', 'data', 'emptySolution_0_1_0_0.zip');
 process.env['INPUT_WORKING-DIRECTORY'] = path.resolve(__dirname, '..', '..', '..', 'out');
 
 process.env['RUNNER_DEBUG'] = '1';
