@@ -10757,7 +10757,7 @@ const logger = new lib_1.ActionLogger();
     }
     yield pac.run(checkArgs);
     const artifactClient = artifact.create();
-    const files = glob_1.glob.sync('**/*', { cwd: outputDirectory });
+    const files = glob_1.glob.sync('**/*', { cwd: outputDirectory, absolute: true });
     const options = { continueOnError: true };
     yield artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
     core.info(`checked solution results in folder [${outputDirectory}] and uploaded as artifacts.`);
