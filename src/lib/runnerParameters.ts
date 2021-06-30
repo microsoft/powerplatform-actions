@@ -4,6 +4,7 @@ import { ActionLogger } from "./actionLogger";
 import getExePath from "./getExePath";
 
 function getAutomationAgent(): string {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const jsonPackage = require("../../package.json")
     const productName = jsonPackage.name.split("/")[1];
     return productName + "/" + jsonPackage.version;
