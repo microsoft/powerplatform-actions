@@ -49,7 +49,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-[![CI](https://github.com/microsoft/powerplatform-actions/workflows/CI/badge.svg)](https://github.com/microsoft/powerplatform-actions/actions?query=workflow%3ACI)
+[![pull-request-validation](https://github.com/microsoft/powerplatform-actions/actions/workflows/pull-request.yml/badge.svg)](https://github.com/microsoft/powerplatform-actions/actions/workflows/pull-request.yml)
 
 ## Contributing
 
