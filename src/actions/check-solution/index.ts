@@ -42,7 +42,7 @@ const logger = new ActionLogger();
     await pac.run(checkArgs);
 
     const artifactClient = artifact.create();
-    const files = glob.sync('**/*', { cwd: outputDirectory });
+    const files = glob.sync('**/*', { cwd: outputDirectory, absolute: true });
     const options = { continueOnError: true };
     await artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
     core.info(`checked solution results in folder [${outputDirectory}] and uploaded as artifacts.`);
