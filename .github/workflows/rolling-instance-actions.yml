@@ -3,6 +3,12 @@ name: rolling-instance-actions
 
 on:
   workflow_dispatch:    # allow for manual workflow triggering as needed
+    inputs:
+      runSlowCRUD:
+        description: 'run slow CRUD actions like copy-env, backup-env, restore-env, reset-env (default: yes)'
+        required: false
+        default: 'yes'
+
   push:
     branches: [ main ]
 
@@ -76,7 +82,7 @@ jobs:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        path: 'src/test/data/emptySolution_0_1_0_0.zip'
+        path: 'src/test/data/singlePCF.zip'
 
     - name: Test import-solution action with username/password
       uses: ./import-solution
@@ -135,6 +141,7 @@ jobs:
         package: 'src\test\data\pkgDeployTestData\CDSPackage.dll'
 
     - name: Test copy-environment action with username/password
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./copy-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -143,6 +150,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test backup-environment action with appId-clientSecret
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./backup-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -152,6 +160,7 @@ jobs:
         tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test reset-environment action with username/password
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./reset-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -159,6 +168,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test restore-environment action with username/password
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./restore-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
