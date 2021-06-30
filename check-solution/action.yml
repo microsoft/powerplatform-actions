@@ -32,7 +32,7 @@ inputs:
     required: true
 
   geo:
-    description: 'Which geo location of the PowerPlatform Checker Service to use.  Default value is \'UnitedStates\'.'
+    description: Which geo location of the PowerPlatform Checker Service to use.  Default value is \'UnitedStates\'.
     required: false
 
   rule-level-override:
@@ -40,7 +40,7 @@ inputs:
     required: false
 
   checker-logs-artifact-name:
-    description: 'The name of the artifact folder of which the PowerApps Checker logs will be uploaded.  Default value is \'CheckSolutionLogs\''
+    description: The name of the artifact folder of which the PowerApps Checker logs will be uploaded.  Default value is \'CheckSolutionLogs\'
     required: false
 
 runs:
