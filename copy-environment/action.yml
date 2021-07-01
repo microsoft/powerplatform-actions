@@ -5,11 +5,19 @@ description: 'Power Platform Copy Environment Action'
 inputs:
   source-url:
     description: 'Source URL of Power Platform environment to copy; e.g. "https://test-env-source.crm.dynamics.com"'
-    required: true
+    required: false
+
+  source-id:
+    description: 'Source ID of Power Platform environment to copy'
+    required: false
 
   target-url:
     description: 'Target URL of Power Platform environment to copy; e.g. "https://test-env-target.crm.dynamics.com"'
-    required: true
+    required: false
+
+  target-id:
+    description: 'Target URL of Power Platform environment to copy'
+    required: false
 
   user-name:
     description: 'Power Platform user name to authenticate with, e.g. myname@my-org.onmicrosoft.com. Setting this input makes user-name and password required; specifying alternate "app-id" credential set of inputs will result in an error.'

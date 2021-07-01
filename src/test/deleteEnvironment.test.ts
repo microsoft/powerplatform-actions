@@ -13,7 +13,6 @@ describe('delete-environment#input validation', () => {
 
     const inputParams = [
         { Name: 'environment-url', Value: 'aUrl' },
-        { Name: 'environment-id', Value: 'envId' },
         { Name: 'user-name', Value: 'aUserName' },
         { Name: 'password-secret', Value: 'aSecret' },
     ];

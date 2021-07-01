@@ -13,9 +13,7 @@ describe('restore-environment#input validation', () => {
     const mockFactory: MockedRunners = new MockedRunners(workDir);
     // TODO: read in params and their required state from the action.yml
     const requiredParams = [
-        { Name: 'source-url', Value: 'sourceUrl', required: true},
-        { Name: 'target-url', Value: 'targetUrl', required: true},
-        { Name: 'selected-backup', Value: 'latest', required: true},
+        { Name: 'selected-backup', Value: 'latest', required: true}
     ];
 
     const inputParams = [

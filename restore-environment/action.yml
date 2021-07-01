@@ -5,11 +5,19 @@ description: 'Power Platform Restore Action'
 inputs:
   source-url:
     description: 'Source URL of Power Platform environment; e.g. "https://test-env-source.crm.dynamics.com"'
-    required: true
+    required: false
+
+  source-id:
+    description: 'Source ID of Power Platform environment'
+    required: false
 
   target-url:
     description: 'Target URL of Power Platform environment; e.g. "https://test-env-target.crm.dynamics.com"'
-    required: true
+    required: false
+
+  target-id:
+    description: 'Target ID of Power Platform environment'
+    required: false
 
   selected-backup:
     description: 'DateTime of the backup in "mm/dd/yyyy hh:mm" format OR string "latest".'

@@ -37,7 +37,7 @@ describe('copy-environment#input validation', () => {
             }
             expect(res).to.be.undefined;
             if(inputParam.required)
-                expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
+                expect(err.message).to.match(new RegExp(`Must provide either environment-id or environment-url for source and target environments!`));
         });
     });
 

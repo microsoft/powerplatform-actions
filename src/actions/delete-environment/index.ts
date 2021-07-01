@@ -12,10 +12,8 @@ import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory} from '../..
 export async function main(factory: RunnerFactory): Promise<void> {
     try {
         core.startGroup('delete-environment:');
-        const pac = factory.getRunner('pac', process.cwd());
         const envUrl = core.getInput('environment-url', { required: false });
         const envId = core.getInput('environment-id', { required: false });
-        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         let deleteEnvArgs;
         if (envUrl) {
@@ -24,10 +22,12 @@ export async function main(factory: RunnerFactory): Promise<void> {
             deleteEnvArgs = ['admin', 'delete', '-id', envId];
         } else {
             throw new Error(
-                "Must provide either environment-id or environment-url!"
+                "Must provide either environment-id or environment-url for deleting the environment!"
             );
         }
 
+        const pac = factory.getRunner('pac', process.cwd());
+        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
         await pac.run(deleteEnvArgs);
         core.info('environment deleted');
         core.endGroup();

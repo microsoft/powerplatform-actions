@@ -420,11 +420,21 @@ function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.startGroup('backup-environment:');
-            const envUrl = core.getInput('environment-url', { required: true });
+            const envUrl = core.getInput('environment-url', { required: false });
+            const envId = core.getInput('environment-id', { required: false });
             const backupLabel = core.getInput('backup-label', { required: true });
+            let backupEnvArgs;
+            if (envUrl) {
+                backupEnvArgs = ['admin', 'backup', '--url', envUrl, '--label', backupLabel];
+            }
+            else if (envId) {
+                backupEnvArgs = ['admin', 'backup', '-id', envId, '--label', backupLabel];
+            }
+            else {
+                throw new Error("Must provide either environment-id or environment-url!");
+            }
             const pac = factory.getRunner('pac', process.cwd());
             yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.ADMIN);
-            const backupEnvArgs = ['admin', 'backup', '--url', envUrl, '--label', backupLabel];
             yield pac.run(backupEnvArgs);
             core.info('environment backup complete');
             core.endGroup();

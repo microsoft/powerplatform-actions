@@ -420,11 +420,22 @@ function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.startGroup('copy-environment:');
-            const sourceUrl = core.getInput('source-url', { required: true });
-            const targetUrl = core.getInput('target-url', { required: true });
+            const sourceUrl = core.getInput('source-url', { required: false });
+            const sourceId = core.getInput('source-id', { required: false });
+            const targetUrl = core.getInput('target-url', { required: false });
+            const targetId = core.getInput('target-id', { required: false });
+            let copyEnvironmentArgs;
+            if (sourceUrl && targetUrl) {
+                copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
+            }
+            else if (sourceId && targetId) {
+                copyEnvironmentArgs = ['admin', 'copy', '--source-id', sourceId, '--target-id', targetId];
+            }
+            else {
+                throw new Error("Must provide either environment-id or environment-url for source and target environments!");
+            }
             const pac = factory.getRunner('pac', process.cwd());
             yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.ADMIN);
-            const copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
             yield pac.run(copyEnvironmentArgs);
             core.endGroup();
         }

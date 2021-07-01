@@ -420,12 +420,23 @@ function main(factory) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.startGroup('restore-environment:');
-            const sourceUrl = core.getInput('source-url', { required: true });
-            const targetUrl = core.getInput('target-url', { required: true });
+            const sourceUrl = core.getInput('source-url', { required: false });
+            const sourceId = core.getInput('source-id', { required: false });
+            const targetUrl = core.getInput('target-url', { required: false });
+            const targetId = core.getInput('target-id', { required: false });
             const selectedBackup = core.getInput('selected-backup', { required: true });
+            let restoreEnvArgs;
+            if (sourceUrl && targetUrl) {
+                restoreEnvArgs = ['admin', 'restore', '--source-url', sourceUrl, '--target-url', targetUrl, '--selected-backup', selectedBackup];
+            }
+            else if (sourceId && targetId) {
+                restoreEnvArgs = ['admin', 'restore', '--source-id', sourceId, '--target-id', targetId, '--selected-backup', selectedBackup];
+            }
+            else {
+                throw new Error("Must provide either environment-id or environment-url of both source and target environments!");
+            }
             const pac = factory.getRunner('pac', process.cwd());
             yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.ADMIN);
-            const restoreEnvArgs = ['admin', 'restore', '--source-url', sourceUrl, '--target-url', targetUrl, '--selected-backup', selectedBackup];
             yield pac.run(restoreEnvArgs);
             core.info('environment restored');
             core.endGroup();

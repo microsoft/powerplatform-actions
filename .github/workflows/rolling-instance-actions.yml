@@ -144,8 +144,8 @@ jobs:
       if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./copy-environment
       with:
-        source-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        target-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        source-id: ${{ steps.create-source-environment.outputs.environment-id }}
+        target-id: ${{ steps.create-target-environment.outputs.environment-id }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
@@ -153,7 +153,7 @@ jobs:
       if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./backup-environment
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-id: ${{ steps.create-source-environment.outputs.environment-id }}
         backup-label: test-backup-label
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
@@ -163,7 +163,7 @@ jobs:
       if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./reset-environment
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-id: ${{ steps.create-source-environment.outputs.environment-id }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
@@ -171,8 +171,8 @@ jobs:
       if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./restore-environment
       with:
-        source-url: ${{ steps.create-source-environment.outputs.environment-url }}
-        target-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        source-id: ${{ steps.create-source-environment.outputs.environment-id }}
+        target-id: ${{ steps.create-target-environment.outputs.environment-id }}
         selected-backup: latest
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
@@ -181,7 +181,7 @@ jobs:
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-id: ${{ steps.create-source-environment.outputs.environment-id }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
@@ -189,7 +189,7 @@ jobs:
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
-        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        environment-id: ${{ steps.create-target-environment.outputs.environment-id }}
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}

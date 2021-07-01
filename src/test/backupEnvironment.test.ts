@@ -13,7 +13,6 @@ describe('backup-environment#input validation', () => {
     const mockFactory: MockedRunners = new MockedRunners(workDir);
 
     const requiredParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
         { Name: 'backup-label', Value: 'aLabel' }
     ];
 

@@ -12,12 +12,23 @@ import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory} from '../..
 export async function main(factory: RunnerFactory): Promise<void> {
     try {
         core.startGroup('backup-environment:');
-        const envUrl = core.getInput('environment-url', { required: true });
+        const envUrl = core.getInput('environment-url', { required: false });
+        const envId = core.getInput('environment-id', { required: false });
         const backupLabel = core.getInput('backup-label', {required: true });
+
+        let backupEnvArgs;
+        if (envUrl) {
+            backupEnvArgs = ['admin', 'backup', '--url', envUrl, '--label', backupLabel];
+        } else if (envId) {
+            backupEnvArgs = ['admin', 'backup', '-id', envId, '--label', backupLabel];
+        } else {
+            throw new Error(
+                "Must provide either environment-id or environment-url!"
+            );
+        }
 
         const pac = factory.getRunner('pac', process.cwd());
         await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
-        const backupEnvArgs = ['admin', 'backup', '--url', envUrl, '--label', backupLabel];
         await pac.run(backupEnvArgs);
         core.info('environment backup complete');
         core.endGroup();
