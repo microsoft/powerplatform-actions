@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import path = require('path');
-import { forEachOf } from 'async';
 import { expect } from 'chai';
 
 import { main as deleteEnvironment } from '../actions/delete-environment';
@@ -11,33 +10,14 @@ import { ActionInputsEmulator } from './actionInputsEmulator';
 describe('delete-environment#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
     const mockFactory: MockedRunners = new MockedRunners(workDir);
-    // TODO: read in params and their required state from the action.yml
-
-    const requiredParams = [
-        { Name: 'environment-url', Value: 'aUrl' }
-    ];
 
     const inputParams = [
         { Name: 'environment-url', Value: 'aUrl' },
+        { Name: 'environment-id', Value: 'envId' },
         { Name: 'user-name', Value: 'aUserName' },
         { Name: 'password-secret', Value: 'aSecret' },
     ];
     const actionInputs = new ActionInputsEmulator(inputParams);
-
-    forEachOf(requiredParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                 res = await deleteEnvironment(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
-    });
 
     it('call action', async() => {
         actionInputs.defineInputs();
