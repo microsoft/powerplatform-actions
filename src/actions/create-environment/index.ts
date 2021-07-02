@@ -24,9 +24,14 @@ export async function main(factory: RunnerFactory): Promise<void> {
         const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
         const result = await pac.run(createEnvironmentArgs);
         // HACK TODO: Need structured output from pac CLI to make parsing out of the resulting env URL more robust
-        const resultArray = result.filter(l => l.length > 0).pop()?.trim().split(/\s+/);
-        const envUrl = resultArray?.shift();
-        const envId = resultArray?.shift();
+        const newEnvDetailColumns = result
+                                    .filter(l => l.length > 0)
+                                    .pop()
+                                    ?.trim()
+                                    .split(/\s+/);
+
+        const envUrl = newEnvDetailColumns?.shift();
+        const envId = newEnvDetailColumns?.shift();
         core.setOutput('environment-url', envUrl);
         core.setOutput('environment-id', envId);
         core.endGroup();
