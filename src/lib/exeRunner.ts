@@ -4,6 +4,7 @@ import { spawn, spawnSync } from "child_process";
 import os = require('os');
 import getExePath from "./getExePath";
 import { Logger } from "./logger";
+import getAutomationAgent from "./runnerParameters"
 
 export class ExeRunner {
     private readonly _exePath: string;
@@ -26,7 +27,10 @@ export class ExeRunner {
             const stderr = new Array<string>();
 
             this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
-            const process = spawn(this._exePath, args, { cwd: this.workingDir });
+            const process = spawn(this._exePath, args, {
+                cwd: this.workingDir,
+                env: Object.assign({ "PP_TOOLS_AUTOMATION_AGENT": getAutomationAgent.agent })
+            });
 
             process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
             process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
@@ -50,7 +54,11 @@ export class ExeRunner {
 
     public runSync(args: string[]): string[] {
         this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
-        const proc = spawnSync(this._exePath, args, { cwd: this.workingDir });
+        const proc = spawnSync(this._exePath, args, {
+            cwd: this.workingDir,
+            env: Object.assign({ "PP_TOOLS_AUTOMATION_AGENT": getAutomationAgent.agent })
+        });
+
         if (proc.status === 0) {
             const output = proc.output
                 .filter(line => !!line)     // can have null entries
