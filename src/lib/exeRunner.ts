@@ -4,7 +4,7 @@ import { spawn, spawnSync } from "child_process";
 import os = require('os');
 import getExePath from "./getExePath";
 import { Logger } from "./logger";
-import runnerParameters from "./runnerParameters"
+import { getAutomationAgent } from "./runnerParameters"
 
 export class ExeRunner {
     private readonly _exePath: string;
@@ -29,7 +29,7 @@ export class ExeRunner {
             this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
             const process = spawn(this._exePath, args, {
                 cwd: this.workingDir,
-                env: Object.assign({ "PP_TOOLS_AUTOMATION_AGENT": runnerParameters.agent })
+                env: { "PP_TOOLS_AUTOMATION_AGENT": getAutomationAgent() }
             });
 
             process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
@@ -56,7 +56,7 @@ export class ExeRunner {
         this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
         const proc = spawnSync(this._exePath, args, {
             cwd: this.workingDir,
-            env: Object.assign({ "PP_TOOLS_AUTOMATION_AGENT": runnerParameters.agent })
+            env: { "PP_TOOLS_AUTOMATION_AGENT": getAutomationAgent() }
         });
 
         if (proc.status === 0) {
