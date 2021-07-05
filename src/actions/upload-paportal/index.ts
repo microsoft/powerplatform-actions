@@ -6,8 +6,7 @@ import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner } f
 
 core.startGroup('upload-paportal:');
 const uploadPath = core.getInput('upload-path', { required: true });
-const deploymentTag = core.getInput('deployment-tag', { required: false });
-core.info(`upload: path:${uploadPath} deploymentTag: ${deploymentTag} `);
+core.info(`upload: path:${uploadPath} `);
 
 const workingDir = getWorkingDirectory('working-directory', false);
 
@@ -19,8 +18,6 @@ const logger = new ActionLogger();
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const exportArgs = ['paportal', 'upload', '--path', uploadPath];
-
-    if (deploymentTag) { exportArgs.push('--deploymentTag', deploymentTag); }
 
     await pac.run(exportArgs);
     core.info(`uploading portal data to current profile from: ${uploadPath}`);
