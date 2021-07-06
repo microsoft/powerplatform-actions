@@ -18,9 +18,7 @@ const logger = new ActionLogger();
     const pac = new PacRunner(workingDir, logger);
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
-    const exportArgs = ['paportal', 'download', '--path', downloadPath];
-
-    { exportArgs.push('--websiteId', websiteId); }
+    const exportArgs = ['paportal', 'download', '--path', downloadPath, '--websiteId', websiteId];
 
     await pac.run(exportArgs);
     core.info(`downloading portal data for websiteId: ${websiteId} at location : ${downloadPath}`);
