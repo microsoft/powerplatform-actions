@@ -421,9 +421,19 @@ function main(factory) {
         try {
             core.startGroup('delete-environment:');
             const pac = factory.getRunner('pac', process.cwd());
-            const envUrl = core.getInput('environment-url', { required: true });
+            const envUrl = core.getInput('environment-url', { required: false });
+            const envId = core.getInput('environment-id', { required: false });
             yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.ADMIN);
-            const deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
+            let deleteEnvArgs;
+            if (envUrl) {
+                deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
+            }
+            else if (envId) {
+                deleteEnvArgs = ['admin', 'delete', '-id', envId];
+            }
+            else {
+                throw new Error("Must provide either environment-id or environment-url!");
+            }
             yield pac.run(deleteEnvArgs);
             core.info('environment deleted');
             core.endGroup();

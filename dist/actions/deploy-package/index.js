@@ -7657,7 +7657,7 @@ function main(factory) {
             ];
             const rootDirectory = '.';
             const options = { continueOnError: true };
-            const uploadResponse = yield artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
+            yield artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
             core.info('package deployed.');
             core.endGroup();
         }

@@ -78,7 +78,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.4": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.5": {
         "dependencies": {
           "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
           "System.ComponentModel.Composition": "5.0.0",
@@ -89,7 +89,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.4"
+            "fileVersion": "9.1.1.5"
           }
         }
       },
@@ -282,7 +282,7 @@
           }
         }
       },
-      "Microsoft.PowerApps.Checker.Client/1.0.0.2": {
+      "Microsoft.PowerApps.Checker.Client/1.0.0.3": {
         "dependencies": {
           "Microsoft.Rest.ClientRuntime": "2.3.20",
           "Newtonsoft.Json": "11.0.2"
@@ -290,7 +290,7 @@
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerApps.Checker.Client.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.34.0"
+            "fileVersion": "1.0.35.0"
           }
         }
       },
@@ -337,7 +337,7 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.Formulas.Tools/0.2.3-preview": {
+      "Microsoft.PowerPlatform.Formulas.Tools/0.3.4-preview": {
         "dependencies": {
           "System.Text.Json": "4.7.2"
         },
@@ -1580,7 +1580,7 @@
       },
       "bolt.module.canvas/1.0.0": {
         "dependencies": {
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.2.3-preview",
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.3.4-preview",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "1.0.0",
           "bolt.system": "1.0.0",
@@ -1639,8 +1639,8 @@
       "bolt.module.solution/1.0.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.4",
-          "Microsoft.PowerApps.Checker.Client": "1.0.0.2",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.5",
+          "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
           "bolt.cli": "1.0.0",
@@ -1716,12 +1716,12 @@
       "path": "microsoft.applicationinsights/2.9.1",
       "hashPath": "microsoft.applicationinsights.2.9.1.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.4": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-rPKViHB2cwCkKc+Srq5Mv/rOmic87s6hHUqcMVb8lFVqoM2Ivl8GW0T/20GNEK5QvJVXqlt0giOLV4mnBnDeuA==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.4",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.4.nupkg.sha512"
+      "sha512": "sha512-FnshdyZYVI5EZ3VokP0HiMWT/Hy4K8SOUWATLn8+W/0xtxT5XrSGVpstj1YpmoGPF6qwUzgx6OQoJ1T+9EclfQ==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.5",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.5.nupkg.sha512"
     },
     "Microsoft.Extensions.Configuration/3.1.8": {
       "type": "package",
@@ -1856,12 +1856,12 @@
       "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.14",
       "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.14.nupkg.sha512"
     },
-    "Microsoft.PowerApps.Checker.Client/1.0.0.2": {
+    "Microsoft.PowerApps.Checker.Client/1.0.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OC7L4jV6Fgp5XDpLnpPG2HpBx4epJ9XxOLrnLrsTuqHCe1AeKzcM7gFtP+OJf792+tFBtao86ZWm1/P1+k7oRA==",
-      "path": "microsoft.powerapps.checker.client/1.0.0.2",
-      "hashPath": "microsoft.powerapps.checker.client.1.0.0.2.nupkg.sha512"
+      "sha512": "sha512-JoM+VvjlHEYmLRSkqDEerJvDbc0Ea4qkKTGC6qwO2LC2MvG44TeXF0GFg4QNdk+uHv4dpb0jMxNQXpVncxRqWg==",
+      "path": "microsoft.powerapps.checker.client/1.0.0.3",
+      "hashPath": "microsoft.powerapps.checker.client.1.0.0.3.nupkg.sha512"
     },
     "Microsoft.PowerPlatform.Dataverse.Client/0.4.11": {
       "type": "package",
@@ -1870,12 +1870,12 @@
       "path": "microsoft.powerplatform.dataverse.client/0.4.11",
       "hashPath": "microsoft.powerplatform.dataverse.client.0.4.11.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Formulas.Tools/0.2.3-preview": {
+    "Microsoft.PowerPlatform.Formulas.Tools/0.3.4-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-PxMnhpAA6wi22xi3kG9HEnn3f2PYUNpjag6pQbkawHkD7DtBJvl3421j0A/4teTHv6bD5Mz6XiS3cRHHLyuAGQ==",
-      "path": "microsoft.powerplatform.formulas.tools/0.2.3-preview",
-      "hashPath": "microsoft.powerplatform.formulas.tools.0.2.3-preview.nupkg.sha512"
+      "sha512": "sha512-x6PaugreC80iAE61VK4BIppYjj9vWXBIJROFf/1YQzhCeFQgWjNbqft6hse7XSuCIOOBuvRylEZhuFhryxnITw==",
+      "path": "microsoft.powerplatform.formulas.tools/0.3.4-preview",
+      "hashPath": "microsoft.powerplatform.formulas.tools.0.3.4-preview.nupkg.sha512"
     },
     "Microsoft.Rest.ClientRuntime/2.3.20": {
       "type": "package",

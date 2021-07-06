@@ -3,6 +3,12 @@ name: rolling-instance-actions
 
 on:
   workflow_dispatch:    # allow for manual workflow triggering as needed
+    inputs:
+      runSlowCRUD:
+        description: 'run slow CRUD actions like copy-env, backup-env, restore-env, reset-env (default: yes)'
+        required: false
+        default: 'yes'
+
   push:
     branches: [ main ]
 
@@ -50,7 +56,7 @@ jobs:
     - name: Test who-am-i action with username/password
       uses: ./who-am-i
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
@@ -70,19 +76,25 @@ jobs:
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
 
+    - name: Check solution
+      uses: ./check-solution
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        path: 'src/test/data/singlePCF.zip'
+
     - name: Test import-solution action with username/password
-      if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./import-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        solution-file: 'out/CI/emptySolution.zip'
+        solution-file: 'src/test/data/emptySolution_0_1_0_0.zip'
         force-overwrite: true
         run-asynchronously: true
 
     - name: Test export-solution action with username/password
-      if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./export-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -103,7 +115,6 @@ jobs:
         overwrite-files: true
 
     - name: Test clone-solution action with username/password
-      if: matrix.os == 'windows-latest'   # The solution we test with here is created in a previous windows-only step
       uses: ./clone-solution
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -130,6 +141,7 @@ jobs:
         package: 'src\test\data\pkgDeployTestData\CDSPackage.dll'
 
     - name: Test copy-environment action with username/password
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./copy-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -138,6 +150,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test backup-environment action with appId-clientSecret
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./backup-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -147,6 +160,7 @@ jobs:
         tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test reset-environment action with username/password
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./reset-environment
       with:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
@@ -154,6 +168,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test restore-environment action with username/password
+      if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
       uses: ./restore-environment
       with:
         source-url: ${{ steps.create-source-environment.outputs.environment-url }}

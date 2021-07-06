@@ -410,13 +410,15 @@ exports.RunnerError = exports.createCommandRunner = void 0;
 const child_process_1 = __webpack_require__(129);
 const process_1 = __webpack_require__(765);
 const os_1 = __webpack_require__(87);
-function createCommandRunner(workingDir, commandPath, logger, options) {
+function createCommandRunner(workingDir, commandPath, logger, options, agent) {
     return function run(...args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 logInitialization(...args);
                 const allOutput = [];
-                const process = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: { PATH: process_1.env.PATH } }, options));
+                const process = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: { PATH: process_1.env.PATH,
+                        "PP_TOOLS_AUTOMATION_AGENT": agent
+                    } }, options));
                 process.stdout.on("data", logData(logger.log));
                 process.stderr.on("data", logData(logger.error));
                 function logData(logFunction) {
@@ -562,10 +564,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const os_1 = __webpack_require__(87);
 const path_1 = __webpack_require__(622);
 const CommandRunner_1 = __webpack_require__(892);
-function createPacRunner({ workingDir, runnersDir, logger, }) {
+function createPacRunner({ workingDir, runnersDir, logger, agent, }) {
     return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32"
         ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe")
-        : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger);
+        : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger, undefined, agent);
 }
 exports.default = createPacRunner;
 
@@ -764,15 +766,29 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const process_1 = __webpack_require__(765);
 const actionLogger_1 = __webpack_require__(970);
 const getExePath_1 = __webpack_require__(309);
+function getAutomationAgent() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const jsonPackage = __webpack_require__(306);
+    const productName = jsonPackage.name.split("/")[1];
+    return productName + "/" + jsonPackage.version;
+}
 const runnerParameters = {
     runnersDir: getExePath_1.default(),
     workingDir: process_1.cwd(),
     logger: new actionLogger_1.ActionLogger(),
+    agent: getAutomationAgent(),
 };
 exports.default = runnerParameters;
 
 //# sourceMappingURL=runnerParameters.js.map
 
+
+/***/ }),
+
+/***/ 306:
+/***/ ((module) => {
+
+module.exports = JSON.parse("{\"name\":\"@microsoft/powerplatform-actions\",\"version\":\"0.1.0\",\"description\":\"Github Action for Power Platform\",\"main\":\"index.js\",\"scripts\":{\"clean\":\"scorch\",\"build\":\"node node_modules/gulp/bin/gulp.js\",\"test\":\"node node_modules/gulp/bin/gulp.js test\",\"ci\":\"node node_modules/gulp/bin/gulp.js ci\",\"dist\":\"node node_modules/gulp/bin/gulp.js recompile && node node_modules/gulp/bin/gulp.js dist && git add -f -- ./dist\"},\"author\":\"PowerApps-ISV-Tools\",\"license\":\"MIT\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/microsoft/powerplatform-actions.git\"},\"devDependencies\":{\"@types/async\":\"^3.2.3\",\"@types/chai\":\"^4.2.12\",\"@types/fancy-log\":\"^1.3.1\",\"@types/fs-extra\":\"^9.0.1\",\"@types/glob\":\"^7.1.3\",\"@types/mocha\":\"^8.0.3\",\"@types/node\":\"^14.14.35\",\"@types/sinon\":\"^9.0.11\",\"@types/sinon-chai\":\"^3.2.5\",\"@types/uuid\":\"^8.3.0\",\"@types/yargs\":\"^15.0.5\",\"@typescript-eslint/eslint-plugin\":\"^4.1.0\",\"@typescript-eslint/parser\":\"^4.1.0\",\"@vercel/ncc\":\"^0.24.0\",\"async\":\"^3.2.0\",\"chai\":\"^4.2.0\",\"dotenv\":\"^8.2.0\",\"eslint\":\"^7.9.0\",\"glob\":\"^7.1.6\",\"gulp\":\"^4.0.2\",\"gulp-eslint\":\"^6.0.0\",\"gulp-mocha\":\"^7.0.2\",\"gulp-sourcemaps\":\"^2.6.5\",\"gulp-typescript\":\"^6.0.0-alpha.1\",\"mocha\":\"^8.1.3\",\"node-fetch\":\"^2.6.1\",\"ps-list\":\"^7.2.0\",\"rewiremock\":\"^3.14.3\",\"sinon\":\"^9.2.4\",\"sinon-chai\":\"^3.5.0\",\"ts-node\":\"^9.0.0\",\"ts-sinon\":\"^2.0.1\",\"unzip-stream\":\"^0.3.0\",\"winston\":\"^3.3.3\"},\"dependencies\":{\"@actions/artifact\":\"^0.5.1\",\"@actions/core\":\"^1.2.6\",\"@microsoft/powerplatform-cli-wrapper\":\"^0.1.14\",\"date-fns\":\"^2.16.1\",\"fancy-log\":\"^1.3.3\",\"fs-extra\":\"^9.0.1\",\"typescript\":\"^4.0.2\",\"uuid\":\"^8.3.0\",\"yargs\":\"^16.0.3\"}}");
 
 /***/ }),
 

@@ -6,7 +6,8 @@
     "build": "pcf-scripts build",
     "clean": "pcf-scripts clean",
     "rebuild": "pcf-scripts rebuild",
-    "start": "pcf-scripts start"
+    "start": "pcf-scripts start",
+    "refreshTypes": "pcf-scripts refreshTypes"
   },
   "dependencies": {
     "@types/node": "^10.12.18",
