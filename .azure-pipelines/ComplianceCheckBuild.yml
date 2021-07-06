@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 # https://aka.ms/yaml
 #
-# Azure DevOps build to integrate with out 1ES compliance assessments
+# Azure DevOps build to integrate with 1ES compliance assessments
 # OneCRM/Pipelines/DPX-Tools/powerplatform-actions ComplianceBuild:
 # https://dev.azure.com/dynamicscrm/OneCRM/_build?definitionId=13638&_a=summary
 
@@ -20,16 +20,13 @@ variables:
 trigger:
   - main
 
-# PR loops only via GH workflows
+# PR loops are run only via GH workflows
 pr: none
 
 pool:
   vmImage: 'windows-latest'
 
 steps:
-# - script: echo "##vso[build.updatebuildnumber]$(VSIX_VERSION)
-#   displayName: Set Job version
-
 - task: NodeTool@0
   displayName: 'Use nodejs 14.x'
   inputs:
@@ -37,12 +34,13 @@ steps:
 
 # need to authenticate to npm package feed in microsoft/powerplatform-cli-wrapper (see also README.md)
 - task: npmAuthenticate@0
+  displayName: 'setup package feed authN with github'
   inputs:
     workingFile: .npmrc
     customEndpoint: github.com_npm_davidjenni
 
 - task: Npm@1
-  displayName: 'Restore (npm install)'
+  displayName: 'npm install'
   inputs:
     command: custom
     customCommand: ci
