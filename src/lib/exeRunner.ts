@@ -4,6 +4,8 @@ import { spawn, spawnSync } from "child_process";
 import os = require('os');
 import getExePath from "./getExePath";
 import { Logger } from "./logger";
+import { getAutomationAgent } from "./runnerParameters"
+import process = require("process");
 
 export class ExeRunner {
     private readonly _exePath: string;
@@ -26,12 +28,17 @@ export class ExeRunner {
             const stderr = new Array<string>();
 
             this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
-            const process = spawn(this._exePath, args, { cwd: this.workingDir });
+            const cp = spawn(this._exePath, args, {
+                cwd: this.workingDir,
+                env: { ...process.env,
+                    "PP_TOOLS_AUTOMATION_AGENT": getAutomationAgent()
+                }
+            });
 
-            process.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
-            process.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
+            cp.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
+            cp.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
 
-            process.on('exit', (code) => {
+            cp.on('exit', (code) => {
                 if (code === 0) {
                     this.logger.info(`success: ${stdout.join(os.EOL)}`);
                     resolve(stdout);
@@ -42,15 +49,21 @@ export class ExeRunner {
                 }
 
                 // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
-                process.stdout.destroy();
-                process.stderr.destroy();
+                cp.stdout.destroy();
+                cp.stderr.destroy();
             });
         });
     }
 
     public runSync(args: string[]): string[] {
         this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0]: '<none>'}`);
-        const proc = spawnSync(this._exePath, args, { cwd: this.workingDir });
+        const proc = spawnSync(this._exePath, args, {
+            cwd: this.workingDir,
+            env: { ...process.env,
+                "PP_TOOLS_AUTOMATION_AGENT": getAutomationAgent()
+            }
+        });
+
         if (proc.status === 0) {
             const output = proc.output
                 .filter(line => !!line)     // can have null entries

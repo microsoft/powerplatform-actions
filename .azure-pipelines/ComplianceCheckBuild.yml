@@ -1,0 +1,52 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+# https://aka.ms/yaml
+#
+# Azure DevOps build to integrate with 1ES compliance assessments
+# OneCRM/Pipelines/DPX-Tools/powerplatform-actions ComplianceBuild:
+# https://dev.azure.com/dynamicscrm/OneCRM/_build?definitionId=13638&_a=summary
+
+variables:
+  # https://aka.ms/gdn-injection
+  GDN_CODESIGN_TARGETDIRECTORY: "$(Build.SourcesDirectory)\\dist"
+  # no codesigning for JavaScript:
+  GDN_CODESIGN_EXCLUSIONS: "f|**/*.js"
+  runCodesignValidationInjection: true
+  breakCodesignValidationInjection: true
+  #
+  # set the following in the pipeline's web UI editor:
+  # AZ_DevOps_Read_PAT  # PAT to read from AzDO feed in msazure
+
+trigger:
+  - main
+
+# PR loops are run only via GH workflows
+pr: none
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: NodeTool@0
+  displayName: 'Use nodejs 14.x'
+  inputs:
+    versionSpec: '14.x'
+
+# need to authenticate to npm package feed in microsoft/powerplatform-cli-wrapper (see also README.md)
+- task: npmAuthenticate@0
+  displayName: 'setup package feed authN with github'
+  inputs:
+    workingFile: .npmrc
+    customEndpoint: github.com_npm_davidjenni
+
+- task: Npm@1
+  displayName: 'npm install'
+  inputs:
+    command: custom
+    customCommand: ci
+
+- task: Npm@1
+  displayName: 'update dist folder'
+  inputs:
+    command: custom
+    customCommand: run update-dist -- --feedPAT $(AZ_DevOps_Read_PAT)
