@@ -3,7 +3,7 @@
 import { whoAmI } from "@microsoft/powerplatform-cli-wrapper";
 import getCredentials from "../../lib/auth/getCredentials";
 import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
-import runnerParameters from "../../lib/runnerParameters";
+import { runnerParameters } from "../../lib/runnerParameters";
 
 whoAmI({
     credentials: getCredentials(),

@@ -1,11 +1,9 @@
-require("dotenv").config();
-
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-undef */
 "use strict";
+require("dotenv").config();
 const gulp = require('gulp');
 const eslint = require('gulp-eslint');
 const mocha = require('gulp-mocha');
@@ -13,7 +11,6 @@ const ncc = require('@vercel/ncc');
 const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 
-const os = require('os');
 const fetch = require('node-fetch');
 const fs = require('fs-extra');
 const log = require('fancy-log');
@@ -21,13 +18,16 @@ const path = require('path');
 const pslist = require('ps-list');
 const unzip = require('unzip-stream');
 const { glob } = require('glob');
-const { exec } = require("child_process");
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+const argv = require('yargs').argv;
 
 const tsConfigFile = './tsconfig.json';
 const tsconfig = require(tsConfigFile);
 const outdir = path.resolve(tsconfig.compilerOptions.outDir);
 const distdir = path.resolve('./dist');
-const readPAT = process.env['AZ_DevOps_Read_PAT'];
+
+const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
 async function clean() {
     (await pslist())
@@ -80,10 +80,10 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
         redirect: 'manual'
     };
     if (selectedFeed.authenticated) {
-        if (!readPAT) {
-            throw new Error(`nuget feed ${nugetSource} requires authN but env var 'AZ_DevOps_Read_PAT' was not defined!`);
+        if (!feedPAT) {
+            throw new Error(`nuget feed ${nugetSource} requires authN but neither '--feedPAT' argument nor env var 'AZ_DevOps_Read_PAT' was defined!`);
         }
-        reqInit.headers['Authorization'] = `Basic ${Buffer.from('PAT:' + readPAT).toString('base64')}`;
+        reqInit.headers['Authorization'] = `Basic ${Buffer.from('PAT:' + feedPAT).toString('base64')}`;
     }
 
     log.info(`Downloading package: ${nupkgUrl}...`);
@@ -140,64 +140,93 @@ function binplace(compName, relativePath) {
     });
 }
 
-async function createDist() {
+async function dist() {
     fs.emptyDirSync(distdir);
     binplace('SoPa', path.join('sopa', 'content', 'bin', 'coretools'));
     binplace('pac CLI', path.join('pac', 'tools'));
     binplace('pac CLI', path.join('pac_linux', 'tools'));
+    await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
 
-    glob.sync('**/action.yml', {
-            cwd: __dirname
-        })
+    const allBundles =
+        glob.sync('**/action.yml', {
+                cwd: __dirname
+            })
         // ignore the toplevel action.yml that is needed for GH Marketplace
         .filter(actionYaml => path.dirname(actionYaml) !== '.')
         .map(actionYaml => path.basename(path.dirname(actionYaml)))
-        .forEach((actionName, idx) => {
+        .map((actionName, idx) => {
             const actionDir = path.resolve(distdir, 'actions', actionName)
             log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
-            ncc(path.resolve(outdir, 'actions', actionName), {
+            // return a promise for each bundled action:
+            return ncc(path.resolve(outdir, 'actions', actionName), {
                 minify: false,
             })
-            .then(({code, map, assets}) => {
-                fs.emptyDirSync(actionDir);
-                fs.writeFileSync(path.resolve(actionDir, 'index.js'), code);
-            });
+                .then(({code, map, assets}) => {
+                    fs.emptyDirSync(actionDir);
+                    fs.writeFileSync(path.resolve(actionDir, 'index.js'), code);
+                })
         });
+    await Promise.all(allBundles);
 }
 
 // Unzipping the pac program from the nuget package does not set the
 // Execute flag on non-Windows platforms.  Thus, we need to set it ourselves.
-async function setExecuteFlag(path) {
+async function setExecuteFlag(path, updateIndex) {
     // chmod sets the execute flag on the filesystem, but is a no-op on windows
-    fs.chmod(path, 0o711)
-        .then(() =>{
-            // Git tracks the execute flag as well, so make sure we set that *esepcially* on Windows
-            exec("git update-index --chmod=+x " + path);
-        });
+    fs.chmodSync(path, 0o711);
+    if (updateIndex) {
+        // Git tracks the execute flag as well, so make sure we set that *esepcially* on Windows
+        await exec("git update-index --info-only --chmod=+x " + path);
+    }
 }
 
-const recompile = gulp.series(
-    clean,
-    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', '1.6.7-daily-21060922', path.resolve(outdir, 'pac_linux')),
-    async () => setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac')),
-    async () => nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', '1.6.7-daily-21060922', path.resolve(outdir, 'pac')),
-    async () => nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.79', path.resolve(outdir, 'sopa')),
-    compile
-);
+async function addDistToIndex() {
+    const res = await exec(`git add -f -- ${distdir}`);
+    console.log(`stdout: ${res.stdout}`);
+    console.log(`stderr: ${res.stderr}`);
+}
 
-const dist = gulp.series(
-    async () => createDist(),
-);
+const cliVersion = '1.7.5-daily-21063017';
+
+async function nugetInstallLinux() {
+    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
+    await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
+}
+
+async function nugetInstallWindows() {
+    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
+    await nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.79', path.resolve(outdir, 'sopa'));
+}
+
+async function restore() {
+    await clean();
+    await nugetInstallLinux();
+    await nugetInstallWindows();
+}
+
 
 exports.clean = clean;
 exports.compile = compile;
-exports.recompile = recompile;
+exports.recompile = gulp.series(
+    restore,
+    compile,
+);
+
 exports.lint = lint;
 exports.test = test;
 exports.ci = gulp.series(
-    recompile,
+    restore,
+    compile,
     lint,
     test
 );
 exports.dist = dist;
-exports.default = recompile;
+exports.updateDist = gulp.series(
+    restore,
+    compile,
+    dist,
+    addDistToIndex,
+);
+exports.addDistToIndex = addDistToIndex;
+
+exports.default = exports.recompile;
