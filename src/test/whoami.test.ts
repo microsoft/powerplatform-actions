@@ -33,8 +33,10 @@ describe("WhoAmI tests", () => {
                 mock(() => import("../lib/auth/getEnvironmentUrl")).withDefault(
                     () => environmentUrl
                 );
-                mock(() => import("../lib/runnerParameters")).withDefault(
-                    runnerParameters
+                mock(() => import("../lib/runnerParameters")).with(
+                    {
+                        runnerParameters
+                    }
                 );
             }
         );

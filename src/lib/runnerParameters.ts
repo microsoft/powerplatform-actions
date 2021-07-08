@@ -17,4 +17,4 @@ const runnerParameters: RunnerParameters = {
     agent: getAutomationAgent(),
 };
 
-export default runnerParameters;
+export { runnerParameters, getAutomationAgent };
