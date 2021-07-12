@@ -65,6 +65,11 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
             // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
             baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/d3fb5788-d047-47f9-9aba-76890f5cecf0/nuget/v3/flat2/'
         },
+        'CAP_ISVExp_Tools_Stable': {
+            authenticated: true,
+            // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
+            baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/b0441cf8-0bc8-4fad-b126-841a6184e784/nuget/v3/flat2/'
+        },
     }
 
     const selectedFeed = feeds[nugetSource];
@@ -190,15 +195,15 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.7.5-daily-21063017';
+const cliVersion = '1.8.5';
 
 async function nugetInstallLinux() {
-    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
+    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
     await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
 }
 
 async function nugetInstallWindows() {
-    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
+    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
     await nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.79', path.resolve(outdir, 'sopa'));
 }
 
