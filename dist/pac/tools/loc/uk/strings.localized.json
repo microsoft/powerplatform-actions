@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Файл {0} уже існує. Укажіть аргумент \"-o true\", щоб перезаписати вміст",
   "PortalDownloadInvalidJsonEditorType": "Не підтримується завантаження типу \"{0}\"",
   "PortalEntityDownloadStart": "Завантаження: {0} [{1}]...",
+  "PortalEntitySchemaError": "Не вдалося знайти визначення сутності для {0} у файлі схеми",
   "PortalEntityUploadComplete": "Передавання для таблиці завершено: {0}",
   "PortalEntityUploadTimeout": "Час очікування відповіді про передавання для таблиці: {0}. Передавання продовжується",
   "PortalFileReadFailure": "Не вдалося прочитати файл \"{0}\" через {1}",

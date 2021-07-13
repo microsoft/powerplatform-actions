@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Filen {0} finnes allerede. Oppgi -o sann-argumentet for å overskrive innholdet",
   "PortalDownloadInvalidJsonEditorType": "Type:{0} kan ikke lastes ned",
   "PortalEntityDownloadStart": "Laster ned: {0} [{1}] ...",
+  "PortalEntitySchemaError": "Finner ikke enhetsdefinisjonen for {0} i skjemafilen",
   "PortalEntityUploadComplete": "Opplasting fullført for tabell: {0}",
   "PortalEntityUploadTimeout": "Last opp svartidsavbrudd for tabell: {0} fortsetter opplasting",
   "PortalFileReadFailure": "Lesing av filen {0} mislyktes på grunn av {1}",

@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "{0} 파일이 이미 있습니다. 내용을 덮어쓰려면 -o true 인수를 제공하세요.",
   "PortalDownloadInvalidJsonEditorType": "유형:{0}을(를) 다운로드할 수 없음",
   "PortalEntityDownloadStart": "다운로드 중: {0} [{1}]...",
+  "PortalEntitySchemaError": "스키마 파일에서 {0}에 대한 엔터티 정의를 찾을 수 없습니다.",
   "PortalEntityUploadComplete": "다음 테이블에 대해 업로드 완료: {0}",
   "PortalEntityUploadTimeout": "테이블에 대한 응답 시간 제한 업로드: {0} 업로드 계속",
   "PortalFileReadFailure": "{1}(으)로 인해 {0} 파일 읽기 실패",

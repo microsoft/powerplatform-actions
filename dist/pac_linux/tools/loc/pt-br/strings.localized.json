@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "O arquivo {0} já existe. Forneça argumento -o true para substituir o conteúdo",
   "PortalDownloadInvalidJsonEditorType": "O tipo {0} não é válido para download",
   "PortalEntityDownloadStart": "Baixando: {0} [{1}]...",
+  "PortalEntitySchemaError": "Não foi possível encontrar a definição da entidade para {0} no arquivo de esquema",
   "PortalEntityUploadComplete": "Carregamento concluído para a tabela: {0}",
   "PortalEntityUploadTimeout": "Carregar tempo de resposta para tabela: {0} continuar carregando",
   "PortalFileReadFailure": "A leitura do arquivo {0} falhou devido a {1}",

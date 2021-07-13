@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Datoteka {0} već postoji. Navedite argument „-o true“ da biste zamenili sadržaj",
   "PortalDownloadInvalidJsonEditorType": "Tip: {0} nije važeći za preuzimanje",
   "PortalEntityDownloadStart": "Preuzimanje: {0} [{1}]...",
+  "PortalEntitySchemaError": "Nije moguće pronaći definiciju entiteta za {0} u datoteci šeme",
   "PortalEntityUploadComplete": "Otpremanje je dovršeno za tabelu: {0}",
   "PortalEntityUploadTimeout": "Vremensko ograničenje odgovora na otpremanje za tabelu: otpremanje se nastavlja za: {0}",
   "PortalFileReadFailure": "Čitanje datoteke {0} nije uspelo zbog {1}",
@@ -466,7 +467,8 @@
   "VersionWithColon": "Verzija: {0}",
   "WarningWithColon": "Upozorenje: ",
   "Yes": "Da"
-}ortalPubsVerb": "Команде за навођење издавача за тренутног корисника",
+}давача за корисника {0}",
+  "PortalPubsVerb": "Команде за навођење издавача за тренутног корисника",
   "PortalSkipExportOnlyEntity": "Прескакање табеле која је само за извоз: {0}",
   "PortalUploadInvalidJsonEditorType": "Тип: {0} није важећи за отпремање",
   "PortalUploadMultipleEntityDataFilesDetected": "Откривено је више датотека са подацима из табела",

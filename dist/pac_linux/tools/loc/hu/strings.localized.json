@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "A(z) {0} fájl már létezik. A tartalma felülírásához használja a „-o true” argumentumot.",
   "PortalDownloadInvalidJsonEditorType": "Típus: {0} nem érvényes letöltéshez",
   "PortalEntityDownloadStart": "Letöltés: {0} [{1}]...",
+  "PortalEntitySchemaError": "Nem található entitásdefiníció a következőhöz sémafájlban: {0}",
   "PortalEntityUploadComplete": "A feltöltés befejeződött a következő tábla esetében: {0}",
   "PortalEntityUploadTimeout": "Lejárt a válaszidő a(z) {0} tábla feltöltése közben; a feltöltés folytatódik",
   "PortalFileReadFailure": "A(z) {0} fájl olvasása sikertelen. Ok: {1}",

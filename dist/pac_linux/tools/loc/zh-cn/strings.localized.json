@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "文件 {0} 已存在。请提供 -o true 参数以覆盖内容",
   "PortalDownloadInvalidJsonEditorType": "类型 {0} 无效，无法下载",
   "PortalEntityDownloadStart": "正在下载: {0} [{1}]...",
+  "PortalEntitySchemaError": "在架构文件中找不到 {0} 的实体定义",
   "PortalEntityUploadComplete": "表上传已完成: {0}",
   "PortalEntityUploadTimeout": "上传表的响应超时: {0}继续上传",
   "PortalFileReadFailure": "由于 {1}，文件 {0} 读取失败",

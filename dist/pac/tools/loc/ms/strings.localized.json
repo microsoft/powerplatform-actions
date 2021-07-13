@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Fail {0} sudah wujud. berikan argumen benar -o untuk menulis ganti kandungan",
   "PortalDownloadInvalidJsonEditorType": "Taip:{0} tidak sah untuk dimuat turun",
   "PortalEntityDownloadStart": "Memuat turun: {0} [{1}]...",
+  "PortalEntitySchemaError": "Tidak dapat mencari definisi entiti bagi {0} dalam fail skema",
   "PortalEntityUploadComplete": "Muat naik telah selesai untuk jadual: {0}",
   "PortalEntityUploadTimeout": "Muat naik tamat masa respons untuk jadual: {0} meneruskan muat naik",
   "PortalFileReadFailure": "Pembacaan fail {0} telah gagal disebabkan {1}",

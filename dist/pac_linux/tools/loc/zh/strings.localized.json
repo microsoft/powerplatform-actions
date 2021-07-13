@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "檔案 {0} 已經存在。請提供 -o true 引數以覆寫內容",
   "PortalDownloadInvalidJsonEditorType": "類型: {0} 無效，無法下載",
   "PortalEntityDownloadStart": "正在下載: {0} [{1}]...",
+  "PortalEntitySchemaError": "找不到結構描述檔案中 {0} 的實體定義",
   "PortalEntityUploadComplete": "資料表上傳完成: {0}",
   "PortalEntityUploadTimeout": "資料表的上傳回覆逾時: {0} 繼續上傳",
   "PortalFileReadFailure": "讀取檔案 {0} 失敗，因為 {1}",

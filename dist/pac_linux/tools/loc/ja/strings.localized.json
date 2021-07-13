@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "ファイル {0} は既に存在します。コンテンツを上書きするには、-o true 引数を指定してください",
   "PortalDownloadInvalidJsonEditorType": "種類: {0} はダウンロードが無効です",
   "PortalEntityDownloadStart": "{0} [{1}] をダウンロードしています...",
+  "PortalEntitySchemaError": "スキーマ ファイルの {0} のエンティティ定義が見つかりません",
   "PortalEntityUploadComplete": "テーブルのアップロードが完了しました: {0}",
   "PortalEntityUploadTimeout": "テーブルのアップロード応答タイムアウト: {0} アップロードを続行中",
   "PortalFileReadFailure": "{1} により、ファイル {0} を読み込めませんでした",
