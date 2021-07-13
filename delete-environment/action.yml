@@ -4,11 +4,11 @@ name: 'delete-environment'
 description: 'Power Platform Delete Environment Action'
 inputs:
   environment-url:
-    description: 'URL of Power Platform environment to delete; e.g. "https://test-env.crm.dynamics.com"'
+    description: 'URL of Power Platform environment to delete; e.g. "https://test-env.crm.dynamics.com". The "environment-url" is mutually exclusive to "environment-id".'
     required: false
 
   environment-id:
-    description: 'ID of Power Platform environment to delete'
+    description: 'ID of Power Platform environment to delete. The "environment-id" is mutually exclusive to "environment-url".'
     required: false
 
   user-name:
