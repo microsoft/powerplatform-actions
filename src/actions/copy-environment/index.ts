@@ -10,13 +10,14 @@ import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory } from '../.
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('copy-environment:');
 
         const sourceUrl = core.getInput('source-url', { required: true});
         const targetUrl = core.getInput('target-url', { required: true});
 
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
         await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         const copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
@@ -25,5 +26,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    } finally {
+        await pac?.run(["auth", "clear"]);
     }
 }

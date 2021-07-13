@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, AuthHandler, AuthKind, getInputAsBool, getWorkingDirectory, PacRunner } from '../../lib';
+import { ActionLogger, AuthHandler, AuthKind, getInputAsBool, getWorkingDirectory, PacRunner, Runner } from '../../lib';
 import path = require('path');
 import fs = require('fs-extra');
 
@@ -18,10 +18,10 @@ const outputFile = path.isAbsolute(outputFileCandidate) ? outputFileCandidate : 
 fs.ensureDirSync(path.dirname(outputFile));
 
 const logger = new ActionLogger();
-
+let pac: Runner;
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    const pac = new PacRunner(workingDir, logger);
+    pac = new PacRunner(workingDir, logger);
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const exportArgs = ['solution', 'export', '--name', solutionName, '--path', outputFile];
@@ -35,4 +35,6 @@ const logger = new ActionLogger();
 })().catch(error => {
     core.setFailed(`failed: ${error}`);
     core.endGroup();
+}).finally(async () => {
+    await pac?.run(["auth", "clear"]);
 });

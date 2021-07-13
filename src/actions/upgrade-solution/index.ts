@@ -10,6 +10,7 @@ import { AuthHandler, AuthKind, DefaultRunnerFactory, getInputAsBool, RunnerFact
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('upgrade-solution:');
         const solutionName = core.getInput('solution-name', { required: true });
@@ -17,7 +18,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
 
         const performAsync = getInputAsBool('async', false, false);
 
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
         await new AuthHandler(pac).authenticate(AuthKind.CDS);
         const upgradeArgs = ['solution', 'upgrade', '--solution-name', solutionName];
         if (performAsync) {
@@ -33,5 +34,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    } finally {
+        await pac?.run(["auth", "clear"]);
     }
 }

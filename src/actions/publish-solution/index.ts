@@ -10,9 +10,10 @@ import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory } from '../.
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('publish-solution:');
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
         await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
         const publishArgs = ['solution', 'publish'];
@@ -22,5 +23,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    }  finally {
+        await pac?.run(["auth", "clear"]);
     }
 }
