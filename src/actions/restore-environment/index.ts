@@ -10,13 +10,14 @@ import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory} from '../..
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('restore-environment:');
         const sourceUrl = core.getInput('source-url', { required: true});
         const targetUrl = core.getInput('target-url', { required: true});
         const selectedBackup = core.getInput('selected-backup', { required: true});
 
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
         await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
 
         const restoreEnvArgs = ['admin', 'restore', '--source-url', sourceUrl, '--target-url', targetUrl, '--selected-backup', selectedBackup];
@@ -26,5 +27,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    } finally {
+        await pac?.run(["auth", "clear"]);
     }
 }

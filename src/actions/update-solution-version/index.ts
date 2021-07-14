@@ -11,6 +11,7 @@ import path = require('path');
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('update-solution-version:');
         const patchVersion = core.getInput('patch-version', { required: false });
@@ -22,7 +23,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
             throw error;
         }
 
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
         const updateSolutionVersionArgs = ['solution', 'version'];
 
         if (patchVersion) {
@@ -49,5 +50,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    } finally {
+        await pac?.run(["auth", "clear"]);
     }
 }

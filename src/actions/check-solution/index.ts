@@ -3,7 +3,7 @@
 import * as core from '@actions/core';
 import * as artifact from '@actions/artifact';
 import { glob } from 'glob';
-import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner } from '../../lib';
+import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner, Runner } from '../../lib';
 import path = require('path');
 import fs = require('fs-extra');
 
@@ -22,14 +22,14 @@ const ruleLevelOverride = core.getInput('rule-level-override', { required: false
 const artifactName = core.getInput('checker-logs-artifact-name', {required: false}) || 'CheckSolutionLogs';
 
 const logger = new ActionLogger();
-
+let pac: Runner;
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     if (!fs.existsSync(solutionPath)) {
         throw new Error(`The solution file could not be found at ${solutionPath}`);
     }
 
-    const pac = new PacRunner(workingDir, logger);
+    pac = new PacRunner(workingDir, logger);
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const checkArgs = ['solution', 'check', '--path', solutionPath, '--outputDirectory', outputDirectory];
@@ -51,4 +51,6 @@ const logger = new ActionLogger();
 })().catch(error => {
     core.setFailed(`failed: ${error}`);
     core.endGroup();
+}).finally(async () => {
+    await pac?.run(["auth", "clear"]);
 });

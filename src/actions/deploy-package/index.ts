@@ -12,13 +12,14 @@ import * as artifact from '@actions/artifact';
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('deploy-package:');
         const platform = os.platform();
         if (platform !== 'win32') {
             throw Error(`Unsupported runner os: '${platform}'; package deployer is only available on Windows.`);
         }
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
         const packagePath = core.getInput('package', { required: true });
         const logToConsole = 'true';
         const LogToFile = 'pac-deploy-log.txt';
@@ -40,5 +41,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    }  finally {
+        await pac?.run(["auth", "clear"]);
     }
 }

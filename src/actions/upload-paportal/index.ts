@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner } from '../../lib';
+import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner, Runner } from '../../lib';
 
 
 core.startGroup('upload-paportal:');
@@ -11,10 +11,10 @@ core.info(`upload: path:${uploadPath} `);
 const workingDir = getWorkingDirectory('working-directory', false);
 
 const logger = new ActionLogger();
-
+let pac: Runner;
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    const pac = new PacRunner(workingDir, logger);
+    pac = new PacRunner(workingDir, logger);
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const exportArgs = ['paportal', 'upload', '--path', uploadPath];
@@ -26,4 +26,6 @@ const logger = new ActionLogger();
 })().catch(error => {
     core.setFailed(`failed: ${error}`);
     core.endGroup();
+}).finally(async () => {
+    await pac?.run(["auth", "clear"]);
 });

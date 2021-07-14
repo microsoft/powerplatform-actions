@@ -10,9 +10,10 @@ import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory } from '../.
 })();
 
 export async function main(factory: RunnerFactory): Promise<void> {
+    let pac;
     try {
         core.startGroup('create-environment:');
-        const pac = factory.getRunner('pac', process.cwd());
+        pac = factory.getRunner('pac', process.cwd());
 
         const envName = core.getInput('name', { required: true});
         const envType = core.getInput('type', {required: true});
@@ -38,5 +39,7 @@ export async function main(factory: RunnerFactory): Promise<void> {
     } catch (error) {
         core.setFailed(`failed: ${error.message}`);
         throw error;
+    } finally {
+        await pac?.run(["auth", "clear"]);
     }
 }
