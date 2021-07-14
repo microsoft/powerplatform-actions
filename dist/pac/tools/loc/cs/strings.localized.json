@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Soubor {0} už existuje. Zadáním argumentu -o true přepíšete obsah.",
   "PortalDownloadInvalidJsonEditorType": "Typ {0} není platný ke stažení.",
   "PortalEntityDownloadStart": "Stahuje se {0} [{1}]...",
+  "PortalEntitySchemaError": "V souboru schématu nelze najít definici entity pro {0}.",
   "PortalEntityUploadComplete": "Nahrávání tabulky {0} bylo dokončeno.",
   "PortalEntityUploadTimeout": "Při nahrávání tabulky {0} vypršel časový limit odpovědi: nahrávání pokračuje.",
   "PortalFileReadFailure": "Soubor {0} se nepodařilo přečíst z tohoto důvodu: {1}",

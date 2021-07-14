@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Fișierul {0} există deja, furnizați argumentul -o true pentru a suprascrie conținutul",
   "PortalDownloadInvalidJsonEditorType": "Tipul: {0} nu este valid pentru descărcare",
   "PortalEntityDownloadStart": "Se descarcă: {0} [{1}]...",
+  "PortalEntitySchemaError": "Nu s-a putut găsi definiția entității pentru {0} în fișierul schemă",
   "PortalEntityUploadComplete": "Încărcare finalizată pentru tabelul: {0}",
   "PortalEntityUploadTimeout": "Expirare răspuns la încărcare pentru tabel: {0} continuă să se încarce",
   "PortalFileReadFailure": "Citirea fișierului {0} nu a reușit, din cauza {1}",

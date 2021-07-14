@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "फ़ाइल {0} पहले से ही मौजूद है. सामग्री को अधिलेखित करने के लिए -o true तर्क प्रदान करें",
   "PortalDownloadInvalidJsonEditorType": "प्रकार:{0} डाउनलोड करने के लिए मान्य नहीं है",
   "PortalEntityDownloadStart": "डाउनलोड किया जा रहा है: {0} [{1}]...",
+  "PortalEntitySchemaError": "स्कीमा फ़ाइल में {0} के लिए निकाय परिभाषा खोजने में असमर्थ",
   "PortalEntityUploadComplete": "तालिका के लिए अपलोड पूरा हुआ: {0}",
   "PortalEntityUploadTimeout": "तालिका के लिए प्रत्युत्तर टाइमआउट अपलोड करें: {0} अपलोड जारी है",
   "PortalFileReadFailure": "{1} के कारण फ़ाइल {0} को पढ़ना विफल रहा",

@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Bestand {0} bestaat al. Geef het argument -o true op om de inhoud te overschrijven",
   "PortalDownloadInvalidJsonEditorType": "Type {0} is niet geldig voor download",
   "PortalEntityDownloadStart": "Bezig met downloaden: {0} [{1}]...",
+  "PortalEntitySchemaError": "Entiteitsdefinitie kan niet worden gevonden voor {0} in het schemabestand",
   "PortalEntityUploadComplete": "Uploaden voltooid voor tabel: {0}",
   "PortalEntityUploadTimeout": "Time-out bij respons tijdens uploaden van tabel: {0} gaat door met uploaden",
   "PortalFileReadFailure": "Lezen van bestand {0} is mislukt vanwege {1}",

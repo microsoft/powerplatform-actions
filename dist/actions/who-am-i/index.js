@@ -1,22 +1,34 @@
-module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 351:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os = __importStar(__webpack_require__(87));
-const utils_1 = __webpack_require__(278);
+exports.issue = exports.issueCommand = void 0;
+const os = __importStar(__nccwpck_require__(87));
+const utils_1 = __nccwpck_require__(278);
 /**
  * Commands
  *
@@ -89,9 +101,28 @@ function escapeProperty(s) {
 /***/ }),
 
 /***/ 186:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -101,19 +132,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const command_1 = __webpack_require__(351);
-const file_command_1 = __webpack_require__(717);
-const utils_1 = __webpack_require__(278);
-const os = __importStar(__webpack_require__(87));
-const path = __importStar(__webpack_require__(622));
+exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
+const command_1 = __nccwpck_require__(351);
+const file_command_1 = __nccwpck_require__(717);
+const utils_1 = __nccwpck_require__(278);
+const os = __importStar(__nccwpck_require__(87));
+const path = __importStar(__nccwpck_require__(622));
 /**
  * The code to exit an action
  */
@@ -175,7 +200,9 @@ function addPath(inputPath) {
 }
 exports.addPath = addPath;
 /**
- * Gets the value of an input.  The value is also trimmed.
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
  *
  * @param     name     name of the input to get
  * @param     options  optional. See InputOptions.
@@ -186,9 +213,49 @@ function getInput(name, options) {
     if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
     }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
     return val.trim();
 }
 exports.getInput = getInput;
+/**
+ * Gets the values of an multiline input.  Each value is also trimmed.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string[]
+ *
+ */
+function getMultilineInput(name, options) {
+    const inputs = getInput(name, options)
+        .split('\n')
+        .filter(x => x !== '');
+    return inputs;
+}
+exports.getMultilineInput = getMultilineInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */
+function getBooleanInput(name, options) {
+    const trueValue = ['true', 'True', 'TRUE'];
+    const falseValue = ['false', 'False', 'FALSE'];
+    const val = getInput(name, options);
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+        `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+exports.getBooleanInput = getBooleanInput;
 /**
  * Sets the value of an output.
  *
@@ -197,6 +264,7 @@ exports.getInput = getInput;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
+    process.stdout.write(os.EOL);
     command_1.issueCommand('set-output', { name }, value);
 }
 exports.setOutput = setOutput;
@@ -333,23 +401,36 @@ exports.getState = getState;
 /***/ }),
 
 /***/ 717:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 // For internal use, subject to change.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
-const utils_1 = __webpack_require__(278);
+const fs = __importStar(__nccwpck_require__(747));
+const os = __importStar(__nccwpck_require__(87));
+const utils_1 = __nccwpck_require__(278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -374,6 +455,7 @@ exports.issueCommand = issueCommand;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -393,7 +475,7 @@ exports.toCommandValue = toCommandValue;
 /***/ }),
 
 /***/ 892:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -407,20 +489,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RunnerError = exports.createCommandRunner = void 0;
-const child_process_1 = __webpack_require__(129);
-const process_1 = __webpack_require__(765);
-const os_1 = __webpack_require__(87);
+const child_process_1 = __nccwpck_require__(129);
+const process_1 = __nccwpck_require__(765);
+const os_1 = __nccwpck_require__(87);
+const process = __nccwpck_require__(765);
 function createCommandRunner(workingDir, commandPath, logger, options, agent) {
     return function run(...args) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 logInitialization(...args);
                 const allOutput = [];
-                const process = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: { PATH: process_1.env.PATH,
+                const cp = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: Object.assign({ PATH: process_1.env.PATH,
                         "PP_TOOLS_AUTOMATION_AGENT": agent
-                    } }, options));
-                process.stdout.on("data", logData(logger.log));
-                process.stderr.on("data", logData(logger.error));
+                    }, process.env) }, options));
+                cp.stdout.on("data", logData(logger.log));
+                cp.stderr.on("data", logData(logger.error));
                 function logData(logFunction) {
                     return (data) => {
                         `${data}`.split(os_1.EOL).forEach((line) => {
@@ -429,7 +512,7 @@ function createCommandRunner(workingDir, commandPath, logger, options, agent) {
                         });
                     };
                 }
-                process.on("exit", (code) => {
+                cp.on("exit", (code) => {
                     if (code === 0) {
                         resolve(allOutput);
                     }
@@ -439,8 +522,8 @@ function createCommandRunner(workingDir, commandPath, logger, options, agent) {
                     }
                     /* Close out handles to the output streams so that we don't wait on
                         grandchild processes like pacTelemetryUpload */
-                    process.stdout.destroy();
-                    process.stderr.destroy();
+                    cp.stdout.destroy();
+                    cp.stderr.destroy();
                 });
             });
         });
@@ -464,7 +547,7 @@ exports.RunnerError = RunnerError;
 /***/ }),
 
 /***/ 302:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -477,9 +560,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const authenticate_1 = __webpack_require__(192);
-const createPacRunner_1 = __webpack_require__(226);
-const whoAmI_1 = __webpack_require__(436);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const whoAmI_1 = __nccwpck_require__(436);
 function default_1(parameters) {
     return __awaiter(this, void 0, void 0, function* () {
         const pac = createPacRunner_1.default(parameters);
@@ -495,16 +578,16 @@ exports.default = default_1;
 /***/ }),
 
 /***/ 470:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.exportSolution = exports.whoAmI = exports.createCommandRunner = void 0;
-const whoAmI_1 = __webpack_require__(302);
+const whoAmI_1 = __nccwpck_require__(302);
 exports.whoAmI = whoAmI_1.default;
-const CommandRunner_1 = __webpack_require__(892);
+const CommandRunner_1 = __nccwpck_require__(892);
 Object.defineProperty(exports, "createCommandRunner", ({ enumerable: true, get: function () { return CommandRunner_1.createCommandRunner; } }));
-const exportSolution_1 = __webpack_require__(787);
+const exportSolution_1 = __nccwpck_require__(787);
 Object.defineProperty(exports, "exportSolution", ({ enumerable: true, get: function () { return exportSolution_1.exportSolution; } }));
 
 //# sourceMappingURL=index.js.map
@@ -557,13 +640,13 @@ function addUsernamePassword(parameters) {
 /***/ }),
 
 /***/ 226:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os_1 = __webpack_require__(87);
-const path_1 = __webpack_require__(622);
-const CommandRunner_1 = __webpack_require__(892);
+const os_1 = __nccwpck_require__(87);
+const path_1 = __nccwpck_require__(622);
+const CommandRunner_1 = __nccwpck_require__(892);
 function createPacRunner({ workingDir, runnersDir, logger, agent, }) {
     return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32"
         ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe")
@@ -608,33 +691,15 @@ exports.default = whoAmI;
 
 /***/ }),
 
-/***/ 274:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const powerplatform_cli_wrapper_1 = __webpack_require__(470);
-const getCredentials_1 = __webpack_require__(429);
-const getEnvironmentUrl_1 = __webpack_require__(699);
-const runnerParameters_1 = __webpack_require__(727);
-powerplatform_cli_wrapper_1.whoAmI(Object.assign({ credentials: getCredentials_1.default(), environmentUrl: getEnvironmentUrl_1.default() }, runnerParameters_1.default));
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
 /***/ 970:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ActionLogger = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-const core = __webpack_require__(186);
+const core = __nccwpck_require__(186);
 class ActionLogger {
     info(...args) {
         core.info(args.join());
@@ -662,11 +727,11 @@ exports.ActionLogger = ActionLogger;
 /***/ }),
 
 /***/ 429:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __webpack_require__(186);
+const core_1 = __nccwpck_require__(186);
 function getCredentials() {
     const usernamePassword = {
         username: getInput("user-name"),
@@ -709,11 +774,11 @@ function isClientCredentialsValid(clientCredentials) {
 /***/ }),
 
 /***/ 699:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __webpack_require__(186);
+const core_1 = __nccwpck_require__(186);
 function getEnvironmentUrl() {
     return core_1.getInput("environment-url", { required: false });
 }
@@ -725,11 +790,11 @@ exports.default = getEnvironmentUrl;
 /***/ }),
 
 /***/ 309:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const path_1 = __webpack_require__(622);
+const path_1 = __nccwpck_require__(622);
 function getExePath(...relativePath) {
     // in mocha, __dirname resolves to the src folder of the .ts file,
     // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
@@ -759,26 +824,28 @@ exports.default = getExePath;
 /***/ }),
 
 /***/ 727:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const process_1 = __webpack_require__(765);
-const actionLogger_1 = __webpack_require__(970);
-const getExePath_1 = __webpack_require__(309);
+exports.getAutomationAgent = exports.runnerParameters = void 0;
+const process_1 = __nccwpck_require__(765);
+const actionLogger_1 = __nccwpck_require__(970);
+const getExePath_1 = __nccwpck_require__(309);
 function getAutomationAgent() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const jsonPackage = __webpack_require__(306);
+    const jsonPackage = __nccwpck_require__(306);
     const productName = jsonPackage.name.split("/")[1];
     return productName + "/" + jsonPackage.version;
 }
+exports.getAutomationAgent = getAutomationAgent;
 const runnerParameters = {
     runnersDir: getExePath_1.default(),
     workingDir: process_1.cwd(),
     logger: new actionLogger_1.ActionLogger(),
     agent: getAutomationAgent(),
 };
-exports.default = runnerParameters;
+exports.runnerParameters = runnerParameters;
 
 //# sourceMappingURL=runnerParameters.js.map
 
@@ -788,42 +855,42 @@ exports.default = runnerParameters;
 /***/ 306:
 /***/ ((module) => {
 
-module.exports = JSON.parse("{\"name\":\"@microsoft/powerplatform-actions\",\"version\":\"0.1.0\",\"description\":\"Github Action for Power Platform\",\"main\":\"index.js\",\"scripts\":{\"clean\":\"scorch\",\"build\":\"node node_modules/gulp/bin/gulp.js\",\"test\":\"node node_modules/gulp/bin/gulp.js test\",\"ci\":\"node node_modules/gulp/bin/gulp.js ci\",\"dist\":\"node node_modules/gulp/bin/gulp.js recompile && node node_modules/gulp/bin/gulp.js dist && git add -f -- ./dist\"},\"author\":\"PowerApps-ISV-Tools\",\"license\":\"MIT\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/microsoft/powerplatform-actions.git\"},\"devDependencies\":{\"@types/async\":\"^3.2.3\",\"@types/chai\":\"^4.2.12\",\"@types/fancy-log\":\"^1.3.1\",\"@types/fs-extra\":\"^9.0.1\",\"@types/glob\":\"^7.1.3\",\"@types/mocha\":\"^8.0.3\",\"@types/node\":\"^14.14.35\",\"@types/sinon\":\"^9.0.11\",\"@types/sinon-chai\":\"^3.2.5\",\"@types/uuid\":\"^8.3.0\",\"@types/yargs\":\"^15.0.5\",\"@typescript-eslint/eslint-plugin\":\"^4.1.0\",\"@typescript-eslint/parser\":\"^4.1.0\",\"@vercel/ncc\":\"^0.24.0\",\"async\":\"^3.2.0\",\"chai\":\"^4.2.0\",\"dotenv\":\"^8.2.0\",\"eslint\":\"^7.9.0\",\"glob\":\"^7.1.6\",\"gulp\":\"^4.0.2\",\"gulp-eslint\":\"^6.0.0\",\"gulp-mocha\":\"^7.0.2\",\"gulp-sourcemaps\":\"^2.6.5\",\"gulp-typescript\":\"^6.0.0-alpha.1\",\"mocha\":\"^8.1.3\",\"node-fetch\":\"^2.6.1\",\"ps-list\":\"^7.2.0\",\"rewiremock\":\"^3.14.3\",\"sinon\":\"^9.2.4\",\"sinon-chai\":\"^3.5.0\",\"ts-node\":\"^9.0.0\",\"ts-sinon\":\"^2.0.1\",\"unzip-stream\":\"^0.3.0\",\"winston\":\"^3.3.3\"},\"dependencies\":{\"@actions/artifact\":\"^0.5.1\",\"@actions/core\":\"^1.2.6\",\"@microsoft/powerplatform-cli-wrapper\":\"^0.1.14\",\"date-fns\":\"^2.16.1\",\"fancy-log\":\"^1.3.3\",\"fs-extra\":\"^9.0.1\",\"typescript\":\"^4.0.2\",\"uuid\":\"^8.3.0\",\"yargs\":\"^16.0.3\"}}");
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.28.6","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.14","date-fns":"^2.22.1","fs-extra":"^10.0.0","uuid":"^8.3.2"}}');
 
 /***/ }),
 
 /***/ 129:
 /***/ ((module) => {
 
-module.exports = require("child_process");
+module.exports = require("child_process");;
 
 /***/ }),
 
 /***/ 747:
 /***/ ((module) => {
 
-module.exports = require("fs");
+module.exports = require("fs");;
 
 /***/ }),
 
 /***/ 87:
 /***/ ((module) => {
 
-module.exports = require("os");
+module.exports = require("os");;
 
 /***/ }),
 
 /***/ 622:
 /***/ ((module) => {
 
-module.exports = require("path");
+module.exports = require("path");;
 
 /***/ }),
 
 /***/ 765:
 /***/ ((module) => {
 
-module.exports = require("process");
+module.exports = require("process");;
 
 /***/ })
 
@@ -833,10 +900,11 @@ module.exports = require("process");
 /******/ 	var __webpack_module_cache__ = {};
 /******/ 	
 /******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+/******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -848,7 +916,7 @@ module.exports = require("process");
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
-/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
 /******/ 			threw = false;
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
@@ -861,10 +929,25 @@ module.exports = require("process");
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
-/******/ 	__webpack_require__.ab = __dirname + "/";/************************************************************************/
-/******/ 	// module exports must be returned from runtime so entry inlining is disabled
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(274);
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+const powerplatform_cli_wrapper_1 = __nccwpck_require__(470);
+const getCredentials_1 = __nccwpck_require__(429);
+const getEnvironmentUrl_1 = __nccwpck_require__(699);
+const runnerParameters_1 = __nccwpck_require__(727);
+powerplatform_cli_wrapper_1.whoAmI(Object.assign({ credentials: getCredentials_1.default(), environmentUrl: getEnvironmentUrl_1.default() }, runnerParameters_1.runnerParameters));
+
+//# sourceMappingURL=index.js.map
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;

@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Файл {0} уже существует. Укажите аргумент -o true, чтобы перезаписать содержимое.",
   "PortalDownloadInvalidJsonEditorType": "Тип {0} не является допустимым типом для загрузки",
   "PortalEntityDownloadStart": "Загрузка: {0} [{1}]...",
+  "PortalEntitySchemaError": "Не удалось найти определение сущности {0} в файле схемы",
   "PortalEntityUploadComplete": "Загрузка завершена для таблицы: {0}",
   "PortalEntityUploadTimeout": "Время ожидания ответа загрузки для таблицы: {0} загрузки",
   "PortalFileReadFailure": "Не удалось прочитать файл {0}. Причина: {1}",

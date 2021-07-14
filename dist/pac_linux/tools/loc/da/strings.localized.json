@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Filen {0} findes allerede. Angiv argumentet -o sand for at overskrive indholdet",
   "PortalDownloadInvalidJsonEditorType": "Typen: {0} er ikke gyldig til download",
   "PortalEntityDownloadStart": "Downloader: {0} [{1}]...",
+  "PortalEntitySchemaError": "Objektdefinitionen for {0} blev ikke fundet i skemafilen",
   "PortalEntityUploadComplete": "Upload blev fuldført for tabellen: {0}",
   "PortalEntityUploadTimeout": "Timeout for uploadsvar for tabellen: {0} fortsætter upload",
   "PortalFileReadFailure": "Læsning af filen {0} mislykkedes på grund af {1}",

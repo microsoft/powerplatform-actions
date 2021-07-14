@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "{0} файлы бұрыннан бар. мазмұнды қайта жазу үшін -o true дәлелін келтіріңіз",
   "PortalDownloadInvalidJsonEditorType": "Түрі: жүктеп алу үшін {0} жарамды емес",
   "PortalEntityDownloadStart": "Жүктеп алынуда: {0} [{1}]...",
+  "PortalEntitySchemaError": "Схема файлынан {0} нысан анықтамасын табу мүмкін емес",
   "PortalEntityUploadComplete": "Кестені жүктеп салу аяқталды: {0}",
   "PortalEntityUploadTimeout": "Кесте бойынша жауапты жүктеп салу уақыты бітті: {0} жүктеп салынуда",
   "PortalFileReadFailure": "{1} байланысты {0} файлын оқу сәтсіз болды",

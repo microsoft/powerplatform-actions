@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Датотека {0} већ постоји. Наведите аргумент „-o true“ да бисте заменили садржај",
   "PortalDownloadInvalidJsonEditorType": "Тип: {0} није важећи за преузимање",
   "PortalEntityDownloadStart": "Преузимање: {0} [{1}]...",
+  "PortalEntitySchemaError": "Није могуће пронаћи дефиницију ентитета за {0} у датотеци шеме",
   "PortalEntityUploadComplete": "Отпремање је довршено за табелу: {0}",
   "PortalEntityUploadTimeout": "Истек времена за одговор на отпремање за табелу: {0}, наставак отпремања",
   "PortalFileReadFailure": "Читање датотеке {0} није успело због {1}",

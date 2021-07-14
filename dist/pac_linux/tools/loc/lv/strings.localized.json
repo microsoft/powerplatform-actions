@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Fails {0} jau pastāv. Norādiet -o true argumentu, lai pārrakstītu saturu.",
   "PortalDownloadInvalidJsonEditorType": "Tips:{0} nav derīgs lejupielādei",
   "PortalEntityDownloadStart": "Notiek lejupielāde: {0} [{1}]...",
+  "PortalEntitySchemaError": "Shēmas failā nevar atrast entītijas definīciju šim: {0}",
   "PortalEntityUploadComplete": "Augšupielāde pabeigta tabulai: {0}",
   "PortalEntityUploadTimeout": "Atbildes taimauta augšupielāde tabulai: {0} augšupielādes turpināšana",
   "PortalFileReadFailure": "Neizdevās lasīt failu {0} šāda iemesla dēļ: {1}",
