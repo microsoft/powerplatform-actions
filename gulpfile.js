@@ -29,6 +29,9 @@ const distdir = path.resolve('./dist');
 
 const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
+// list actions (by their name) that are not ready for release yet (see dist task below):
+const underFeatureFlagActions = [ 'download-paportal', 'upload-paportal' ];
+
 async function clean() {
     (await pslist())
         .filter((info) => info.name.startsWith('pacTelemetryUpload'))
@@ -154,6 +157,7 @@ async function dist() {
         // ignore the toplevel action.yml that is needed for GH Marketplace
         .filter(actionYaml => path.dirname(actionYaml) !== '.')
         .map(actionYaml => path.basename(path.dirname(actionYaml)))
+        .filter(actionName => !underFeatureFlagActions.includes(actionName))
         .map((actionName, idx) => {
             const actionDir = path.resolve(distdir, 'actions', actionName)
             log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
