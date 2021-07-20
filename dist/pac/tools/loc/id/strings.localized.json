@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "File {0} sudah ada. Masukkan argumen -o true untuk menimpa konten",
   "PortalDownloadInvalidJsonEditorType": "Jenis:{0} tidak valid untuk diunduh",
   "PortalEntityDownloadStart": "Mengunduh: {0} [{1}]...",
+  "PortalEntitySchemaError": "Tidak dapat menemukan definisi entitas untuk {0} dalam file skema",
   "PortalEntityUploadComplete": "Pengunggahan selesai untuk tabel: {0}",
   "PortalEntityUploadTimeout": "Batas waktu respons pengunggahan tabel: {0} melanjutkan pengunggahan",
   "PortalFileReadFailure": "Gagal membaca file {0} karena {1}",

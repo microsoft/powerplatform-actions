@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "הקובץ {0} כבר קיים. ספק ארגומנט ‎-o true כדי להחליף את התוכן",
   "PortalDownloadInvalidJsonEditorType": "סוג:{0} לא חוקי להורדה",
   "PortalEntityDownloadStart": "מוריד: {0} [{1}]...",
+  "PortalEntitySchemaError": "לא ניתן למצוא הגדרת ישות עבור {0} בקובץ הסכימה",
   "PortalEntityUploadComplete": "ההעלאה הושלמה עבור הטבלה: {0}",
   "PortalEntityUploadTimeout": "זמן קצוב לתגובת העלאה עבור טבלה: {0} ממשיך בהעלאה",
   "PortalFileReadFailure": "קריאת הקובץ {0} נכשלה, בשל {1}",

@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Fail {0} on juba olemas. Esitage –o true argument sisu ülekirjutamiseks",
   "PortalDownloadInvalidJsonEditorType": "Tüüpi {0} ei saa alla laadida",
   "PortalEntityDownloadStart": "Allalaadimine: {0} [{1}]...",
+  "PortalEntitySchemaError": "Üksuse {0} olemimääratlust ei leitud skeemifailist",
   "PortalEntityUploadComplete": "Tabeli {0} üleslaadimine on lõpule viidud",
   "PortalEntityUploadTimeout": "Tabeli üleslaadimise tagasiside ajalõpp: {0} üleslaadimine jätkub",
   "PortalFileReadFailure": "Faili {0} lugemine nurjus põhjusel {1}",

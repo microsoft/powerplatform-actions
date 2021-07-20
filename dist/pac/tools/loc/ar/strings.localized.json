@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "الملف {0} موجود بالفعل. يُرجى توفير الوسيطة -o صواب لاستبدال المحتوى",
   "PortalDownloadInvalidJsonEditorType": "النوع: {0} غير صالح للتنزيل",
   "PortalEntityDownloadStart": "جارٍ تنزيل: {0} [{1}]...",
+  "PortalEntitySchemaError": "يتعذر العثور على تعريف الكيان لـ {0} في ملف المخطط",
   "PortalEntityUploadComplete": "اكتمل التحميل للجدول: {0}",
   "PortalEntityUploadTimeout": "انقضاء مهلة تحميل الردود للجدول: {0} متابعة التحميل",
   "PortalFileReadFailure": "فشل قراءة الملف {0}، بسبب {1}",

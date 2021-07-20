@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Failas {0} jau yra. Pateikite -o true argumentą, kad perrašytumėte turinį",
   "PortalDownloadInvalidJsonEditorType": "Tipas: {0} netinkamas atsisiųsti",
   "PortalEntityDownloadStart": "Atsisiunčiama {0} [{1}]...",
+  "PortalEntitySchemaError": "Schemos faile nepavyksta rasti {0} objekto aprašo",
   "PortalEntityUploadComplete": "Lentelė nusiųsta: {0}",
   "PortalEntityUploadTimeout": "Lentelės įkėlimo atsakymo skirtasis laikas: {0} atlikus įkėlimą",
   "PortalFileReadFailure": "Nepavyko perskaityti failo {0} dėl {1}",

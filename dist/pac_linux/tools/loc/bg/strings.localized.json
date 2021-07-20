@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Файлът {0} вече съществува. Предоставете -o true аргумент, за да презапишете съдържанието",
   "PortalDownloadInvalidJsonEditorType": "Тип: {0} не е валиден за изтегляне",
   "PortalEntityDownloadStart": "Изтегляне: {0} [{1}]...",
+  "PortalEntitySchemaError": "Не може да се намери дефиниция на обект за {0} във файла на схемата",
   "PortalEntityUploadComplete": "Качването е завършено за таблица: {0}",
   "PortalEntityUploadTimeout": "Време за изчакване на отговора за качване за таблица: {0} продължава качването",
   "PortalFileReadFailure": "Четенето на файла {0} е неуспешно поради {1}",

@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Το αρχείο \"{0}\" υπάρχει ήδη. Προσθέστε το όρισμα -o true για να αντικαταστήσετε το περιεχόμενο",
   "PortalDownloadInvalidJsonEditorType": "Τύπος: Το \"{0}\" δεν είναι έγκυρο για λήψη",
   "PortalEntityDownloadStart": "Λήψη: {0} [{1}]...",
+  "PortalEntitySchemaError": "Δεν είναι δυνατή η εύρεση του ορισμού οντότητας για το {0} στο αρχείο σχήματος",
   "PortalEntityUploadComplete": "Η αποστολή ολοκληρώθηκε για τον πίνακα: {0}",
   "PortalEntityUploadTimeout": "Αποστολή χρονικού ορίου απόκρισης για τον πίνακα: συνέχιση αποστολής {0}",
   "PortalFileReadFailure": "Η ανάγνωση του αρχείου \"{0}\" απέτυχε. Αιτία: {1}",
