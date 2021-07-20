@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "El fitxer {0} ja existeix. Proporcioneu l’argument -o true per sobreescriure’n el contingut",
   "PortalDownloadInvalidJsonEditorType": "Tipus:{0} no és vàlid per a la baixada",
   "PortalEntityDownloadStart": "S’està baixant: {0} [{1}]...",
+  "PortalEntitySchemaError": "No es pot trobar la definició d'entitat per a {0} al fitxer d'esquema",
   "PortalEntityUploadComplete": "Càrrega completada per a la taula: {0}",
   "PortalEntityUploadTimeout": "Temps d’espera de la resposta de càrrega per a la taula: la càrrega de {0} continua",
   "PortalFileReadFailure": "No s'ha pogut llegir el fitxer {0} a causa de {1}",

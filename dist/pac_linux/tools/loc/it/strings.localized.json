@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "File {0} già esistente. Fornisci l'argomento -o true per sovrascrivere il contenuto",
   "PortalDownloadInvalidJsonEditorType": "Il tipo:{0} non è valido per il download",
   "PortalEntityDownloadStart": "Download di {0} [{1}] in corso...",
+  "PortalEntitySchemaError": "Impossibile trovare la definizione dell'entità per {0} nel file dello schema",
   "PortalEntityUploadComplete": "Caricamento completato per la tabella: {0}",
   "PortalEntityUploadTimeout": "Timeout di caricamento della risposta per la tabella: caricamento di {0} in corso",
   "PortalFileReadFailure": "Lettura del file {0} non riuscito, a causa di {1}",

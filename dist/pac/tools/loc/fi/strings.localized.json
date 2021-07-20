@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Tiedosto {0} on jo olemassa. Korvaa sisältö antamalla argumentti '-o true'",
   "PortalDownloadInvalidJsonEditorType": "Tyyppi {0} ei ole sovellu ladattavaksi",
   "PortalEntityDownloadStart": "Ladataan: {0} [{1}]...",
+  "PortalEntitySchemaError": "Rakennetiedostosta ei löydy kohteen {0} entiteettimääritystä",
   "PortalEntityUploadComplete": "Taulukon {0} lataus palvelimeen valmis",
   "PortalEntityUploadTimeout": "Palvelimeen lataamisen vastauksen aikakatkaisu taulukolle {0}, jatketaan lataamista",
   "PortalFileReadFailure": "Tiedoston {0} lukeminen epäonnistui, syy: {1}",

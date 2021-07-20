@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Tệp {0} đã tồn tại, hãy cung cấp đối số -o true để ghi đè nội dung",
   "PortalDownloadInvalidJsonEditorType": "Loại:{0} không còn hợp lệ để tải xuống",
   "PortalEntityDownloadStart": "Đang tải xuống: {0} [{1}]...",
+  "PortalEntitySchemaError": "Không tìm thấy định nghĩa thực thể cho {0} trong tệp sơ đồ",
   "PortalEntityUploadComplete": "Đã hoàn tất tải lên cho bảng: {0}",
   "PortalEntityUploadTimeout": "Tải thời gian chờ phản hồi cho bảng lên: {0} đang tiếp tục tải lên",
   "PortalFileReadFailure": "Không đọc được tệp {0} do {1}",

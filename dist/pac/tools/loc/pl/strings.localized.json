@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Plik {0} już istnieje. Podaj argument „-o true”, aby zastąpić zawartość.",
   "PortalDownloadInvalidJsonEditorType": "Typ {0} nie jest prawidłowym typem do pobrania",
   "PortalEntityDownloadStart": "Trwa pobieranie: {0} [{1}]...",
+  "PortalEntitySchemaError": "Nie można odnaleźć definicji encji {0} w pliku schematu",
   "PortalEntityUploadComplete": "Przekazywanie zostało zakończone dla tabeli: {0}",
   "PortalEntityUploadTimeout": "Przekroczono limit czasu przekazywania odpowiedzi dla tabeli {0}; kontynuowanie przekazywania",
   "PortalFileReadFailure": "Odczytywanie pliku {0} nie powiodło się. Przyczyna: {1}.",
