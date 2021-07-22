@@ -30,7 +30,7 @@ const distdir = path.resolve('./dist');
 const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
 // list actions (by their name) that are not ready for release yet (see dist task below):
-const underFeatureFlagActions = [ 'download-paportal', 'upload-paportal' ];
+const underFeatureFlagActions = [ ];
 
 async function clean() {
     (await pslist())
