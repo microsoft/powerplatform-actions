@@ -39,7 +39,6 @@ jobs:
       run: npm ci
 
     - name: Download CDSStarterPortal package from portal authenticated feed
-      uses: actions/setup-node@v2
       run: gulp fetchPortalPackage --feedPAT OneCRM_DevOps_Read_PAT
 
     - name: Test create-source-environment action with appId-clientSecret
