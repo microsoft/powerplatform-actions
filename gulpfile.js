@@ -84,8 +84,6 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
     version = version.toLowerCase();
     const packagePath = `${packageName}/${version}/${packageName}.${version}.nupkg`;
 
-    log.info('The PAT is ' + argv.feedPAT)
-
     const nupkgUrl = new URL(packagePath, baseUrl);
     const reqInit = {
         headers: {

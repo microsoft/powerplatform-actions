@@ -35,8 +35,8 @@ jobs:
       with:
         node-version: '12.x'
 
-    - name: Install dependencies
-      run: npm ci
+    - name: Install gulp
+      run: npm install gulp
 
     - name: Download CDSStarterPortal package from portal authenticated feed
       run: gulp fetchPortalPackage --feedPAT OneCRM_DevOps_Read_PAT
