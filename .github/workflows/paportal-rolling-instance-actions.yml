@@ -6,11 +6,6 @@ name: paportal-rolling-instance-actions
 
 on:
   workflow_dispatch:    # allow for manual workflow triggering as needed
-    inputs:
-      runSlowCRUD:
-        description: 'run slow operation for paportal command download,import pacakge and download/upload portal data'
-        required: false
-        default: 'yes'
 
   push:
     branches: [ main ]
