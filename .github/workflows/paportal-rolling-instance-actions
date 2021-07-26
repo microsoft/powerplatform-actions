@@ -1,0 +1,108 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Actions workflow for merges to main
+name: paportal-rolling-instance-actions
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Run paportal command after installing portal packages on a fresh environment'
+        default: 'paportal-rolling-instance-actions'
+        required: false
+        
+  push:
+    branches: [ main ]
+
+jobs:
+  instance-actions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+      fail-fast: false
+    env:
+      RUNNER_DEBUG: 1
+      WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+      WF_APPID: 8a7729e0-2b71-4919-a89a-c789d0a9720a
+      WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 14.x
+        registry-url: https://npm.pkg.github.com
+
+    - name: Build and test
+      run: |
+        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
+        npm ci
+      env:
+        AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
+
+    - name: Download CDSStarterPortal package from portal authenticated feed
+      run: gulp fetchPortalPackage --feedPAT ${{ secrets.OneCRM_DevOps_Read_PAT }}
+
+    - name: Test create-source-environment action with appId-clientSecret
+      uses: ./create-environment
+      id: create-source-environment
+      with:
+        app-id: ${{ env.WF_APPID }}
+        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
+        name: sourceEnvironment
+        type: Sandbox
+        region: unitedstates
+        domain: test-source
+
+    - name: Use deploy-package action with username-password
+      if: matrix.os == 'windows-latest'
+      uses: ./deploy-package
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
+        package: 'out\portal_package\Adxstudio.CDSStarterPortal.dll'
+
+    - name: Test paportal-download action with username/password
+      uses: ./download-paportal
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        website-id: f46b70cc-580b-4f1a-87c3-41deb48eb90d
+        download-path: ./paportal-download
+
+    - name: Test paportal-upload action with username/password
+      uses: ./upload-paportal
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        upload-path: ./paportal-download/starter-portal
+
+    - name: Test delete-source-environment action with appId-clientSecret
+      if: always() # Clean up created environments even on failed run
+      uses: ./delete-environment
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Upload pac CLI logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: pac-cli-log ${{ matrix.os }}
+        path: ./dist/pac*/tools/logs/pac-log.txt
