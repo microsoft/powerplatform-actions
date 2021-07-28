@@ -70,6 +70,11 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
             // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
             baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/b0441cf8-0bc8-4fad-b126-841a6184e784/nuget/v3/flat2/'
         },
+        'PowerPortalPackages': {
+            authenticated: true,
+            // https://dynamicscrm.visualstudio.com/DefaultCollection/OneCRM/_packaging?_a=feed&feed=PowerPortalPackages
+            baseUrl: 'https://pkgs.dev.azure.com/dynamicscrm/b276c3e1-2902-46bd-a686-484157b97f48/_packaging/63f896c0-b555-4017-a932-9063f2e7487e/nuget/v3/flat2/'
+        },
     }
 
     const selectedFeed = feeds[nugetSource];
@@ -105,7 +110,8 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
         res = await fetch(location, reqInit);
     }
     if (!res.ok) {
-        throw new Error(`Cannot download ${res.url}, status: ${res.statusText} (${res.status}), body: ${res.body.read().toString('ascii')}`);
+        const body = res.body.read();
+        throw new Error(`Cannot download ${res.url}, status: ${res.statusText} (${res.status}), body: ${body ? body.toString('ascii') : 'null'}`);
     }
 
     log.info(`Extracting into folder: ${targetDir}`);
@@ -197,6 +203,36 @@ async function addDistToIndex() {
 
 const cliVersion = '1.8.5';
 
+async function nugetInstallPortalPackages() {
+    const packageName = "CDSStarterPortal"
+    const packageNameToImport = `Adxstudio.${packageName}`
+    const downloadDir = path.resolve(outdir, 'temp_portal_package', 'download');
+    const downloadedZipFile = path.resolve(downloadDir,`${packageName}.zip`);
+    const portalPackageOutDir = path.resolve(outdir , 'portal_package')
+
+    await nugetInstall('PowerPortalPackages', 'cdsstarterportal', '9.2.2103.21', downloadDir );
+
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(downloadedZipFile)
+        .pipe(unzip.Parse())
+        .on('entry', function (entry) {
+            var filePath = entry.path;
+            if (filePath === `${packageNameToImport}.zip`) {
+                entry.pipe(unzip.Extract({ path: portalPackageOutDir}))
+                .on('close', () => {
+                    log.info(`Extracted portal package to ${portalPackageOutDir} `);
+                    fs.rmdirSync(path.resolve(outdir, 'temp_portal_package'), { recursive: true })
+                    resolve();
+                }).on('error', err => {
+                    reject(err);
+                })
+            } else {
+                entry.autodrain();
+            }
+        })
+    });
+}
+
 async function nugetInstallLinux() {
     await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
     await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
@@ -211,6 +247,10 @@ async function restore() {
     await clean();
     await nugetInstallLinux();
     await nugetInstallWindows();
+}
+
+async function fetchPortalPackage() {
+    await nugetInstallPortalPackages()
 }
 
 
@@ -237,5 +277,6 @@ exports.updateDist = gulp.series(
     addDistToIndex,
 );
 exports.addDistToIndex = addDistToIndex;
+exports.fetchPortalPackage = fetchPortalPackage
 
 exports.default = exports.recompile;
