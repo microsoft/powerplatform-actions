@@ -204,37 +204,6 @@ async function addDistToIndex() {
 const cliVersion = '1.8.5';
 
 async function nugetInstallPortalPackages() {
-    const downloadDir = path.resolve(outdir, 'temp_portal_package', 'download');
-    const unzpiDir = path.resolve(outdir, 'temp_portal_package', 'unzipped_package');
-    const packageName = "CDSStarterPortal"
-    const packageNameToImport = `Adxstudio.${packageName}`
-    const portalPackageOutDir = path.resolve(outdir , 'portal_package')
-
-    await nugetInstall('PowerPortalPackages', 'cdsstarterportal', '9.2.2103.21', downloadDir );
-
-    log.info(`Extracting package zip into folder: ${unzpiDir}`);
-    return new Promise((resolve, reject) => {
-        fs.createReadStream(path.resolve(downloadDir, `${packageName}.zip`)).pipe(unzip.Extract({ path: unzpiDir }))
-            .on('close', () => {
-                fs.createReadStream(path.resolve(unzpiDir , `${packageNameToImport}.zip`)).pipe(unzip.Extract({ path: portalPackageOutDir}))
-                    .on('close', () => {
-                        log.info(`Extracted portal package to ${portalPackageOutDir} `);
-                        fs.rmdir(path.resolve(outdir, 'temp_portal_package'), { recursive: true }, (err) => {
-                            if (err) {
-                                reject(err);
-                            }
-                            resolve();
-                        });
-                    }).on('error', err => {
-                        reject(err);
-                    })
-            }).on('error', err => {
-                reject(err);
-            })
-    });
-}
-
-async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
     const packageNameToImport = `Adxstudio.${packageName}`
     const downloadDir = path.resolve(outdir, 'temp_portal_package', 'download');
