@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "{0} dosyası zaten mevcut. İçeriğin üzerine yazmak için -o true bağımsız değişkenini kullanın",
   "PortalDownloadInvalidJsonEditorType": "Tür:{0} indirme için geçerli değil",
   "PortalEntityDownloadStart": "İndiriliyor: {0} [{1}]...",
+  "PortalEntitySchemaError": "Şema dosyasında {0} için varlık tanımı bulunamıyor",
   "PortalEntityUploadComplete": "Tablo için yükleme tamamlandı: {0}",
   "PortalEntityUploadTimeout": "Tablo için yanıt yükleme zaman aşımı: {0} yüklemeye devam ediyor",
   "PortalFileReadFailure": "{1} nedeniyle {0} dosyası okunamadı",

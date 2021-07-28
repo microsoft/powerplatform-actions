@@ -474,7 +474,7 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 411:
+/***/ 133:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
@@ -488,59 +488,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.main = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __nccwpck_require__(186);
 const lib_1 = __nccwpck_require__(806);
-const path = __nccwpck_require__(622);
+core.startGroup('download-paportal:');
+const downloadPath = core.getInput('download-path', { required: true });
+const websiteId = core.getInput('website-id', { required: true });
+core.info(`downloadPath: path:${downloadPath} websiteId: ${websiteId} `);
+const workingDir = lib_1.getWorkingDirectory('working-directory', false);
+const logger = new lib_1.ActionLogger();
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    if (process.env.GITHUB_ACTIONS) {
-        yield main(lib_1.DefaultRunnerFactory);
-    }
-}))();
-function main(factory) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let pac;
-        try {
-            core.startGroup('update-solution-version:');
-            const patchVersion = core.getInput('patch-version', { required: false });
-            const strategy = core.getInput('strategy', { required: false });
-            if (!!patchVersion === !!strategy) {
-                const error = new Error("Input 'patch-version': not allowed with input 'strategy'");
-                core.setFailed(error);
-                throw error;
-            }
-            pac = factory.getRunner('pac', process.cwd());
-            const updateSolutionVersionArgs = ['solution', 'version'];
-            if (patchVersion) {
-                updateSolutionVersionArgs.push('--patchversion', patchVersion);
-            }
-            if (strategy) {
-                updateSolutionVersionArgs.push('--strategy', strategy);
-            }
-            const workingDir = lib_1.getWorkingDirectory('working-directory', false);
-            const trackerFileCandidate = core.getInput('tracker-file', { required: false });
-            if (trackerFileCandidate) {
-                const trackerFile = path.isAbsolute(trackerFileCandidate)
-                    ? trackerFileCandidate
-                    : path.resolve(workingDir, trackerFileCandidate);
-                updateSolutionVersionArgs.push('--filename', trackerFile);
-            }
-            yield pac.run(updateSolutionVersionArgs);
-            core.info('updated solution version');
-            core.endGroup();
-        }
-        catch (error) {
-            core.setFailed(`failed: ${error.message}`);
-            throw error;
-        }
-        finally {
-            yield (pac === null || pac === void 0 ? void 0 : pac.run(["auth", "clear"]));
-        }
-    });
-}
-exports.main = main;
+    const pac = new lib_1.PacRunner(workingDir, logger);
+    yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.CDS);
+    const exportArgs = ['paportal', 'download', '--path', downloadPath, '--websiteId', websiteId];
+    yield pac.run(exportArgs);
+    core.info(`downloading portal data for websiteId: ${websiteId} at location : ${downloadPath}`);
+    core.endGroup();
+}))().catch(error => {
+    core.setFailed(`failed: ${error}`);
+    core.endGroup();
+});
 
 //# sourceMappingURL=index.js.map
 
@@ -1214,7 +1183,7 @@ module.exports = require("process");;
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(411);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(133);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

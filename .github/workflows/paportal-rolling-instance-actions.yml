@@ -6,6 +6,11 @@ name: paportal-rolling-instance-actions
 
 on:
   workflow_dispatch:    # allow for manual workflow triggering as needed
+    inputs:
+      runPAPortalTests:
+        description: 'Run paportal commands by installing portal packages in fresh environment'
+        required: false
+        default: 'yes'
 
   push:
     branches: [ main ]

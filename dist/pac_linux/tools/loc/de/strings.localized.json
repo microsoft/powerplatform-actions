@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Die Datei {0} ist bereits vorhanden. Geben Sie -o true-Argument zum Überschreiben des Inhalts an.",
   "PortalDownloadInvalidJsonEditorType": "Typ: {0} ist zum Herunterladen nicht gültig",
   "PortalEntityDownloadStart": "Wird heruntergeladen: {0} [{1}] ...",
+  "PortalEntitySchemaError": "Die Entitätsdefinition zur Entität {0} wurde in der Schemadatei nicht gefunden.",
   "PortalEntityUploadComplete": "Upload für Tabelle abgeschlossen: {0}",
   "PortalEntityUploadTimeout": "Zeitüberschreitung beim Hochladen der Antwort bei Tabelle {0}. Das Hochladen wird fortgesetzt.",
   "PortalFileReadFailure": "Fehler beim Lesen der Datei {0} aufgrund von {1}",

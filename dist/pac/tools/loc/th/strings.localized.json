@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "ไฟล์ {0} มีอยู่แล้ว ระบุอาร์กิวเมนต์-o true เพื่อเขียนทับเนื้อหา",
   "PortalDownloadInvalidJsonEditorType": "ชนิด:{0} ไม่ใช่ชนิดที่ถูกต้องในการดาวน์โหลด",
   "PortalEntityDownloadStart": "กำลังดาวน์โหลด: {0} [{1}]...",
+  "PortalEntitySchemaError": "ไม่พบคำจำกัดความเอนทิตีสำหรับ {0} ในไฟล์ Schema",
   "PortalEntityUploadComplete": "การอัปโหลดเสร็จสมบูรณ์สำหรับตาราง: {0}",
   "PortalEntityUploadTimeout": "การอัปโหลดคำตอบหมดเวลาสำหรับตาราง: อัปโหลด {0} ต่อไป",
   "PortalFileReadFailure": "การอ่านไฟล์ {0} ล้มเหลวเนื่องจาก {1}",

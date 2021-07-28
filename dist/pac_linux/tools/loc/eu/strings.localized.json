@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Lehendik dago {0} fitxategia. Eman \"-o true\" argumentu bat edukia gainidazteko.",
   "PortalDownloadInvalidJsonEditorType": "{0} mota ezin da deskargatu",
   "PortalEntityDownloadStart": "Deskargatzen: {0} [{1}]...",
+  "PortalEntitySchemaError": "Ezin da aurkitu honen entitate-definizioa eskema-fitxategian: {0}",
   "PortalEntityUploadComplete": "Kargatu da taula hau: {0}",
   "PortalEntityUploadTimeout": "{0} taula kargatzean erantzuna jasotzeko denbora-muga gainditu da. Karga jarraitzen.",
   "PortalFileReadFailure": "Ezin izan da irakurri {0} fitxategia, arrazoi honengatik: {1}",

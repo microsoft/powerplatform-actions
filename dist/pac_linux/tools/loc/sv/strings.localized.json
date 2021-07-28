@@ -326,6 +326,7 @@
   "PortalDownloadFileAlreadyExist": "Filen {0} finns redan. Ange argumentet -o true för att skriva över innehållet",
   "PortalDownloadInvalidJsonEditorType": "Typen {0} går inte att ladda ned",
   "PortalEntityDownloadStart": "Laddar ned: {0} [{1}]...",
+  "PortalEntitySchemaError": "Det gick inte att hitta entitetsdefinitionen för {0} i schemafilen",
   "PortalEntityUploadComplete": "Tabellen {0} har laddats upp",
   "PortalEntityUploadTimeout": "Timeout för uppladdningssvar för tabell: {0} fortsätter uppladdningen",
   "PortalFileReadFailure": "Det gick inte att läsa filen {0} på grund av {1}",

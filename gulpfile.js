@@ -29,6 +29,9 @@ const distdir = path.resolve('./dist');
 
 const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
+// list actions (by their name) that are not ready for release yet (see dist task below):
+const underFeatureFlagActions = [ ];
+
 async function clean() {
     (await pslist())
         .filter((info) => info.name.startsWith('pacTelemetryUpload'))
@@ -61,6 +64,11 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
             authenticated: true,
             // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
             baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/d3fb5788-d047-47f9-9aba-76890f5cecf0/nuget/v3/flat2/'
+        },
+        'CAP_ISVExp_Tools_Stable': {
+            authenticated: true,
+            // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
+            baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/b0441cf8-0bc8-4fad-b126-841a6184e784/nuget/v3/flat2/'
         },
         'PowerPortalPackages': {
             authenticated: true,
@@ -160,6 +168,7 @@ async function dist() {
         // ignore the toplevel action.yml that is needed for GH Marketplace
         .filter(actionYaml => path.dirname(actionYaml) !== '.')
         .map(actionYaml => path.basename(path.dirname(actionYaml)))
+        .filter(actionName => !underFeatureFlagActions.includes(actionName))
         .map((actionName, idx) => {
             const actionDir = path.resolve(distdir, 'actions', actionName)
             log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
@@ -192,7 +201,38 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.7.5-daily-21063017';
+const cliVersion = '1.8.5';
+
+async function nugetInstallPortalPackages() {
+    const downloadDir = path.resolve(outdir, 'temp_portal_package', 'download');
+    const unzpiDir = path.resolve(outdir, 'temp_portal_package', 'unzipped_package');
+    const packageName = "CDSStarterPortal"
+    const packageNameToImport = `Adxstudio.${packageName}`
+    const portalPackageOutDir = path.resolve(outdir , 'portal_package')
+
+    await nugetInstall('PowerPortalPackages', 'cdsstarterportal', '9.2.2103.21', downloadDir );
+
+    log.info(`Extracting package zip into folder: ${unzpiDir}`);
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(path.resolve(downloadDir, `${packageName}.zip`)).pipe(unzip.Extract({ path: unzpiDir }))
+            .on('close', () => {
+                fs.createReadStream(path.resolve(unzpiDir , `${packageNameToImport}.zip`)).pipe(unzip.Extract({ path: portalPackageOutDir}))
+                    .on('close', () => {
+                        log.info(`Extracted portal package to ${portalPackageOutDir} `);
+                        fs.rmdir(path.resolve(outdir, 'temp_portal_package'), { recursive: true }, (err) => {
+                            if (err) {
+                                reject(err);
+                            }
+                            resolve();
+                        });
+                    }).on('error', err => {
+                        reject(err);
+                    })
+            }).on('error', err => {
+                reject(err);
+            })
+    });
+}
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
@@ -225,12 +265,12 @@ async function nugetInstallPortalPackages() {
 }
 
 async function nugetInstallLinux() {
-    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
+    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
     await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
 }
 
 async function nugetInstallWindows() {
-    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
+    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
     await nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.79', path.resolve(outdir, 'sopa'));
 }
 
