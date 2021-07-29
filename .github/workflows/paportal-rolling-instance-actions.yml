@@ -111,6 +111,10 @@ jobs:
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
 
     steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+
     - name: Test paportal-download action with username/password
       uses: ./download-paportal
       with:
