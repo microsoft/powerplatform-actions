@@ -7,6 +7,8 @@ import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner, Ru
 core.startGroup('upload-paportal:');
 const uploadPath = core.getInput('upload-path', { required: true });
 core.info(`upload: path:${uploadPath} `);
+const deploymentProfile = core.getInput('deployment-profile', { required: false });
+core.info(`deploymentProfile: ${deploymentProfile} `);
 
 const workingDir = getWorkingDirectory('working-directory', false);
 
@@ -18,6 +20,7 @@ let pac: Runner;
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
 
     const exportArgs = ['paportal', 'upload', '--path', uploadPath];
+    if (deploymentProfile) { exportArgs.push('--deploymentProfile', deploymentProfile); }
 
     await pac.run(exportArgs);
     core.info(`uploading portal data to current profile from: ${uploadPath}`);

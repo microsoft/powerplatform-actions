@@ -31,6 +31,10 @@ inputs:
     description: 'Path from where the website content will be uploaded'
     required: true
 
+  deployment-profile:
+    description: 'Deployment profile name to be used. Defaults to "default"'
+    required: false
+
   working-directory:
     description: 'Working directory; default: root of repository'
     required: false
