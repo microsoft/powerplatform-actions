@@ -495,6 +495,8 @@ const lib_1 = __nccwpck_require__(806);
 core.startGroup('upload-paportal:');
 const uploadPath = core.getInput('upload-path', { required: true });
 core.info(`upload: path:${uploadPath} `);
+const deploymentProfile = core.getInput('deployment-profile', { required: false });
+core.info(`deploymentProfile: ${deploymentProfile} `);
 const workingDir = lib_1.getWorkingDirectory('working-directory', false);
 const logger = new lib_1.ActionLogger();
 let pac;
@@ -503,6 +505,9 @@ let pac;
     pac = new lib_1.PacRunner(workingDir, logger);
     yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.CDS);
     const exportArgs = ['paportal', 'upload', '--path', uploadPath];
+    if (deploymentProfile) {
+        exportArgs.push('--deploymentProfile', deploymentProfile);
+    }
     yield pac.run(exportArgs);
     core.info(`uploading portal data to current profile from: ${uploadPath}`);
     core.endGroup();
