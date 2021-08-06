@@ -32,6 +32,8 @@
     -->
     <resources>
       <code path="index.ts" order="1"/>
+      <platform-library name="React" version="$pcfReactVersion$" />
+      <platform-library name="Fluent" version="$pcfFluentVersion$" />
       <!-- UNCOMMENT TO ADD MORE RESOURCES
       <css path="css/$controlnameplaceholder$.css" order="1" />
       <resx path="strings/$controlnameplaceholder$.1033.resx" version="1.0.0" />

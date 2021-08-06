@@ -3,6 +3,7 @@
   "verbOrg": "on",
   "verbOrgEntity": "off",
   "verbOrgQuery": "off",
+  "verbOrgList": "off",
   "verbSolutionImport": "on",
   "verbSolutionExport": "on",
   "verbSolutionClone": "on",
@@ -34,5 +35,5 @@
   "verbPAPortalBundle": "off",
   "componentSettings": "off",
   "verbCanvas": "on",
-  "verbSolutionCreateSettings": "off"
+  "verbSolutionCreateSettings": "on"
 }
