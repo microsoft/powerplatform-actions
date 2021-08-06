@@ -156,7 +156,6 @@ function binplace(compName, relativePath) {
 
 async function dist() {
     fs.emptyDirSync(distdir);
-    binplace('SoPa', path.join('sopa', 'content', 'bin', 'coretools'));
     binplace('pac CLI', path.join('pac', 'tools'));
     binplace('pac CLI', path.join('pac_linux', 'tools'));
     await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
@@ -201,7 +200,7 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.8.5';
+const cliVersion = '1.9.1';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
@@ -240,7 +239,6 @@ async function nugetInstallLinux() {
 
 async function nugetInstallWindows() {
     await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
-    await nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.79', path.resolve(outdir, 'sopa'));
 }
 
 async function restore() {
