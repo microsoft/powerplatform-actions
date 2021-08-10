@@ -18,5 +18,5 @@ inputs:
 
 runs:
   using: 'node12'
-  # main: '../dist/actions/pack-solution/index.js'
-  main: '../out/actions/pack-solution/index.js'
+  main: '../dist/actions/pack-solution/index.js'
+  # main: '../out/actions/pack-solution/index.js'
