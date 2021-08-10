@@ -69,7 +69,6 @@ jobs:
         tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test pack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
@@ -106,7 +105,6 @@ jobs:
         run-asynchronously: true
 
     - name: Test unpack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./unpack-solution
       with:
         solution-file: 'out/CI/solution1.zip'
