@@ -19,9 +19,9 @@ inputs:
   overwrite-files:
     description: 'OK to overwrite existing files when unpacking a solution.zip'
     required: false
-    default: true
+    default: 'true'
 
 runs:
   using: 'node12'
-  main: '../dist/actions/unpack-solution/index.js'
-  # main: '../out/actions/unpack-solution/index.js'
+  # main: '../dist/actions/unpack-solution/index.js'
+  main: '../out/actions/unpack-solution/index.js'
