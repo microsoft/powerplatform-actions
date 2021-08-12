@@ -157,7 +157,7 @@
   "SolutionExportErrorFileExists" : "Solution output file {0} already exists.",
   "SolutionExportErrorInvalidPath" : "{0} is an invalid file path. {1}",
   "SolutionExportSucceeded" : "Solution export succeeded.",
-  "CreateSettingsSolutionFolderHelp" : "Path to solution folder.",
+  "CreateSettingsSolutionFolderHelp" : "Path to the local, unpacked solution folder: either the root of the 'Other/Solution.xml' file or a folder with a .cdsproj file.",
   "SolutionCloneHelp" : "Create a solution project based on an existing solution in your Organization",
   "SolutionCloneErrorFolderExists" : "Solution folder already exists and is not empty.",
   "SolutionCloneUnmanagedExportSucceeded" : "Unmanaged solution export succeeded.",
