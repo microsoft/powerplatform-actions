@@ -53,13 +53,6 @@ jobs:
         region: unitedstates
         domain: test-target
 
-    - name: Test who-am-i action with username/password
-      uses: ./who-am-i
-      with:
-        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-
     - name: Test who-am-i action with appId-clientSecret
       uses: ./who-am-i
       with:
@@ -67,6 +60,13 @@ jobs:
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
+
+    - name: Test who-am-i action with username/password
+      uses: ./who-am-i
+      with:
+        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test pack-solution action
       uses: ./pack-solution
