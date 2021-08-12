@@ -37,7 +37,7 @@ const logger = new ActionLogger();
 (async () => {
     const sopa = new PacRunner(workingDir, logger);
 
-    const unpackArgs = ['solution', 'unpack', '--packageType', solutionType, '--zipFile', solutionZipFile, '--folder', targetFolder, '--clobber', '--allowDelete', 'yes', '--allowWrite', 'yes'];
+    const unpackArgs = ['solution', 'unpack', '--packageType', solutionType, '--zipFile', solutionZipFile, '--folder', targetFolder, '--clobber', '--allowDelete', 'yes', '--allowWrite', 'false'];
     await sopa.run(unpackArgs);
     core.info(`unpacked solution to: ${targetFolder}`);
     core.endGroup();
