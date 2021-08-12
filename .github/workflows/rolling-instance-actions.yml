@@ -53,13 +53,6 @@ jobs:
         region: unitedstates
         domain: test-target
 
-    - name: Test who-am-i action with username/password
-      uses: ./who-am-i
-      with:
-        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-
     - name: Test who-am-i action with appId-clientSecret
       uses: ./who-am-i
       with:
@@ -68,8 +61,14 @@ jobs:
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
 
+    - name: Test who-am-i action with username/password
+      uses: ./who-am-i
+      with:
+        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
     - name: Test pack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
@@ -106,7 +105,6 @@ jobs:
         run-asynchronously: true
 
     - name: Test unpack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./unpack-solution
       with:
         solution-file: 'out/CI/solution1.zip'

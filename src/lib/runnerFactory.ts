@@ -5,7 +5,6 @@ import { ActionLogger } from "./actionLogger";
 import { GitRunner } from "./gitRunner";
 import { Logger } from "./logger";
 import { PacRunner } from "./pacRunner";
-import { SopaRunner } from "./sopaRunner";
 
 export interface Runner {
     run(args: string[]): Promise<string[]>;
@@ -25,8 +24,6 @@ class RealRunnerFactory implements RunnerFactory {
                 return new PacRunner(workingDir, this._logger);
             case 'git':
                 return new GitRunner(workingDir, this._logger);
-            case 'sopa':
-                return new SopaRunner(workingDir, this._logger);
             default:
                 throw new Error(`Unknown runner type requested: ${runnerName}`);
         }

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, SopaRunner } from '../../lib';
+import { ActionLogger, PacRunner } from '../../lib';
 import path = require('path');
 import { exit } from 'process';
 
@@ -24,9 +24,9 @@ const logger = new ActionLogger();
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    const sopa = new SopaRunner(workingDir, logger);
+    const sopa = new PacRunner(workingDir, logger);
 
-    const packArgs = ['/action:pack', `/packageType:${solutionType}`, `/zipFile:${solutionZipFile}`, `/folder:${solutionFolder}`];
+    const packArgs = ['solution', 'pack', '--packageType', solutionType, '--zipFile', solutionZipFile, '--folder', solutionFolder];
     await sopa.run(packArgs);
     core.info(`packed solution into: ${solutionZipFile}`);
     core.endGroup();

@@ -19,7 +19,7 @@ inputs:
   overwrite-files:
     description: 'OK to overwrite existing files when unpacking a solution.zip'
     required: false
-    default: true
+    default: 'true'
 
 runs:
   using: 'node12'

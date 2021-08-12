@@ -3560,8 +3560,8 @@ if (!overwrite || overwrite.toString().toLowerCase() !== 'true') {
 const logger = new lib_1.ActionLogger();
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const sopa = new lib_1.SopaRunner(workingDir, logger);
-    const unpackArgs = ['/action:extract', `/packageType:${solutionType}`, `/zipFile:${solutionZipFile}`, `/folder:${targetFolder}`, '/clobber', '/allowDelete:yes', '/allowWrite:yes'];
+    const sopa = new lib_1.PacRunner(workingDir, logger);
+    const unpackArgs = ['solution', 'unpack', '--packageType', solutionType, '--zipFile', solutionZipFile, '--folder', targetFolder, '--clobber', '--allowDelete', 'yes', '--allowWrite', 'false'];
     yield sopa.run(unpackArgs);
     core.info(`unpacked solution to: ${targetFolder}`);
     core.endGroup();
@@ -4024,7 +4024,7 @@ exports.GitRunner = GitRunner;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = exports.SopaRunner = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
+exports.AuthKind = exports.AuthHandler = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 var actionInput_1 = __nccwpck_require__(1434);
@@ -4041,8 +4041,6 @@ var gitRunner_1 = __nccwpck_require__(5973);
 Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
 var pacRunner_1 = __nccwpck_require__(7366);
 Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
-var sopaRunner_1 = __nccwpck_require__(3653);
-Object.defineProperty(exports, "SopaRunner", ({ enumerable: true, get: function () { return sopaRunner_1.SopaRunner; } }));
 var authHandler_1 = __nccwpck_require__(3677);
 Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
 Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
@@ -4090,7 +4088,6 @@ exports.DefaultRunnerFactory = void 0;
 const actionLogger_1 = __nccwpck_require__(3970);
 const gitRunner_1 = __nccwpck_require__(5973);
 const pacRunner_1 = __nccwpck_require__(7366);
-const sopaRunner_1 = __nccwpck_require__(3653);
 class RealRunnerFactory {
     constructor() {
         this._logger = new actionLogger_1.ActionLogger();
@@ -4101,8 +4098,6 @@ class RealRunnerFactory {
                 return new pacRunner_1.PacRunner(workingDir, this._logger);
             case 'git':
                 return new gitRunner_1.GitRunner(workingDir, this._logger);
-            case 'sopa':
-                return new sopaRunner_1.SopaRunner(workingDir, this._logger);
             default:
                 throw new Error(`Unknown runner type requested: ${runnerName}`);
         }
@@ -4141,33 +4136,6 @@ const runnerParameters = {
 exports.runnerParameters = runnerParameters;
 
 //# sourceMappingURL=runnerParameters.js.map
-
-
-/***/ }),
-
-/***/ 3653:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SopaRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __nccwpck_require__(7021);
-const os = __nccwpck_require__(2087);
-class SopaRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, 'SolutionPackager.exe', ['sopa', 'content', 'bin', 'coretools']);
-        const platform = os.platform();
-        if (platform !== 'win32') {
-            throw Error(`Unsupported SoPa runner os: '${platform}'; the standalone SoPa executable is only available on Windows`);
-        }
-    }
-}
-exports.SopaRunner = SopaRunner;
-
-//# sourceMappingURL=sopaRunner.js.map
 
 
 /***/ }),
