@@ -200,7 +200,7 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.9.4';
+const cliVersion = '1.9.7';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
