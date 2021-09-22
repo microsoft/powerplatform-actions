@@ -7,23 +7,23 @@
   "targets": {
     ".NETCoreApp,Version=v5.0": {},
     ".NETCoreApp,Version=v5.0/linux-x64": {
-      "pac/1.0.0": {
+      "pac/0.1.0": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.16",
           "StyleCop.Analyzers": "1.1.118",
           "System.ComponentModel.Composition": "5.0.0",
-          "bolt.cli": "1.0.0",
-          "bolt.module.admin": "1.0.0",
-          "bolt.module.auth": "1.0.0",
-          "bolt.module.canvas": "1.0.0",
-          "bolt.module.cds": "1.0.0",
-          "bolt.module.cli": "1.0.0",
-          "bolt.module.paportal": "1.0.0",
-          "bolt.module.pcf": "1.0.0",
-          "bolt.module.plugin": "1.0.0",
-          "bolt.module.solution": "1.0.0",
-          "bolt.system": "1.0.0",
-          "bolt.version": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.module.admin": "0.1.0",
+          "bolt.module.auth": "0.1.0",
+          "bolt.module.canvas": "0.1.0",
+          "bolt.module.cds": "0.1.0",
+          "bolt.module.cli": "0.1.0",
+          "bolt.module.paportal": "0.1.0",
+          "bolt.module.pcf": "0.1.0",
+          "bolt.module.plugin": "0.1.0",
+          "bolt.module.solution": "0.1.0",
+          "bolt.system": "0.1.0",
+          "bolt.version": "0.1.0"
         },
         "runtime": {
           "pac.dll": {}
@@ -78,9 +78,9 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.8": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.90": {
         "dependencies": {
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.16",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Configuration.ConfigurationManager": "4.7.0",
           "System.IO.Packaging": "4.7.0",
@@ -89,122 +89,118 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.8"
+            "fileVersion": "9.1.1.90"
           }
         }
       },
-      "Microsoft.Extensions.Configuration/3.1.8": {
+      "Microsoft.Extensions.Configuration/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "3.1.8"
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Primitives": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Configuration.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.0/Microsoft.Extensions.Configuration.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/3.1.8": {
+      "Microsoft.Extensions.Configuration.Abstractions/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "3.1.8"
+          "Microsoft.Extensions.Primitives": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Configuration.Abstractions.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Binder/3.1.8": {
+      "Microsoft.Extensions.Configuration.FileExtensions/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "3.1.8"
+          "Microsoft.Extensions.Configuration": "5.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.FileProviders.Abstractions": "5.0.0",
+          "Microsoft.Extensions.FileProviders.Physical": "5.0.0",
+          "Microsoft.Extensions.Primitives": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Configuration.Binder.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.0/Microsoft.Extensions.Configuration.FileExtensions.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/3.1.8": {
+      "Microsoft.Extensions.Configuration.Json/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "3.1.8",
-          "Microsoft.Extensions.FileProviders.Physical": "3.1.8"
+          "Microsoft.Extensions.Configuration": "5.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Configuration.FileExtensions": "5.0.0",
+          "Microsoft.Extensions.FileProviders.Abstractions": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Configuration.FileExtensions.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.1/Microsoft.Extensions.Configuration.Json.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Json/3.1.8": {
+      "Microsoft.Extensions.DependencyInjection/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "3.1.8",
-          "Microsoft.Extensions.Configuration.FileExtensions": "3.1.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Configuration.Json.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/net5.0/Microsoft.Extensions.DependencyInjection.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.DependencyInjection/3.1.8": {
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.8"
-        },
-        "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.DependencyInjection.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
-          }
-        }
-      },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/3.1.8": {
+      "Microsoft.Extensions.DependencyInjection.Abstractions/5.0.0": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/3.1.8": {
+      "Microsoft.Extensions.FileProviders.Abstractions/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "3.1.8"
+          "Microsoft.Extensions.Primitives": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.FileProviders.Abstractions.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Abstractions.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/3.1.8": {
+      "Microsoft.Extensions.FileProviders.Physical/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "3.1.8",
-          "Microsoft.Extensions.FileSystemGlobbing": "3.1.8"
+          "Microsoft.Extensions.FileProviders.Abstractions": "5.0.0",
+          "Microsoft.Extensions.FileSystemGlobbing": "5.0.0",
+          "Microsoft.Extensions.Primitives": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.FileProviders.Physical.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Physical.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/3.1.8": {
+      "Microsoft.Extensions.FileSystemGlobbing/5.0.0": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
       "Microsoft.Extensions.Http/3.1.8": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.8",
-          "Microsoft.Extensions.Logging": "3.1.8",
-          "Microsoft.Extensions.Options": "3.1.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0"
         },
         "runtime": {
           "lib/netcoreapp3.1/Microsoft.Extensions.Http.dll": {
@@ -213,59 +209,59 @@
           }
         }
       },
-      "Microsoft.Extensions.Logging/3.1.8": {
+      "Microsoft.Extensions.Logging/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "3.1.8",
-          "Microsoft.Extensions.DependencyInjection": "3.1.8",
-          "Microsoft.Extensions.Logging.Abstractions": "3.1.8",
-          "Microsoft.Extensions.Options": "3.1.8"
+          "Microsoft.Extensions.DependencyInjection": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Logging.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netstandard2.1/Microsoft.Extensions.Logging.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions/3.1.8": {
+      "Microsoft.Extensions.Logging.Abstractions/5.0.0": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Options/3.1.8": {
+      "Microsoft.Extensions.Options/5.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.8",
-          "Microsoft.Extensions.Primitives": "3.1.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Primitives": "5.0.0"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Options.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/net5.0/Microsoft.Extensions.Options.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Extensions.Primitives/3.1.8": {
+      "Microsoft.Extensions.Primitives/5.0.0": {
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Extensions.Primitives.dll": {
-            "assemblyVersion": "3.1.8.0",
-            "fileVersion": "3.100.820.42004"
+          "lib/netcoreapp3.0/Microsoft.Extensions.Primitives.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
           }
         }
       },
-      "Microsoft.Identity.Client/4.29.0": {
+      "Microsoft.Identity.Client/4.35.1": {
         "runtime": {
           "lib/netcoreapp2.1/Microsoft.Identity.Client.dll": {
-            "assemblyVersion": "4.29.0.0",
-            "fileVersion": "4.29.0.0"
+            "assemblyVersion": "4.35.1.0",
+            "fileVersion": "4.35.1.0"
           }
         }
       },
       "Microsoft.NETCore.Platforms/3.1.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
-      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.14": {
+      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.16": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.9.1",
           "Newtonsoft.Json": "11.0.2",
@@ -274,11 +270,11 @@
         "runtime": {
           "lib/net5.0/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.14"
+            "fileVersion": "2.0.0.16"
           },
           "lib/net5.0/pacTelemetryUpload.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.14"
+            "fileVersion": "2.0.0.16"
           }
         }
       },
@@ -294,12 +290,12 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.Dataverse.Client/0.4.11": {
+      "Microsoft.PowerPlatform.Dataverse.Client/0.4.19": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection": "3.1.8",
+          "Microsoft.Extensions.DependencyInjection": "5.0.0",
           "Microsoft.Extensions.Http": "3.1.8",
-          "Microsoft.Extensions.Logging": "3.1.8",
-          "Microsoft.Identity.Client": "4.29.0",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "Microsoft.Identity.Client": "4.35.1",
           "Microsoft.Rest.ClientRuntime": "2.3.20",
           "Microsoft.VisualBasic": "10.3.0",
           "Newtonsoft.Json": "11.0.2",
@@ -325,15 +321,15 @@
         "runtime": {
           "lib/netcoreapp3.1/Microsoft.Cds.Sdk.Proxy.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.46.3082"
+            "fileVersion": "9.0.46.3291"
           },
           "lib/netcoreapp3.1/Microsoft.Cds.Sdk.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.46.3082"
+            "fileVersion": "9.0.46.3291"
           },
           "lib/netcoreapp3.1/Microsoft.PowerPlatform.Dataverse.Client.dll": {
             "assemblyVersion": "0.0.4.0",
-            "fileVersion": "0.0.4.11"
+            "fileVersion": "0.0.4.19"
           }
         }
       },
@@ -445,7 +441,7 @@
       },
       "NLog.Extensions.Logging/1.5.1": {
         "dependencies": {
-          "Microsoft.Extensions.Logging": "3.1.8",
+          "Microsoft.Extensions.Logging": "5.0.0",
           "NLog": "4.6.5"
         },
         "runtime": {
@@ -673,6 +669,7 @@
           "System.Threading": "4.3.0"
         }
       },
+      "System.ComponentModel.Annotations/5.0.0": {},
       "System.ComponentModel.Composition/5.0.0": {
         "runtime": {
           "lib/netcoreapp2.0/System.ComponentModel.Composition.dll": {
@@ -1538,132 +1535,134 @@
           }
         }
       },
-      "bolt.cli/1.0.0": {
+      "bolt.cli/0.1.0": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.9.1",
-          "Microsoft.Extensions.Configuration.Json": "3.1.8",
-          "Microsoft.Extensions.DependencyInjection": "3.1.8",
-          "Microsoft.Extensions.Logging": "3.1.8",
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.14",
+          "Microsoft.Extensions.Configuration.Json": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection": "5.0.0",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.16",
           "NLog": "4.6.5",
           "NLog.Extensions.Logging": "1.5.1",
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.cli.dll": {}
         }
       },
-      "bolt.module.admin/1.0.0": {
+      "bolt.module.admin/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.module.admin.dll": {}
         }
       },
-      "bolt.module.auth/1.0.0": {
+      "bolt.module.auth/0.1.0": {
         "dependencies": {
-          "Microsoft.Identity.Client": "4.29.0",
+          "Microsoft.Identity.Client": "4.35.1",
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Security.Cryptography.ProtectedData": "4.7.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.module.auth.dll": {}
         }
       },
-      "bolt.module.canvas/1.0.0": {
+      "bolt.module.canvas/0.1.0": {
         "dependencies": {
           "Microsoft.PowerPlatform.Formulas.Tools": "0.3.8-preview",
+          "System.ComponentModel.Annotations": "5.0.0",
           "System.ComponentModel.Composition": "5.0.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0",
-          "bolt.version": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0",
+          "bolt.version": "0.1.0"
         },
         "runtime": {
           "bolt.module.canvas.dll": {}
         }
       },
-      "bolt.module.cds/1.0.0": {
+      "bolt.module.cds/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.8",
-          "Microsoft.Identity.Client": "4.29.0",
-          "Microsoft.PowerPlatform.Dataverse.Client": "0.4.11",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0"
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.90",
+          "Microsoft.Identity.Client": "4.35.1",
+          "Microsoft.PowerPlatform.Dataverse.Client": "0.4.19",
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.module.cds.dll": {}
         }
       },
-      "bolt.module.cli/1.0.0": {
+      "bolt.module.cli/0.1.0": {
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.module.cli.dll": {}
         }
       },
-      "bolt.module.paportal/1.0.0": {
+      "bolt.module.paportal/0.1.0": {
         "dependencies": {
-          "Microsoft.Identity.Client": "4.29.0",
-          "Microsoft.PowerPlatform.Dataverse.Client": "0.4.11",
+          "Microsoft.Identity.Client": "4.35.1",
+          "Microsoft.PowerPlatform.Dataverse.Client": "0.4.19",
           "YamlDotNet": "11.0.1",
-          "bolt.cli": "1.0.0",
-          "bolt.module.cds": "1.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.module.cds": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.module.paportal.dll": {}
         }
       },
-      "bolt.module.pcf/1.0.0": {
+      "bolt.module.pcf/0.1.0": {
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0",
-          "bolt.version": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0",
+          "bolt.version": "0.1.0"
         },
         "runtime": {
           "bolt.module.pcf.dll": {}
         }
       },
-      "bolt.module.plugin/1.0.0": {
+      "bolt.module.plugin/0.1.0": {
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.module.plugin.dll": {}
         }
       },
-      "bolt.module.solution/1.0.0": {
+      "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.8",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.90",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0",
-          "bolt.version": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0",
+          "bolt.version": "0.1.0"
         },
         "runtime": {
           "bolt.module.solution.dll": {}
         }
       },
-      "bolt.system/1.0.0": {
+      "bolt.system/0.1.0": {
         "dependencies": {
+          "Microsoft.Extensions.Logging": "5.0.0",
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
@@ -1672,13 +1671,13 @@
           "bolt.system.dll": {}
         }
       },
-      "bolt.version/1.0.0": {
+      "bolt.version/0.1.0": {
         "dependencies": {
           "LibGit2Sharp": "0.26.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
-          "bolt.cli": "1.0.0",
-          "bolt.system": "1.0.0"
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.version.dll": {}
@@ -1687,7 +1686,7 @@
     }
   },
   "libraries": {
-    "pac/1.0.0": {
+    "pac/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -1727,82 +1726,75 @@
       "path": "microsoft.applicationinsights/2.9.1",
       "hashPath": "microsoft.applicationinsights.2.9.1.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.8": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.90": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-X/fkHer6YVDSLU0thOd9i997cnbyUGWFXORmGNHmAFsOoJPN2FyVG80I9Sn2/iJbgX18Tdrr82s24I3/g5FGFw==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.8",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.8.nupkg.sha512"
+      "sha512": "sha512-S8ocR8k/Y4xuozWHqNZv/HdBn2NprPWC6TFk7ldN88NkI8XRWv6vTxpiD5JAai2qPlZM7adh/gRh21Q4Hgr6kA==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.90",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.90.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration/3.1.8": {
+    "Microsoft.Extensions.Configuration/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-xWvtu/ra8xDOy62ZXzQj1ElmmH3GpZBSKvw4LbfNXKCy+PaziS5Uh0gQ47D4H4w3u+PJfhNWCCGCp9ORNEzkRw==",
-      "path": "microsoft.extensions.configuration/3.1.8",
-      "hashPath": "microsoft.extensions.configuration.3.1.8.nupkg.sha512"
+      "sha512": "sha512-LN322qEKHjuVEhhXueTUe7RNePooZmS8aGid5aK2woX3NPjSnONFyKUc6+JknOS6ce6h2tCLfKPTBXE3mN/6Ag==",
+      "path": "microsoft.extensions.configuration/5.0.0",
+      "hashPath": "microsoft.extensions.configuration.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Abstractions/3.1.8": {
+    "Microsoft.Extensions.Configuration.Abstractions/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-0qbNyxGpuNP/fuQ3FLHesm1Vn/83qYcAgVsi1UQCQN1peY4YH1uiizOh4xbYkQyxiVMD/c/zhiYYv94G0DXSSA==",
-      "path": "microsoft.extensions.configuration.abstractions/3.1.8",
-      "hashPath": "microsoft.extensions.configuration.abstractions.3.1.8.nupkg.sha512"
+      "sha512": "sha512-ETjSBHMp3OAZ4HxGQYpwyGsD8Sw5FegQXphi0rpoGMT74S4+I2mm7XJEswwn59XAaKOzC15oDSOWEE8SzDCd6Q==",
+      "path": "microsoft.extensions.configuration.abstractions/5.0.0",
+      "hashPath": "microsoft.extensions.configuration.abstractions.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Binder/3.1.8": {
+    "Microsoft.Extensions.Configuration.FileExtensions/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-l/oqIWRM4YF62mlCOrIKGUOCemsaID/lngK2SZEtpYI8LrktpjPd4QzvENWj5GebbLbqOtsFhF6Ko6dgzmUnBw==",
-      "path": "microsoft.extensions.configuration.binder/3.1.8",
-      "hashPath": "microsoft.extensions.configuration.binder.3.1.8.nupkg.sha512"
+      "sha512": "sha512-rRdspYKA18ViPOISwAihhCMbusHsARCOtDMwa23f+BGEdIjpKPlhs3LLjmKlxfhpGXBjIsS0JpXcChjRUN+PAw==",
+      "path": "microsoft.extensions.configuration.fileextensions/5.0.0",
+      "hashPath": "microsoft.extensions.configuration.fileextensions.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.FileExtensions/3.1.8": {
+    "Microsoft.Extensions.Configuration.Json/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kNiruN3duAuhk8et5EmDiPdrxMY4Bk+LMGPreuum9q5R9TUJpSVlB5vS+9rHRZL1DWzhytz+0GfdnI3yCNp/KA==",
-      "path": "microsoft.extensions.configuration.fileextensions/3.1.8",
-      "hashPath": "microsoft.extensions.configuration.fileextensions.3.1.8.nupkg.sha512"
+      "sha512": "sha512-Pak8ymSUfdzPfBTLHxeOwcR32YDbuVfhnH2hkfOLnJNQd19ItlBdpMjIDY9C5O/nS2Sn9bzDMai0ZrvF7KyY/Q==",
+      "path": "microsoft.extensions.configuration.json/5.0.0",
+      "hashPath": "microsoft.extensions.configuration.json.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Json/3.1.8": {
+    "Microsoft.Extensions.DependencyInjection/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-YkPzhLuPXoxl+QmbZFHtMOt9efb3sUAlcRtCzUapkeOkFsgqYIC43D9WKYtYStfC3a844ThNlxInoJwASP/HLA==",
-      "path": "microsoft.extensions.configuration.json/3.1.8",
-      "hashPath": "microsoft.extensions.configuration.json.3.1.8.nupkg.sha512"
+      "sha512": "sha512-Rc2kb/p3Ze6cP6rhFC3PJRdWGbLvSHZc0ev7YlyeU6FmHciDMLrhoVoTUEzKPhN5ZjFgKF1Cf5fOz8mCMIkvpA==",
+      "path": "microsoft.extensions.dependencyinjection/5.0.0",
+      "hashPath": "microsoft.extensions.dependencyinjection.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.DependencyInjection/3.1.8": {
+    "Microsoft.Extensions.DependencyInjection.Abstractions/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-tUpYcVxFqwh8wVD8O+6A8gJnVtl6L4N1Vd9bLJgQSJ0gjBTUQ/eKwJn0LglkkaDU7GAxODDv4eexgZn3QSE0NQ==",
-      "path": "microsoft.extensions.dependencyinjection/3.1.8",
-      "hashPath": "microsoft.extensions.dependencyinjection.3.1.8.nupkg.sha512"
+      "sha512": "sha512-ORj7Zh81gC69TyvmcUm9tSzytcy8AVousi+IVRAI8nLieQjOFryRusSFh7+aLk16FN9pQNqJAiMd7BTKINK0kA==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/5.0.0",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/3.1.8": {
+    "Microsoft.Extensions.FileProviders.Abstractions/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-YP0kEBkSLTVl3znqZEux+xyJpz5iVNwFZf0OPS7nupdKbojSlO7Fa+JuQjLYpWfpAshaMcznu27tjWzfXRJnOA==",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/3.1.8",
-      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.3.1.8.nupkg.sha512"
+      "sha512": "sha512-iuZIiZ3mteEb+nsUqpGXKx2cGF+cv6gWPd5jqQI4hzqdiJ6I94ddLjKhQOuRW1lueHwocIw30xbSHGhQj0zjdQ==",
+      "path": "microsoft.extensions.fileproviders.abstractions/5.0.0",
+      "hashPath": "microsoft.extensions.fileproviders.abstractions.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.FileProviders.Abstractions/3.1.8": {
+    "Microsoft.Extensions.FileProviders.Physical/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-U7ffyzrPfRDH5K3h/mBpqJVoHbppw1kc1KyHZcZeDR7b1A0FRaqMSiizGpN9IGwWs9BuN7oXIKFyviuSGBjHtQ==",
-      "path": "microsoft.extensions.fileproviders.abstractions/3.1.8",
-      "hashPath": "microsoft.extensions.fileproviders.abstractions.3.1.8.nupkg.sha512"
+      "sha512": "sha512-1rkd8UO2qf21biwO7X0hL9uHP7vtfmdv/NLvKgCRHkdz1XnW8zVQJXyEYiN68WYpExgtVWn55QF0qBzgfh1mGg==",
+      "path": "microsoft.extensions.fileproviders.physical/5.0.0",
+      "hashPath": "microsoft.extensions.fileproviders.physical.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.FileProviders.Physical/3.1.8": {
+    "Microsoft.Extensions.FileSystemGlobbing/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-C75r2Xos93s0cAFFihJjyUui7wXaTQjvbqxDhJnpGkAS2Iqw5LBzIida5qz0qgI7IrAfWoOHxKHD3o83YdGA7w==",
-      "path": "microsoft.extensions.fileproviders.physical/3.1.8",
-      "hashPath": "microsoft.extensions.fileproviders.physical.3.1.8.nupkg.sha512"
-    },
-    "Microsoft.Extensions.FileSystemGlobbing/3.1.8": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-WkVBJy0bgkvegB11KT6Jc1xZEnd4qwowZsjsASx2y0AaulSkBHydGUqpEGkYgtIIQdvIvf2QeoEHM/K0JDCIrA==",
-      "path": "microsoft.extensions.filesystemglobbing/3.1.8",
-      "hashPath": "microsoft.extensions.filesystemglobbing.3.1.8.nupkg.sha512"
+      "sha512": "sha512-ArliS8lGk8sWRtrWpqI8yUVYJpRruPjCDT+EIjrgkA/AAPRctlAkRISVZ334chAKktTLzD1+PK8F5IZpGedSqA==",
+      "path": "microsoft.extensions.filesystemglobbing/5.0.0",
+      "hashPath": "microsoft.extensions.filesystemglobbing.5.0.0.nupkg.sha512"
     },
     "Microsoft.Extensions.Http/3.1.8": {
       "type": "package",
@@ -1811,40 +1803,40 @@
       "path": "microsoft.extensions.http/3.1.8",
       "hashPath": "microsoft.extensions.http.3.1.8.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging/3.1.8": {
+    "Microsoft.Extensions.Logging/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Bch88WGwrgJUabSOiTbPgne/jkCcWTyP97db8GWzQH9RcGi6TThiRm8ggsD+OXBW2UBwAYx1Zb1ns1elsMiomQ==",
-      "path": "microsoft.extensions.logging/3.1.8",
-      "hashPath": "microsoft.extensions.logging.3.1.8.nupkg.sha512"
+      "sha512": "sha512-MgOwK6tPzB6YNH21wssJcw/2MKwee8b2gI7SllYfn6rvTpIrVvVS5HAjSU2vqSku1fwqRvWP0MdIi14qjd93Aw==",
+      "path": "microsoft.extensions.logging/5.0.0",
+      "hashPath": "microsoft.extensions.logging.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.Abstractions/3.1.8": {
+    "Microsoft.Extensions.Logging.Abstractions/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-LxQPR/KE4P9nx304VcFipWPcW8ZOZOGHuiYlG0ncAQJItogDzR9nyYUNvziLObx2MfX2Z9iCTdAqEtoImaQOYg==",
-      "path": "microsoft.extensions.logging.abstractions/3.1.8",
-      "hashPath": "microsoft.extensions.logging.abstractions.3.1.8.nupkg.sha512"
+      "sha512": "sha512-NxP6ahFcBnnSfwNBi2KH2Oz8Xl5Sm2krjId/jRR3I7teFphwiUoUeZPwTNA21EX+5PtjqmyAvKaOeBXcJjcH/w==",
+      "path": "microsoft.extensions.logging.abstractions/5.0.0",
+      "hashPath": "microsoft.extensions.logging.abstractions.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Options/3.1.8": {
+    "Microsoft.Extensions.Options/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-mpkwjNg5sr1XHEJwVS8G1w6dsh5/72vQOOe4aqhg012j93m8OOmfyIBwoQN4SE0KRRS+fatdW3qqUrHbRwlWOA==",
-      "path": "microsoft.extensions.options/3.1.8",
-      "hashPath": "microsoft.extensions.options.3.1.8.nupkg.sha512"
+      "sha512": "sha512-CBvR92TCJ5uBIdd9/HzDSrxYak+0W/3+yxrNg8Qm6Bmrkh5L+nu6m3WeazQehcZ5q1/6dDA7J5YdQjim0165zg==",
+      "path": "microsoft.extensions.options/5.0.0",
+      "hashPath": "microsoft.extensions.options.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Primitives/3.1.8": {
+    "Microsoft.Extensions.Primitives/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-XcIoXQhT0kwnEhOKv/LmpWR6yF6QWmBTy9Fcsz4aHuCOgTJ7Zd23ELtUA4BfwlYoFlSedavS+vURz9tNekd44g==",
-      "path": "microsoft.extensions.primitives/3.1.8",
-      "hashPath": "microsoft.extensions.primitives.3.1.8.nupkg.sha512"
+      "sha512": "sha512-cI/VWn9G1fghXrNDagX9nYaaB/nokkZn0HYAawGaELQrl8InSezfe9OnfPZLcJq3esXxygh3hkq2c3qoV3SDyQ==",
+      "path": "microsoft.extensions.primitives/5.0.0",
+      "hashPath": "microsoft.extensions.primitives.5.0.0.nupkg.sha512"
     },
-    "Microsoft.Identity.Client/4.29.0": {
+    "Microsoft.Identity.Client/4.35.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Pr0zGK5UVOH1wNIMRVtakImDX0OWmI87HANvOQqnhahkeevVOZBnsw1QouEb5eZlLvMciuSaShuSz0806bmCvQ==",
-      "path": "microsoft.identity.client/4.29.0",
-      "hashPath": "microsoft.identity.client.4.29.0.nupkg.sha512"
+      "sha512": "sha512-u7IU0HlOG+nedpG/syrKStAVkHfp2cBJe09udQF8jFiQs3784dGteMneijM61g4NIGBi3XmDDNnbmPVi2K94Ng==",
+      "path": "microsoft.identity.client/4.35.1",
+      "hashPath": "microsoft.identity.client.4.35.1.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/3.1.0": {
       "type": "package",
@@ -1860,12 +1852,12 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
-    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.14": {
+    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/2.0.16": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-5drSSMlrNv3EnpOYiWlERoOPAzE3fJ80rgcABEE7OYfTsUl3fzz4Uzb6LLMKqeUljJODd4CrgIVz4uCdsVB5/w==",
-      "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.14",
-      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.14.nupkg.sha512"
+      "sha512": "sha512-eA7qfGWWEL1qG2g6xgQVjVfJh9MN0chLYWWaHw72G3DZaLKKtofP40BTeWkstMorWSKu1Lx95Tldzn5W+Y7weA==",
+      "path": "microsoft.powerapps.appinsights.batchedtelemetry/2.0.16",
+      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.2.0.16.nupkg.sha512"
     },
     "Microsoft.PowerApps.Checker.Client/1.0.0.3": {
       "type": "package",
@@ -1874,12 +1866,12 @@
       "path": "microsoft.powerapps.checker.client/1.0.0.3",
       "hashPath": "microsoft.powerapps.checker.client.1.0.0.3.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Dataverse.Client/0.4.11": {
+    "Microsoft.PowerPlatform.Dataverse.Client/0.4.19": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-WnD52oq2Xyg9Z54fO1RyTbBhvM4gYvb9aOR6y+avT+0vlHhzP47RDLOCLq8gJ20xjsMFy0YnRdy5vsjF48xEzg==",
-      "path": "microsoft.powerplatform.dataverse.client/0.4.11",
-      "hashPath": "microsoft.powerplatform.dataverse.client.0.4.11.nupkg.sha512"
+      "sha512": "sha512-PSio3ONMBWYfGH4W9j/la7Tdy97bVk9mBnKrUWvu0SFcruna1mfvzMt8rLO30qfFjNEI/fx3pToHkvAiPzoW2A==",
+      "path": "microsoft.powerplatform.dataverse.client/0.4.19",
+      "hashPath": "microsoft.powerplatform.dataverse.client.0.4.19.nupkg.sha512"
     },
     "Microsoft.PowerPlatform.Formulas.Tools/0.3.8-preview": {
       "type": "package",
@@ -2272,6 +2264,13 @@
       "sha512": "sha512-zukBRPUuNxwy9m4TGWLxKAnoiMc9+B+8VXeXVyPiBPvOd7yLgAlZ1DlsRWJjMx4VsvhhF2+6q6kO2GRbPja6hA==",
       "path": "system.collections.immutable/1.3.0",
       "hashPath": "system.collections.immutable.1.3.0.nupkg.sha512"
+    },
+    "System.ComponentModel.Annotations/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
+      "path": "system.componentmodel.annotations/5.0.0",
+      "hashPath": "system.componentmodel.annotations.5.0.0.nupkg.sha512"
     },
     "System.ComponentModel.Composition/5.0.0": {
       "type": "package",
@@ -2847,62 +2846,62 @@
       "path": "yamldotnet/11.0.1",
       "hashPath": "yamldotnet.11.0.1.nupkg.sha512"
     },
-    "bolt.cli/1.0.0": {
+    "bolt.cli/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.admin/1.0.0": {
+    "bolt.module.admin/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.auth/1.0.0": {
+    "bolt.module.auth/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.canvas/1.0.0": {
+    "bolt.module.canvas/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.cds/1.0.0": {
+    "bolt.module.cds/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.cli/1.0.0": {
+    "bolt.module.cli/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.paportal/1.0.0": {
+    "bolt.module.paportal/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.pcf/1.0.0": {
+    "bolt.module.pcf/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.plugin/1.0.0": {
+    "bolt.module.plugin/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.module.solution/1.0.0": {
+    "bolt.module.solution/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.system/1.0.0": {
+    "bolt.system/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "bolt.version/1.0.0": {
+    "bolt.version/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
