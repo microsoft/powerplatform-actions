@@ -22,7 +22,7 @@ describe("WhoAmI tests", () => {
         await rewiremock.around(
             () => import("../actions/who-am-i/index"),
             (mock) => {
-                mock(() => import("@microsoft/powerplatform-cli-wrapper")).with(
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with(
                     {
                         whoAmI: whoAmIStub,
                     }
@@ -44,7 +44,6 @@ describe("WhoAmI tests", () => {
         whoAmIStub.should.have.been.calledOnceWithExactly({
             credentials: credentials,
             environmentUrl: environmentUrl,
-            ...runnerParameters,
-        });
+        }, runnerParameters);
     });
 });

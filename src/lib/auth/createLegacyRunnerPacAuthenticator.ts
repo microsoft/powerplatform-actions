@@ -1,24 +1,24 @@
 import { PacRunner } from "../pacRunner";
 import { PacAuthenticator } from "./PacAuthenticator";
+import getEnvironmentUrl from "./getEnvironmentUrl";
 import {
     ClientCredentials,
-    EnvironmentUrlParameters,
     UsernamePassword,
-} from "@microsoft/powerplatform-cli-wrapper";
+} from "@microsoft/powerplatform-cli-wrapper/";
 
 export default function createLegacyRunnerPacAuthenticator(
     pac: PacRunner
 ): PacAuthenticator {
     return {
         authenticateCdsWithClientCredentials: async (
-            parameters: ClientCredentials & EnvironmentUrlParameters
+            parameters: ClientCredentials
         ) => {
             await clearAuth();
             await pac.run([
                 "auth",
                 "create",
                 "--url",
-                parameters.environmentUrl,
+                getEnvironmentUrl(),
                 "--applicationId",
                 parameters.appId,
                 "--clientSecret",
@@ -45,14 +45,14 @@ export default function createLegacyRunnerPacAuthenticator(
             ]);
         },
         authenticateCdsWithUsernamePassword: async (
-            parameters: UsernamePassword & EnvironmentUrlParameters
+            parameters: UsernamePassword
         ) => {
             await clearAuth();
             await pac.run([
                 "auth",
                 "create",
                 "--url",
-                parameters.environmentUrl,
+                getEnvironmentUrl(),
                 "--username",
                 parameters.username,
                 "--password",
