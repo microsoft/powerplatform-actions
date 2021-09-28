@@ -5,7 +5,7 @@ import { should, use } from "chai";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import rewiremock from "./rewiremock";
-import { fake, restore, stub } from "sinon";
+import { fake, stub } from "sinon";
 import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
 import { runnerParameters } from "../../src/lib/runnerParameters";
 import Sinon = require("sinon");
@@ -15,15 +15,9 @@ use(sinonChai);
 
 describe("unpack solution test", () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let unpackSolutionStub: Sinon.SinonStub<any[], any>;
-  let credentials: UsernamePassword;
+  const unpackSolutionStub: Sinon.SinonStub<any[], any> = stub();
+  const credentials: UsernamePassword = stubInterface<UsernamePassword>();
   const environmentUrl = "environment url";
-
-  beforeEach(() => {
-    unpackSolutionStub = stub();
-    credentials = stubInterface<UsernamePassword>();
-  });
-  afterEach(() => restore());
 
   async function callActionWithMocks(): Promise<void> {
     await rewiremock.around(
