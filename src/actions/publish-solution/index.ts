@@ -1,29 +1,28 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory } from '../../lib';
+import { publishSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from "../../lib/runnerParameters";
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
 })();
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
+export async function main(): Promise<void> {
     try {
         core.startGroup('publish-solution:');
-        pac = factory.getRunner('pac', process.cwd());
-        await new AuthHandler(pac).authenticate(AuthKind.CDS);
-
-        const publishArgs = ['solution', 'publish'];
-        await pac.run(publishArgs);
+        await publishSolution({
+            credentials: getCredentials(),
+            environmentUrl: getEnvironmentUrl(),
+        }, runnerParameters);
         core.info('published solution customizations');
         core.endGroup();
     } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
-    }  finally {
-        await pac?.run(["auth", "clear"]);
+        core.setFailed(`failed: ${error}`);
+        core.endGroup();
     }
 }

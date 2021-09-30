@@ -1,35 +1,43 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { expect } from 'chai';
 
-import { main as publishSolution } from '../actions/publish-solution';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { fake, stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+should();
+use(sinonChai);
 
-describe('publish-solution#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
-    // TODO: read in params and their required state from the action.yml
-    const inputParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
-        { Name: 'user-name', Value: 'aUserName' },
-        { Name: 'password-secret', Value: 'aSecret' }
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+describe("publish solution test", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const publishSolutionStub: Sinon.SinonStub<any[], any> = stub();
+  const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+  const environmentUrl = "environment url";
 
-    it('call action', async() => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await publishSolution(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--url', 'aUrl', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'solution', 'publish' ] });
-    });
+  async function callActionWithMocks(): Promise<void> {
+    const publishSolution = await rewiremock.around(
+      () => import("../../src/actions/publish-solution/index"),
+      (mock) => {
+        mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ publishSolution: publishSolutionStub });
+        mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials );
+        mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => environmentUrl );
+        mock(() => import("fs/promises")).with({ chmod: fake() });
+        mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+      });
+    await publishSolution.main();
+  }
+
+  it("calls publish solution", async () => {
+
+    await callActionWithMocks();
+
+    publishSolutionStub.should.have.been.calledOnceWithExactly({
+      credentials: credentials,
+      environmentUrl: environmentUrl,
+    }, runnerParameters);
+  });
 });
