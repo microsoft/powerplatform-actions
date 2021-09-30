@@ -29,8 +29,8 @@ const distdir = path.resolve('./dist');
 
 const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
-// list actions (by their name) that are not ready for release yet (see dist task below):
-const underFeatureFlagActions = [ ];
+// list actions (by their name) that are not to be added to the release (test or pre-release actions):
+const skippedActionYamls = [ 'data' ];
 
 async function clean() {
     (await pslist())
@@ -167,7 +167,7 @@ async function dist() {
         // ignore the toplevel action.yml that is needed for GH Marketplace
         .filter(actionYaml => path.dirname(actionYaml) !== '.')
         .map(actionYaml => path.basename(path.dirname(actionYaml)))
-        .filter(actionName => !underFeatureFlagActions.includes(actionName))
+        .filter(actionName => !skippedActionYamls.includes(actionName))
         .map((actionName, idx) => {
             const actionDir = path.resolve(distdir, 'actions', actionName)
             log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
@@ -200,7 +200,7 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.9.7';
+const cliVersion = '1.9.8';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"

@@ -1,18 +1,17 @@
 import {
     ClientCredentials,
-    EnvironmentUrlParameters,
     UsernamePassword,
 } from "@microsoft/powerplatform-cli-wrapper";
 
 export interface PacAuthenticator {
     authenticateCdsWithClientCredentials(
-        parameters: ClientCredentials & EnvironmentUrlParameters
+        parameters: ClientCredentials
     ): Promise<void>;
     authenticateAdminWithClientCredentials(
         parameters: ClientCredentials
     ): Promise<void>;
     authenticateCdsWithUsernamePassword(
-        parameters: UsernamePassword & EnvironmentUrlParameters
+        parameters: UsernamePassword
     ): Promise<void>;
     authenticateAdminWithUsernamePassword(
         parameters: UsernamePassword

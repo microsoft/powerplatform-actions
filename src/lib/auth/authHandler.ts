@@ -89,7 +89,6 @@ export class AuthHandler {
         );
         if (authKind === AuthKind.CDS) {
             await this._pacAuthenticator.authenticateCdsWithClientCredentials({
-                environmentUrl: this._envUrl,
                 tenantId: this._tenantId,
                 appId: this._appId,
                 clientSecret: this._clientSecret,
@@ -113,7 +112,6 @@ export class AuthHandler {
         );
         if (authKind == AuthKind.CDS) {
             await this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-                environmentUrl: this._envUrl,
                 username: this._username,
                 password: this._password,
             });

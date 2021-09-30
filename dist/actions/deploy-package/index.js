@@ -7900,7 +7900,6 @@ class AuthHandler {
             core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
             if (authKind === AuthKind.CDS) {
                 yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
-                    environmentUrl: this._envUrl,
                     tenantId: this._tenantId,
                     appId: this._appId,
                     clientSecret: this._clientSecret,
@@ -7920,7 +7919,6 @@ class AuthHandler {
             core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
             if (authKind == AuthKind.CDS) {
                 yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-                    environmentUrl: this._envUrl,
                     username: this._username,
                     password: this._password,
                 });
@@ -7953,7 +7951,7 @@ var AuthKind;
 /***/ }),
 
 /***/ 6687:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -7967,6 +7965,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const getEnvironmentUrl_1 = __nccwpck_require__(699);
 function createLegacyRunnerPacAuthenticator(pac) {
     return {
         authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
@@ -7975,7 +7974,7 @@ function createLegacyRunnerPacAuthenticator(pac) {
                 "auth",
                 "create",
                 "--url",
-                parameters.environmentUrl,
+                getEnvironmentUrl_1.default(),
                 "--applicationId",
                 parameters.appId,
                 "--clientSecret",
@@ -8005,7 +8004,7 @@ function createLegacyRunnerPacAuthenticator(pac) {
                 "auth",
                 "create",
                 "--url",
-                parameters.environmentUrl,
+                getEnvironmentUrl_1.default(),
                 "--username",
                 parameters.username,
                 "--password",
@@ -8035,6 +8034,23 @@ function createLegacyRunnerPacAuthenticator(pac) {
 exports.default = createLegacyRunnerPacAuthenticator;
 
 //# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
+
+
+/***/ }),
+
+/***/ 699:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core_1 = __nccwpck_require__(2186);
+function getEnvironmentUrl() {
+    return core_1.getInput("environment-url", { required: false });
+}
+exports.default = getEnvironmentUrl;
+
+//# sourceMappingURL=getEnvironmentUrl.js.map
 
 
 /***/ }),
@@ -8323,7 +8339,7 @@ exports.runnerParameters = runnerParameters;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.28.6","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.14","date-fns":"^2.22.1","fs-extra":"^10.0.0","uuid":"^8.3.2"}}');
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.28.6","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.25","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
 
 /***/ }),
 
