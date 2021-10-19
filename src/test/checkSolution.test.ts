@@ -41,6 +41,7 @@ describe("check solution test", () => {
       solutionPath: { name: 'path', required: true, defaultValue: undefined },
       geoInstance: { name: 'geo', required: false, defaultValue: undefined },
       ruleLevelOverride: { name: 'rule-level-override', required: false, defaultValue: undefined },
+      outputDirectory: { name: 'checker-logs-artifact-name', required: false, defaultValue: undefined },
     }, runnerParameters, new ActionsHost());
   });
 });

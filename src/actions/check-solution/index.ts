@@ -19,6 +19,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         solutionPath: parameterMap["path"],
         geoInstance: parameterMap["geo"],
         ruleLevelOverride: parameterMap["rule-level-override"],
+        outputDirectory: parameterMap["checker-logs-artifact-name"]
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 })().catch(error => {

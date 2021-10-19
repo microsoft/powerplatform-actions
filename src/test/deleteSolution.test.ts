@@ -36,7 +36,7 @@ describe("delete solution test", () => {
 
     await callActionWithMocks();
 
-    deleteSolutionStub.should.have.been.calledOnceWithExactly({
+    deleteSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
       name: { name: 'solution-name', required: true, defaultValue: undefined },
