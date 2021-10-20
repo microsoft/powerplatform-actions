@@ -1,34 +1,24 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner, Runner } from '../../lib';
+import { uploadPaportal } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from '../../lib/runnerParameters';
 
-
-core.startGroup('upload-paportal:');
-const uploadPath = core.getInput('upload-path', { required: true });
-core.info(`upload: path:${uploadPath} `);
-const deploymentProfile = core.getInput('deployment-profile', { required: false });
-core.info(`deploymentProfile: ${deploymentProfile} `);
-
-const workingDir = getWorkingDirectory('working-directory', false);
-
-const logger = new ActionLogger();
-let pac: Runner;
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    pac = new PacRunner(workingDir, logger);
-    await new AuthHandler(pac).authenticate(AuthKind.CDS);
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "upload-paportal");
 
-    const exportArgs = ['paportal', 'upload', '--path', uploadPath];
-    if (deploymentProfile) { exportArgs.push('--deploymentProfile', deploymentProfile); }
-
-    await pac.run(exportArgs);
-    core.info(`uploading portal data to current profile from: ${uploadPath}`);
-    core.endGroup();
-
+    await uploadPaportal({
+        credentials: getCredentials(),
+        environmentUrl: getEnvironmentUrl(),
+        path: parameterMap['upload-path'],
+        deploymentProfile: parameterMap['deployment-profile'],
+    }, runnerParameters, new ActionsHost());
 })().catch(error => {
     core.setFailed(`failed: ${error}`);
     core.endGroup();
-}).finally(async () => {
-    await pac?.run(["auth", "clear"]);
 });
