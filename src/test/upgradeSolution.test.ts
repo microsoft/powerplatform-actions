@@ -36,7 +36,7 @@ describe("upgrade solution test", () => {
 
     await callActionWithMocks();
 
-    upgradeSolutionStub.should.have.been.calledOnceWithExactly({
+    upgradeSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
       name: { name: 'solution-name', required: true, defaultValue: undefined },

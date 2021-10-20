@@ -35,7 +35,7 @@ describe("publish solution test", () => {
 
     await callActionWithMocks();
 
-    publishSolutionStub.should.have.been.calledOnceWithExactly({
+    publishSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
     }, runnerParameters);
