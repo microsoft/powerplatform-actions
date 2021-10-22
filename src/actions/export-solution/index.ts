@@ -1,40 +1,49 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
+import { exportSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
-import { ActionLogger, AuthHandler, AuthKind, getInputAsBool, getWorkingDirectory, PacRunner, Runner } from '../../lib';
-import path = require('path');
-import fs = require('fs-extra');
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from '../../lib/runnerParameters';
 
-core.startGroup('export-solution:');
-const solutionName = core.getInput('solution-name', { required: true });
-const solutionVersion = core.getInput('solution-version', { required: false });
-const isManaged = getInputAsBool('managed', false, false);
-const isAsync = getInputAsBool('run-asynchronously', false, false);
-core.info(`solution: ${solutionName} (${solutionVersion}) - managed: ${isManaged}`);
-
-const workingDir = getWorkingDirectory('working-directory', false);
-const outputFileCandidate = core.getInput('solution-output-file', { required: true });
-const outputFile = path.isAbsolute(outputFileCandidate) ? outputFileCandidate : path.resolve(workingDir, outputFileCandidate);
-fs.ensureDirSync(path.dirname(outputFile));
-
-const logger = new ActionLogger();
-let pac: Runner;
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    pac = new PacRunner(workingDir, logger);
-    await new AuthHandler(pac).authenticate(AuthKind.CDS);
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "export-solution");
+    const actionsHost = new ActionsHost();
+    const workingDir = actionsHost.getInput({ name: "working-directory", required: false });
+    if (workingDir) {
+        runnerParameters.workingDir = workingDir;
+    }
 
-    const exportArgs = ['solution', 'export', '--name', solutionName, '--path', outputFile];
-    if (solutionVersion) { exportArgs.push('--targetVersion', solutionVersion); }
-    if (isManaged) { exportArgs.push('--managed'); }
-    if (isAsync) { exportArgs.push('--async'); }
-    await pac.run(exportArgs);
-    core.info(`exported solution to: ${outputFile}`);
+    core.startGroup('export-solution:');
+    await exportSolution({
+        credentials: getCredentials(),
+        environmentUrl: getEnvironmentUrl(),
+        name: parameterMap['solution-name'],
+        path: parameterMap['solution-output-file'],
+        managed: parameterMap['managed'],
+        targetVersion: parameterMap['solution-version'],
+        async: parameterMap['run-asynchronously'],
+        maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
+        autoNumberSettings: parameterMap['export-auto-numbering-settings'],
+        calenderSettings: parameterMap['export-calendar-settings'],
+        customizationSettings: parameterMap['export-customization-settings'],
+        emailTrackingSettings: parameterMap['export-email-tracking-settings'],
+        externalApplicationSettings: parameterMap['export-external-applications-settings'],
+        generalSettings: parameterMap['export-general-settings'],
+        isvConfig: parameterMap['export-isv-config'],
+        marketingSettings: parameterMap['export-marketing-settings'],
+        outlookSynchronizationSettings: parameterMap['export-outlook-synchronization-settings'],
+        relationshipRoles: parameterMap['export-relationship-roles'],
+        sales: parameterMap['export-sales'],
+    }, runnerParameters, actionsHost);
+
     core.endGroup();
-
 })().catch(error => {
-    core.setFailed(`failed: ${error}`);
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
     core.endGroup();
-}).finally(async () => {
-    await pac?.run(["auth", "clear"]);
 });
