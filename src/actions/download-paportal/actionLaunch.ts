@@ -18,4 +18,5 @@ process.env['INPUT_WORKING-DIRECTORY'] = path.resolve(__dirname, '..', '..', '..
 
 const pathToAction = path.join(__dirname, 'index.js');
 process.env['RUNNER_DEBUG'] = '1';
+
 cp.execSync(`node ${pathToAction}`, { stdio: 'inherit'});
