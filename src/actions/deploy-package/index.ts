@@ -1,47 +1,34 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import os = require('os');
-import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory} from '../../lib';
-import * as artifact from '@actions/artifact';
+import { deployPackage } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
 })();
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
+export async function main(): Promise<void> {
     try {
         core.startGroup('deploy-package:');
-        const platform = os.platform();
-        if (platform !== 'win32') {
-            throw Error(`Unsupported runner os: '${platform}'; package deployer is only available on Windows.`);
-        }
-        pac = factory.getRunner('pac', process.cwd());
-        const packagePath = core.getInput('package', { required: true });
-        const logToConsole = 'true';
-        const LogToFile = 'pac-deploy-log.txt';
-        await new AuthHandler(pac).authenticate(AuthKind.CDS);
+        const taskParser = new YamlParser();
+        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "deploy-package");
 
-        const deployPackageArgs = ['package', 'deploy', '--package', packagePath, '--logFile', LogToFile, '--logConsole', logToConsole];
-        await pac.run(deployPackageArgs);
-
-        const artifactClient = artifact.create();
-        const artifactName = 'pac-deploy-log';
-        const files = [
-            'pac-deploy-log.txt'
-        ]
-        const rootDirectory = '.';
-        const options = { continueOnError: true };
-        await artifactClient.uploadArtifact(artifactName, files, rootDirectory, options);
+        await deployPackage({
+            credentials: getCredentials(),
+            environmentUrl: getEnvironmentUrl(),
+            packagePath: parameterMap["package"],
+        }, runnerParameters, new ActionsHost())
         core.info('package deployed.');
         core.endGroup();
     } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
+        core.setFailed(`failed: ${error}`);
         throw error;
-    }  finally {
-        await pac?.run(["auth", "clear"]);
     }
 }
