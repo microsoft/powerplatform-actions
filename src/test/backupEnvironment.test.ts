@@ -3,10 +3,11 @@
 import path = require('path');
 import { forEachOf } from 'async';
 import { expect } from 'chai';
-
+import { assert } from "chai";
 import { main as backupEnvironment } from '../actions/backup-environment';
 import { MockedRunners } from './mockedRunners';
 import { ActionInputsEmulator } from './actionInputsEmulator';
+//import { assert } from 'sinon';
 
 describe('backup-environment#input validation', () => {
     const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
@@ -27,21 +28,21 @@ describe('backup-environment#input validation', () => {
     const actionInputs = new ActionInputsEmulator(inputParams);
 
     forEachOf(requiredParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
+        it(`required parameter - ${inputParam.Name}`, async () => {
             actionInputs.defineInputsExcept(inputParam.Name);
             let res, err;
             try {
-                 res = await backupEnvironment(mockFactory);
+                res = await backupEnvironment(mockFactory);
             }
             catch (error) {
                 err = error;
             }
             expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
+            assert.deepEqual(err, undefined, `required and not supplied: ${inputParam.Name}`);
         });
     });
 
-    it('call action', async() => {
+    it('call action', async () => {
         actionInputs.defineInputs();
         let err;
         try {
@@ -52,7 +53,7 @@ describe('backup-environment#input validation', () => {
         }
         expect(err).to.be.undefined;
         const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'backup', '--url', 'aUrl', '--label', 'aLabel' ] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: ['auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
+        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: ['admin', 'backup', '--url', 'aUrl', '--label', 'aLabel'] });
     }).timeout(5000);
 });
