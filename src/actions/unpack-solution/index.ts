@@ -19,6 +19,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
       solutionZipFile: parameterMap['solution-file'],
       sourceFolder: parameterMap['solution-folder'],
       solutionType: parameterMap['solution-type'],
+      overwriteFiles: parameterMap['overwrite-files'],
     }, runnerParameters, new ActionsHost());
 
     core.endGroup();
