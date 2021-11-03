@@ -2,6 +2,7 @@
 name: pull-request-validation
 
 on:
+  workflow_dispatch:    # allow for manual workflow triggering as needed
   pull_request:
     branches: [ main ]
 
