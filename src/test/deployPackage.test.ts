@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { should, use } from "chai";
+import { should, use, assert } from "chai";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import rewiremock from "./rewiremock";
@@ -10,7 +10,6 @@ import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
 import { runnerParameters } from "../../src/lib/runnerParameters";
 import Sinon = require("sinon");
 import { ActionsHost } from "../lib/host/ActionsHost";
-import { assert } from "console";
 should();
 use(sinonChai);
 
@@ -44,6 +43,6 @@ describe("deploy package test", () => {
   });
 
   it("undefined checker", async () => {
-    chai.assert.isNotNull(process.env.GITHUB_ACTIONS);
+    assert.isNotNull(process.env.GITHUB_ACTIONS);
   });
 });
