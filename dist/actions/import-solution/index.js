@@ -3579,6 +3579,13 @@ let pac;
     if (isAsync) {
         importArgs.push('--async');
     }
+    const deploymentSettingsFileCandidate = core.getInput('deployment-settings-file', { required: false });
+    if (deploymentSettingsFileCandidate) {
+        const deploymentSettingsFile = path.isAbsolute(deploymentSettingsFileCandidate)
+            ? deploymentSettingsFileCandidate
+            : path.resolve(workingDir, deploymentSettingsFileCandidate);
+        importArgs.push('--settings-file', deploymentSettingsFile);
+    }
     yield pac.run(importArgs);
     core.info(`imported solution from: ${solutionFile}`);
     core.endGroup();
