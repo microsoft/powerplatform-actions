@@ -64,6 +64,10 @@ inputs:
     description: 'Imports solution asynchronously'
     required: false
 
+  deployment-settings-file:
+    description: 'The .json file with the deployment settings for connection references and environment variables.'
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/import-solution/index.js'
