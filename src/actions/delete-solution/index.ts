@@ -20,7 +20,6 @@ export async function main(): Promise<void> {
         const taskParser = new YamlParser();
         const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "delete-solution");
 
-        core.info("solution name: " + parameterMap["solution-name"]);
         await deleteSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
