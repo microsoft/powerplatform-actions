@@ -41,7 +41,7 @@ describe("WhoAmI tests", () => {
             }
         );
 
-        whoAmIStub.should.have.been.calledOnceWithExactly({
+        whoAmIStub.should.have.been.calledWithExactly({
             credentials: credentials,
             environmentUrl: environmentUrl,
         }, runnerParameters);
