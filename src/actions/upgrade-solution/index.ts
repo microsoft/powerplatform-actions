@@ -30,7 +30,8 @@ export async function main(): Promise<void> {
         }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {
-        core.setFailed(`failed: ${error}`);
+        const logger = runnerParameters.logger;
+        logger.error(`failed: ${error}`);
         core.endGroup();
     }
 }

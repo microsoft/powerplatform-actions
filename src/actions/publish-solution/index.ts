@@ -22,7 +22,8 @@ export async function main(): Promise<void> {
         core.info('published solution customizations');
         core.endGroup();
     } catch (error) {
-        core.setFailed(`failed: ${error}`);
+        const logger = runnerParameters.logger;
+        logger.error(`failed: ${error}`);
         core.endGroup();
     }
 }
