@@ -23,6 +23,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
     core.endGroup();
   })().catch(error => {
-    core.setFailed(`failed: ${error}`);
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
     core.endGroup();
 });
