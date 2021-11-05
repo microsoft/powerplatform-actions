@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { upgradeSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { deleteSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
 import getCredentials from "../../lib/auth/getCredentials";
@@ -16,16 +16,14 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 export async function main(): Promise<void> {
     try {
-        core.startGroup('upgrade-solution:');
+        core.startGroup('delete-solution:');
         const taskParser = new YamlParser();
-        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "upgrade-solution");
+        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "delete-solution");
 
-        await upgradeSolution({
+        await deleteSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
-            name: parameterMap["solution-name"],
-            async: parameterMap["async"],
-            maxAsyncWaitTimeInMin: parameterMap["max-async-wait-time"],
+            name: parameterMap["solution-name"]
         }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {
