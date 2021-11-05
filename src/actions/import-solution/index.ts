@@ -1,64 +1,43 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
+import { importSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
-import { ActionLogger, AuthHandler, AuthKind, getInputAsBool, getWorkingDirectory, PacRunner, Runner } from '../../lib';
-import path = require('path');
-import fs = require('fs-extra');
-import { exit } from 'process';
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from '../../lib/runnerParameters';
 
-core.startGroup('import-solution:');
-
-const workingDir = getWorkingDirectory('working-directory', false);
-const solutionFileCandidate = core.getInput('solution-file', { required: true });
-const solutionFile = path.isAbsolute(solutionFileCandidate) ? solutionFileCandidate : path.resolve(workingDir, solutionFileCandidate);
-if (!fs.existsSync(solutionFile)) {
-    core.setFailed(`Solution file "${solutionFile}" does not exist`);
-    exit();
-}
-
-const activatePlugins = getInputAsBool('activate-plugins', false, true);
-const forceOverwrite = getInputAsBool('force-overwrite', false, true);
-const skipDepCheck = getInputAsBool('skip-dependency-check', false, false);
-const importAsHolding = getInputAsBool('import-as-holding', false, false);
-const publishChanges = getInputAsBool('publish-changes', false, false);
-const isAsync = getInputAsBool('run-asynchronously', false, false);
-
-core.info(`  solution import: ${solutionFile}`);
-core.info(`  activatePlugins: ${activatePlugins} - forceOverwrite: ${forceOverwrite}`);
-core.info(`  skipDependencyCheck: ${skipDepCheck} - importAsHolding: ${importAsHolding}`);
-core.info(`  publishChanges: ${publishChanges}`);
-
-const logger = new ActionLogger();
-let pac: Runner;
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    pac = new PacRunner(workingDir, logger);
-    await new AuthHandler(pac).authenticate(AuthKind.CDS);
-
-    const importArgs = ['solution', 'import', '--path', solutionFile];
-    if (activatePlugins) { importArgs.push('--activate-plugins'); }
-    if (forceOverwrite) { importArgs.push('--force-overwrite'); }
-    if (skipDepCheck) { importArgs.push('--skip-dependency-check'); }
-    if (importAsHolding) { importArgs.push('--import-as-holding'); }
-    if (publishChanges) { importArgs.push('--publish-changes'); }
-    if (isAsync) {  importArgs.push('--async'); }
-
-    const deploymentSettingsFileCandidate = core.getInput('deployment-settings-file', { required: false });
-    if (deploymentSettingsFileCandidate) {
-        const deploymentSettingsFile = path.isAbsolute(deploymentSettingsFileCandidate)
-            ? deploymentSettingsFileCandidate
-            : path.resolve(workingDir, deploymentSettingsFileCandidate);
-
-        importArgs.push('--settings-file', deploymentSettingsFile);
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "import-solution");
+    const actionsHost = new ActionsHost();
+    const workingDir = actionsHost.getInput({ name: "working-directory", required: false });
+    if (workingDir) {
+        runnerParameters.workingDir = workingDir;
     }
 
-    await pac.run(importArgs);
-    core.info(`imported solution from: ${solutionFile}`);
-    core.endGroup();
+    core.startGroup('import-solution:');
+    await importSolution({
+        credentials: getCredentials(),
+        environmentUrl: getEnvironmentUrl(),
+        path: parameterMap['solution-file'],
+        useDeploymentSettingsFile: parameterMap['use-deployment-settings-file'],
+        deploymentSettingsFile: parameterMap['deployment-settings-file'],
+        async: parameterMap['run-asynchronously'],
+        maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
+        importAsHolding: parameterMap['import-as-holding'],
+        forceOverwrite: parameterMap['force-overwrite'],
+        publishChanges: parameterMap['publish-changes'],
+        skipDependencyCheck: parameterMap['skip-dependency-check'],
+        convertToManaged: parameterMap['convert-to-managed'],
+        activatePlugins: parameterMap['activate-plugins']
+    }, runnerParameters, new ActionsHost());
 
-})().catch(error => {
-    core.setFailed(`failed: ${error}`);
     core.endGroup();
-}).finally(async () => {
-    await pac?.run(["auth", "clear"]);
+})().catch(error => {
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
+    core.endGroup();
 });
