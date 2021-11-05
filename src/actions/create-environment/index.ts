@@ -1,45 +1,36 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+import { createEnvironment } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
-import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory } from '../../lib';
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
-})();
+})().catch(error => {
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
+    core.endGroup();
+});
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
-    try {
-        core.startGroup('create-environment:');
-        pac = factory.getRunner('pac', process.cwd());
+export async function main(): Promise<void> {
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "create-environment");
 
-        const envName = core.getInput('name', { required: true});
-        const envType = core.getInput('type', {required: true});
-        const envRegion = core.getInput('region', {required: false});
-        const domain = core.getInput('domain', {required: false});
-
-        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
-
-        const createEnvironmentArgs = ['admin', 'create', '--name', envName, '--region', envRegion, '--type', envType, '--domain', domain];
-        const result = await pac.run(createEnvironmentArgs);
-        // HACK TODO: Need structured output from pac CLI to make parsing out of the resulting env URL more robust
-        const newEnvDetailColumns = result
-                                    .filter(l => l.length > 0)
-                                    .pop()
-                                    ?.trim()
-                                    .split(/\s+/);
-
-        const envUrl = newEnvDetailColumns?.shift();
-        const envId = newEnvDetailColumns?.shift();
-        core.setOutput('environment-url', envUrl);
-        core.setOutput('environment-id', envId);
-        core.endGroup();
-    } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
-    } finally {
-        await pac?.run(["auth", "clear"]);
-    }
+    core.startGroup('create-environment:');
+    await createEnvironment({
+        credentials: getCredentials(),
+        environmentName: parameterMap['name'],
+        environmentType: parameterMap['type'],
+        region: parameterMap['region'],
+        currency: parameterMap['currency'],
+        language: parameterMap['language'],
+        templates: parameterMap['templates'],
+        domainName: parameterMap['domain']
+    }, runnerParameters, new ActionsHost());
+    core.endGroup();
 }

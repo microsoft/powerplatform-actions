@@ -1,58 +1,46 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { forEachOf } from 'async';
-import { expect } from 'chai';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { main as copyEnvironment } from '../actions/copy-environment';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
+should();
+use(sinonChai);
 
-describe('copy-environment#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
+describe("copy-environment tests", () => {
+    const copyEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
+    const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
-    const requiredParams = [
-        { Name: 'source-url', Value: 'sourceUrl', required: true},
-        { Name: 'target-url', Value: 'targetUrl', required: true},
-    ];
-    // TODO: read in params and their required state from the action.yml
-    const inputParams = [
-        { Name: 'user-name', Value: 'aUserName', required: true},
-        { Name: 'password-secret', Value: 'aSecret', required: true},
-        { Name: 'source-url', Value: 'sourceUrl', required: true},
-        { Name: 'target-url', Value: 'targetUrl', required: true},
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+    async function callActionWithMocks(): Promise<void> {
+        const mockedModule = await rewiremock.around(() => import("../../src/actions/copy-environment/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ copyEnvironment: copyEnvironmentStub });
+                mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
+                mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+            });
+        await mockedModule.main();
+    }
 
-    forEachOf(requiredParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                res = await copyEnvironment(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            if(inputParam.required)
-                expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
-    });
+    it("fetches parameters from index.ts, calls copyEnvironmentStub properly", async () => {
 
-    it('call action', async() => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await copyEnvironment(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'copy', '--source-url', 'sourceUrl', '--target-url', 'targetUrl'] });
+        await callActionWithMocks();
+
+        copyEnvironmentStub.should.have.been.calledWithExactly({
+            credentials: credentials,
+            sourceEnvironmentUrl: mockEnvironmentUrl,
+            targetEnvironmentUrl: { name: 'target-url', required: true, defaultValue: undefined },
+            copyType: { name: 'copy-type', required: false, defaultValue: 'Full Copy' },
+            overrideFriendlyName: { name: 'override-friendly-name', required: false, defaultValue: 'false' },
+            friendlyTargetEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined }
+        }, runnerParameters, new ActionsHost());
     });
 });
