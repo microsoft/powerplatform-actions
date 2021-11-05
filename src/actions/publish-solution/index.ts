@@ -19,7 +19,6 @@ export async function main(): Promise<void> {
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
         }, runnerParameters);
-        core.info('published solution customizations');
         core.endGroup();
     } catch (error) {
         const logger = runnerParameters.logger;
