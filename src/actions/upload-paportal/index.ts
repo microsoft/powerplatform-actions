@@ -18,7 +18,9 @@ import { runnerParameters } from '../../lib/runnerParameters';
         path: parameterMap['upload-path'],
         deploymentProfile: parameterMap['deployment-profile'],
     }, runnerParameters, new ActionsHost());
+    core.endGroup();
 })().catch(error => {
-    core.setFailed(`failed: ${error}`);
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
     core.endGroup();
 });
