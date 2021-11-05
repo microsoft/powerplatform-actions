@@ -1,60 +1,48 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { forEachOf } from 'async';
-import { expect } from 'chai';
-import { main as createEnvironment } from '../actions/create-environment';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-describe('create-environment#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
-    // TODO: read in params and their required state from the action.yml
-    const requiredParams = [
-        { Name: 'name', Value: 'newEnvironment', required: true },
-        { Name: 'type', Value: 'Sandbox', required: true }
-    ];
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
+should();
+use(sinonChai);
 
-    const inputParams = [
-        { Name: 'name', Value: 'newEnvironment', required: true },
-        { Name: 'type', Value: 'Sandbox', required: true },
-        { Name: 'user-name', Value: 'aUserName', required: false},
-        { Name: 'password-secret', Value: 'aSecret', required: false},
-        { Name: 'region', Value: 'unitedstates', required: false},
-        { Name: 'domain', Value: 'test-rolling123', required: false}
+describe("create-environment tests", () => {
+    const createEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
+    const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+    async function callActionWithMocks(): Promise<void> {
+        const mockedModule = await rewiremock.around(() => import("../../src/actions/create-environment/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ createEnvironment: createEnvironmentStub });
+                mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
+                mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+            });
+        await mockedModule.main();
+    }
 
-    forEachOf(requiredParams, (requiredInputParam) => {
-        it(`required parameter - ${requiredInputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(requiredInputParam.Name);
-            let res, err;
-            try {
-                res = await createEnvironment(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            if(requiredInputParam.required)
-                expect(err.message).to.match(new RegExp(`required and not supplied: ${requiredInputParam.Name}`));
-        });
-    });
+    it("fetches parameters from index.ts, calls createEnvironmentStub properly", async () => {
 
-    it('call action', async() => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await createEnvironment(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'create', '--name', 'newEnvironment', '--region', 'unitedstates', '--type', 'Sandbox', '--domain', 'test-rolling123'] });
+        await callActionWithMocks();
+
+        createEnvironmentStub.should.have.been.calledWithExactly({
+            credentials: credentials,
+            environmentName: { name: 'name', required: true, defaultValue: undefined },
+            environmentType: { name: 'type', required: true, defaultValue: 'Sandbox' },
+            region: { name: 'region', required: true, defaultValue: 'unitedstates' },
+            currency: { name: 'currency', required: false, defaultValue: 'USD' },
+            language: { name: 'language', required: false, defaultValue: 'English' },
+            templates: { name: 'templates', required: false, defaultValue: undefined },
+            domainName: { name: 'domain', required: false, defaultValue: undefined }
+        }, runnerParameters, new ActionsHost());
     });
 });
