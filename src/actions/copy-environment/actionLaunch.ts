@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import process = require('process');
-import { DefaultRunnerFactory } from '../../lib';
 import { main } from './index';
 
 process.env['INPUT_USER-NAME'] = process.env['PA_BT_ORG_USER'] ?? 'davidjen@ppdevtools.onmicrosoft.com';
@@ -16,4 +15,4 @@ process.env['INPUT_TARGET_URL'] = 'test-pizza';
 
 process.env['RUNNER_DEBUG'] = '1';
 process.env['GITHUB_ACTIONS'] = '1';
-main(DefaultRunnerFactory);
+main();

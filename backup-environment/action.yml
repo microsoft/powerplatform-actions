@@ -1,14 +1,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'backup-environment'
-description: 'Power Platform Backup Environment Action'
+name: "backup-environment"
+description: "Power Platform Backup Environment Action"
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to backup; e.g. "https://test-env.crm.dynamics.com"'
     required: true
 
   backup-label:
-    description: 'Label to add to the Power Platform environment backup.'
+    description: "Label to add to the Power Platform environment backup."
     required: true
 
   user-name:
@@ -16,7 +16,7 @@ inputs:
     required: false
 
   password-secret:
-    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
     required: false
 
   app-id:
@@ -24,13 +24,13 @@ inputs:
     required: false
 
   client-secret:
-    description: 'The client secret to authenticate with. Required if authenticating with app-id.'
+    description: "The client secret to authenticate with. Required if authenticating with app-id."
     required: false
 
   tenant-id:
-    description: 'Tenant id if using app-id & client secret to authenticate.'
+    description: "Tenant id if using app-id & client secret to authenticate."
     required: false
 
 runs:
-  using: 'node12'
-  main: '../dist/actions/backup-environment/index.js'
+  using: "node12"
+  main: "../dist/actions/backup-environment/index.js"
