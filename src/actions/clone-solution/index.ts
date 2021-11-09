@@ -1,39 +1,39 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner, Runner } from '../../lib';
-import path = require('path');
-import fs = require('fs-extra');
+import { cloneSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from "../../lib/runnerParameters";
 
-core.startGroup('clone-solution:');
-const solutionName = core.getInput('solution-name', { required: true });
-const solutionVersion = core.getInput('solution-version', { required: false });
-core.info(`solution: ${solutionName} (${solutionVersion})`);
-
-const workingDir = getWorkingDirectory('working-directory', false);
-const targetFolderCandidate = core.getInput('target-folder', { required: false }) || `${solutionName}_${!solutionVersion ? '0.1.0' : solutionVersion}`;
-const targetFolder = path.isAbsolute(targetFolderCandidate) ? targetFolderCandidate : path.resolve(workingDir, targetFolderCandidate);
-fs.ensureDirSync(targetFolder);
-
-const logger = new ActionLogger();
-let pac: Runner;
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    pac = new PacRunner(workingDir, logger);
-    await new AuthHandler(pac).authenticate(AuthKind.CDS);
+    core.startGroup('clone-solution:');
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "clone-solution");
 
-    const cloneArgs = ['solution', 'clone', '--name', solutionName, '--outputDirectory', targetFolder];
-    if (solutionVersion) {
-        cloneArgs.push('--targetVersion', solutionVersion);
-    }
-    await pac.run(cloneArgs);
-    core.info(`cloned solution into folder: ${targetFolder}`);
+    await cloneSolution({
+        credentials: getCredentials(),
+        environmentUrl: getEnvironmentUrl(),
+        name: parameterMap['solution-name'],
+        targetVersion: parameterMap['solution-version'],
+        outputDirectory: parameterMap['target-folder'],
+        autoNumberSettings: parameterMap['export-auto-numbering-settings'],
+        calenderSettings: parameterMap['export-calendar-settings'],
+        customizationSettings: parameterMap['export-customization-settings'],
+        emailTrackingSettings: parameterMap['export-email-tracking-settings'],
+        externalApplicationSettings: parameterMap['export-external-applications-settings'],
+        generalSettings: parameterMap['export-general-settings'],
+        isvConfig: parameterMap['export-isv-config'],
+        marketingSettings: parameterMap['export-marketing-settings'],
+        outlookSynchronizationSettings: parameterMap['export-outlook-synchronization-settings'],
+        relationshipRoles: parameterMap['export-relationship-roles'],
+        sales: parameterMap['export-sales'],
+    }, runnerParameters, new ActionsHost());
     core.endGroup();
-
 })().catch(error => {
-    core.setFailed(`failed: ${error}`);
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
     core.endGroup();
-}).finally(async () => {
-    await pac?.run(["auth", "clear"]);
 });
