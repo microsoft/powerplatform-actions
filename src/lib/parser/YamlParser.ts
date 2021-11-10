@@ -7,8 +7,9 @@ import path = require("path");
 export class YamlParser {
     public getHostParameterEntries(workingDir: string, actionFolder: string): Record<string, HostParameterEntry> {
         const parameterMap: Record<string, HostParameterEntry> = {};
+        let file;
         try {
-            const file = path.resolve(workingDir, `./${actionFolder}/action.yml`);
+            file = path.resolve(workingDir, `./${actionFolder}/action.yml`);
             const fileContents = fs.readFileSync(file, 'utf8');
             const data = yaml.load(fileContents) as any;
             for (const [name, inputInfo] of Object.entries(data.inputs)) {
@@ -21,7 +22,7 @@ export class YamlParser {
             }
             return parameterMap;
         } catch (e) {
-            throw new Error(`Error parsing yaml file for ${actionFolder} with error: ${e}`)
+            throw new Error(`Error parsing yaml file for ${actionFolder} with error: ${e}, workingDir: ${workingDir} and file: ${file}`)
         }
     }
 }
