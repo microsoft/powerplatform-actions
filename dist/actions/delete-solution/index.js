@@ -5915,7 +5915,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 /***/ }),
 
-/***/ 8878:
+/***/ 6259:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
@@ -5932,8 +5932,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-const actions_1 = __nccwpck_require__(7765);
 const core = __nccwpck_require__(2186);
+const actions_1 = __nccwpck_require__(7765);
 const YamlParser_1 = __nccwpck_require__(734);
 const ActionsHost_1 = __nccwpck_require__(5726);
 const getCredentials_1 = __nccwpck_require__(2429);
@@ -5943,22 +5943,25 @@ const runnerParameters_1 = __nccwpck_require__(7727);
     if (process.env.GITHUB_ACTIONS) {
         yield main();
     }
-}))().catch(error => {
-    const logger = runnerParameters_1.runnerParameters.logger;
-    logger.error(`failed: ${error}`);
-    core.endGroup();
-});
+}))();
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const taskParser = new YamlParser_1.YamlParser();
-        const parameterMap = taskParser.getHostParameterEntries(runnerParameters_1.runnerParameters.workingDir, "backup-environment");
-        core.startGroup('backup-environment:');
-        yield actions_1.backupEnvironment({
-            credentials: getCredentials_1.default(),
-            environmentUrl: getEnvironmentUrl_1.default(),
-            backupLabel: parameterMap['backup-label']
-        }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
-        core.endGroup();
+        try {
+            core.startGroup('delete-solution:');
+            const taskParser = new YamlParser_1.YamlParser();
+            const parameterMap = taskParser.getHostParameterEntries(runnerParameters_1.runnerParameters.workingDir, "delete-solution");
+            yield actions_1.deleteSolution({
+                credentials: getCredentials_1.default(),
+                environmentUrl: getEnvironmentUrl_1.default(),
+                name: parameterMap["solution-name"]
+            }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
+            core.endGroup();
+        }
+        catch (error) {
+            const logger = runnerParameters_1.runnerParameters.logger;
+            logger.error(`failed: ${error}`);
+            core.endGroup();
+        }
     });
 }
 exports.main = main;
@@ -6272,7 +6275,7 @@ module.exports = require("process");;
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(8878);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6259);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

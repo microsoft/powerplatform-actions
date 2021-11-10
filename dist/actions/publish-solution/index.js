@@ -474,6 +474,1364 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
+/***/ 892:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RunnerError = exports.createCommandRunner = void 0;
+const child_process_1 = __nccwpck_require__(129);
+const process_1 = __nccwpck_require__(316);
+const os_1 = __nccwpck_require__(87);
+const process = __nccwpck_require__(316);
+function createCommandRunner(workingDir, commandPath, logger, options, agent) {
+    return function run(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                logInitialization(...args);
+                const allOutput = [];
+                const cp = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: Object.assign({ PATH: process_1.env.PATH,
+                        "PP_TOOLS_AUTOMATION_AGENT": agent
+                    }, process.env) }, options));
+                cp.stdout.on("data", logData(logger.log));
+                cp.stderr.on("data", logData(logger.error));
+                function logData(logFunction) {
+                    return (data) => {
+                        `${data}`.split(os_1.EOL).forEach((line) => {
+                            allOutput.push(line);
+                            logFunction(line);
+                        });
+                    };
+                }
+                cp.on("exit", (code) => {
+                    if (code === 0) {
+                        resolve(allOutput);
+                    }
+                    else {
+                        logger.error(`error: ${code}`);
+                        reject(new RunnerError(code, allOutput.join(os_1.EOL)));
+                    }
+                    /* Close out handles to the output streams so that we don't wait on
+                        grandchild processes like pacTelemetryUpload */
+                    cp.stdout.destroy();
+                    cp.stderr.destroy();
+                });
+            });
+        });
+    };
+    function logInitialization(...args) {
+        logger.debug(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
+    }
+}
+exports.createCommandRunner = createCommandRunner;
+class RunnerError extends Error {
+    constructor(exitCode, message) {
+        super(message);
+        this.exitCode = exitCode;
+    }
+}
+exports.RunnerError = RunnerError;
+
+//# sourceMappingURL=CommandRunner.js.map
+
+
+/***/ }),
+
+/***/ 920:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.backupEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function backupEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "backup", "--url", parameters.environmentUrl];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--label", parameters.backupLabel);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("BackupEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.backupEnvironment = backupEnvironment;
+
+//# sourceMappingURL=backupEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 896:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const path = __nccwpck_require__(622);
+function checkSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "check"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.solutionPath, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--geo", parameters.geoInstance);
+            validator.pushInput(pacArgs, "--ruleLevelOverride", parameters.ruleLevelOverride);
+            validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CheckSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.checkSolution = checkSolution;
+
+//# sourceMappingURL=checkSolution.js.map
+
+
+/***/ }),
+
+/***/ 841:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.cloneSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function cloneSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "clone"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--name", parameters.name);
+            validator.pushInput(pacArgs, "--targetversion", parameters.targetVersion);
+            validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            const includeArgs = [];
+            if (validator.getInput(parameters.autoNumberSettings) === 'true') {
+                includeArgs.push("autonumbering");
+            }
+            if (validator.getInput(parameters.calenderSettings) === 'true') {
+                includeArgs.push("calendar");
+            }
+            if (validator.getInput(parameters.customizationSettings) === 'true') {
+                includeArgs.push("customization");
+            }
+            if (validator.getInput(parameters.emailTrackingSettings) === 'true') {
+                includeArgs.push("emailtracking");
+            }
+            if (validator.getInput(parameters.externalApplicationSettings) === 'true') {
+                includeArgs.push("externalapplications");
+            }
+            if (validator.getInput(parameters.generalSettings) === 'true') {
+                includeArgs.push("general");
+            }
+            if (validator.getInput(parameters.isvConfig) === 'true') {
+                includeArgs.push("isvconfig");
+            }
+            if (validator.getInput(parameters.marketingSettings) === 'true') {
+                includeArgs.push("marketing");
+            }
+            if (validator.getInput(parameters.outlookSynchronizationSettings) === 'true') {
+                includeArgs.push("outlooksynchronization");
+            }
+            if (validator.getInput(parameters.relationshipRoles) === 'true') {
+                includeArgs.push("relationshiproles");
+            }
+            if (validator.getInput(parameters.sales) === 'true') {
+                includeArgs.push("sales");
+            }
+            if (includeArgs.length > 0) {
+                pacArgs.push("--include", includeArgs.join(','));
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CloneSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.cloneSolution = cloneSolution;
+
+//# sourceMappingURL=cloneSolution.js.map
+
+
+/***/ }),
+
+/***/ 219:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.copyEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function copyEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "copy", "--source-url", parameters.sourceEnvironmentUrl];
+            logger.log("Source Url: " + parameters.sourceEnvironmentUrl);
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
+            if (validator.getInput(parameters.overrideFriendlyName) === 'true') {
+                validator.pushInput(pacArgs, "--name", parameters.friendlyTargetEnvironmentName);
+            }
+            validator.pushInput(pacArgs, "--type", parameters.copyType);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CopyEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.copyEnvironment = copyEnvironment;
+
+//# sourceMappingURL=copyEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 98:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function createEnvironment(parameters, runnerParameters, host) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["admin", "create"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--name", parameters.environmentName);
+            validator.pushInput(pacArgs, "--type", parameters.environmentType);
+            validator.pushInput(pacArgs, "--templates", parameters.templates);
+            validator.pushInput(pacArgs, "--region", parameters.region);
+            validator.pushInput(pacArgs, "--currency", parameters.currency);
+            validator.pushInput(pacArgs, "--language", parameters.language);
+            validator.pushInput(pacArgs, "--domain", parameters.domainName);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CreateEnvironment Action Result: " + pacResult);
+            // HACK TODO: Need structured output from pac CLI to make parsing out of the resulting env URL more robust
+            const newEnvDetailColumns = (_a = pacResult
+                .filter(l => l.length > 0)
+                .pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/);
+            const envUrl = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
+            const envId = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
+            return {
+                environmentId: envId,
+                environmentUrl: envUrl
+            };
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.createEnvironment = createEnvironment;
+
+//# sourceMappingURL=createEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 930:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deleteEnvironment = void 0;
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function deleteEnvironment(parameters, runnerParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "delete", "--url", parameters.environmentUrl];
+            logger.log("Url: " + parameters.environmentUrl);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DeleteEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.deleteEnvironment = deleteEnvironment;
+
+//# sourceMappingURL=deleteEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 183:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deleteSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function deleteSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "delete"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--solution-name", parameters.name);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DeleteSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.deleteSolution = deleteSolution;
+
+//# sourceMappingURL=deleteSolution.js.map
+
+
+/***/ }),
+
+/***/ 671:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deployPackage = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const path = __nccwpck_require__(622);
+function deployPackage(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["package", "deploy"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--package", parameters.packagePath, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--logFile", parameters.logFile);
+            validator.pushInput(pacArgs, "--logConsole", parameters.logConsole);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DeployPackage Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.deployPackage = deployPackage;
+
+//# sourceMappingURL=deployPackage.js.map
+
+
+/***/ }),
+
+/***/ 598:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.downloadPaportal = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function downloadPaportal(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["paportal", "download"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.path);
+            validator.pushInput(pacArgs, "--websiteId", parameters.websiteId);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DownloadPaPortal Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.downloadPaportal = downloadPaportal;
+
+//# sourceMappingURL=downloadPaportal.js.map
+
+
+/***/ }),
+
+/***/ 288:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.exportSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const path = __nccwpck_require__(622);
+function exportSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "export"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--name", parameters.name);
+            validator.pushInput(pacArgs, "--path", parameters.path, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--managed", parameters.managed);
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            validator.pushInput(pacArgs, "--targetversion", parameters.targetVersion);
+            const includeArgs = [];
+            if (validator.getInput(parameters.autoNumberSettings) === 'true') {
+                includeArgs.push("autonumbering");
+            }
+            if (validator.getInput(parameters.calenderSettings) === 'true') {
+                includeArgs.push("calendar");
+            }
+            if (validator.getInput(parameters.customizationSettings) === 'true') {
+                includeArgs.push("customization");
+            }
+            if (validator.getInput(parameters.emailTrackingSettings) === 'true') {
+                includeArgs.push("emailtracking");
+            }
+            if (validator.getInput(parameters.externalApplicationSettings) === 'true') {
+                includeArgs.push("externalapplications");
+            }
+            if (validator.getInput(parameters.generalSettings) === 'true') {
+                includeArgs.push("general");
+            }
+            if (validator.getInput(parameters.isvConfig) === 'true') {
+                includeArgs.push("isvconfig");
+            }
+            if (validator.getInput(parameters.marketingSettings) === 'true') {
+                includeArgs.push("marketing");
+            }
+            if (validator.getInput(parameters.outlookSynchronizationSettings) === 'true') {
+                includeArgs.push("outlooksynchronization");
+            }
+            if (validator.getInput(parameters.relationshipRoles) === 'true') {
+                includeArgs.push("relationshiproles");
+            }
+            if (validator.getInput(parameters.sales) === 'true') {
+                includeArgs.push("sales");
+            }
+            if (includeArgs.length > 0) {
+                pacArgs.push("--include", includeArgs.join(','));
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("ExportSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.exportSolution = exportSolution;
+
+//# sourceMappingURL=exportSolution.js.map
+
+
+/***/ }),
+
+/***/ 274:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.importSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const path = __nccwpck_require__(622);
+function importSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "import"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.path, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
+            validator.pushInput(pacArgs, "--force-overwrite", parameters.forceOverwrite);
+            validator.pushInput(pacArgs, "--publish-changes", parameters.publishChanges);
+            validator.pushInput(pacArgs, "--skip-dependency-check", parameters.skipDependencyCheck);
+            validator.pushInput(pacArgs, "--convert-to-managed", parameters.convertToManaged);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            validator.pushInput(pacArgs, "--activate-plugins", parameters.activatePlugins);
+            if (validator.getInput(parameters.useDeploymentSettingsFile) === "true") {
+                validator.pushInput(pacArgs, "--settings-file", parameters.deploymentSettingsFile);
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("ImportSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.importSolution = importSolution;
+
+//# sourceMappingURL=importSolution.js.map
+
+
+/***/ }),
+
+/***/ 765:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(288), exports);
+__exportStar(__nccwpck_require__(302), exports);
+__exportStar(__nccwpck_require__(274), exports);
+__exportStar(__nccwpck_require__(177), exports);
+__exportStar(__nccwpck_require__(930), exports);
+__exportStar(__nccwpck_require__(920), exports);
+__exportStar(__nccwpck_require__(896), exports);
+__exportStar(__nccwpck_require__(119), exports);
+__exportStar(__nccwpck_require__(671), exports);
+__exportStar(__nccwpck_require__(98), exports);
+__exportStar(__nccwpck_require__(697), exports);
+__exportStar(__nccwpck_require__(183), exports);
+__exportStar(__nccwpck_require__(936), exports);
+__exportStar(__nccwpck_require__(230), exports);
+__exportStar(__nccwpck_require__(682), exports);
+__exportStar(__nccwpck_require__(219), exports);
+__exportStar(__nccwpck_require__(223), exports);
+__exportStar(__nccwpck_require__(598), exports);
+__exportStar(__nccwpck_require__(841), exports);
+__exportStar(__nccwpck_require__(21), exports);
+
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 936:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.packSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const path = __nccwpck_require__(622);
+function packSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "pack"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("PackSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.packSolution = packSolution;
+
+//# sourceMappingURL=packSolution.js.map
+
+
+/***/ }),
+
+/***/ 119:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.publishSolution = void 0;
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function publishSolution(parameters, runnerParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacResult = yield pac("solution", "publish");
+            logger.log("PublishSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.publishSolution = publishSolution;
+
+//# sourceMappingURL=publishSolution.js.map
+
+
+/***/ }),
+
+/***/ 682:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resetEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function resetEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "reset", "--url", parameters.environmentUrl];
+            logger.log("Url: " + parameters.environmentUrl);
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--language", parameters.language);
+            if (validator.getInput(parameters.overrideDomainName) === 'true') {
+                validator.pushInput(pacArgs, "--domain", parameters.domainName);
+            }
+            if (validator.getInput(parameters.overrideFriendlyName) === 'true') {
+                validator.pushInput(pacArgs, "--name", parameters.friendlyEnvironmentName);
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("ResetEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.resetEnvironment = resetEnvironment;
+
+//# sourceMappingURL=resetEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 697:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.restoreEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function restoreEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["admin", "restore", "--source-url", parameters.sourceEnvironmentUrl];
+            logger.log("Source Url: " + parameters.sourceEnvironmentUrl);
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
+            validator.pushInput(pacArgs, "--name", parameters.targetEnvironmentName);
+            if (validator.getInput(parameters.restoreLatestBackup) === 'true') {
+                pacArgs.push("--selected-backup", "latest");
+            }
+            else if (parameters.backupDateTime) {
+                validator.pushInput(pacArgs, "--selected-backup", parameters.backupDateTime);
+            }
+            else {
+                throw new Error("Either latest backup must be true or Valid date and time for backup must be provided.");
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("RestoreEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.restoreEnvironment = restoreEnvironment;
+
+//# sourceMappingURL=restoreEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 230:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.unpackSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+const path = __nccwpck_require__(622);
+function unpackSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "unpack"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
+            if (validator.getInput(parameters.overwriteFiles) === "true") {
+                pacArgs.push("--allowDelete");
+                pacArgs.push("yes");
+                pacArgs.push("--allowWrite");
+                pacArgs.push("true");
+                pacArgs.push("--clobber");
+                pacArgs.push("true");
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UnpackSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.unpackSolution = unpackSolution;
+
+//# sourceMappingURL=unpackSolution.js.map
+
+
+/***/ }),
+
+/***/ 21:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateVersionSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function updateVersionSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "version"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--patchversion", parameters.patchVersion);
+            validator.pushInput(pacArgs, "--strategy", parameters.strategy);
+            validator.pushInput(pacArgs, "--filename", parameters.fileName);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UpdateVersionSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.updateVersionSolution = updateVersionSolution;
+
+//# sourceMappingURL=updateVersionSolution.js.map
+
+
+/***/ }),
+
+/***/ 177:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.upgradeSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function upgradeSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "upgrade"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--solution-name", parameters.name);
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UpgradeSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.upgradeSolution = upgradeSolution;
+
+//# sourceMappingURL=upgradeSolution.js.map
+
+
+/***/ }),
+
+/***/ 223:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.uploadPaportal = void 0;
+const InputValidator_1 = __nccwpck_require__(988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function uploadPaportal(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["paportal", "upload"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.path);
+            validator.pushInput(pacArgs, "--deploymentProfile", parameters.deploymentProfile);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UploadPaPortal Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.uploadPaportal = uploadPaportal;
+
+//# sourceMappingURL=uploadPaportal.js.map
+
+
+/***/ }),
+
+/***/ 302:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.whoAmI = void 0;
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(226);
+function whoAmI(parameters, runnerParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacResult = yield pac("org", "who");
+            logger.log("WhoAmI Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.whoAmI = whoAmI;
+
+//# sourceMappingURL=whoAmI.js.map
+
+
+/***/ }),
+
+/***/ 988:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.InputValidator = void 0;
+class InputValidator {
+    constructor(host) {
+        this._host = host;
+    }
+    getInput(params) {
+        const val = this._host.getInput(params);
+        if (val === undefined && params.defaultValue !== undefined) {
+            return params.defaultValue.toString();
+        }
+        return val;
+    }
+    pushInput(pacArgs, property, params, callback) {
+        if (params !== undefined) {
+            let val = this.getInput(params);
+            if (val === undefined && params.required) {
+                throw new Error(`Required ${params.name} not set`);
+            }
+            else if (val !== undefined) {
+                if (callback) {
+                    val = callback(val);
+                }
+                pacArgs.push(property, val);
+            }
+        }
+    }
+}
+exports.InputValidator = InputValidator;
+
+//# sourceMappingURL=InputValidator.js.map
+
+
+/***/ }),
+
+/***/ 192:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.clearAuthentication = exports.authenticateEnvironment = exports.authenticateAdmin = void 0;
+function authenticateAdmin(pac, credentials) {
+    return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials));
+}
+exports.authenticateAdmin = authenticateAdmin;
+function authenticateEnvironment(pac, credentials, environmentUrl) {
+    return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials));
+}
+exports.authenticateEnvironment = authenticateEnvironment;
+function clearAuthentication(pac) {
+    return pac("auth", "clear");
+}
+exports.clearAuthentication = clearAuthentication;
+function addUrl(url) {
+    return ["--url", url];
+}
+function addCredentials(credentials) {
+    return isUsernamePassword(credentials) ? addUsernamePassword(credentials) : addClientCredentials(credentials);
+}
+function isUsernamePassword(credentials) {
+    return "username" in credentials;
+}
+function addClientCredentials(parameters) {
+    return ["--tenant", parameters.tenantId, "--applicationId", parameters.appId, "--clientSecret", parameters.clientSecret];
+}
+function addUsernamePassword(parameters) {
+    return ["--username", parameters.username, "--password", parameters.password];
+}
+
+//# sourceMappingURL=authenticate.js.map
+
+
+/***/ }),
+
+/***/ 226:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const os_1 = __nccwpck_require__(87);
+const path_1 = __nccwpck_require__(622);
+const CommandRunner_1 = __nccwpck_require__(892);
+function createPacRunner({ workingDir, runnersDir, logger, agent }) {
+    return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32"
+        ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe")
+        : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger, undefined, agent);
+}
+exports.default = createPacRunner;
+
+//# sourceMappingURL=createPacRunner.js.map
+
+
+/***/ }),
+
 /***/ 10:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -492,61 +1850,35 @@ exports.main = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __nccwpck_require__(186);
-const lib_1 = __nccwpck_require__(806);
+const actions_1 = __nccwpck_require__(765);
+const getCredentials_1 = __nccwpck_require__(429);
+const getEnvironmentUrl_1 = __nccwpck_require__(699);
+const runnerParameters_1 = __nccwpck_require__(727);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.GITHUB_ACTIONS) {
-        yield main(lib_1.DefaultRunnerFactory);
+        yield main();
     }
 }))();
-function main(factory) {
+function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        let pac;
         try {
             core.startGroup('publish-solution:');
-            pac = factory.getRunner('pac', process.cwd());
-            yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.CDS);
-            const publishArgs = ['solution', 'publish'];
-            yield pac.run(publishArgs);
-            core.info('published solution customizations');
+            yield actions_1.publishSolution({
+                credentials: getCredentials_1.default(),
+                environmentUrl: getEnvironmentUrl_1.default(),
+            }, runnerParameters_1.runnerParameters);
             core.endGroup();
         }
         catch (error) {
-            core.setFailed(`failed: ${error.message}`);
-            throw error;
-        }
-        finally {
-            yield (pac === null || pac === void 0 ? void 0 : pac.run(["auth", "clear"]));
+            const logger = runnerParameters_1.runnerParameters.logger;
+            logger.error(`failed: ${error}`);
+            core.endGroup();
         }
     });
 }
 exports.main = main;
 
 //# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 434:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkingDirectory = exports.getInputAsBool = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const core = __nccwpck_require__(186);
-function getInputAsBool(name, required, defaultValue) {
-    const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? defaultValue : textValue.toLowerCase() === 'true';
-}
-exports.getInputAsBool = getInputAsBool;
-function getWorkingDirectory(name, required, defaultValue) {
-    const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? (defaultValue !== null && defaultValue !== void 0 ? defaultValue : process.cwd()) : textValue;
-}
-exports.getWorkingDirectory = getWorkingDirectory;
-
-//# sourceMappingURL=actionInput.js.map
 
 
 /***/ }),
@@ -586,222 +1918,49 @@ exports.ActionLogger = ActionLogger;
 
 /***/ }),
 
-/***/ 677:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 429:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const core = __nccwpck_require__(186);
-const createLegacyRunnerPacAuthenticator_1 = __nccwpck_require__(687);
-class AuthHandler {
-    constructor(pac) {
-        if ("run" in pac) {
-            this._pacAuthenticator = createLegacyRunnerPacAuthenticator_1.default(pac);
-        }
-        else {
-            this._pacAuthenticator = pac;
-        }
-    }
-    authenticate(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.startGroup("authentication");
-            this._envUrl = core.getInput("environment-url", { required: false });
-            const authType = this.determineAuthType();
-            if (authType === AuthTypes.USERNAME_PASSWORD) {
-                yield this.authenticateWithUsernamePassword(authKind);
-            }
-            else if (authType == AuthTypes.APPID_SECRET) {
-                yield this.authenticateWithClientCredentials(authKind);
-            }
-            else {
-                throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
-            }
-            core.endGroup();
-        });
-    }
-    determineAuthType() {
-        const validUsernameAuth = this.isValidUsernameAuth();
-        const validSPNAuth = this.isValidSPNAuth();
-        try {
-            if (validUsernameAuth && validSPNAuth) {
-                throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
-            }
-            if (validUsernameAuth) {
-                return AuthTypes.USERNAME_PASSWORD;
-            }
-            else if (validSPNAuth) {
-                return AuthTypes.APPID_SECRET;
-            }
-        }
-        catch (error) {
-            core.setFailed(`failed: ${error.message}`);
-            throw error;
-        }
-        return AuthTypes.INVALID_AUTH_TYPE;
-    }
-    isValidUsernameAuth() {
-        this._username = core.getInput("user-name", { required: false });
-        this._password = core.getInput("password-secret", { required: false });
-        return !!this._username && !!this._password;
-    }
-    isValidSPNAuth() {
-        this._appId = core.getInput("app-id", { required: false });
-        this._clientSecret = core.getInput("client-secret", {
-            required: false,
-        });
-        this._tenantId = core.getInput("tenant-id", { required: false });
-        return !!this._appId && !!this._clientSecret && !!this._tenantId;
-    }
-    authenticateWithClientCredentials(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
-            if (authKind === AuthKind.CDS) {
-                yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
-                    tenantId: this._tenantId,
-                    appId: this._appId,
-                    clientSecret: this._clientSecret,
-                });
-            }
-            else {
-                yield this._pacAuthenticator.authenticateAdminWithClientCredentials({
-                    tenantId: this._tenantId,
-                    appId: this._appId,
-                    clientSecret: this._clientSecret,
-                });
-            }
-        });
-    }
-    authenticateWithUsernamePassword(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
-            if (authKind == AuthKind.CDS) {
-                yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-                    username: this._username,
-                    password: this._password,
-                });
-            }
-            else {
-                yield this._pacAuthenticator.authenticateAdminWithUsernamePassword({
-                    username: this._username,
-                    password: this._password,
-                });
-            }
-        });
-    }
-}
-exports.AuthHandler = AuthHandler;
-var AuthTypes;
-(function (AuthTypes) {
-    AuthTypes[AuthTypes["USERNAME_PASSWORD"] = 0] = "USERNAME_PASSWORD";
-    AuthTypes[AuthTypes["APPID_SECRET"] = 1] = "APPID_SECRET";
-    AuthTypes[AuthTypes["INVALID_AUTH_TYPE"] = 2] = "INVALID_AUTH_TYPE";
-})(AuthTypes || (AuthTypes = {}));
-var AuthKind;
-(function (AuthKind) {
-    AuthKind[AuthKind["CDS"] = 0] = "CDS";
-    AuthKind[AuthKind["ADMIN"] = 1] = "ADMIN";
-})(AuthKind = exports.AuthKind || (exports.AuthKind = {}));
-
-//# sourceMappingURL=authHandler.js.map
-
-
-/***/ }),
-
-/***/ 687:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const getEnvironmentUrl_1 = __nccwpck_require__(699);
-function createLegacyRunnerPacAuthenticator(pac) {
-    return {
-        authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--url",
-                getEnvironmentUrl_1.default(),
-                "--applicationId",
-                parameters.appId,
-                "--clientSecret",
-                parameters.clientSecret,
-                "--tenant",
-                parameters.tenantId,
-            ]);
-        }),
-        authenticateAdminWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--kind",
-                "ADMIN",
-                "--applicationId",
-                parameters.appId,
-                "--clientSecret",
-                parameters.clientSecret,
-                "--tenant",
-                parameters.tenantId,
-            ]);
-        }),
-        authenticateCdsWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--url",
-                getEnvironmentUrl_1.default(),
-                "--username",
-                parameters.username,
-                "--password",
-                parameters.password,
-            ]);
-        }),
-        authenticateAdminWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--kind",
-                "ADMIN",
-                "--username",
-                parameters.username,
-                "--password",
-                parameters.password,
-            ]);
-        }),
+const core_1 = __nccwpck_require__(186);
+function getCredentials() {
+    const usernamePassword = {
+        username: getInput("user-name"),
+        password: getInput("password-secret"),
     };
-    function clearAuth() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield pac.run(["auth", "clear"]);
-        });
+    const isUpValid = isUsernamePasswordValid(usernamePassword);
+    const clientCredentials = {
+        appId: getInput("app-id"),
+        clientSecret: getInput("client-secret"),
+        tenantId: getInput("tenant-id"),
+    };
+    const isCcValid = isClientCredentialsValid(clientCredentials);
+    if (isUpValid && isCcValid) {
+        throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
     }
+    if (isUpValid) {
+        return usernamePassword;
+    }
+    if (isCcValid) {
+        return clientCredentials;
+    }
+    throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
 }
-exports.default = createLegacyRunnerPacAuthenticator;
+exports.default = getCredentials;
+function getInput(name) {
+    return core_1.getInput(name, { required: false });
+}
+function isUsernamePasswordValid(usernamePassword) {
+    return !!usernamePassword.username && !!usernamePassword.password;
+}
+function isClientCredentialsValid(clientCredentials) {
+    return (!!clientCredentials.appId &&
+        !!clientCredentials.clientSecret &&
+        !!clientCredentials.tenantId);
+}
 
-//# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
+//# sourceMappingURL=getCredentials.js.map
 
 
 /***/ }),
@@ -818,106 +1977,6 @@ function getEnvironmentUrl() {
 exports.default = getEnvironmentUrl;
 
 //# sourceMappingURL=getEnvironmentUrl.js.map
-
-
-/***/ }),
-
-/***/ 21:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RunnerError = exports.ExeRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const child_process_1 = __nccwpck_require__(129);
-const os = __nccwpck_require__(87);
-const getExePath_1 = __nccwpck_require__(309);
-const runnerParameters_1 = __nccwpck_require__(727);
-const process = __nccwpck_require__(765);
-class ExeRunner {
-    constructor(_workingDir, logger, exeName, exeRelativePath) {
-        this._workingDir = _workingDir;
-        this.logger = logger;
-        if (exeRelativePath) {
-            this._exePath = getExePath_1.default(...exeRelativePath, exeName);
-        }
-        else {
-            this._exePath = exeName;
-        }
-    }
-    get workingDir() {
-        return this._workingDir;
-    }
-    run(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                const stdout = new Array();
-                const stderr = new Array();
-                this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
-                const cp = child_process_1.spawn(this._exePath, args, {
-                    cwd: this.workingDir,
-                    env: Object.assign(Object.assign({}, process.env), { "PP_TOOLS_AUTOMATION_AGENT": runnerParameters_1.getAutomationAgent() })
-                });
-                cp.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
-                cp.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
-                cp.on('exit', (code) => {
-                    if (code === 0) {
-                        this.logger.info(`success: ${stdout.join(os.EOL)}`);
-                        resolve(stdout);
-                    }
-                    else {
-                        const allOutput = stderr.concat(stdout);
-                        this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                        reject(new RunnerError(code !== null && code !== void 0 ? code : 99999, allOutput.join()));
-                    }
-                    // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
-                    cp.stdout.destroy();
-                    cp.stderr.destroy();
-                });
-            });
-        });
-    }
-    runSync(args) {
-        var _a;
-        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
-        const proc = child_process_1.spawnSync(this._exePath, args, {
-            cwd: this.workingDir,
-            env: Object.assign(Object.assign({}, process.env), { "PP_TOOLS_AUTOMATION_AGENT": runnerParameters_1.getAutomationAgent() })
-        });
-        if (proc.status === 0) {
-            const output = proc.output
-                .filter(line => !!line) // can have null entries
-                .map(line => line.toString());
-            this.logger.info(`success: ${output.join(os.EOL)}`);
-            return output;
-        }
-        else {
-            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
-            this.logger.error(`error: ${proc.status}: ${allOutput}`);
-            throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
-        }
-    }
-}
-exports.ExeRunner = ExeRunner;
-class RunnerError extends Error {
-    constructor(exitCode, message) {
-        super(message);
-        this.exitCode = exitCode;
-    }
-}
-exports.RunnerError = RunnerError;
-
-//# sourceMappingURL=exeRunner.js.map
 
 
 /***/ }),
@@ -956,123 +2015,13 @@ exports.default = getExePath;
 
 /***/ }),
 
-/***/ 973:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GitRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __nccwpck_require__(21);
-class GitRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, 'git');
-    }
-}
-exports.GitRunner = GitRunner;
-
-//# sourceMappingURL=gitRunner.js.map
-
-
-/***/ }),
-
-/***/ 806:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-var actionInput_1 = __nccwpck_require__(434);
-Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
-Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
-var exeRunner_1 = __nccwpck_require__(21);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
-var runnerFactory_1 = __nccwpck_require__(147);
-Object.defineProperty(exports, "DefaultRunnerFactory", ({ enumerable: true, get: function () { return runnerFactory_1.DefaultRunnerFactory; } }));
-// TODO: delete exports once all actions are converted:
-var actionLogger_1 = __nccwpck_require__(970);
-Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
-var gitRunner_1 = __nccwpck_require__(973);
-Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
-var pacRunner_1 = __nccwpck_require__(366);
-Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
-var authHandler_1 = __nccwpck_require__(677);
-Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
-Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 366:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PacRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __nccwpck_require__(21);
-const os = __nccwpck_require__(87);
-const platform = os.platform();
-const programName = platform === "win32" ? 'pac.exe' : 'pac';
-const programPath = platform === "win32" ? ['pac', 'tools'] : ['pac_linux', 'tools'];
-class PacRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, programName, programPath);
-    }
-}
-exports.PacRunner = PacRunner;
-
-//# sourceMappingURL=pacRunner.js.map
-
-
-/***/ }),
-
-/***/ 147:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DefaultRunnerFactory = void 0;
-const actionLogger_1 = __nccwpck_require__(970);
-const gitRunner_1 = __nccwpck_require__(973);
-const pacRunner_1 = __nccwpck_require__(366);
-class RealRunnerFactory {
-    constructor() {
-        this._logger = new actionLogger_1.ActionLogger();
-    }
-    getRunner(runnerName, workingDir) {
-        switch (runnerName) {
-            case 'pac':
-                return new pacRunner_1.PacRunner(workingDir, this._logger);
-            case 'git':
-                return new gitRunner_1.GitRunner(workingDir, this._logger);
-            default:
-                throw new Error(`Unknown runner type requested: ${runnerName}`);
-        }
-    }
-}
-exports.DefaultRunnerFactory = new RealRunnerFactory();
-
-//# sourceMappingURL=runnerFactory.js.map
-
-
-/***/ }),
-
 /***/ 727:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAutomationAgent = exports.runnerParameters = void 0;
-const process_1 = __nccwpck_require__(765);
+const process_1 = __nccwpck_require__(316);
 const actionLogger_1 = __nccwpck_require__(970);
 const getExePath_1 = __nccwpck_require__(309);
 function getAutomationAgent() {
@@ -1098,7 +2047,7 @@ exports.runnerParameters = runnerParameters;
 /***/ 306:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.28.6","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.25","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.28.6","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.31","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
 
 /***/ }),
 
@@ -1130,7 +2079,7 @@ module.exports = require("path");;
 
 /***/ }),
 
-/***/ 765:
+/***/ 316:
 /***/ ((module) => {
 
 module.exports = require("process");;
