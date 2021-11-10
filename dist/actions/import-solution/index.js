@@ -6156,7 +6156,7 @@ class YamlParser {
             return parameterMap;
         }
         catch (e) {
-            throw new Error(`Error parsing yaml file for ${actionFolder}`);
+            throw new Error(`Error parsing yaml file for ${actionFolder} with error: ${e}`);
         }
     }
 }
