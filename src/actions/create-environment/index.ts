@@ -22,7 +22,7 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "create-environment");
 
     core.startGroup('create-environment:');
-    await createEnvironment({
+    const result = await createEnvironment({
         credentials: getCredentials(),
         environmentName: parameterMap['name'],
         environmentType: parameterMap['type'],
@@ -32,5 +32,8 @@ export async function main(): Promise<void> {
         templates: parameterMap['templates'],
         domainName: parameterMap['domain']
     }, runnerParameters, new ActionsHost());
+
+    core.setOutput('environment-url', result.environmentUrl);
+    core.setOutput('environment-id', result.environmentId);
     core.endGroup();
 }
