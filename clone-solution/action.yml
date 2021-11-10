@@ -39,61 +39,6 @@ inputs:
     description: 'Target folder to place the extracted solution into'
     required: false
 
-  export-auto-numbering-settings:
-    description: "Specify whether to export auto numbering settings."
-    required: false
-    default: "false"
-
-  export-calendar-settings:
-    description: "Specify whether to export calendar settings."
-    required: false
-    default: "false"
-
-  export-customization-settings:
-    description: "Specify whether to export customization settings."
-    required: false
-    default: "false"
-
-  export-email-tracking-settings:
-    description: "Specify whether to export email tracking settings."
-    required: false
-    default: "false"
-
-  export-external-applications-settings:
-    description: "Specify whether to export external applications settings."
-    required: false
-    default: "false"
-
-  export-general-settings:
-    description: "Specify whether to export general settings."
-    required: false
-    default: "false"
-
-  export-isv-config:
-    description: "Specify whether to export isv config."
-    required: false
-    default: "false"
-
-  export-marketing-settings:
-    description: "Specify whether to export marketing settings."
-    required: false
-    default: "false"
-
-  export-outlook-synchronization-settings:
-    description: "Specify whether to export outlook synchornization settings."
-    required: false
-    default: "false"
-
-  export-relationship-roles:
-    description: "Specify whether to export relationship roles."
-    required: false
-    default: "false"
-
-  export-sales:
-    description: "Specify whether to export sales."
-    required: false
-    default: "false"
-
   working-directory:
     description: 'Working directory; default: root of repository'
     required: false
