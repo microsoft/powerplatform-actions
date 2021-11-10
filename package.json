@@ -59,7 +59,11 @@
   "dependencies": {
     "@actions/artifact": "^0.5.2",
     "@actions/core": "^1.4.0",
+<<<<<<< HEAD
     "@microsoft/powerplatform-cli-wrapper": "^0.1.36",
+=======
+    "@microsoft/powerplatform-cli-wrapper": "^0.1.30",
+>>>>>>> 8b61c9d (Revert "Fix for create environment to consume and set env id and url parameters")
     "date-fns": "^2.22.1",
     "fs-extra": "^10.0.0",
     "js-yaml": "^4.1",
