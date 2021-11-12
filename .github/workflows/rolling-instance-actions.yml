@@ -33,25 +33,29 @@ jobs:
     - name: Test create-source-environment action with appId-clientSecret
       uses: ./create-environment
       id: create-source-environment
+      env:
+        PP_SRC_ENV_NAME: ${{ format('ci-actions-src-{0}', runner.os) }}
       with:
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
-        name: sourceEnvironment
+        name: ${{ env.PP_SRC_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: test-source
+        domain: ${{ env.PP_SRC_ENV_NAME }}
 
     - name: Test create-target-environment action with username/password
       uses: ./create-environment
       id: create-target-environment
+      env:
+        PP_TRG_ENV_NAME: ${{ format('ci-actions-trg-{0}', runner.os) }}
       with:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        name: targetEnvironment
+        name: ${{ env.PP_TRG_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: test-target
+        domain: ${{ env.PP_TRG_ENV_NAME }}
 
     - name: Test who-am-i action with appId-clientSecret
       uses: ./who-am-i
