@@ -179,6 +179,9 @@ async function dist() {
                     fs.emptyDirSync(actionDir);
                     fs.writeFileSync(path.resolve(actionDir, 'index.js'), code);
                 })
+                .catch(err => {
+                    console.log(err);
+                });
         });
     await Promise.all(allBundles);
 }
