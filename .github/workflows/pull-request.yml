@@ -48,13 +48,15 @@ jobs:
     - name: Test create-environment action with username/password
       uses: ./create-environment
       id: create-environment
+      env:
+        PP_ENV_NAME: ${{ format('pr-actions-{0}', runner.os) }}
       with:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        name: pullRequestTestEnv
+        name: ${{ env.PP_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: pp-actions-pr
+        domain: ${{ env.PP_ENV_NAME }}
 
     - name: Test who-am-i action
       uses: ./who-am-i
