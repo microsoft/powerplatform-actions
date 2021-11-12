@@ -5909,7 +5909,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 /***/ }),
 
-/***/ 99:
+/***/ 6259:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
@@ -5941,15 +5941,13 @@ const runnerParameters_1 = __nccwpck_require__(7727);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.startGroup('upgrade-solution:');
+            core.startGroup('delete-solution:');
             const taskParser = new YamlParser_1.YamlParser();
-            const parameterMap = taskParser.getHostParameterEntries(runnerParameters_1.runnerParameters.workingDir, "upgrade-solution");
-            yield actions_1.upgradeSolution({
+            const parameterMap = taskParser.getHostParameterEntries(runnerParameters_1.runnerParameters.workingDir, "delete-solution");
+            yield actions_1.deleteSolution({
                 credentials: getCredentials_1.default(),
                 environmentUrl: getEnvironmentUrl_1.default(),
-                name: parameterMap["solution-name"],
-                async: parameterMap["async"],
-                maxAsyncWaitTimeInMin: parameterMap["max-async-wait-time"],
+                name: parameterMap["solution-name"]
             }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
             core.endGroup();
         }
@@ -6276,7 +6274,7 @@ module.exports = require("process");
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(99);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6259);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
