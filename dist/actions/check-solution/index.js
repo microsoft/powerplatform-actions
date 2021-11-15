@@ -1,1692 +1,10 @@
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
-
-/***/ 2605:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const artifact_client_1 = __nccwpck_require__(8802);
-/**
- * Constructs an ArtifactClient
- */
-function create() {
-    return artifact_client_1.DefaultArtifactClient.create();
-}
-exports.create = create;
-//# sourceMappingURL=artifact-client.js.map
-
-/***/ }),
-
-/***/ 8802:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(2186));
-const upload_specification_1 = __nccwpck_require__(183);
-const upload_http_client_1 = __nccwpck_require__(4354);
-const utils_1 = __nccwpck_require__(6327);
-const download_http_client_1 = __nccwpck_require__(8538);
-const download_specification_1 = __nccwpck_require__(5686);
-const config_variables_1 = __nccwpck_require__(2222);
-const path_1 = __nccwpck_require__(5622);
-class DefaultArtifactClient {
-    /**
-     * Constructs a DefaultArtifactClient
-     */
-    static create() {
-        return new DefaultArtifactClient();
-    }
-    /**
-     * Uploads an artifact
-     */
-    uploadArtifact(name, files, rootDirectory, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            utils_1.checkArtifactName(name);
-            // Get specification for the files being uploaded
-            const uploadSpecification = upload_specification_1.getUploadSpecification(name, rootDirectory, files);
-            const uploadResponse = {
-                artifactName: name,
-                artifactItems: [],
-                size: 0,
-                failedItems: []
-            };
-            const uploadHttpClient = new upload_http_client_1.UploadHttpClient();
-            if (uploadSpecification.length === 0) {
-                core.warning(`No files found that can be uploaded`);
-            }
-            else {
-                // Create an entry for the artifact in the file container
-                const response = yield uploadHttpClient.createArtifactInFileContainer(name, options);
-                if (!response.fileContainerResourceUrl) {
-                    core.debug(response.toString());
-                    throw new Error('No URL provided by the Artifact Service to upload an artifact to');
-                }
-                core.debug(`Upload Resource URL: ${response.fileContainerResourceUrl}`);
-                // Upload each of the files that were found concurrently
-                const uploadResult = yield uploadHttpClient.uploadArtifactToFileContainer(response.fileContainerResourceUrl, uploadSpecification, options);
-                // Update the size of the artifact to indicate we are done uploading
-                // The uncompressed size is used for display when downloading a zip of the artifact from the UI
-                yield uploadHttpClient.patchArtifactSize(uploadResult.totalSize, name);
-                core.info(`Finished uploading artifact ${name}. Reported size is ${uploadResult.uploadSize} bytes. There were ${uploadResult.failedItems.length} items that failed to upload`);
-                uploadResponse.artifactItems = uploadSpecification.map(item => item.absoluteFilePath);
-                uploadResponse.size = uploadResult.uploadSize;
-                uploadResponse.failedItems = uploadResult.failedItems;
-            }
-            return uploadResponse;
-        });
-    }
-    downloadArtifact(name, path, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const downloadHttpClient = new download_http_client_1.DownloadHttpClient();
-            const artifacts = yield downloadHttpClient.listArtifacts();
-            if (artifacts.count === 0) {
-                throw new Error(`Unable to find any artifacts for the associated workflow`);
-            }
-            const artifactToDownload = artifacts.value.find(artifact => {
-                return artifact.name === name;
-            });
-            if (!artifactToDownload) {
-                throw new Error(`Unable to find an artifact with the name: ${name}`);
-            }
-            const items = yield downloadHttpClient.getContainerItems(artifactToDownload.name, artifactToDownload.fileContainerResourceUrl);
-            if (!path) {
-                path = config_variables_1.getWorkSpaceDirectory();
-            }
-            path = path_1.normalize(path);
-            path = path_1.resolve(path);
-            // During upload, empty directories are rejected by the remote server so there should be no artifacts that consist of only empty directories
-            const downloadSpecification = download_specification_1.getDownloadSpecification(name, items.value, path, (options === null || options === void 0 ? void 0 : options.createArtifactFolder) || false);
-            if (downloadSpecification.filesToDownload.length === 0) {
-                core.info(`No downloadable files were found for the artifact: ${artifactToDownload.name}`);
-            }
-            else {
-                // Create all necessary directories recursively before starting any download
-                yield utils_1.createDirectoriesForArtifact(downloadSpecification.directoryStructure);
-                core.info('Directory structure has been setup for the artifact');
-                yield utils_1.createEmptyFilesForArtifact(downloadSpecification.emptyFilesToCreate);
-                yield downloadHttpClient.downloadSingleArtifact(downloadSpecification.filesToDownload);
-            }
-            return {
-                artifactName: name,
-                downloadPath: downloadSpecification.rootDownloadLocation
-            };
-        });
-    }
-    downloadAllArtifacts(path) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const downloadHttpClient = new download_http_client_1.DownloadHttpClient();
-            const response = [];
-            const artifacts = yield downloadHttpClient.listArtifacts();
-            if (artifacts.count === 0) {
-                core.info('Unable to find any artifacts for the associated workflow');
-                return response;
-            }
-            if (!path) {
-                path = config_variables_1.getWorkSpaceDirectory();
-            }
-            path = path_1.normalize(path);
-            path = path_1.resolve(path);
-            let downloadedArtifacts = 0;
-            while (downloadedArtifacts < artifacts.count) {
-                const currentArtifactToDownload = artifacts.value[downloadedArtifacts];
-                downloadedArtifacts += 1;
-                // Get container entries for the specific artifact
-                const items = yield downloadHttpClient.getContainerItems(currentArtifactToDownload.name, currentArtifactToDownload.fileContainerResourceUrl);
-                const downloadSpecification = download_specification_1.getDownloadSpecification(currentArtifactToDownload.name, items.value, path, true);
-                if (downloadSpecification.filesToDownload.length === 0) {
-                    core.info(`No downloadable files were found for any artifact ${currentArtifactToDownload.name}`);
-                }
-                else {
-                    yield utils_1.createDirectoriesForArtifact(downloadSpecification.directoryStructure);
-                    yield utils_1.createEmptyFilesForArtifact(downloadSpecification.emptyFilesToCreate);
-                    yield downloadHttpClient.downloadSingleArtifact(downloadSpecification.filesToDownload);
-                }
-                response.push({
-                    artifactName: currentArtifactToDownload.name,
-                    downloadPath: downloadSpecification.rootDownloadLocation
-                });
-            }
-            return response;
-        });
-    }
-}
-exports.DefaultArtifactClient = DefaultArtifactClient;
-//# sourceMappingURL=artifact-client.js.map
-
-/***/ }),
-
-/***/ 2222:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-// The number of concurrent uploads that happens at the same time
-function getUploadFileConcurrency() {
-    return 2;
-}
-exports.getUploadFileConcurrency = getUploadFileConcurrency;
-// When uploading large files that can't be uploaded with a single http call, this controls
-// the chunk size that is used during upload
-function getUploadChunkSize() {
-    return 8 * 1024 * 1024; // 8 MB Chunks
-}
-exports.getUploadChunkSize = getUploadChunkSize;
-// The maximum number of retries that can be attempted before an upload or download fails
-function getRetryLimit() {
-    return 5;
-}
-exports.getRetryLimit = getRetryLimit;
-// With exponential backoff, the larger the retry count, the larger the wait time before another attempt
-// The retry multiplier controls by how much the backOff time increases depending on the number of retries
-function getRetryMultiplier() {
-    return 1.5;
-}
-exports.getRetryMultiplier = getRetryMultiplier;
-// The initial wait time if an upload or download fails and a retry is being attempted for the first time
-function getInitialRetryIntervalInMilliseconds() {
-    return 3000;
-}
-exports.getInitialRetryIntervalInMilliseconds = getInitialRetryIntervalInMilliseconds;
-// The number of concurrent downloads that happens at the same time
-function getDownloadFileConcurrency() {
-    return 2;
-}
-exports.getDownloadFileConcurrency = getDownloadFileConcurrency;
-function getRuntimeToken() {
-    const token = process.env['ACTIONS_RUNTIME_TOKEN'];
-    if (!token) {
-        throw new Error('Unable to get ACTIONS_RUNTIME_TOKEN env variable');
-    }
-    return token;
-}
-exports.getRuntimeToken = getRuntimeToken;
-function getRuntimeUrl() {
-    const runtimeUrl = process.env['ACTIONS_RUNTIME_URL'];
-    if (!runtimeUrl) {
-        throw new Error('Unable to get ACTIONS_RUNTIME_URL env variable');
-    }
-    return runtimeUrl;
-}
-exports.getRuntimeUrl = getRuntimeUrl;
-function getWorkFlowRunId() {
-    const workFlowRunId = process.env['GITHUB_RUN_ID'];
-    if (!workFlowRunId) {
-        throw new Error('Unable to get GITHUB_RUN_ID env variable');
-    }
-    return workFlowRunId;
-}
-exports.getWorkFlowRunId = getWorkFlowRunId;
-function getWorkSpaceDirectory() {
-    const workspaceDirectory = process.env['GITHUB_WORKSPACE'];
-    if (!workspaceDirectory) {
-        throw new Error('Unable to get GITHUB_WORKSPACE env variable');
-    }
-    return workspaceDirectory;
-}
-exports.getWorkSpaceDirectory = getWorkSpaceDirectory;
-function getRetentionDays() {
-    return process.env['GITHUB_RETENTION_DAYS'];
-}
-exports.getRetentionDays = getRetentionDays;
-//# sourceMappingURL=config-variables.js.map
-
-/***/ }),
-
-/***/ 8538:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const fs = __importStar(__nccwpck_require__(5747));
-const core = __importStar(__nccwpck_require__(2186));
-const zlib = __importStar(__nccwpck_require__(8761));
-const utils_1 = __nccwpck_require__(6327);
-const url_1 = __nccwpck_require__(8835);
-const status_reporter_1 = __nccwpck_require__(9081);
-const perf_hooks_1 = __nccwpck_require__(630);
-const http_manager_1 = __nccwpck_require__(6527);
-const config_variables_1 = __nccwpck_require__(2222);
-const requestUtils_1 = __nccwpck_require__(755);
-class DownloadHttpClient {
-    constructor() {
-        this.downloadHttpManager = new http_manager_1.HttpManager(config_variables_1.getDownloadFileConcurrency(), '@actions/artifact-download');
-        // downloads are usually significantly faster than uploads so display status information every second
-        this.statusReporter = new status_reporter_1.StatusReporter(1000);
-    }
-    /**
-     * Gets a list of all artifacts that are in a specific container
-     */
-    listArtifacts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const artifactUrl = utils_1.getArtifactUrl();
-            // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
-            const client = this.downloadHttpManager.getClient(0);
-            const headers = utils_1.getDownloadHeaders('application/json');
-            const response = yield requestUtils_1.retryHttpClientRequest('List Artifacts', () => __awaiter(this, void 0, void 0, function* () { return client.get(artifactUrl, headers); }));
-            const body = yield response.readBody();
-            return JSON.parse(body);
-        });
-    }
-    /**
-     * Fetches a set of container items that describe the contents of an artifact
-     * @param artifactName the name of the artifact
-     * @param containerUrl the artifact container URL for the run
-     */
-    getContainerItems(artifactName, containerUrl) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // the itemPath search parameter controls which containers will be returned
-            const resourceUrl = new url_1.URL(containerUrl);
-            resourceUrl.searchParams.append('itemPath', artifactName);
-            // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
-            const client = this.downloadHttpManager.getClient(0);
-            const headers = utils_1.getDownloadHeaders('application/json');
-            const response = yield requestUtils_1.retryHttpClientRequest('Get Container Items', () => __awaiter(this, void 0, void 0, function* () { return client.get(resourceUrl.toString(), headers); }));
-            const body = yield response.readBody();
-            return JSON.parse(body);
-        });
-    }
-    /**
-     * Concurrently downloads all the files that are part of an artifact
-     * @param downloadItems information about what items to download and where to save them
-     */
-    downloadSingleArtifact(downloadItems) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const DOWNLOAD_CONCURRENCY = config_variables_1.getDownloadFileConcurrency();
-            // limit the number of files downloaded at a single time
-            core.debug(`Download file concurrency is set to ${DOWNLOAD_CONCURRENCY}`);
-            const parallelDownloads = [...new Array(DOWNLOAD_CONCURRENCY).keys()];
-            let currentFile = 0;
-            let downloadedFiles = 0;
-            core.info(`Total number of files that will be downloaded: ${downloadItems.length}`);
-            this.statusReporter.setTotalNumberOfFilesToProcess(downloadItems.length);
-            this.statusReporter.start();
-            yield Promise.all(parallelDownloads.map((index) => __awaiter(this, void 0, void 0, function* () {
-                while (currentFile < downloadItems.length) {
-                    const currentFileToDownload = downloadItems[currentFile];
-                    currentFile += 1;
-                    const startTime = perf_hooks_1.performance.now();
-                    yield this.downloadIndividualFile(index, currentFileToDownload.sourceLocation, currentFileToDownload.targetPath);
-                    if (core.isDebug()) {
-                        core.debug(`File: ${++downloadedFiles}/${downloadItems.length}. ${currentFileToDownload.targetPath} took ${(perf_hooks_1.performance.now() - startTime).toFixed(3)} milliseconds to finish downloading`);
-                    }
-                    this.statusReporter.incrementProcessedCount();
-                }
-            })))
-                .catch(error => {
-                throw new Error(`Unable to download the artifact: ${error}`);
-            })
-                .finally(() => {
-                this.statusReporter.stop();
-                // safety dispose all connections
-                this.downloadHttpManager.disposeAndReplaceAllClients();
-            });
-        });
-    }
-    /**
-     * Downloads an individual file
-     * @param httpClientIndex the index of the http client that is used to make all of the calls
-     * @param artifactLocation origin location where a file will be downloaded from
-     * @param downloadPath destination location for the file being downloaded
-     */
-    downloadIndividualFile(httpClientIndex, artifactLocation, downloadPath) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let retryCount = 0;
-            const retryLimit = config_variables_1.getRetryLimit();
-            let destinationStream = fs.createWriteStream(downloadPath);
-            const headers = utils_1.getDownloadHeaders('application/json', true, true);
-            // a single GET request is used to download a file
-            const makeDownloadRequest = () => __awaiter(this, void 0, void 0, function* () {
-                const client = this.downloadHttpManager.getClient(httpClientIndex);
-                return yield client.get(artifactLocation, headers);
-            });
-            // check the response headers to determine if the file was compressed using gzip
-            const isGzip = (incomingHeaders) => {
-                return ('content-encoding' in incomingHeaders &&
-                    incomingHeaders['content-encoding'] === 'gzip');
-            };
-            // Increments the current retry count and then checks if the retry limit has been reached
-            // If there have been too many retries, fail so the download stops. If there is a retryAfterValue value provided,
-            // it will be used
-            const backOff = (retryAfterValue) => __awaiter(this, void 0, void 0, function* () {
-                retryCount++;
-                if (retryCount > retryLimit) {
-                    return Promise.reject(new Error(`Retry limit has been reached. Unable to download ${artifactLocation}`));
-                }
-                else {
-                    this.downloadHttpManager.disposeAndReplaceClient(httpClientIndex);
-                    if (retryAfterValue) {
-                        // Back off by waiting the specified time denoted by the retry-after header
-                        core.info(`Backoff due to too many requests, retry #${retryCount}. Waiting for ${retryAfterValue} milliseconds before continuing the download`);
-                        yield utils_1.sleep(retryAfterValue);
-                    }
-                    else {
-                        // Back off using an exponential value that depends on the retry count
-                        const backoffTime = utils_1.getExponentialRetryTimeInMilliseconds(retryCount);
-                        core.info(`Exponential backoff for retry #${retryCount}. Waiting for ${backoffTime} milliseconds before continuing the download`);
-                        yield utils_1.sleep(backoffTime);
-                    }
-                    core.info(`Finished backoff for retry #${retryCount}, continuing with download`);
-                }
-            });
-            const isAllBytesReceived = (expected, received) => {
-                // be lenient, if any input is missing, assume success, i.e. not truncated
-                if (!expected ||
-                    !received ||
-                    process.env['ACTIONS_ARTIFACT_SKIP_DOWNLOAD_VALIDATION']) {
-                    core.info('Skipping download validation.');
-                    return true;
-                }
-                return parseInt(expected) === received;
-            };
-            const resetDestinationStream = (fileDownloadPath) => __awaiter(this, void 0, void 0, function* () {
-                destinationStream.close();
-                yield utils_1.rmFile(fileDownloadPath);
-                destinationStream = fs.createWriteStream(fileDownloadPath);
-            });
-            // keep trying to download a file until a retry limit has been reached
-            while (retryCount <= retryLimit) {
-                let response;
-                try {
-                    response = yield makeDownloadRequest();
-                    if (core.isDebug()) {
-                        utils_1.displayHttpDiagnostics(response);
-                    }
-                }
-                catch (error) {
-                    // if an error is caught, it is usually indicative of a timeout so retry the download
-                    core.info('An error occurred while attempting to download a file');
-                    // eslint-disable-next-line no-console
-                    console.log(error);
-                    // increment the retryCount and use exponential backoff to wait before making the next request
-                    yield backOff();
-                    continue;
-                }
-                let forceRetry = false;
-                if (utils_1.isSuccessStatusCode(response.message.statusCode)) {
-                    // The body contains the contents of the file however calling response.readBody() causes all the content to be converted to a string
-                    // which can cause some gzip encoded data to be lost
-                    // Instead of using response.readBody(), response.message is a readableStream that can be directly used to get the raw body contents
-                    try {
-                        const isGzipped = isGzip(response.message.headers);
-                        yield this.pipeResponseToFile(response, destinationStream, isGzipped);
-                        if (isGzipped ||
-                            isAllBytesReceived(response.message.headers['content-length'], yield utils_1.getFileSize(downloadPath))) {
-                            return;
-                        }
-                        else {
-                            forceRetry = true;
-                        }
-                    }
-                    catch (error) {
-                        // retry on error, most likely streams were corrupted
-                        forceRetry = true;
-                    }
-                }
-                if (forceRetry || utils_1.isRetryableStatusCode(response.message.statusCode)) {
-                    core.info(`A ${response.message.statusCode} response code has been received while attempting to download an artifact`);
-                    resetDestinationStream(downloadPath);
-                    // if a throttled status code is received, try to get the retryAfter header value, else differ to standard exponential backoff
-                    utils_1.isThrottledStatusCode(response.message.statusCode)
-                        ? yield backOff(utils_1.tryGetRetryAfterValueTimeInMilliseconds(response.message.headers))
-                        : yield backOff();
-                }
-                else {
-                    // Some unexpected response code, fail immediately and stop the download
-                    utils_1.displayHttpDiagnostics(response);
-                    return Promise.reject(new Error(`Unexpected http ${response.message.statusCode} during download for ${artifactLocation}`));
-                }
-            }
-        });
-    }
-    /**
-     * Pipes the response from downloading an individual file to the appropriate destination stream while decoding gzip content if necessary
-     * @param response the http response received when downloading a file
-     * @param destinationStream the stream where the file should be written to
-     * @param isGzip a boolean denoting if the content is compressed using gzip and if we need to decode it
-     */
-    pipeResponseToFile(response, destinationStream, isGzip) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield new Promise((resolve, reject) => {
-                if (isGzip) {
-                    const gunzip = zlib.createGunzip();
-                    response.message
-                        .on('error', error => {
-                        core.error(`An error occurred while attempting to read the response stream`);
-                        gunzip.close();
-                        destinationStream.close();
-                        reject(error);
-                    })
-                        .pipe(gunzip)
-                        .on('error', error => {
-                        core.error(`An error occurred while attempting to decompress the response stream`);
-                        destinationStream.close();
-                        reject(error);
-                    })
-                        .pipe(destinationStream)
-                        .on('close', () => {
-                        resolve();
-                    })
-                        .on('error', error => {
-                        core.error(`An error occurred while writing a downloaded file to ${destinationStream.path}`);
-                        reject(error);
-                    });
-                }
-                else {
-                    response.message
-                        .on('error', error => {
-                        core.error(`An error occurred while attempting to read the response stream`);
-                        destinationStream.close();
-                        reject(error);
-                    })
-                        .pipe(destinationStream)
-                        .on('close', () => {
-                        resolve();
-                    })
-                        .on('error', error => {
-                        core.error(`An error occurred while writing a downloaded file to ${destinationStream.path}`);
-                        reject(error);
-                    });
-                }
-            });
-            return;
-        });
-    }
-}
-exports.DownloadHttpClient = DownloadHttpClient;
-//# sourceMappingURL=download-http-client.js.map
-
-/***/ }),
-
-/***/ 5686:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const path = __importStar(__nccwpck_require__(5622));
-/**
- * Creates a specification for a set of files that will be downloaded
- * @param artifactName the name of the artifact
- * @param artifactEntries a set of container entries that describe that files that make up an artifact
- * @param downloadPath the path where the artifact will be downloaded to
- * @param includeRootDirectory specifies if there should be an extra directory (denoted by the artifact name) where the artifact files should be downloaded to
- */
-function getDownloadSpecification(artifactName, artifactEntries, downloadPath, includeRootDirectory) {
-    // use a set for the directory paths so that there are no duplicates
-    const directories = new Set();
-    const specifications = {
-        rootDownloadLocation: includeRootDirectory
-            ? path.join(downloadPath, artifactName)
-            : downloadPath,
-        directoryStructure: [],
-        emptyFilesToCreate: [],
-        filesToDownload: []
-    };
-    for (const entry of artifactEntries) {
-        // Ignore artifacts in the container that don't begin with the same name
-        if (entry.path.startsWith(`${artifactName}/`) ||
-            entry.path.startsWith(`${artifactName}\\`)) {
-            // normalize all separators to the local OS
-            const normalizedPathEntry = path.normalize(entry.path);
-            // entry.path always starts with the artifact name, if includeRootDirectory is false, remove the name from the beginning of the path
-            const filePath = path.join(downloadPath, includeRootDirectory
-                ? normalizedPathEntry
-                : normalizedPathEntry.replace(artifactName, ''));
-            // Case insensitive folder structure maintained in the backend, not every folder is created so the 'folder'
-            // itemType cannot be relied upon. The file must be used to determine the directory structure
-            if (entry.itemType === 'file') {
-                // Get the directories that we need to create from the filePath for each individual file
-                directories.add(path.dirname(filePath));
-                if (entry.fileLength === 0) {
-                    // An empty file was uploaded, create the empty files locally so that no extra http calls are made
-                    specifications.emptyFilesToCreate.push(filePath);
-                }
-                else {
-                    specifications.filesToDownload.push({
-                        sourceLocation: entry.contentLocation,
-                        targetPath: filePath
-                    });
-                }
-            }
-        }
-    }
-    specifications.directoryStructure = Array.from(directories);
-    return specifications;
-}
-exports.getDownloadSpecification = getDownloadSpecification;
-//# sourceMappingURL=download-specification.js.map
-
-/***/ }),
-
-/***/ 6527:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const utils_1 = __nccwpck_require__(6327);
-/**
- * Used for managing http clients during either upload or download
- */
-class HttpManager {
-    constructor(clientCount, userAgent) {
-        if (clientCount < 1) {
-            throw new Error('There must be at least one client');
-        }
-        this.userAgent = userAgent;
-        this.clients = new Array(clientCount).fill(utils_1.createHttpClient(userAgent));
-    }
-    getClient(index) {
-        return this.clients[index];
-    }
-    // client disposal is necessary if a keep-alive connection is used to properly close the connection
-    // for more information see: https://github.com/actions/http-client/blob/04e5ad73cd3fd1f5610a32116b0759eddf6570d2/index.ts#L292
-    disposeAndReplaceClient(index) {
-        this.clients[index].dispose();
-        this.clients[index] = utils_1.createHttpClient(this.userAgent);
-    }
-    disposeAndReplaceAllClients() {
-        for (const [index] of this.clients.entries()) {
-            this.disposeAndReplaceClient(index);
-        }
-    }
-}
-exports.HttpManager = HttpManager;
-//# sourceMappingURL=http-manager.js.map
-
-/***/ }),
-
-/***/ 755:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const utils_1 = __nccwpck_require__(6327);
-const core = __importStar(__nccwpck_require__(2186));
-const config_variables_1 = __nccwpck_require__(2222);
-function retry(name, operation, customErrorMessages, maxAttempts) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let response = undefined;
-        let statusCode = undefined;
-        let isRetryable = false;
-        let errorMessage = '';
-        let customErrorInformation = undefined;
-        let attempt = 1;
-        while (attempt <= maxAttempts) {
-            try {
-                response = yield operation();
-                statusCode = response.message.statusCode;
-                if (utils_1.isSuccessStatusCode(statusCode)) {
-                    return response;
-                }
-                // Extra error information that we want to display if a particular response code is hit
-                if (statusCode) {
-                    customErrorInformation = customErrorMessages.get(statusCode);
-                }
-                isRetryable = utils_1.isRetryableStatusCode(statusCode);
-                errorMessage = `Artifact service responded with ${statusCode}`;
-            }
-            catch (error) {
-                isRetryable = true;
-                errorMessage = error.message;
-            }
-            if (!isRetryable) {
-                core.info(`${name} - Error is not retryable`);
-                if (response) {
-                    utils_1.displayHttpDiagnostics(response);
-                }
-                break;
-            }
-            core.info(`${name} - Attempt ${attempt} of ${maxAttempts} failed with error: ${errorMessage}`);
-            yield utils_1.sleep(utils_1.getExponentialRetryTimeInMilliseconds(attempt));
-            attempt++;
-        }
-        if (response) {
-            utils_1.displayHttpDiagnostics(response);
-        }
-        if (customErrorInformation) {
-            throw Error(`${name} failed: ${customErrorInformation}`);
-        }
-        throw Error(`${name} failed: ${errorMessage}`);
-    });
-}
-exports.retry = retry;
-function retryHttpClientRequest(name, method, customErrorMessages = new Map(), maxAttempts = config_variables_1.getRetryLimit()) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield retry(name, method, customErrorMessages, maxAttempts);
-    });
-}
-exports.retryHttpClientRequest = retryHttpClientRequest;
-//# sourceMappingURL=requestUtils.js.map
-
-/***/ }),
-
-/***/ 9081:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(2186);
-/**
- * Status Reporter that displays information about the progress/status of an artifact that is being uploaded or downloaded
- *
- * Variable display time that can be adjusted using the displayFrequencyInMilliseconds variable
- * The total status of the upload/download gets displayed according to this value
- * If there is a large file that is being uploaded, extra information about the individual status can also be displayed using the updateLargeFileStatus function
- */
-class StatusReporter {
-    constructor(displayFrequencyInMilliseconds) {
-        this.totalNumberOfFilesToProcess = 0;
-        this.processedCount = 0;
-        this.largeFiles = new Map();
-        this.totalFileStatus = undefined;
-        this.largeFileStatus = undefined;
-        this.displayFrequencyInMilliseconds = displayFrequencyInMilliseconds;
-    }
-    setTotalNumberOfFilesToProcess(fileTotal) {
-        this.totalNumberOfFilesToProcess = fileTotal;
-    }
-    start() {
-        // displays information about the total upload/download status
-        this.totalFileStatus = setInterval(() => {
-            // display 1 decimal place without any rounding
-            const percentage = this.formatPercentage(this.processedCount, this.totalNumberOfFilesToProcess);
-            core_1.info(`Total file count: ${this.totalNumberOfFilesToProcess} ---- Processed file #${this.processedCount} (${percentage.slice(0, percentage.indexOf('.') + 2)}%)`);
-        }, this.displayFrequencyInMilliseconds);
-        // displays extra information about any large files that take a significant amount of time to upload or download every 1 second
-        this.largeFileStatus = setInterval(() => {
-            for (const value of Array.from(this.largeFiles.values())) {
-                core_1.info(value);
-            }
-            // delete all entries in the map after displaying the information so it will not be displayed again unless explicitly added
-            this.largeFiles.clear();
-        }, 1000);
-    }
-    // if there is a large file that is being uploaded in chunks, this is used to display extra information about the status of the upload
-    updateLargeFileStatus(fileName, numerator, denominator) {
-        // display 1 decimal place without any rounding
-        const percentage = this.formatPercentage(numerator, denominator);
-        const displayInformation = `Uploading ${fileName} (${percentage.slice(0, percentage.indexOf('.') + 2)}%)`;
-        // any previously added display information should be overwritten for the specific large file because a map is being used
-        this.largeFiles.set(fileName, displayInformation);
-    }
-    stop() {
-        if (this.totalFileStatus) {
-            clearInterval(this.totalFileStatus);
-        }
-        if (this.largeFileStatus) {
-            clearInterval(this.largeFileStatus);
-        }
-    }
-    incrementProcessedCount() {
-        this.processedCount++;
-    }
-    formatPercentage(numerator, denominator) {
-        // toFixed() rounds, so use extra precision to display accurate information even though 4 decimal places are not displayed
-        return ((numerator / denominator) * 100).toFixed(4).toString();
-    }
-}
-exports.StatusReporter = StatusReporter;
-//# sourceMappingURL=status-reporter.js.map
-
-/***/ }),
-
-/***/ 606:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const fs = __importStar(__nccwpck_require__(5747));
-const zlib = __importStar(__nccwpck_require__(8761));
-const util_1 = __nccwpck_require__(1669);
-const stat = util_1.promisify(fs.stat);
-/**
- * Creates a Gzip compressed file of an original file at the provided temporary filepath location
- * @param {string} originalFilePath filepath of whatever will be compressed. The original file will be unmodified
- * @param {string} tempFilePath the location of where the Gzip file will be created
- * @returns the size of gzip file that gets created
- */
-function createGZipFileOnDisk(originalFilePath, tempFilePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            const inputStream = fs.createReadStream(originalFilePath);
-            const gzip = zlib.createGzip();
-            const outputStream = fs.createWriteStream(tempFilePath);
-            inputStream.pipe(gzip).pipe(outputStream);
-            outputStream.on('finish', () => __awaiter(this, void 0, void 0, function* () {
-                // wait for stream to finish before calculating the size which is needed as part of the Content-Length header when starting an upload
-                const size = (yield stat(tempFilePath)).size;
-                resolve(size);
-            }));
-            outputStream.on('error', error => {
-                // eslint-disable-next-line no-console
-                console.log(error);
-                reject;
-            });
-        });
-    });
-}
-exports.createGZipFileOnDisk = createGZipFileOnDisk;
-/**
- * Creates a GZip file in memory using a buffer. Should be used for smaller files to reduce disk I/O
- * @param originalFilePath the path to the original file that is being GZipped
- * @returns a buffer with the GZip file
- */
-function createGZipFileInBuffer(originalFilePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            var e_1, _a;
-            const inputStream = fs.createReadStream(originalFilePath);
-            const gzip = zlib.createGzip();
-            inputStream.pipe(gzip);
-            // read stream into buffer, using experimental async iterators see https://github.com/nodejs/readable-stream/issues/403#issuecomment-479069043
-            const chunks = [];
-            try {
-                for (var gzip_1 = __asyncValues(gzip), gzip_1_1; gzip_1_1 = yield gzip_1.next(), !gzip_1_1.done;) {
-                    const chunk = gzip_1_1.value;
-                    chunks.push(chunk);
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (gzip_1_1 && !gzip_1_1.done && (_a = gzip_1.return)) yield _a.call(gzip_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            resolve(Buffer.concat(chunks));
-        }));
-    });
-}
-exports.createGZipFileInBuffer = createGZipFileInBuffer;
-//# sourceMappingURL=upload-gzip.js.map
-
-/***/ }),
-
-/***/ 4354:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const fs = __importStar(__nccwpck_require__(5747));
-const core = __importStar(__nccwpck_require__(2186));
-const tmp = __importStar(__nccwpck_require__(8065));
-const stream = __importStar(__nccwpck_require__(2413));
-const utils_1 = __nccwpck_require__(6327);
-const config_variables_1 = __nccwpck_require__(2222);
-const util_1 = __nccwpck_require__(1669);
-const url_1 = __nccwpck_require__(8835);
-const perf_hooks_1 = __nccwpck_require__(630);
-const status_reporter_1 = __nccwpck_require__(9081);
-const http_client_1 = __nccwpck_require__(9925);
-const http_manager_1 = __nccwpck_require__(6527);
-const upload_gzip_1 = __nccwpck_require__(606);
-const requestUtils_1 = __nccwpck_require__(755);
-const stat = util_1.promisify(fs.stat);
-class UploadHttpClient {
-    constructor() {
-        this.uploadHttpManager = new http_manager_1.HttpManager(config_variables_1.getUploadFileConcurrency(), '@actions/artifact-upload');
-        this.statusReporter = new status_reporter_1.StatusReporter(10000);
-    }
-    /**
-     * Creates a file container for the new artifact in the remote blob storage/file service
-     * @param {string} artifactName Name of the artifact being created
-     * @returns The response from the Artifact Service if the file container was successfully created
-     */
-    createArtifactInFileContainer(artifactName, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const parameters = {
-                Type: 'actions_storage',
-                Name: artifactName
-            };
-            // calculate retention period
-            if (options && options.retentionDays) {
-                const maxRetentionStr = config_variables_1.getRetentionDays();
-                parameters.RetentionDays = utils_1.getProperRetention(options.retentionDays, maxRetentionStr);
-            }
-            const data = JSON.stringify(parameters, null, 2);
-            const artifactUrl = utils_1.getArtifactUrl();
-            // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
-            const client = this.uploadHttpManager.getClient(0);
-            const headers = utils_1.getUploadHeaders('application/json', false);
-            // Extra information to display when a particular HTTP code is returned
-            // If a 403 is returned when trying to create a file container, the customer has exceeded
-            // their storage quota so no new artifact containers can be created
-            const customErrorMessages = new Map([
-                [
-                    http_client_1.HttpCodes.Forbidden,
-                    'Artifact storage quota has been hit. Unable to upload any new artifacts'
-                ],
-                [
-                    http_client_1.HttpCodes.BadRequest,
-                    `The artifact name ${artifactName} is not valid. Request URL ${artifactUrl}`
-                ]
-            ]);
-            const response = yield requestUtils_1.retryHttpClientRequest('Create Artifact Container', () => __awaiter(this, void 0, void 0, function* () { return client.post(artifactUrl, data, headers); }), customErrorMessages);
-            const body = yield response.readBody();
-            return JSON.parse(body);
-        });
-    }
-    /**
-     * Concurrently upload all of the files in chunks
-     * @param {string} uploadUrl Base Url for the artifact that was created
-     * @param {SearchResult[]} filesToUpload A list of information about the files being uploaded
-     * @returns The size of all the files uploaded in bytes
-     */
-    uploadArtifactToFileContainer(uploadUrl, filesToUpload, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const FILE_CONCURRENCY = config_variables_1.getUploadFileConcurrency();
-            const MAX_CHUNK_SIZE = config_variables_1.getUploadChunkSize();
-            core.debug(`File Concurrency: ${FILE_CONCURRENCY}, and Chunk Size: ${MAX_CHUNK_SIZE}`);
-            const parameters = [];
-            // by default, file uploads will continue if there is an error unless specified differently in the options
-            let continueOnError = true;
-            if (options) {
-                if (options.continueOnError === false) {
-                    continueOnError = false;
-                }
-            }
-            // prepare the necessary parameters to upload all the files
-            for (const file of filesToUpload) {
-                const resourceUrl = new url_1.URL(uploadUrl);
-                resourceUrl.searchParams.append('itemPath', file.uploadFilePath);
-                parameters.push({
-                    file: file.absoluteFilePath,
-                    resourceUrl: resourceUrl.toString(),
-                    maxChunkSize: MAX_CHUNK_SIZE,
-                    continueOnError
-                });
-            }
-            const parallelUploads = [...new Array(FILE_CONCURRENCY).keys()];
-            const failedItemsToReport = [];
-            let currentFile = 0;
-            let completedFiles = 0;
-            let uploadFileSize = 0;
-            let totalFileSize = 0;
-            let abortPendingFileUploads = false;
-            this.statusReporter.setTotalNumberOfFilesToProcess(filesToUpload.length);
-            this.statusReporter.start();
-            // only allow a certain amount of files to be uploaded at once, this is done to reduce potential errors
-            yield Promise.all(parallelUploads.map((index) => __awaiter(this, void 0, void 0, function* () {
-                while (currentFile < filesToUpload.length) {
-                    const currentFileParameters = parameters[currentFile];
-                    currentFile += 1;
-                    if (abortPendingFileUploads) {
-                        failedItemsToReport.push(currentFileParameters.file);
-                        continue;
-                    }
-                    const startTime = perf_hooks_1.performance.now();
-                    const uploadFileResult = yield this.uploadFileAsync(index, currentFileParameters);
-                    if (core.isDebug()) {
-                        core.debug(`File: ${++completedFiles}/${filesToUpload.length}. ${currentFileParameters.file} took ${(perf_hooks_1.performance.now() - startTime).toFixed(3)} milliseconds to finish upload`);
-                    }
-                    uploadFileSize += uploadFileResult.successfulUploadSize;
-                    totalFileSize += uploadFileResult.totalSize;
-                    if (uploadFileResult.isSuccess === false) {
-                        failedItemsToReport.push(currentFileParameters.file);
-                        if (!continueOnError) {
-                            // fail fast
-                            core.error(`aborting artifact upload`);
-                            abortPendingFileUploads = true;
-                        }
-                    }
-                    this.statusReporter.incrementProcessedCount();
-                }
-            })));
-            this.statusReporter.stop();
-            // done uploading, safety dispose all connections
-            this.uploadHttpManager.disposeAndReplaceAllClients();
-            core.info(`Total size of all the files uploaded is ${uploadFileSize} bytes`);
-            return {
-                uploadSize: uploadFileSize,
-                totalSize: totalFileSize,
-                failedItems: failedItemsToReport
-            };
-        });
-    }
-    /**
-     * Asynchronously uploads a file. The file is compressed and uploaded using GZip if it is determined to save space.
-     * If the upload file is bigger than the max chunk size it will be uploaded via multiple calls
-     * @param {number} httpClientIndex The index of the httpClient that is being used to make all of the calls
-     * @param {UploadFileParameters} parameters Information about the file that needs to be uploaded
-     * @returns The size of the file that was uploaded in bytes along with any failed uploads
-     */
-    uploadFileAsync(httpClientIndex, parameters) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const totalFileSize = (yield stat(parameters.file)).size;
-            let offset = 0;
-            let isUploadSuccessful = true;
-            let failedChunkSizes = 0;
-            let uploadFileSize = 0;
-            let isGzip = true;
-            // the file that is being uploaded is less than 64k in size, to increase throughput and to minimize disk I/O
-            // for creating a new GZip file, an in-memory buffer is used for compression
-            if (totalFileSize < 65536) {
-                const buffer = yield upload_gzip_1.createGZipFileInBuffer(parameters.file);
-                //An open stream is needed in the event of a failure and we need to retry. If a NodeJS.ReadableStream is directly passed in,
-                // it will not properly get reset to the start of the stream if a chunk upload needs to be retried
-                let openUploadStream;
-                if (totalFileSize < buffer.byteLength) {
-                    // compression did not help with reducing the size, use a readable stream from the original file for upload
-                    openUploadStream = () => fs.createReadStream(parameters.file);
-                    isGzip = false;
-                    uploadFileSize = totalFileSize;
-                }
-                else {
-                    // create a readable stream using a PassThrough stream that is both readable and writable
-                    openUploadStream = () => {
-                        const passThrough = new stream.PassThrough();
-                        passThrough.end(buffer);
-                        return passThrough;
-                    };
-                    uploadFileSize = buffer.byteLength;
-                }
-                const result = yield this.uploadChunk(httpClientIndex, parameters.resourceUrl, openUploadStream, 0, uploadFileSize - 1, uploadFileSize, isGzip, totalFileSize);
-                if (!result) {
-                    // chunk failed to upload
-                    isUploadSuccessful = false;
-                    failedChunkSizes += uploadFileSize;
-                    core.warning(`Aborting upload for ${parameters.file} due to failure`);
-                }
-                return {
-                    isSuccess: isUploadSuccessful,
-                    successfulUploadSize: uploadFileSize - failedChunkSizes,
-                    totalSize: totalFileSize
-                };
-            }
-            else {
-                // the file that is being uploaded is greater than 64k in size, a temporary file gets created on disk using the
-                // npm tmp-promise package and this file gets used to create a GZipped file
-                const tempFile = yield tmp.file();
-                // create a GZip file of the original file being uploaded, the original file should not be modified in any way
-                uploadFileSize = yield upload_gzip_1.createGZipFileOnDisk(parameters.file, tempFile.path);
-                let uploadFilePath = tempFile.path;
-                // compression did not help with size reduction, use the original file for upload and delete the temp GZip file
-                if (totalFileSize < uploadFileSize) {
-                    uploadFileSize = totalFileSize;
-                    uploadFilePath = parameters.file;
-                    isGzip = false;
-                }
-                let abortFileUpload = false;
-                // upload only a single chunk at a time
-                while (offset < uploadFileSize) {
-                    const chunkSize = Math.min(uploadFileSize - offset, parameters.maxChunkSize);
-                    // if an individual file is greater than 100MB (1024*1024*100) in size, display extra information about the upload status
-                    if (uploadFileSize > 104857600) {
-                        this.statusReporter.updateLargeFileStatus(parameters.file, offset, uploadFileSize);
-                    }
-                    const start = offset;
-                    const end = offset + chunkSize - 1;
-                    offset += parameters.maxChunkSize;
-                    if (abortFileUpload) {
-                        // if we don't want to continue in the event of an error, any pending upload chunks will be marked as failed
-                        failedChunkSizes += chunkSize;
-                        continue;
-                    }
-                    const result = yield this.uploadChunk(httpClientIndex, parameters.resourceUrl, () => fs.createReadStream(uploadFilePath, {
-                        start,
-                        end,
-                        autoClose: false
-                    }), start, end, uploadFileSize, isGzip, totalFileSize);
-                    if (!result) {
-                        // Chunk failed to upload, report as failed and do not continue uploading any more chunks for the file. It is possible that part of a chunk was
-                        // successfully uploaded so the server may report a different size for what was uploaded
-                        isUploadSuccessful = false;
-                        failedChunkSizes += chunkSize;
-                        core.warning(`Aborting upload for ${parameters.file} due to failure`);
-                        abortFileUpload = true;
-                    }
-                }
-                // Delete the temporary file that was created as part of the upload. If the temp file does not get manually deleted by
-                // calling cleanup, it gets removed when the node process exits. For more info see: https://www.npmjs.com/package/tmp-promise#about
-                yield tempFile.cleanup();
-                return {
-                    isSuccess: isUploadSuccessful,
-                    successfulUploadSize: uploadFileSize - failedChunkSizes,
-                    totalSize: totalFileSize
-                };
-            }
-        });
-    }
-    /**
-     * Uploads a chunk of an individual file to the specified resourceUrl. If the upload fails and the status code
-     * indicates a retryable status, we try to upload the chunk as well
-     * @param {number} httpClientIndex The index of the httpClient being used to make all the necessary calls
-     * @param {string} resourceUrl Url of the resource that the chunk will be uploaded to
-     * @param {NodeJS.ReadableStream} openStream Stream of the file that will be uploaded
-     * @param {number} start Starting byte index of file that the chunk belongs to
-     * @param {number} end Ending byte index of file that the chunk belongs to
-     * @param {number} uploadFileSize Total size of the file in bytes that is being uploaded
-     * @param {boolean} isGzip Denotes if we are uploading a Gzip compressed stream
-     * @param {number} totalFileSize Original total size of the file that is being uploaded
-     * @returns if the chunk was successfully uploaded
-     */
-    uploadChunk(httpClientIndex, resourceUrl, openStream, start, end, uploadFileSize, isGzip, totalFileSize) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // prepare all the necessary headers before making any http call
-            const headers = utils_1.getUploadHeaders('application/octet-stream', true, isGzip, totalFileSize, end - start + 1, utils_1.getContentRange(start, end, uploadFileSize));
-            const uploadChunkRequest = () => __awaiter(this, void 0, void 0, function* () {
-                const client = this.uploadHttpManager.getClient(httpClientIndex);
-                return yield client.sendStream('PUT', resourceUrl, openStream(), headers);
-            });
-            let retryCount = 0;
-            const retryLimit = config_variables_1.getRetryLimit();
-            // Increments the current retry count and then checks if the retry limit has been reached
-            // If there have been too many retries, fail so the download stops
-            const incrementAndCheckRetryLimit = (response) => {
-                retryCount++;
-                if (retryCount > retryLimit) {
-                    if (response) {
-                        utils_1.displayHttpDiagnostics(response);
-                    }
-                    core.info(`Retry limit has been reached for chunk at offset ${start} to ${resourceUrl}`);
-                    return true;
-                }
-                return false;
-            };
-            const backOff = (retryAfterValue) => __awaiter(this, void 0, void 0, function* () {
-                this.uploadHttpManager.disposeAndReplaceClient(httpClientIndex);
-                if (retryAfterValue) {
-                    core.info(`Backoff due to too many requests, retry #${retryCount}. Waiting for ${retryAfterValue} milliseconds before continuing the upload`);
-                    yield utils_1.sleep(retryAfterValue);
-                }
-                else {
-                    const backoffTime = utils_1.getExponentialRetryTimeInMilliseconds(retryCount);
-                    core.info(`Exponential backoff for retry #${retryCount}. Waiting for ${backoffTime} milliseconds before continuing the upload at offset ${start}`);
-                    yield utils_1.sleep(backoffTime);
-                }
-                core.info(`Finished backoff for retry #${retryCount}, continuing with upload`);
-                return;
-            });
-            // allow for failed chunks to be retried multiple times
-            while (retryCount <= retryLimit) {
-                let response;
-                try {
-                    response = yield uploadChunkRequest();
-                }
-                catch (error) {
-                    // if an error is caught, it is usually indicative of a timeout so retry the upload
-                    core.info(`An error has been caught http-client index ${httpClientIndex}, retrying the upload`);
-                    // eslint-disable-next-line no-console
-                    console.log(error);
-                    if (incrementAndCheckRetryLimit()) {
-                        return false;
-                    }
-                    yield backOff();
-                    continue;
-                }
-                // Always read the body of the response. There is potential for a resource leak if the body is not read which will
-                // result in the connection remaining open along with unintended consequences when trying to dispose of the client
-                yield response.readBody();
-                if (utils_1.isSuccessStatusCode(response.message.statusCode)) {
-                    return true;
-                }
-                else if (utils_1.isRetryableStatusCode(response.message.statusCode)) {
-                    core.info(`A ${response.message.statusCode} status code has been received, will attempt to retry the upload`);
-                    if (incrementAndCheckRetryLimit(response)) {
-                        return false;
-                    }
-                    utils_1.isThrottledStatusCode(response.message.statusCode)
-                        ? yield backOff(utils_1.tryGetRetryAfterValueTimeInMilliseconds(response.message.headers))
-                        : yield backOff();
-                }
-                else {
-                    core.error(`Unexpected response. Unable to upload chunk to ${resourceUrl}`);
-                    utils_1.displayHttpDiagnostics(response);
-                    return false;
-                }
-            }
-            return false;
-        });
-    }
-    /**
-     * Updates the size of the artifact from -1 which was initially set when the container was first created for the artifact.
-     * Updating the size indicates that we are done uploading all the contents of the artifact
-     */
-    patchArtifactSize(size, artifactName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const resourceUrl = new url_1.URL(utils_1.getArtifactUrl());
-            resourceUrl.searchParams.append('artifactName', artifactName);
-            const parameters = { Size: size };
-            const data = JSON.stringify(parameters, null, 2);
-            core.debug(`URL is ${resourceUrl.toString()}`);
-            // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
-            const client = this.uploadHttpManager.getClient(0);
-            const headers = utils_1.getUploadHeaders('application/json', false);
-            // Extra information to display when a particular HTTP code is returned
-            const customErrorMessages = new Map([
-                [
-                    http_client_1.HttpCodes.NotFound,
-                    `An Artifact with the name ${artifactName} was not found`
-                ]
-            ]);
-            // TODO retry for all possible response codes, the artifact upload is pretty much complete so it at all costs we should try to finish this
-            const response = yield requestUtils_1.retryHttpClientRequest('Finalize artifact upload', () => __awaiter(this, void 0, void 0, function* () { return client.patch(resourceUrl.toString(), data, headers); }), customErrorMessages);
-            yield response.readBody();
-            core.debug(`Artifact ${artifactName} has been successfully uploaded, total size in bytes: ${size}`);
-        });
-    }
-}
-exports.UploadHttpClient = UploadHttpClient;
-//# sourceMappingURL=upload-http-client.js.map
-
-/***/ }),
-
-/***/ 183:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const fs = __importStar(__nccwpck_require__(5747));
-const core_1 = __nccwpck_require__(2186);
-const path_1 = __nccwpck_require__(5622);
-const utils_1 = __nccwpck_require__(6327);
-/**
- * Creates a specification that describes how each file that is part of the artifact will be uploaded
- * @param artifactName the name of the artifact being uploaded. Used during upload to denote where the artifact is stored on the server
- * @param rootDirectory an absolute file path that denotes the path that should be removed from the beginning of each artifact file
- * @param artifactFiles a list of absolute file paths that denote what should be uploaded as part of the artifact
- */
-function getUploadSpecification(artifactName, rootDirectory, artifactFiles) {
-    utils_1.checkArtifactName(artifactName);
-    const specifications = [];
-    if (!fs.existsSync(rootDirectory)) {
-        throw new Error(`Provided rootDirectory ${rootDirectory} does not exist`);
-    }
-    if (!fs.lstatSync(rootDirectory).isDirectory()) {
-        throw new Error(`Provided rootDirectory ${rootDirectory} is not a valid directory`);
-    }
-    // Normalize and resolve, this allows for either absolute or relative paths to be used
-    rootDirectory = path_1.normalize(rootDirectory);
-    rootDirectory = path_1.resolve(rootDirectory);
-    /*
-       Example to demonstrate behavior
-       
-       Input:
-         artifactName: my-artifact
-         rootDirectory: '/home/user/files/plz-upload'
-         artifactFiles: [
-           '/home/user/files/plz-upload/file1.txt',
-           '/home/user/files/plz-upload/file2.txt',
-           '/home/user/files/plz-upload/dir/file3.txt'
-         ]
-       
-       Output:
-         specifications: [
-           ['/home/user/files/plz-upload/file1.txt', 'my-artifact/file1.txt'],
-           ['/home/user/files/plz-upload/file1.txt', 'my-artifact/file2.txt'],
-           ['/home/user/files/plz-upload/file1.txt', 'my-artifact/dir/file3.txt']
-         ]
-    */
-    for (let file of artifactFiles) {
-        if (!fs.existsSync(file)) {
-            throw new Error(`File ${file} does not exist`);
-        }
-        if (!fs.lstatSync(file).isDirectory()) {
-            // Normalize and resolve, this allows for either absolute or relative paths to be used
-            file = path_1.normalize(file);
-            file = path_1.resolve(file);
-            if (!file.startsWith(rootDirectory)) {
-                throw new Error(`The rootDirectory: ${rootDirectory} is not a parent directory of the file: ${file}`);
-            }
-            // Check for forbidden characters in file paths that will be rejected during upload
-            const uploadPath = file.replace(rootDirectory, '');
-            utils_1.checkArtifactFilePath(uploadPath);
-            /*
-              uploadFilePath denotes where the file will be uploaded in the file container on the server. During a run, if multiple artifacts are uploaded, they will all
-              be saved in the same container. The artifact name is used as the root directory in the container to separate and distinguish uploaded artifacts
-      
-              path.join handles all the following cases and would return 'artifact-name/file-to-upload.txt
-                join('artifact-name/', 'file-to-upload.txt')
-                join('artifact-name/', '/file-to-upload.txt')
-                join('artifact-name', 'file-to-upload.txt')
-                join('artifact-name', '/file-to-upload.txt')
-            */
-            specifications.push({
-                absoluteFilePath: file,
-                uploadFilePath: path_1.join(artifactName, uploadPath)
-            });
-        }
-        else {
-            // Directories are rejected by the server during upload
-            core_1.debug(`Removing ${file} from rawSearchResults because it is a directory`);
-        }
-    }
-    return specifications;
-}
-exports.getUploadSpecification = getUploadSpecification;
-//# sourceMappingURL=upload-specification.js.map
-
-/***/ }),
-
-/***/ 6327:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(2186);
-const fs_1 = __nccwpck_require__(5747);
-const http_client_1 = __nccwpck_require__(9925);
-const auth_1 = __nccwpck_require__(3702);
-const config_variables_1 = __nccwpck_require__(2222);
-/**
- * Returns a retry time in milliseconds that exponentially gets larger
- * depending on the amount of retries that have been attempted
- */
-function getExponentialRetryTimeInMilliseconds(retryCount) {
-    if (retryCount < 0) {
-        throw new Error('RetryCount should not be negative');
-    }
-    else if (retryCount === 0) {
-        return config_variables_1.getInitialRetryIntervalInMilliseconds();
-    }
-    const minTime = config_variables_1.getInitialRetryIntervalInMilliseconds() * config_variables_1.getRetryMultiplier() * retryCount;
-    const maxTime = minTime * config_variables_1.getRetryMultiplier();
-    // returns a random number between the minTime (inclusive) and the maxTime (exclusive)
-    return Math.random() * (maxTime - minTime) + minTime;
-}
-exports.getExponentialRetryTimeInMilliseconds = getExponentialRetryTimeInMilliseconds;
-/**
- * Parses a env variable that is a number
- */
-function parseEnvNumber(key) {
-    const value = Number(process.env[key]);
-    if (Number.isNaN(value) || value < 0) {
-        return undefined;
-    }
-    return value;
-}
-exports.parseEnvNumber = parseEnvNumber;
-/**
- * Various utility functions to help with the necessary API calls
- */
-function getApiVersion() {
-    return '6.0-preview';
-}
-exports.getApiVersion = getApiVersion;
-function isSuccessStatusCode(statusCode) {
-    if (!statusCode) {
-        return false;
-    }
-    return statusCode >= 200 && statusCode < 300;
-}
-exports.isSuccessStatusCode = isSuccessStatusCode;
-function isForbiddenStatusCode(statusCode) {
-    if (!statusCode) {
-        return false;
-    }
-    return statusCode === http_client_1.HttpCodes.Forbidden;
-}
-exports.isForbiddenStatusCode = isForbiddenStatusCode;
-function isRetryableStatusCode(statusCode) {
-    if (!statusCode) {
-        return false;
-    }
-    const retryableStatusCodes = [
-        http_client_1.HttpCodes.BadGateway,
-        http_client_1.HttpCodes.GatewayTimeout,
-        http_client_1.HttpCodes.InternalServerError,
-        http_client_1.HttpCodes.ServiceUnavailable,
-        http_client_1.HttpCodes.TooManyRequests,
-        413 // Payload Too Large
-    ];
-    return retryableStatusCodes.includes(statusCode);
-}
-exports.isRetryableStatusCode = isRetryableStatusCode;
-function isThrottledStatusCode(statusCode) {
-    if (!statusCode) {
-        return false;
-    }
-    return statusCode === http_client_1.HttpCodes.TooManyRequests;
-}
-exports.isThrottledStatusCode = isThrottledStatusCode;
-/**
- * Attempts to get the retry-after value from a set of http headers. The retry time
- * is originally denoted in seconds, so if present, it is converted to milliseconds
- * @param headers all the headers received when making an http call
- */
-function tryGetRetryAfterValueTimeInMilliseconds(headers) {
-    if (headers['retry-after']) {
-        const retryTime = Number(headers['retry-after']);
-        if (!isNaN(retryTime)) {
-            core_1.info(`Retry-After header is present with a value of ${retryTime}`);
-            return retryTime * 1000;
-        }
-        core_1.info(`Returned retry-after header value: ${retryTime} is non-numeric and cannot be used`);
-        return undefined;
-    }
-    core_1.info(`No retry-after header was found. Dumping all headers for diagnostic purposes`);
-    // eslint-disable-next-line no-console
-    console.log(headers);
-    return undefined;
-}
-exports.tryGetRetryAfterValueTimeInMilliseconds = tryGetRetryAfterValueTimeInMilliseconds;
-function getContentRange(start, end, total) {
-    // Format: `bytes start-end/fileSize
-    // start and end are inclusive
-    // For a 200 byte chunk starting at byte 0:
-    // Content-Range: bytes 0-199/200
-    return `bytes ${start}-${end}/${total}`;
-}
-exports.getContentRange = getContentRange;
-/**
- * Sets all the necessary headers when downloading an artifact
- * @param {string} contentType the type of content being uploaded
- * @param {boolean} isKeepAlive is the same connection being used to make multiple calls
- * @param {boolean} acceptGzip can we accept a gzip encoded response
- * @param {string} acceptType the type of content that we can accept
- * @returns appropriate headers to make a specific http call during artifact download
- */
-function getDownloadHeaders(contentType, isKeepAlive, acceptGzip) {
-    const requestOptions = {};
-    if (contentType) {
-        requestOptions['Content-Type'] = contentType;
-    }
-    if (isKeepAlive) {
-        requestOptions['Connection'] = 'Keep-Alive';
-        // keep alive for at least 10 seconds before closing the connection
-        requestOptions['Keep-Alive'] = '10';
-    }
-    if (acceptGzip) {
-        // if we are expecting a response with gzip encoding, it should be using an octet-stream in the accept header
-        requestOptions['Accept-Encoding'] = 'gzip';
-        requestOptions['Accept'] = `application/octet-stream;api-version=${getApiVersion()}`;
-    }
-    else {
-        // default to application/json if we are not working with gzip content
-        requestOptions['Accept'] = `application/json;api-version=${getApiVersion()}`;
-    }
-    return requestOptions;
-}
-exports.getDownloadHeaders = getDownloadHeaders;
-/**
- * Sets all the necessary headers when uploading an artifact
- * @param {string} contentType the type of content being uploaded
- * @param {boolean} isKeepAlive is the same connection being used to make multiple calls
- * @param {boolean} isGzip is the connection being used to upload GZip compressed content
- * @param {number} uncompressedLength the original size of the content if something is being uploaded that has been compressed
- * @param {number} contentLength the length of the content that is being uploaded
- * @param {string} contentRange the range of the content that is being uploaded
- * @returns appropriate headers to make a specific http call during artifact upload
- */
-function getUploadHeaders(contentType, isKeepAlive, isGzip, uncompressedLength, contentLength, contentRange) {
-    const requestOptions = {};
-    requestOptions['Accept'] = `application/json;api-version=${getApiVersion()}`;
-    if (contentType) {
-        requestOptions['Content-Type'] = contentType;
-    }
-    if (isKeepAlive) {
-        requestOptions['Connection'] = 'Keep-Alive';
-        // keep alive for at least 10 seconds before closing the connection
-        requestOptions['Keep-Alive'] = '10';
-    }
-    if (isGzip) {
-        requestOptions['Content-Encoding'] = 'gzip';
-        requestOptions['x-tfs-filelength'] = uncompressedLength;
-    }
-    if (contentLength) {
-        requestOptions['Content-Length'] = contentLength;
-    }
-    if (contentRange) {
-        requestOptions['Content-Range'] = contentRange;
-    }
-    return requestOptions;
-}
-exports.getUploadHeaders = getUploadHeaders;
-function createHttpClient(userAgent) {
-    return new http_client_1.HttpClient(userAgent, [
-        new auth_1.BearerCredentialHandler(config_variables_1.getRuntimeToken())
-    ]);
-}
-exports.createHttpClient = createHttpClient;
-function getArtifactUrl() {
-    const artifactUrl = `${config_variables_1.getRuntimeUrl()}_apis/pipelines/workflows/${config_variables_1.getWorkFlowRunId()}/artifacts?api-version=${getApiVersion()}`;
-    core_1.debug(`Artifact Url: ${artifactUrl}`);
-    return artifactUrl;
-}
-exports.getArtifactUrl = getArtifactUrl;
-/**
- * Uh oh! Something might have gone wrong during either upload or download. The IHtttpClientResponse object contains information
- * about the http call that was made by the actions http client. This information might be useful to display for diagnostic purposes, but
- * this entire object is really big and most of the information is not really useful. This function takes the response object and displays only
- * the information that we want.
- *
- * Certain information such as the TLSSocket and the Readable state are not really useful for diagnostic purposes so they can be avoided.
- * Other information such as the headers, the response code and message might be useful, so this is displayed.
- */
-function displayHttpDiagnostics(response) {
-    core_1.info(`##### Begin Diagnostic HTTP information #####
-Status Code: ${response.message.statusCode}
-Status Message: ${response.message.statusMessage}
-Header Information: ${JSON.stringify(response.message.headers, undefined, 2)}
-###### End Diagnostic HTTP information ######`);
-}
-exports.displayHttpDiagnostics = displayHttpDiagnostics;
-/**
- * Invalid characters that cannot be in the artifact name or an uploaded file. Will be rejected
- * from the server if attempted to be sent over. These characters are not allowed due to limitations with certain
- * file systems such as NTFS. To maintain platform-agnostic behavior, all characters that are not supported by an
- * individual filesystem/platform will not be supported on all fileSystems/platforms
- *
- * FilePaths can include characters such as \ and / which are not permitted in the artifact name alone
- */
-const invalidArtifactFilePathCharacters = ['"', ':', '<', '>', '|', '*', '?'];
-const invalidArtifactNameCharacters = [
-    ...invalidArtifactFilePathCharacters,
-    '\\',
-    '/'
-];
-/**
- * Scans the name of the artifact to make sure there are no illegal characters
- */
-function checkArtifactName(name) {
-    if (!name) {
-        throw new Error(`Artifact name: ${name}, is incorrectly provided`);
-    }
-    for (const invalidChar of invalidArtifactNameCharacters) {
-        if (name.includes(invalidChar)) {
-            throw new Error(`Artifact name is not valid: ${name}. Contains character: "${invalidChar}". Invalid artifact name characters include: ${invalidArtifactNameCharacters.toString()}.`);
-        }
-    }
-}
-exports.checkArtifactName = checkArtifactName;
-/**
- * Scans the name of the filePath used to make sure there are no illegal characters
- */
-function checkArtifactFilePath(path) {
-    if (!path) {
-        throw new Error(`Artifact path: ${path}, is incorrectly provided`);
-    }
-    for (const invalidChar of invalidArtifactFilePathCharacters) {
-        if (path.includes(invalidChar)) {
-            throw new Error(`Artifact path is not valid: ${path}. Contains character: "${invalidChar}". Invalid characters include: ${invalidArtifactFilePathCharacters.toString()}.`);
-        }
-    }
-}
-exports.checkArtifactFilePath = checkArtifactFilePath;
-function createDirectoriesForArtifact(directories) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const directory of directories) {
-            yield fs_1.promises.mkdir(directory, {
-                recursive: true
-            });
-        }
-    });
-}
-exports.createDirectoriesForArtifact = createDirectoriesForArtifact;
-function createEmptyFilesForArtifact(emptyFilesToCreate) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const filePath of emptyFilesToCreate) {
-            yield (yield fs_1.promises.open(filePath, 'w')).close();
-        }
-    });
-}
-exports.createEmptyFilesForArtifact = createEmptyFilesForArtifact;
-function getFileSize(filePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const stats = yield fs_1.promises.stat(filePath);
-        core_1.debug(`${filePath} size:(${stats.size}) blksize:(${stats.blksize}) blocks:(${stats.blocks})`);
-        return stats.size;
-    });
-}
-exports.getFileSize = getFileSize;
-function rmFile(filePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield fs_1.promises.unlink(filePath);
-    });
-}
-exports.rmFile = rmFile;
-function getProperRetention(retentionInput, retentionSetting) {
-    if (retentionInput < 0) {
-        throw new Error('Invalid retention, minimum value is 1.');
-    }
-    let retention = retentionInput;
-    if (retentionSetting) {
-        const maxRetention = parseInt(retentionSetting);
-        if (!isNaN(maxRetention) && maxRetention < retention) {
-            core_1.warning(`Retention days is greater than the max value allowed by the repository setting, reduce retention to ${maxRetention} days`);
-            retention = maxRetention;
-        }
-    }
-    return retention;
-}
-exports.getProperRetention = getProperRetention;
-function sleep(milliseconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
-    });
-}
-exports.sleep = sleep;
-//# sourceMappingURL=utils.js.map
-
-/***/ }),
 
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
-"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -1785,7 +103,6 @@ function escapeProperty(s) {
 /***/ 2186:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
-"use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -2086,7 +403,6 @@ exports.getState = getState;
 /***/ 717:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
-"use strict";
 
 // For internal use, subject to change.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -2135,7 +451,6 @@ exports.issueCommand = issueCommand;
 /***/ 5278:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -2159,8564 +474,5437 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 3702:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 5892:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
-"use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-class BasicCredentialHandler {
-    constructor(username, password) {
-        this.username = username;
-        this.password = password;
-    }
-    prepareRequest(options) {
-        options.headers['Authorization'] =
-            'Basic ' +
-                Buffer.from(this.username + ':' + this.password).toString('base64');
-    }
-    // This handler cannot handle 401
-    canHandleAuthentication(response) {
-        return false;
-    }
-    handleAuthentication(httpClient, requestInfo, objs) {
-        return null;
-    }
-}
-exports.BasicCredentialHandler = BasicCredentialHandler;
-class BearerCredentialHandler {
-    constructor(token) {
-        this.token = token;
-    }
-    // currently implements pre-authorization
-    // TODO: support preAuth = false where it hooks on 401
-    prepareRequest(options) {
-        options.headers['Authorization'] = 'Bearer ' + this.token;
-    }
-    // This handler cannot handle 401
-    canHandleAuthentication(response) {
-        return false;
-    }
-    handleAuthentication(httpClient, requestInfo, objs) {
-        return null;
-    }
-}
-exports.BearerCredentialHandler = BearerCredentialHandler;
-class PersonalAccessTokenCredentialHandler {
-    constructor(token) {
-        this.token = token;
-    }
-    // currently implements pre-authorization
-    // TODO: support preAuth = false where it hooks on 401
-    prepareRequest(options) {
-        options.headers['Authorization'] =
-            'Basic ' + Buffer.from('PAT:' + this.token).toString('base64');
-    }
-    // This handler cannot handle 401
-    canHandleAuthentication(response) {
-        return false;
-    }
-    handleAuthentication(httpClient, requestInfo, objs) {
-        return null;
-    }
-}
-exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHandler;
-
-
-/***/ }),
-
-/***/ 9925:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const http = __nccwpck_require__(8605);
-const https = __nccwpck_require__(7211);
-const pm = __nccwpck_require__(6443);
-let tunnel;
-var HttpCodes;
-(function (HttpCodes) {
-    HttpCodes[HttpCodes["OK"] = 200] = "OK";
-    HttpCodes[HttpCodes["MultipleChoices"] = 300] = "MultipleChoices";
-    HttpCodes[HttpCodes["MovedPermanently"] = 301] = "MovedPermanently";
-    HttpCodes[HttpCodes["ResourceMoved"] = 302] = "ResourceMoved";
-    HttpCodes[HttpCodes["SeeOther"] = 303] = "SeeOther";
-    HttpCodes[HttpCodes["NotModified"] = 304] = "NotModified";
-    HttpCodes[HttpCodes["UseProxy"] = 305] = "UseProxy";
-    HttpCodes[HttpCodes["SwitchProxy"] = 306] = "SwitchProxy";
-    HttpCodes[HttpCodes["TemporaryRedirect"] = 307] = "TemporaryRedirect";
-    HttpCodes[HttpCodes["PermanentRedirect"] = 308] = "PermanentRedirect";
-    HttpCodes[HttpCodes["BadRequest"] = 400] = "BadRequest";
-    HttpCodes[HttpCodes["Unauthorized"] = 401] = "Unauthorized";
-    HttpCodes[HttpCodes["PaymentRequired"] = 402] = "PaymentRequired";
-    HttpCodes[HttpCodes["Forbidden"] = 403] = "Forbidden";
-    HttpCodes[HttpCodes["NotFound"] = 404] = "NotFound";
-    HttpCodes[HttpCodes["MethodNotAllowed"] = 405] = "MethodNotAllowed";
-    HttpCodes[HttpCodes["NotAcceptable"] = 406] = "NotAcceptable";
-    HttpCodes[HttpCodes["ProxyAuthenticationRequired"] = 407] = "ProxyAuthenticationRequired";
-    HttpCodes[HttpCodes["RequestTimeout"] = 408] = "RequestTimeout";
-    HttpCodes[HttpCodes["Conflict"] = 409] = "Conflict";
-    HttpCodes[HttpCodes["Gone"] = 410] = "Gone";
-    HttpCodes[HttpCodes["TooManyRequests"] = 429] = "TooManyRequests";
-    HttpCodes[HttpCodes["InternalServerError"] = 500] = "InternalServerError";
-    HttpCodes[HttpCodes["NotImplemented"] = 501] = "NotImplemented";
-    HttpCodes[HttpCodes["BadGateway"] = 502] = "BadGateway";
-    HttpCodes[HttpCodes["ServiceUnavailable"] = 503] = "ServiceUnavailable";
-    HttpCodes[HttpCodes["GatewayTimeout"] = 504] = "GatewayTimeout";
-})(HttpCodes = exports.HttpCodes || (exports.HttpCodes = {}));
-var Headers;
-(function (Headers) {
-    Headers["Accept"] = "accept";
-    Headers["ContentType"] = "content-type";
-})(Headers = exports.Headers || (exports.Headers = {}));
-var MediaTypes;
-(function (MediaTypes) {
-    MediaTypes["ApplicationJson"] = "application/json";
-})(MediaTypes = exports.MediaTypes || (exports.MediaTypes = {}));
-/**
- * Returns the proxy URL, depending upon the supplied url and proxy environment variables.
- * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
- */
-function getProxyUrl(serverUrl) {
-    let proxyUrl = pm.getProxyUrl(new URL(serverUrl));
-    return proxyUrl ? proxyUrl.href : '';
-}
-exports.getProxyUrl = getProxyUrl;
-const HttpRedirectCodes = [
-    HttpCodes.MovedPermanently,
-    HttpCodes.ResourceMoved,
-    HttpCodes.SeeOther,
-    HttpCodes.TemporaryRedirect,
-    HttpCodes.PermanentRedirect
-];
-const HttpResponseRetryCodes = [
-    HttpCodes.BadGateway,
-    HttpCodes.ServiceUnavailable,
-    HttpCodes.GatewayTimeout
-];
-const RetryableHttpVerbs = ['OPTIONS', 'GET', 'DELETE', 'HEAD'];
-const ExponentialBackoffCeiling = 10;
-const ExponentialBackoffTimeSlice = 5;
-class HttpClientError extends Error {
-    constructor(message, statusCode) {
-        super(message);
-        this.name = 'HttpClientError';
-        this.statusCode = statusCode;
-        Object.setPrototypeOf(this, HttpClientError.prototype);
-    }
-}
-exports.HttpClientError = HttpClientError;
-class HttpClientResponse {
-    constructor(message) {
-        this.message = message;
-    }
-    readBody() {
-        return new Promise(async (resolve, reject) => {
-            let output = Buffer.alloc(0);
-            this.message.on('data', (chunk) => {
-                output = Buffer.concat([output, chunk]);
-            });
-            this.message.on('end', () => {
-                resolve(output.toString());
-            });
-        });
-    }
-}
-exports.HttpClientResponse = HttpClientResponse;
-function isHttps(requestUrl) {
-    let parsedUrl = new URL(requestUrl);
-    return parsedUrl.protocol === 'https:';
-}
-exports.isHttps = isHttps;
-class HttpClient {
-    constructor(userAgent, handlers, requestOptions) {
-        this._ignoreSslError = false;
-        this._allowRedirects = true;
-        this._allowRedirectDowngrade = false;
-        this._maxRedirects = 50;
-        this._allowRetries = false;
-        this._maxRetries = 1;
-        this._keepAlive = false;
-        this._disposed = false;
-        this.userAgent = userAgent;
-        this.handlers = handlers || [];
-        this.requestOptions = requestOptions;
-        if (requestOptions) {
-            if (requestOptions.ignoreSslError != null) {
-                this._ignoreSslError = requestOptions.ignoreSslError;
-            }
-            this._socketTimeout = requestOptions.socketTimeout;
-            if (requestOptions.allowRedirects != null) {
-                this._allowRedirects = requestOptions.allowRedirects;
-            }
-            if (requestOptions.allowRedirectDowngrade != null) {
-                this._allowRedirectDowngrade = requestOptions.allowRedirectDowngrade;
-            }
-            if (requestOptions.maxRedirects != null) {
-                this._maxRedirects = Math.max(requestOptions.maxRedirects, 0);
-            }
-            if (requestOptions.keepAlive != null) {
-                this._keepAlive = requestOptions.keepAlive;
-            }
-            if (requestOptions.allowRetries != null) {
-                this._allowRetries = requestOptions.allowRetries;
-            }
-            if (requestOptions.maxRetries != null) {
-                this._maxRetries = requestOptions.maxRetries;
-            }
-        }
-    }
-    options(requestUrl, additionalHeaders) {
-        return this.request('OPTIONS', requestUrl, null, additionalHeaders || {});
-    }
-    get(requestUrl, additionalHeaders) {
-        return this.request('GET', requestUrl, null, additionalHeaders || {});
-    }
-    del(requestUrl, additionalHeaders) {
-        return this.request('DELETE', requestUrl, null, additionalHeaders || {});
-    }
-    post(requestUrl, data, additionalHeaders) {
-        return this.request('POST', requestUrl, data, additionalHeaders || {});
-    }
-    patch(requestUrl, data, additionalHeaders) {
-        return this.request('PATCH', requestUrl, data, additionalHeaders || {});
-    }
-    put(requestUrl, data, additionalHeaders) {
-        return this.request('PUT', requestUrl, data, additionalHeaders || {});
-    }
-    head(requestUrl, additionalHeaders) {
-        return this.request('HEAD', requestUrl, null, additionalHeaders || {});
-    }
-    sendStream(verb, requestUrl, stream, additionalHeaders) {
-        return this.request(verb, requestUrl, stream, additionalHeaders);
-    }
-    /**
-     * Gets a typed object from an endpoint
-     * Be aware that not found returns a null.  Other errors (4xx, 5xx) reject the promise
-     */
-    async getJson(requestUrl, additionalHeaders = {}) {
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        let res = await this.get(requestUrl, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
-    }
-    async postJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.post(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
-    }
-    async putJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.put(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
-    }
-    async patchJson(requestUrl, obj, additionalHeaders = {}) {
-        let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.ContentType, MediaTypes.ApplicationJson);
-        let res = await this.patch(requestUrl, data, additionalHeaders);
-        return this._processResponse(res, this.requestOptions);
-    }
-    /**
-     * Makes a raw http request.
-     * All other methods such as get, post, patch, and request ultimately call this.
-     * Prefer get, del, post and patch
-     */
-    async request(verb, requestUrl, data, headers) {
-        if (this._disposed) {
-            throw new Error('Client has already been disposed.');
-        }
-        let parsedUrl = new URL(requestUrl);
-        let info = this._prepareRequest(verb, parsedUrl, headers);
-        // Only perform retries on reads since writes may not be idempotent.
-        let maxTries = this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1
-            ? this._maxRetries + 1
-            : 1;
-        let numTries = 0;
-        let response;
-        while (numTries < maxTries) {
-            response = await this.requestRaw(info, data);
-            // Check if it's an authentication challenge
-            if (response &&
-                response.message &&
-                response.message.statusCode === HttpCodes.Unauthorized) {
-                let authenticationHandler;
-                for (let i = 0; i < this.handlers.length; i++) {
-                    if (this.handlers[i].canHandleAuthentication(response)) {
-                        authenticationHandler = this.handlers[i];
-                        break;
-                    }
+exports.RunnerError = exports.createCommandRunner = void 0;
+const child_process_1 = __nccwpck_require__(3129);
+const process_1 = __nccwpck_require__(1765);
+const os_1 = __nccwpck_require__(2087);
+const process = __nccwpck_require__(1765);
+function createCommandRunner(workingDir, commandPath, logger, options, agent) {
+    return function run(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                logInitialization(...args);
+                const allOutput = [];
+                const cp = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: Object.assign({ PATH: process_1.env.PATH,
+                        "PP_TOOLS_AUTOMATION_AGENT": agent
+                    }, process.env) }, options));
+                cp.stdout.on("data", logData(logger.log));
+                cp.stderr.on("data", logData(logger.error));
+                function logData(logFunction) {
+                    return (data) => {
+                        `${data}`.split(os_1.EOL).forEach((line) => {
+                            allOutput.push(line);
+                            logFunction(line);
+                        });
+                    };
                 }
-                if (authenticationHandler) {
-                    return authenticationHandler.handleAuthentication(this, info, data);
-                }
-                else {
-                    // We have received an unauthorized response but have no handlers to handle it.
-                    // Let the response return to the caller.
-                    return response;
-                }
-            }
-            let redirectsRemaining = this._maxRedirects;
-            while (HttpRedirectCodes.indexOf(response.message.statusCode) != -1 &&
-                this._allowRedirects &&
-                redirectsRemaining > 0) {
-                const redirectUrl = response.message.headers['location'];
-                if (!redirectUrl) {
-                    // if there's no location to redirect to, we won't
-                    break;
-                }
-                let parsedRedirectUrl = new URL(redirectUrl);
-                if (parsedUrl.protocol == 'https:' &&
-                    parsedUrl.protocol != parsedRedirectUrl.protocol &&
-                    !this._allowRedirectDowngrade) {
-                    throw new Error('Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.');
-                }
-                // we need to finish reading the response before reassigning response
-                // which will leak the open socket.
-                await response.readBody();
-                // strip authorization header if redirected to a different hostname
-                if (parsedRedirectUrl.hostname !== parsedUrl.hostname) {
-                    for (let header in headers) {
-                        // header names are case insensitive
-                        if (header.toLowerCase() === 'authorization') {
-                            delete headers[header];
-                        }
-                    }
-                }
-                // let's make the request with the new redirectUrl
-                info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-                response = await this.requestRaw(info, data);
-                redirectsRemaining--;
-            }
-            if (HttpResponseRetryCodes.indexOf(response.message.statusCode) == -1) {
-                // If not a retry code, return immediately instead of retrying
-                return response;
-            }
-            numTries += 1;
-            if (numTries < maxTries) {
-                await response.readBody();
-                await this._performExponentialBackoff(numTries);
-            }
-        }
-        return response;
-    }
-    /**
-     * Needs to be called if keepAlive is set to true in request options.
-     */
-    dispose() {
-        if (this._agent) {
-            this._agent.destroy();
-        }
-        this._disposed = true;
-    }
-    /**
-     * Raw request.
-     * @param info
-     * @param data
-     */
-    requestRaw(info, data) {
-        return new Promise((resolve, reject) => {
-            let callbackForResult = function (err, res) {
-                if (err) {
-                    reject(err);
-                }
-                resolve(res);
-            };
-            this.requestRawWithCallback(info, data, callbackForResult);
-        });
-    }
-    /**
-     * Raw request with callback.
-     * @param info
-     * @param data
-     * @param onResult
-     */
-    requestRawWithCallback(info, data, onResult) {
-        let socket;
-        if (typeof data === 'string') {
-            info.options.headers['Content-Length'] = Buffer.byteLength(data, 'utf8');
-        }
-        let callbackCalled = false;
-        let handleResult = (err, res) => {
-            if (!callbackCalled) {
-                callbackCalled = true;
-                onResult(err, res);
-            }
-        };
-        let req = info.httpModule.request(info.options, (msg) => {
-            let res = new HttpClientResponse(msg);
-            handleResult(null, res);
-        });
-        req.on('socket', sock => {
-            socket = sock;
-        });
-        // If we ever get disconnected, we want the socket to timeout eventually
-        req.setTimeout(this._socketTimeout || 3 * 60000, () => {
-            if (socket) {
-                socket.end();
-            }
-            handleResult(new Error('Request timeout: ' + info.options.path), null);
-        });
-        req.on('error', function (err) {
-            // err has statusCode property
-            // res should have headers
-            handleResult(err, null);
-        });
-        if (data && typeof data === 'string') {
-            req.write(data, 'utf8');
-        }
-        if (data && typeof data !== 'string') {
-            data.on('close', function () {
-                req.end();
-            });
-            data.pipe(req);
-        }
-        else {
-            req.end();
-        }
-    }
-    /**
-     * Gets an http agent. This function is useful when you need an http agent that handles
-     * routing through a proxy server - depending upon the url and proxy environment variables.
-     * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
-     */
-    getAgent(serverUrl) {
-        let parsedUrl = new URL(serverUrl);
-        return this._getAgent(parsedUrl);
-    }
-    _prepareRequest(method, requestUrl, headers) {
-        const info = {};
-        info.parsedUrl = requestUrl;
-        const usingSsl = info.parsedUrl.protocol === 'https:';
-        info.httpModule = usingSsl ? https : http;
-        const defaultPort = usingSsl ? 443 : 80;
-        info.options = {};
-        info.options.host = info.parsedUrl.hostname;
-        info.options.port = info.parsedUrl.port
-            ? parseInt(info.parsedUrl.port)
-            : defaultPort;
-        info.options.path =
-            (info.parsedUrl.pathname || '') + (info.parsedUrl.search || '');
-        info.options.method = method;
-        info.options.headers = this._mergeHeaders(headers);
-        if (this.userAgent != null) {
-            info.options.headers['user-agent'] = this.userAgent;
-        }
-        info.options.agent = this._getAgent(info.parsedUrl);
-        // gives handlers an opportunity to participate
-        if (this.handlers) {
-            this.handlers.forEach(handler => {
-                handler.prepareRequest(info.options);
-            });
-        }
-        return info;
-    }
-    _mergeHeaders(headers) {
-        const lowercaseKeys = obj => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
-        if (this.requestOptions && this.requestOptions.headers) {
-            return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers));
-        }
-        return lowercaseKeys(headers || {});
-    }
-    _getExistingOrDefaultHeader(additionalHeaders, header, _default) {
-        const lowercaseKeys = obj => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
-        let clientHeader;
-        if (this.requestOptions && this.requestOptions.headers) {
-            clientHeader = lowercaseKeys(this.requestOptions.headers)[header];
-        }
-        return additionalHeaders[header] || clientHeader || _default;
-    }
-    _getAgent(parsedUrl) {
-        let agent;
-        let proxyUrl = pm.getProxyUrl(parsedUrl);
-        let useProxy = proxyUrl && proxyUrl.hostname;
-        if (this._keepAlive && useProxy) {
-            agent = this._proxyAgent;
-        }
-        if (this._keepAlive && !useProxy) {
-            agent = this._agent;
-        }
-        // if agent is already assigned use that agent.
-        if (!!agent) {
-            return agent;
-        }
-        const usingSsl = parsedUrl.protocol === 'https:';
-        let maxSockets = 100;
-        if (!!this.requestOptions) {
-            maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
-        }
-        if (useProxy) {
-            // If using proxy, need tunnel
-            if (!tunnel) {
-                tunnel = __nccwpck_require__(4294);
-            }
-            const agentOptions = {
-                maxSockets: maxSockets,
-                keepAlive: this._keepAlive,
-                proxy: {
-                    ...((proxyUrl.username || proxyUrl.password) && {
-                        proxyAuth: `${proxyUrl.username}:${proxyUrl.password}`
-                    }),
-                    host: proxyUrl.hostname,
-                    port: proxyUrl.port
-                }
-            };
-            let tunnelAgent;
-            const overHttps = proxyUrl.protocol === 'https:';
-            if (usingSsl) {
-                tunnelAgent = overHttps ? tunnel.httpsOverHttps : tunnel.httpsOverHttp;
-            }
-            else {
-                tunnelAgent = overHttps ? tunnel.httpOverHttps : tunnel.httpOverHttp;
-            }
-            agent = tunnelAgent(agentOptions);
-            this._proxyAgent = agent;
-        }
-        // if reusing agent across request and tunneling agent isn't assigned create a new agent
-        if (this._keepAlive && !agent) {
-            const options = { keepAlive: this._keepAlive, maxSockets: maxSockets };
-            agent = usingSsl ? new https.Agent(options) : new http.Agent(options);
-            this._agent = agent;
-        }
-        // if not using private agent and tunnel agent isn't setup then use global agent
-        if (!agent) {
-            agent = usingSsl ? https.globalAgent : http.globalAgent;
-        }
-        if (usingSsl && this._ignoreSslError) {
-            // we don't want to set NODE_TLS_REJECT_UNAUTHORIZED=0 since that will affect request for entire process
-            // http.RequestOptions doesn't expose a way to modify RequestOptions.agent.options
-            // we have to cast it to any and change it directly
-            agent.options = Object.assign(agent.options || {}, {
-                rejectUnauthorized: false
-            });
-        }
-        return agent;
-    }
-    _performExponentialBackoff(retryNumber) {
-        retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
-        const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-        return new Promise(resolve => setTimeout(() => resolve(), ms));
-    }
-    static dateTimeDeserializer(key, value) {
-        if (typeof value === 'string') {
-            let a = new Date(value);
-            if (!isNaN(a.valueOf())) {
-                return a;
-            }
-        }
-        return value;
-    }
-    async _processResponse(res, options) {
-        return new Promise(async (resolve, reject) => {
-            const statusCode = res.message.statusCode;
-            const response = {
-                statusCode: statusCode,
-                result: null,
-                headers: {}
-            };
-            // not found leads to null obj returned
-            if (statusCode == HttpCodes.NotFound) {
-                resolve(response);
-            }
-            let obj;
-            let contents;
-            // get the result from the body
-            try {
-                contents = await res.readBody();
-                if (contents && contents.length > 0) {
-                    if (options && options.deserializeDates) {
-                        obj = JSON.parse(contents, HttpClient.dateTimeDeserializer);
+                cp.on("exit", (code) => {
+                    if (code === 0) {
+                        resolve(allOutput);
                     }
                     else {
-                        obj = JSON.parse(contents);
+                        logger.error(`error: ${code}`);
+                        reject(new RunnerError(code, allOutput.join(os_1.EOL)));
                     }
-                    response.result = obj;
-                }
-                response.headers = res.message.headers;
+                    /* Close out handles to the output streams so that we don't wait on
+                        grandchild processes like pacTelemetryUpload */
+                    cp.stdout.destroy();
+                    cp.stderr.destroy();
+                });
+            });
+        });
+    };
+    function logInitialization(...args) {
+        logger.debug(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
+    }
+}
+exports.createCommandRunner = createCommandRunner;
+class RunnerError extends Error {
+    constructor(exitCode, message) {
+        super(message);
+        this.exitCode = exitCode;
+    }
+}
+exports.RunnerError = RunnerError;
+
+//# sourceMappingURL=CommandRunner.js.map
+
+
+/***/ }),
+
+/***/ 5920:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.backupEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function backupEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "backup", "--url", parameters.environmentUrl];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--label", parameters.backupLabel);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("BackupEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.backupEnvironment = backupEnvironment;
+
+//# sourceMappingURL=backupEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 2896:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+const path = __nccwpck_require__(5622);
+function checkSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "check"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.solutionPath, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--geo", parameters.geoInstance);
+            validator.pushInput(pacArgs, "--ruleLevelOverride", parameters.ruleLevelOverride);
+            validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CheckSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.checkSolution = checkSolution;
+
+//# sourceMappingURL=checkSolution.js.map
+
+
+/***/ }),
+
+/***/ 4841:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.cloneSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function cloneSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "clone"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--name", parameters.name);
+            validator.pushInput(pacArgs, "--targetversion", parameters.targetVersion);
+            validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            const includeArgs = [];
+            if (validator.getInput(parameters.autoNumberSettings) === 'true') {
+                includeArgs.push("autonumbering");
             }
-            catch (err) {
-                // Invalid resource (contents not json);  leaving result obj null
+            if (validator.getInput(parameters.calenderSettings) === 'true') {
+                includeArgs.push("calendar");
             }
-            // note that 3xx redirects are handled by the http layer.
-            if (statusCode > 299) {
-                let msg;
-                // if exception/error in body, attempt to get better error
-                if (obj && obj.message) {
-                    msg = obj.message;
-                }
-                else if (contents && contents.length > 0) {
-                    // it may be the case that the exception is in the body message as string
-                    msg = contents;
-                }
-                else {
-                    msg = 'Failed request: (' + statusCode + ')';
-                }
-                let err = new HttpClientError(msg, statusCode);
-                err.result = response.result;
-                reject(err);
+            if (validator.getInput(parameters.customizationSettings) === 'true') {
+                includeArgs.push("customization");
+            }
+            if (validator.getInput(parameters.emailTrackingSettings) === 'true') {
+                includeArgs.push("emailtracking");
+            }
+            if (validator.getInput(parameters.externalApplicationSettings) === 'true') {
+                includeArgs.push("externalapplications");
+            }
+            if (validator.getInput(parameters.generalSettings) === 'true') {
+                includeArgs.push("general");
+            }
+            if (validator.getInput(parameters.isvConfig) === 'true') {
+                includeArgs.push("isvconfig");
+            }
+            if (validator.getInput(parameters.marketingSettings) === 'true') {
+                includeArgs.push("marketing");
+            }
+            if (validator.getInput(parameters.outlookSynchronizationSettings) === 'true') {
+                includeArgs.push("outlooksynchronization");
+            }
+            if (validator.getInput(parameters.relationshipRoles) === 'true') {
+                includeArgs.push("relationshiproles");
+            }
+            if (validator.getInput(parameters.sales) === 'true') {
+                includeArgs.push("sales");
+            }
+            if (includeArgs.length > 0) {
+                pacArgs.push("--include", includeArgs.join(','));
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CloneSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.cloneSolution = cloneSolution;
+
+//# sourceMappingURL=cloneSolution.js.map
+
+
+/***/ }),
+
+/***/ 219:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.copyEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function copyEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "copy", "--source-url", parameters.sourceEnvironmentUrl];
+            logger.log("Source Url: " + parameters.sourceEnvironmentUrl);
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
+            if (validator.getInput(parameters.overrideFriendlyName) === 'true') {
+                validator.pushInput(pacArgs, "--name", parameters.friendlyTargetEnvironmentName);
+            }
+            validator.pushInput(pacArgs, "--type", parameters.copyType);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CopyEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.copyEnvironment = copyEnvironment;
+
+//# sourceMappingURL=copyEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 98:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function createEnvironment(parameters, runnerParameters, host) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["admin", "create"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--name", parameters.environmentName);
+            validator.pushInput(pacArgs, "--type", parameters.environmentType);
+            validator.pushInput(pacArgs, "--templates", parameters.templates);
+            validator.pushInput(pacArgs, "--region", parameters.region);
+            validator.pushInput(pacArgs, "--currency", parameters.currency);
+            validator.pushInput(pacArgs, "--language", parameters.language);
+            validator.pushInput(pacArgs, "--domain", parameters.domainName);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("CreateEnvironment Action Result: " + pacResult);
+            // HACK TODO: Need structured output from pac CLI to make parsing out of the resulting env URL more robust
+            const newEnvDetailColumns = (_a = pacResult
+                .filter(l => l.length > 0)
+                .pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/);
+            const envUrl = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
+            const envId = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
+            return {
+                environmentId: envId,
+                environmentUrl: envUrl
+            };
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.createEnvironment = createEnvironment;
+
+//# sourceMappingURL=createEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 4930:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deleteEnvironment = void 0;
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function deleteEnvironment(parameters, runnerParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "delete", "--url", parameters.environmentUrl];
+            logger.log("Url: " + parameters.environmentUrl);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DeleteEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.deleteEnvironment = deleteEnvironment;
+
+//# sourceMappingURL=deleteEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 183:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deleteSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function deleteSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "delete"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--solution-name", parameters.name);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DeleteSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.deleteSolution = deleteSolution;
+
+//# sourceMappingURL=deleteSolution.js.map
+
+
+/***/ }),
+
+/***/ 671:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.deployPackage = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+const path = __nccwpck_require__(5622);
+const os = __nccwpck_require__(2087);
+function deployPackage(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const platform = os.platform();
+            if (platform !== 'win32') {
+                throw new Error(`deploy package is only supported on Windows agents/runners (attempted run on ${platform})`);
+            }
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["package", "deploy"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--package", parameters.packagePath, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--logFile", parameters.logFile);
+            validator.pushInput(pacArgs, "--logConsole", parameters.logConsole);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DeployPackage Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.deployPackage = deployPackage;
+
+//# sourceMappingURL=deployPackage.js.map
+
+
+/***/ }),
+
+/***/ 6598:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.downloadPaportal = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function downloadPaportal(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["paportal", "download"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.path);
+            validator.pushInput(pacArgs, "--websiteId", parameters.websiteId);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("DownloadPaPortal Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.downloadPaportal = downloadPaportal;
+
+//# sourceMappingURL=downloadPaportal.js.map
+
+
+/***/ }),
+
+/***/ 5288:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.exportSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+const path = __nccwpck_require__(5622);
+function exportSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "export"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--name", parameters.name);
+            validator.pushInput(pacArgs, "--path", parameters.path, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--managed", parameters.managed);
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            validator.pushInput(pacArgs, "--targetversion", parameters.targetVersion);
+            const includeArgs = [];
+            if (validator.getInput(parameters.autoNumberSettings) === 'true') {
+                includeArgs.push("autonumbering");
+            }
+            if (validator.getInput(parameters.calenderSettings) === 'true') {
+                includeArgs.push("calendar");
+            }
+            if (validator.getInput(parameters.customizationSettings) === 'true') {
+                includeArgs.push("customization");
+            }
+            if (validator.getInput(parameters.emailTrackingSettings) === 'true') {
+                includeArgs.push("emailtracking");
+            }
+            if (validator.getInput(parameters.externalApplicationSettings) === 'true') {
+                includeArgs.push("externalapplications");
+            }
+            if (validator.getInput(parameters.generalSettings) === 'true') {
+                includeArgs.push("general");
+            }
+            if (validator.getInput(parameters.isvConfig) === 'true') {
+                includeArgs.push("isvconfig");
+            }
+            if (validator.getInput(parameters.marketingSettings) === 'true') {
+                includeArgs.push("marketing");
+            }
+            if (validator.getInput(parameters.outlookSynchronizationSettings) === 'true') {
+                includeArgs.push("outlooksynchronization");
+            }
+            if (validator.getInput(parameters.relationshipRoles) === 'true') {
+                includeArgs.push("relationshiproles");
+            }
+            if (validator.getInput(parameters.sales) === 'true') {
+                includeArgs.push("sales");
+            }
+            if (includeArgs.length > 0) {
+                pacArgs.push("--include", includeArgs.join(','));
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("ExportSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.exportSolution = exportSolution;
+
+//# sourceMappingURL=exportSolution.js.map
+
+
+/***/ }),
+
+/***/ 9274:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.importSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+const path = __nccwpck_require__(5622);
+function importSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "import"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.path, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
+            validator.pushInput(pacArgs, "--force-overwrite", parameters.forceOverwrite);
+            validator.pushInput(pacArgs, "--publish-changes", parameters.publishChanges);
+            validator.pushInput(pacArgs, "--skip-dependency-check", parameters.skipDependencyCheck);
+            validator.pushInput(pacArgs, "--convert-to-managed", parameters.convertToManaged);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            validator.pushInput(pacArgs, "--activate-plugins", parameters.activatePlugins);
+            if (validator.getInput(parameters.useDeploymentSettingsFile) === "true") {
+                validator.pushInput(pacArgs, "--settings-file", parameters.deploymentSettingsFile);
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("ImportSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.importSolution = importSolution;
+
+//# sourceMappingURL=importSolution.js.map
+
+
+/***/ }),
+
+/***/ 7765:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(5288), exports);
+__exportStar(__nccwpck_require__(7302), exports);
+__exportStar(__nccwpck_require__(9274), exports);
+__exportStar(__nccwpck_require__(6177), exports);
+__exportStar(__nccwpck_require__(4930), exports);
+__exportStar(__nccwpck_require__(5920), exports);
+__exportStar(__nccwpck_require__(2896), exports);
+__exportStar(__nccwpck_require__(7119), exports);
+__exportStar(__nccwpck_require__(671), exports);
+__exportStar(__nccwpck_require__(98), exports);
+__exportStar(__nccwpck_require__(697), exports);
+__exportStar(__nccwpck_require__(183), exports);
+__exportStar(__nccwpck_require__(3936), exports);
+__exportStar(__nccwpck_require__(8230), exports);
+__exportStar(__nccwpck_require__(4682), exports);
+__exportStar(__nccwpck_require__(219), exports);
+__exportStar(__nccwpck_require__(8223), exports);
+__exportStar(__nccwpck_require__(6598), exports);
+__exportStar(__nccwpck_require__(4841), exports);
+__exportStar(__nccwpck_require__(5021), exports);
+
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 3936:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.packSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const createPacRunner_1 = __nccwpck_require__(2226);
+const path = __nccwpck_require__(5622);
+function packSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const pacArgs = ["solution", "pack"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("PackSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+    });
+}
+exports.packSolution = packSolution;
+
+//# sourceMappingURL=packSolution.js.map
+
+
+/***/ }),
+
+/***/ 7119:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.publishSolution = void 0;
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function publishSolution(parameters, runnerParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacResult = yield pac("solution", "publish");
+            logger.log("PublishSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.publishSolution = publishSolution;
+
+//# sourceMappingURL=publishSolution.js.map
+
+
+/***/ }),
+
+/***/ 4682:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resetEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function resetEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
+            const pacArgs = ["admin", "reset", "--url", parameters.environmentUrl];
+            logger.log("Url: " + parameters.environmentUrl);
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--language", parameters.language);
+            if (validator.getInput(parameters.overrideDomainName) === 'true') {
+                validator.pushInput(pacArgs, "--domain", parameters.domainName);
+            }
+            if (validator.getInput(parameters.overrideFriendlyName) === 'true') {
+                validator.pushInput(pacArgs, "--name", parameters.friendlyEnvironmentName);
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("ResetEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.resetEnvironment = resetEnvironment;
+
+//# sourceMappingURL=resetEnvironment.js.map
+
+
+/***/ }),
+
+/***/ 697:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.restoreEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function restoreEnvironment(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["admin", "restore", "--source-url", parameters.sourceEnvironmentUrl];
+            logger.log("Source Url: " + parameters.sourceEnvironmentUrl);
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
+            validator.pushInput(pacArgs, "--name", parameters.targetEnvironmentName);
+            if (validator.getInput(parameters.restoreLatestBackup) === 'true') {
+                pacArgs.push("--selected-backup", "latest");
+            }
+            else if (parameters.backupDateTime) {
+                validator.pushInput(pacArgs, "--selected-backup", parameters.backupDateTime);
             }
             else {
-                resolve(response);
+                throw new Error("Either latest backup must be true or Valid date and time for backup must be provided.");
             }
-        });
-    }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("RestoreEnvironment Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
 }
-exports.HttpClient = HttpClient;
+exports.restoreEnvironment = restoreEnvironment;
+
+//# sourceMappingURL=restoreEnvironment.js.map
 
 
 /***/ }),
 
-/***/ 6443:
+/***/ 8230:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.unpackSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const createPacRunner_1 = __nccwpck_require__(2226);
+const path = __nccwpck_require__(5622);
+function unpackSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const pacArgs = ["solution", "unpack"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
+            validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
+            if (validator.getInput(parameters.overwriteFiles) === "true") {
+                pacArgs.push("--allowDelete");
+                pacArgs.push("yes");
+                pacArgs.push("--allowWrite");
+                pacArgs.push("true");
+                pacArgs.push("--clobber");
+                pacArgs.push("true");
+            }
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UnpackSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+    });
+}
+exports.unpackSolution = unpackSolution;
+
+//# sourceMappingURL=unpackSolution.js.map
+
+
+/***/ }),
+
+/***/ 5021:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateVersionSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function updateVersionSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "version"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--patchversion", parameters.patchVersion);
+            validator.pushInput(pacArgs, "--strategy", parameters.strategy);
+            validator.pushInput(pacArgs, "--filename", parameters.fileName);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UpdateVersionSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.updateVersionSolution = updateVersionSolution;
+
+//# sourceMappingURL=updateVersionSolution.js.map
+
+
+/***/ }),
+
+/***/ 6177:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.upgradeSolution = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function upgradeSolution(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["solution", "upgrade"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--solution-name", parameters.name);
+            validator.pushInput(pacArgs, "--async", parameters.async);
+            validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UpgradeSolution Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.upgradeSolution = upgradeSolution;
+
+//# sourceMappingURL=upgradeSolution.js.map
+
+
+/***/ }),
+
+/***/ 8223:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.uploadPaportal = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function uploadPaportal(parameters, runnerParameters, host) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacArgs = ["paportal", "upload"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--path", parameters.path);
+            validator.pushInput(pacArgs, "--deploymentProfile", parameters.deploymentProfile);
+            logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+            const pacResult = yield pac(...pacArgs);
+            logger.log("UploadPaPortal Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.uploadPaportal = uploadPaportal;
+
+//# sourceMappingURL=uploadPaportal.js.map
+
+
+/***/ }),
+
+/***/ 7302:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.whoAmI = void 0;
+const authenticate_1 = __nccwpck_require__(192);
+const createPacRunner_1 = __nccwpck_require__(2226);
+function whoAmI(parameters, runnerParameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+            const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+            logger.log("The Authentication Result: " + authenticateResult);
+            const pacResult = yield pac("org", "who");
+            logger.log("WhoAmI Action Result: " + pacResult);
+        }
+        catch (error) {
+            logger.error(`failed: ${error.message}`);
+            throw error;
+        }
+        finally {
+            const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+            logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+    });
+}
+exports.whoAmI = whoAmI;
+
+//# sourceMappingURL=whoAmI.js.map
+
+
+/***/ }),
+
+/***/ 9988:
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-function getProxyUrl(reqUrl) {
-    let usingSsl = reqUrl.protocol === 'https:';
-    let proxyUrl;
-    if (checkBypass(reqUrl)) {
-        return proxyUrl;
+exports.InputValidator = void 0;
+class InputValidator {
+    constructor(host) {
+        this._host = host;
     }
-    let proxyVar;
-    if (usingSsl) {
-        proxyVar = process.env['https_proxy'] || process.env['HTTPS_PROXY'];
+    getInput(params) {
+        const val = this._host.getInput(params);
+        if (val === undefined && params.defaultValue !== undefined) {
+            return params.defaultValue.toString();
+        }
+        return val;
     }
-    else {
-        proxyVar = process.env['http_proxy'] || process.env['HTTP_PROXY'];
-    }
-    if (proxyVar) {
-        proxyUrl = new URL(proxyVar);
-    }
-    return proxyUrl;
-}
-exports.getProxyUrl = getProxyUrl;
-function checkBypass(reqUrl) {
-    if (!reqUrl.hostname) {
-        return false;
-    }
-    let noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
-    if (!noProxy) {
-        return false;
-    }
-    // Determine the request port
-    let reqPort;
-    if (reqUrl.port) {
-        reqPort = Number(reqUrl.port);
-    }
-    else if (reqUrl.protocol === 'http:') {
-        reqPort = 80;
-    }
-    else if (reqUrl.protocol === 'https:') {
-        reqPort = 443;
-    }
-    // Format the request hostname and hostname with port
-    let upperReqHosts = [reqUrl.hostname.toUpperCase()];
-    if (typeof reqPort === 'number') {
-        upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
-    }
-    // Compare request host against noproxy
-    for (let upperNoProxyItem of noProxy
-        .split(',')
-        .map(x => x.trim().toUpperCase())
-        .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
-            return true;
+    pushInput(pacArgs, property, paramEntry, callback) {
+        // TODO: change action-specific ...Parameters contracts to always require the parameter definition
+        // today, we double-encode if a task/action parameter is optional in the ...Parameters interface definition, but shouldn't!
+        if (!paramEntry) {
+            return;
+        }
+        let val = this.getInput(paramEntry);
+        if (!val && paramEntry.required) {
+            throw new Error(`Required ${paramEntry.name} not set`);
+        }
+        else if (val) {
+            if (callback) {
+                val = callback(val);
+            }
+            pacArgs.push(property, val);
         }
     }
-    return false;
 }
-exports.checkBypass = checkBypass;
+exports.InputValidator = InputValidator;
+
+//# sourceMappingURL=InputValidator.js.map
 
 
 /***/ }),
 
-/***/ 9417:
-/***/ ((module) => {
+/***/ 192:
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-module.exports = balanced;
-function balanced(a, b, str) {
-  if (a instanceof RegExp) a = maybeMatch(a, str);
-  if (b instanceof RegExp) b = maybeMatch(b, str);
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.clearAuthentication = exports.authenticateEnvironment = exports.authenticateAdmin = void 0;
+function authenticateAdmin(pac, credentials) {
+    return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials));
+}
+exports.authenticateAdmin = authenticateAdmin;
+function authenticateEnvironment(pac, credentials, environmentUrl) {
+    return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials));
+}
+exports.authenticateEnvironment = authenticateEnvironment;
+function clearAuthentication(pac) {
+    return pac("auth", "clear");
+}
+exports.clearAuthentication = clearAuthentication;
+function addUrl(url) {
+    return ["--url", url];
+}
+function addCredentials(credentials) {
+    return isUsernamePassword(credentials) ? addUsernamePassword(credentials) : addClientCredentials(credentials);
+}
+function isUsernamePassword(credentials) {
+    return "username" in credentials;
+}
+function addClientCredentials(parameters) {
+    return ["--tenant", parameters.tenantId, "--applicationId", parameters.appId, "--clientSecret", parameters.clientSecret];
+}
+function addUsernamePassword(parameters) {
+    return ["--username", parameters.username, "--password", parameters.password];
+}
 
-  var r = range(a, b, str);
+//# sourceMappingURL=authenticate.js.map
 
-  return r && {
-    start: r[0],
-    end: r[1],
-    pre: str.slice(0, r[0]),
-    body: str.slice(r[0] + a.length, r[1]),
-    post: str.slice(r[1] + b.length)
+
+/***/ }),
+
+/***/ 2226:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const os_1 = __nccwpck_require__(2087);
+const path_1 = __nccwpck_require__(5622);
+const CommandRunner_1 = __nccwpck_require__(5892);
+function createPacRunner({ workingDir, runnersDir, logger, agent }) {
+    return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32"
+        ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe")
+        : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger, undefined, agent);
+}
+exports.default = createPacRunner;
+
+//# sourceMappingURL=createPacRunner.js.map
+
+
+/***/ }),
+
+/***/ 1917:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+
+var loader = __nccwpck_require__(1161);
+var dumper = __nccwpck_require__(8866);
+
+
+function renamed(from, to) {
+  return function () {
+    throw new Error('Function yaml.' + from + ' is removed in js-yaml 4. ' +
+      'Use yaml.' + to + ' instead, which is now safe by default.');
   };
 }
 
-function maybeMatch(reg, str) {
-  var m = str.match(reg);
-  return m ? m[0] : null;
+
+module.exports.Type = __nccwpck_require__(6073);
+module.exports.Schema = __nccwpck_require__(1082);
+module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(8562);
+module.exports.JSON_SCHEMA = __nccwpck_require__(1035);
+module.exports.CORE_SCHEMA = __nccwpck_require__(2011);
+module.exports.DEFAULT_SCHEMA = __nccwpck_require__(8759);
+module.exports.load                = loader.load;
+module.exports.loadAll             = loader.loadAll;
+module.exports.dump                = dumper.dump;
+module.exports.YAMLException = __nccwpck_require__(8179);
+
+// Re-export all types in case user wants to create custom schema
+module.exports.types = {
+  binary:    __nccwpck_require__(7900),
+  float:     __nccwpck_require__(2705),
+  map:       __nccwpck_require__(6150),
+  null:      __nccwpck_require__(721),
+  pairs:     __nccwpck_require__(6860),
+  set:       __nccwpck_require__(9548),
+  timestamp: __nccwpck_require__(9212),
+  bool:      __nccwpck_require__(4993),
+  int:       __nccwpck_require__(1615),
+  merge:     __nccwpck_require__(6104),
+  omap:      __nccwpck_require__(9046),
+  seq:       __nccwpck_require__(7283),
+  str:       __nccwpck_require__(3619)
+};
+
+// Removed functions from JS-YAML 3.0.x
+module.exports.safeLoad            = renamed('safeLoad', 'load');
+module.exports.safeLoadAll         = renamed('safeLoadAll', 'loadAll');
+module.exports.safeDump            = renamed('safeDump', 'dump');
+
+
+/***/ }),
+
+/***/ 6829:
+/***/ ((module) => {
+
+
+
+
+function isNothing(subject) {
+  return (typeof subject === 'undefined') || (subject === null);
 }
 
-balanced.range = range;
-function range(a, b, str) {
-  var begs, beg, left, right, result;
-  var ai = str.indexOf(a);
-  var bi = str.indexOf(b, ai + 1);
-  var i = ai;
 
-  if (ai >= 0 && bi > 0) {
-    if(a===b) {
-      return [ai, bi];
+function isObject(subject) {
+  return (typeof subject === 'object') && (subject !== null);
+}
+
+
+function toArray(sequence) {
+  if (Array.isArray(sequence)) return sequence;
+  else if (isNothing(sequence)) return [];
+
+  return [ sequence ];
+}
+
+
+function extend(target, source) {
+  var index, length, key, sourceKeys;
+
+  if (source) {
+    sourceKeys = Object.keys(source);
+
+    for (index = 0, length = sourceKeys.length; index < length; index += 1) {
+      key = sourceKeys[index];
+      target[key] = source[key];
     }
-    begs = [];
-    left = str.length;
+  }
 
-    while (i >= 0 && !result) {
-      if (i == ai) {
-        begs.push(i);
-        ai = str.indexOf(a, i + 1);
-      } else if (begs.length == 1) {
-        result = [ begs.pop(), bi ];
-      } else {
-        beg = begs.pop();
-        if (beg < left) {
-          left = beg;
-          right = bi;
-        }
+  return target;
+}
 
-        bi = str.indexOf(b, i + 1);
-      }
 
-      i = ai < bi && ai >= 0 ? ai : bi;
-    }
+function repeat(string, count) {
+  var result = '', cycle;
 
-    if (begs.length) {
-      result = [ left, right ];
-    }
+  for (cycle = 0; cycle < count; cycle += 1) {
+    result += string;
   }
 
   return result;
 }
 
 
+function isNegativeZero(number) {
+  return (number === 0) && (Number.NEGATIVE_INFINITY === 1 / number);
+}
+
+
+module.exports.isNothing      = isNothing;
+module.exports.isObject       = isObject;
+module.exports.toArray        = toArray;
+module.exports.repeat         = repeat;
+module.exports.isNegativeZero = isNegativeZero;
+module.exports.extend         = extend;
+
+
 /***/ }),
 
-/***/ 3717:
+/***/ 8866:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var concatMap = __nccwpck_require__(6891);
-var balanced = __nccwpck_require__(9417);
-
-module.exports = expandTop;
-
-var escSlash = '\0SLASH'+Math.random()+'\0';
-var escOpen = '\0OPEN'+Math.random()+'\0';
-var escClose = '\0CLOSE'+Math.random()+'\0';
-var escComma = '\0COMMA'+Math.random()+'\0';
-var escPeriod = '\0PERIOD'+Math.random()+'\0';
-
-function numeric(str) {
-  return parseInt(str, 10) == str
-    ? parseInt(str, 10)
-    : str.charCodeAt(0);
-}
-
-function escapeBraces(str) {
-  return str.split('\\\\').join(escSlash)
-            .split('\\{').join(escOpen)
-            .split('\\}').join(escClose)
-            .split('\\,').join(escComma)
-            .split('\\.').join(escPeriod);
-}
-
-function unescapeBraces(str) {
-  return str.split(escSlash).join('\\')
-            .split(escOpen).join('{')
-            .split(escClose).join('}')
-            .split(escComma).join(',')
-            .split(escPeriod).join('.');
-}
 
 
-// Basically just str.split(","), but handling cases
-// where we have nested braced sections, which should be
-// treated as individual members, like {a,{b,c},d}
-function parseCommaParts(str) {
-  if (!str)
-    return [''];
+/*eslint-disable no-use-before-define*/
 
-  var parts = [];
-  var m = balanced('{', '}', str);
+var common              = __nccwpck_require__(6829);
+var YAMLException       = __nccwpck_require__(8179);
+var DEFAULT_SCHEMA      = __nccwpck_require__(8759);
 
-  if (!m)
-    return str.split(',');
+var _toString       = Object.prototype.toString;
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
 
-  var pre = m.pre;
-  var body = m.body;
-  var post = m.post;
-  var p = pre.split(',');
+var CHAR_BOM                  = 0xFEFF;
+var CHAR_TAB                  = 0x09; /* Tab */
+var CHAR_LINE_FEED            = 0x0A; /* LF */
+var CHAR_CARRIAGE_RETURN      = 0x0D; /* CR */
+var CHAR_SPACE                = 0x20; /* Space */
+var CHAR_EXCLAMATION          = 0x21; /* ! */
+var CHAR_DOUBLE_QUOTE         = 0x22; /* " */
+var CHAR_SHARP                = 0x23; /* # */
+var CHAR_PERCENT              = 0x25; /* % */
+var CHAR_AMPERSAND            = 0x26; /* & */
+var CHAR_SINGLE_QUOTE         = 0x27; /* ' */
+var CHAR_ASTERISK             = 0x2A; /* * */
+var CHAR_COMMA                = 0x2C; /* , */
+var CHAR_MINUS                = 0x2D; /* - */
+var CHAR_COLON                = 0x3A; /* : */
+var CHAR_EQUALS               = 0x3D; /* = */
+var CHAR_GREATER_THAN         = 0x3E; /* > */
+var CHAR_QUESTION             = 0x3F; /* ? */
+var CHAR_COMMERCIAL_AT        = 0x40; /* @ */
+var CHAR_LEFT_SQUARE_BRACKET  = 0x5B; /* [ */
+var CHAR_RIGHT_SQUARE_BRACKET = 0x5D; /* ] */
+var CHAR_GRAVE_ACCENT         = 0x60; /* ` */
+var CHAR_LEFT_CURLY_BRACKET   = 0x7B; /* { */
+var CHAR_VERTICAL_LINE        = 0x7C; /* | */
+var CHAR_RIGHT_CURLY_BRACKET  = 0x7D; /* } */
 
-  p[p.length-1] += '{' + body + '}';
-  var postParts = parseCommaParts(post);
-  if (post.length) {
-    p[p.length-1] += postParts.shift();
-    p.push.apply(p, postParts);
-  }
+var ESCAPE_SEQUENCES = {};
 
-  parts.push.apply(parts, p);
+ESCAPE_SEQUENCES[0x00]   = '\\0';
+ESCAPE_SEQUENCES[0x07]   = '\\a';
+ESCAPE_SEQUENCES[0x08]   = '\\b';
+ESCAPE_SEQUENCES[0x09]   = '\\t';
+ESCAPE_SEQUENCES[0x0A]   = '\\n';
+ESCAPE_SEQUENCES[0x0B]   = '\\v';
+ESCAPE_SEQUENCES[0x0C]   = '\\f';
+ESCAPE_SEQUENCES[0x0D]   = '\\r';
+ESCAPE_SEQUENCES[0x1B]   = '\\e';
+ESCAPE_SEQUENCES[0x22]   = '\\"';
+ESCAPE_SEQUENCES[0x5C]   = '\\\\';
+ESCAPE_SEQUENCES[0x85]   = '\\N';
+ESCAPE_SEQUENCES[0xA0]   = '\\_';
+ESCAPE_SEQUENCES[0x2028] = '\\L';
+ESCAPE_SEQUENCES[0x2029] = '\\P';
 
-  return parts;
-}
+var DEPRECATED_BOOLEANS_SYNTAX = [
+  'y', 'Y', 'yes', 'Yes', 'YES', 'on', 'On', 'ON',
+  'n', 'N', 'no', 'No', 'NO', 'off', 'Off', 'OFF'
+];
 
-function expandTop(str) {
-  if (!str)
-    return [];
+var DEPRECATED_BASE60_SYNTAX = /^[-+]?[0-9_]+(?::[0-9_]+)+(?:\.[0-9_]*)?$/;
 
-  // I don't know why Bash 4.3 does this, but it does.
-  // Anything starting with {} will have the first two bytes preserved
-  // but *only* at the top level, so {},a}b will not expand to anything,
-  // but a{},b}c will be expanded to [a}c,abc].
-  // One could argue that this is a bug in Bash, but since the goal of
-  // this module is to match Bash's rules, we escape a leading {}
-  if (str.substr(0, 2) === '{}') {
-    str = '\\{\\}' + str.substr(2);
-  }
+function compileStyleMap(schema, map) {
+  var result, keys, index, length, tag, style, type;
 
-  return expand(escapeBraces(str), true).map(unescapeBraces);
-}
+  if (map === null) return {};
 
-function identity(e) {
-  return e;
-}
+  result = {};
+  keys = Object.keys(map);
 
-function embrace(str) {
-  return '{' + str + '}';
-}
-function isPadded(el) {
-  return /^-?0\d/.test(el);
-}
+  for (index = 0, length = keys.length; index < length; index += 1) {
+    tag = keys[index];
+    style = String(map[tag]);
 
-function lte(i, y) {
-  return i <= y;
-}
-function gte(i, y) {
-  return i >= y;
-}
-
-function expand(str, isTop) {
-  var expansions = [];
-
-  var m = balanced('{', '}', str);
-  if (!m || /\$$/.test(m.pre)) return [str];
-
-  var isNumericSequence = /^-?\d+\.\.-?\d+(?:\.\.-?\d+)?$/.test(m.body);
-  var isAlphaSequence = /^[a-zA-Z]\.\.[a-zA-Z](?:\.\.-?\d+)?$/.test(m.body);
-  var isSequence = isNumericSequence || isAlphaSequence;
-  var isOptions = m.body.indexOf(',') >= 0;
-  if (!isSequence && !isOptions) {
-    // {a},b}
-    if (m.post.match(/,.*\}/)) {
-      str = m.pre + '{' + m.body + escClose + m.post;
-      return expand(str);
+    if (tag.slice(0, 2) === '!!') {
+      tag = 'tag:yaml.org,2002:' + tag.slice(2);
     }
-    return [str];
+    type = schema.compiledTypeMap['fallback'][tag];
+
+    if (type && _hasOwnProperty.call(type.styleAliases, style)) {
+      style = type.styleAliases[style];
+    }
+
+    result[tag] = style;
   }
 
-  var n;
-  if (isSequence) {
-    n = m.body.split(/\.\./);
+  return result;
+}
+
+function encodeHex(character) {
+  var string, handle, length;
+
+  string = character.toString(16).toUpperCase();
+
+  if (character <= 0xFF) {
+    handle = 'x';
+    length = 2;
+  } else if (character <= 0xFFFF) {
+    handle = 'u';
+    length = 4;
+  } else if (character <= 0xFFFFFFFF) {
+    handle = 'U';
+    length = 8;
   } else {
-    n = parseCommaParts(m.body);
-    if (n.length === 1) {
-      // x{{a,b}}y ==> x{a}y x{b}y
-      n = expand(n[0], false).map(embrace);
-      if (n.length === 1) {
-        var post = m.post.length
-          ? expand(m.post, false)
-          : [''];
-        return post.map(function(p) {
-          return m.pre + n[0] + p;
-        });
-      }
-    }
+    throw new YAMLException('code point within a string may not be greater than 0xFFFFFFFF');
   }
 
-  // at this point, n is the parts, and we know it's not a comma set
-  // with a single entry.
-
-  // no need to expand pre, since it is guaranteed to be free of brace-sets
-  var pre = m.pre;
-  var post = m.post.length
-    ? expand(m.post, false)
-    : [''];
-
-  var N;
-
-  if (isSequence) {
-    var x = numeric(n[0]);
-    var y = numeric(n[1]);
-    var width = Math.max(n[0].length, n[1].length)
-    var incr = n.length == 3
-      ? Math.abs(numeric(n[2]))
-      : 1;
-    var test = lte;
-    var reverse = y < x;
-    if (reverse) {
-      incr *= -1;
-      test = gte;
-    }
-    var pad = n.some(isPadded);
-
-    N = [];
-
-    for (var i = x; test(i, y); i += incr) {
-      var c;
-      if (isAlphaSequence) {
-        c = String.fromCharCode(i);
-        if (c === '\\')
-          c = '';
-      } else {
-        c = String(i);
-        if (pad) {
-          var need = width - c.length;
-          if (need > 0) {
-            var z = new Array(need + 1).join('0');
-            if (i < 0)
-              c = '-' + z + c.slice(1);
-            else
-              c = z + c;
-          }
-        }
-      }
-      N.push(c);
-    }
-  } else {
-    N = concatMap(n, function(el) { return expand(el, false) });
-  }
-
-  for (var j = 0; j < N.length; j++) {
-    for (var k = 0; k < post.length; k++) {
-      var expansion = pre + N[j] + post[k];
-      if (!isTop || isSequence || expansion)
-        expansions.push(expansion);
-    }
-  }
-
-  return expansions;
+  return '\\' + handle + common.repeat('0', length - string.length) + string;
 }
 
 
+var QUOTING_TYPE_SINGLE = 1,
+    QUOTING_TYPE_DOUBLE = 2;
 
-/***/ }),
+function State(options) {
+  this.schema        = options['schema'] || DEFAULT_SCHEMA;
+  this.indent        = Math.max(1, (options['indent'] || 2));
+  this.noArrayIndent = options['noArrayIndent'] || false;
+  this.skipInvalid   = options['skipInvalid'] || false;
+  this.flowLevel     = (common.isNothing(options['flowLevel']) ? -1 : options['flowLevel']);
+  this.styleMap      = compileStyleMap(this.schema, options['styles'] || null);
+  this.sortKeys      = options['sortKeys'] || false;
+  this.lineWidth     = options['lineWidth'] || 80;
+  this.noRefs        = options['noRefs'] || false;
+  this.noCompatMode  = options['noCompatMode'] || false;
+  this.condenseFlow  = options['condenseFlow'] || false;
+  this.quotingType   = options['quotingType'] === '"' ? QUOTING_TYPE_DOUBLE : QUOTING_TYPE_SINGLE;
+  this.forceQuotes   = options['forceQuotes'] || false;
+  this.replacer      = typeof options['replacer'] === 'function' ? options['replacer'] : null;
 
-/***/ 6891:
-/***/ ((module) => {
+  this.implicitTypes = this.schema.compiledImplicit;
+  this.explicitTypes = this.schema.compiledExplicit;
 
-module.exports = function (xs, fn) {
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        var x = fn(xs[i], i);
-        if (isArray(x)) res.push.apply(res, x);
-        else res.push(x);
-    }
-    return res;
-};
+  this.tag = null;
+  this.result = '';
 
-var isArray = Array.isArray || function (xs) {
-    return Object.prototype.toString.call(xs) === '[object Array]';
-};
-
-
-/***/ }),
-
-/***/ 3338:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const mkdirsSync = __nccwpck_require__(2915).mkdirsSync
-const utimesMillisSync = __nccwpck_require__(2548).utimesMillisSync
-const stat = __nccwpck_require__(3901)
-
-function copySync (src, dest, opts) {
-  if (typeof opts === 'function') {
-    opts = { filter: opts }
-  }
-
-  opts = opts || {}
-  opts.clobber = 'clobber' in opts ? !!opts.clobber : true // default to true for now
-  opts.overwrite = 'overwrite' in opts ? !!opts.overwrite : opts.clobber // overwrite falls back to clobber
-
-  // Warn about using preserveTimestamps on 32-bit node
-  if (opts.preserveTimestamps && process.arch === 'ia32') {
-    console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;\n
-    see https://github.com/jprichardson/node-fs-extra/issues/269`)
-  }
-
-  const { srcStat, destStat } = stat.checkPathsSync(src, dest, 'copy', opts)
-  stat.checkParentPathsSync(src, srcStat, dest, 'copy')
-  return handleFilterAndCopy(destStat, src, dest, opts)
+  this.duplicates = [];
+  this.usedDuplicates = null;
 }
 
-function handleFilterAndCopy (destStat, src, dest, opts) {
-  if (opts.filter && !opts.filter(src, dest)) return
-  const destParent = path.dirname(dest)
-  if (!fs.existsSync(destParent)) mkdirsSync(destParent)
-  return getStats(destStat, src, dest, opts)
-}
+// Indents every line in a string. Empty lines (\n only) are not indented.
+function indentString(string, spaces) {
+  var ind = common.repeat(' ', spaces),
+      position = 0,
+      next = -1,
+      result = '',
+      line,
+      length = string.length;
 
-function startCopy (destStat, src, dest, opts) {
-  if (opts.filter && !opts.filter(src, dest)) return
-  return getStats(destStat, src, dest, opts)
-}
-
-function getStats (destStat, src, dest, opts) {
-  const statSync = opts.dereference ? fs.statSync : fs.lstatSync
-  const srcStat = statSync(src)
-
-  if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts)
-  else if (srcStat.isFile() ||
-           srcStat.isCharacterDevice() ||
-           srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts)
-  else if (srcStat.isSymbolicLink()) return onLink(destStat, src, dest, opts)
-  else if (srcStat.isSocket()) throw new Error(`Cannot copy a socket file: ${src}`)
-  else if (srcStat.isFIFO()) throw new Error(`Cannot copy a FIFO pipe: ${src}`)
-  throw new Error(`Unknown file: ${src}`)
-}
-
-function onFile (srcStat, destStat, src, dest, opts) {
-  if (!destStat) return copyFile(srcStat, src, dest, opts)
-  return mayCopyFile(srcStat, src, dest, opts)
-}
-
-function mayCopyFile (srcStat, src, dest, opts) {
-  if (opts.overwrite) {
-    fs.unlinkSync(dest)
-    return copyFile(srcStat, src, dest, opts)
-  } else if (opts.errorOnExist) {
-    throw new Error(`'${dest}' already exists`)
-  }
-}
-
-function copyFile (srcStat, src, dest, opts) {
-  fs.copyFileSync(src, dest)
-  if (opts.preserveTimestamps) handleTimestamps(srcStat.mode, src, dest)
-  return setDestMode(dest, srcStat.mode)
-}
-
-function handleTimestamps (srcMode, src, dest) {
-  // Make sure the file is writable before setting the timestamp
-  // otherwise open fails with EPERM when invoked with 'r+'
-  // (through utimes call)
-  if (fileIsNotWritable(srcMode)) makeFileWritable(dest, srcMode)
-  return setDestTimestamps(src, dest)
-}
-
-function fileIsNotWritable (srcMode) {
-  return (srcMode & 0o200) === 0
-}
-
-function makeFileWritable (dest, srcMode) {
-  return setDestMode(dest, srcMode | 0o200)
-}
-
-function setDestMode (dest, srcMode) {
-  return fs.chmodSync(dest, srcMode)
-}
-
-function setDestTimestamps (src, dest) {
-  // The initial srcStat.atime cannot be trusted
-  // because it is modified by the read(2) system call
-  // (See https://nodejs.org/api/fs.html#fs_stat_time_values)
-  const updatedSrcStat = fs.statSync(src)
-  return utimesMillisSync(dest, updatedSrcStat.atime, updatedSrcStat.mtime)
-}
-
-function onDir (srcStat, destStat, src, dest, opts) {
-  if (!destStat) return mkDirAndCopy(srcStat.mode, src, dest, opts)
-  return copyDir(src, dest, opts)
-}
-
-function mkDirAndCopy (srcMode, src, dest, opts) {
-  fs.mkdirSync(dest)
-  copyDir(src, dest, opts)
-  return setDestMode(dest, srcMode)
-}
-
-function copyDir (src, dest, opts) {
-  fs.readdirSync(src).forEach(item => copyDirItem(item, src, dest, opts))
-}
-
-function copyDirItem (item, src, dest, opts) {
-  const srcItem = path.join(src, item)
-  const destItem = path.join(dest, item)
-  const { destStat } = stat.checkPathsSync(srcItem, destItem, 'copy', opts)
-  return startCopy(destStat, srcItem, destItem, opts)
-}
-
-function onLink (destStat, src, dest, opts) {
-  let resolvedSrc = fs.readlinkSync(src)
-  if (opts.dereference) {
-    resolvedSrc = path.resolve(process.cwd(), resolvedSrc)
-  }
-
-  if (!destStat) {
-    return fs.symlinkSync(resolvedSrc, dest)
-  } else {
-    let resolvedDest
-    try {
-      resolvedDest = fs.readlinkSync(dest)
-    } catch (err) {
-      // dest exists and is a regular file or directory,
-      // Windows may throw UNKNOWN error. If dest already exists,
-      // fs throws error anyway, so no need to guard against it here.
-      if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return fs.symlinkSync(resolvedSrc, dest)
-      throw err
-    }
-    if (opts.dereference) {
-      resolvedDest = path.resolve(process.cwd(), resolvedDest)
-    }
-    if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
-      throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`)
-    }
-
-    // prevent copy if src is a subdir of dest since unlinking
-    // dest in this case would result in removing src contents
-    // and therefore a broken symlink would be created.
-    if (fs.statSync(dest).isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
-      throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`)
-    }
-    return copyLink(resolvedSrc, dest)
-  }
-}
-
-function copyLink (resolvedSrc, dest) {
-  fs.unlinkSync(dest)
-  return fs.symlinkSync(resolvedSrc, dest)
-}
-
-module.exports = copySync
-
-
-/***/ }),
-
-/***/ 1135:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-module.exports = {
-  copySync: __nccwpck_require__(3338)
-}
-
-
-/***/ }),
-
-/***/ 8834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const mkdirs = __nccwpck_require__(2915).mkdirs
-const pathExists = __nccwpck_require__(3835).pathExists
-const utimesMillis = __nccwpck_require__(2548).utimesMillis
-const stat = __nccwpck_require__(3901)
-
-function copy (src, dest, opts, cb) {
-  if (typeof opts === 'function' && !cb) {
-    cb = opts
-    opts = {}
-  } else if (typeof opts === 'function') {
-    opts = { filter: opts }
-  }
-
-  cb = cb || function () {}
-  opts = opts || {}
-
-  opts.clobber = 'clobber' in opts ? !!opts.clobber : true // default to true for now
-  opts.overwrite = 'overwrite' in opts ? !!opts.overwrite : opts.clobber // overwrite falls back to clobber
-
-  // Warn about using preserveTimestamps on 32-bit node
-  if (opts.preserveTimestamps && process.arch === 'ia32') {
-    console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;\n
-    see https://github.com/jprichardson/node-fs-extra/issues/269`)
-  }
-
-  stat.checkPaths(src, dest, 'copy', opts, (err, stats) => {
-    if (err) return cb(err)
-    const { srcStat, destStat } = stats
-    stat.checkParentPaths(src, srcStat, dest, 'copy', err => {
-      if (err) return cb(err)
-      if (opts.filter) return handleFilter(checkParentDir, destStat, src, dest, opts, cb)
-      return checkParentDir(destStat, src, dest, opts, cb)
-    })
-  })
-}
-
-function checkParentDir (destStat, src, dest, opts, cb) {
-  const destParent = path.dirname(dest)
-  pathExists(destParent, (err, dirExists) => {
-    if (err) return cb(err)
-    if (dirExists) return getStats(destStat, src, dest, opts, cb)
-    mkdirs(destParent, err => {
-      if (err) return cb(err)
-      return getStats(destStat, src, dest, opts, cb)
-    })
-  })
-}
-
-function handleFilter (onInclude, destStat, src, dest, opts, cb) {
-  Promise.resolve(opts.filter(src, dest)).then(include => {
-    if (include) return onInclude(destStat, src, dest, opts, cb)
-    return cb()
-  }, error => cb(error))
-}
-
-function startCopy (destStat, src, dest, opts, cb) {
-  if (opts.filter) return handleFilter(getStats, destStat, src, dest, opts, cb)
-  return getStats(destStat, src, dest, opts, cb)
-}
-
-function getStats (destStat, src, dest, opts, cb) {
-  const stat = opts.dereference ? fs.stat : fs.lstat
-  stat(src, (err, srcStat) => {
-    if (err) return cb(err)
-
-    if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts, cb)
-    else if (srcStat.isFile() ||
-             srcStat.isCharacterDevice() ||
-             srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts, cb)
-    else if (srcStat.isSymbolicLink()) return onLink(destStat, src, dest, opts, cb)
-    else if (srcStat.isSocket()) return cb(new Error(`Cannot copy a socket file: ${src}`))
-    else if (srcStat.isFIFO()) return cb(new Error(`Cannot copy a FIFO pipe: ${src}`))
-    return cb(new Error(`Unknown file: ${src}`))
-  })
-}
-
-function onFile (srcStat, destStat, src, dest, opts, cb) {
-  if (!destStat) return copyFile(srcStat, src, dest, opts, cb)
-  return mayCopyFile(srcStat, src, dest, opts, cb)
-}
-
-function mayCopyFile (srcStat, src, dest, opts, cb) {
-  if (opts.overwrite) {
-    fs.unlink(dest, err => {
-      if (err) return cb(err)
-      return copyFile(srcStat, src, dest, opts, cb)
-    })
-  } else if (opts.errorOnExist) {
-    return cb(new Error(`'${dest}' already exists`))
-  } else return cb()
-}
-
-function copyFile (srcStat, src, dest, opts, cb) {
-  fs.copyFile(src, dest, err => {
-    if (err) return cb(err)
-    if (opts.preserveTimestamps) return handleTimestampsAndMode(srcStat.mode, src, dest, cb)
-    return setDestMode(dest, srcStat.mode, cb)
-  })
-}
-
-function handleTimestampsAndMode (srcMode, src, dest, cb) {
-  // Make sure the file is writable before setting the timestamp
-  // otherwise open fails with EPERM when invoked with 'r+'
-  // (through utimes call)
-  if (fileIsNotWritable(srcMode)) {
-    return makeFileWritable(dest, srcMode, err => {
-      if (err) return cb(err)
-      return setDestTimestampsAndMode(srcMode, src, dest, cb)
-    })
-  }
-  return setDestTimestampsAndMode(srcMode, src, dest, cb)
-}
-
-function fileIsNotWritable (srcMode) {
-  return (srcMode & 0o200) === 0
-}
-
-function makeFileWritable (dest, srcMode, cb) {
-  return setDestMode(dest, srcMode | 0o200, cb)
-}
-
-function setDestTimestampsAndMode (srcMode, src, dest, cb) {
-  setDestTimestamps(src, dest, err => {
-    if (err) return cb(err)
-    return setDestMode(dest, srcMode, cb)
-  })
-}
-
-function setDestMode (dest, srcMode, cb) {
-  return fs.chmod(dest, srcMode, cb)
-}
-
-function setDestTimestamps (src, dest, cb) {
-  // The initial srcStat.atime cannot be trusted
-  // because it is modified by the read(2) system call
-  // (See https://nodejs.org/api/fs.html#fs_stat_time_values)
-  fs.stat(src, (err, updatedSrcStat) => {
-    if (err) return cb(err)
-    return utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime, cb)
-  })
-}
-
-function onDir (srcStat, destStat, src, dest, opts, cb) {
-  if (!destStat) return mkDirAndCopy(srcStat.mode, src, dest, opts, cb)
-  return copyDir(src, dest, opts, cb)
-}
-
-function mkDirAndCopy (srcMode, src, dest, opts, cb) {
-  fs.mkdir(dest, err => {
-    if (err) return cb(err)
-    copyDir(src, dest, opts, err => {
-      if (err) return cb(err)
-      return setDestMode(dest, srcMode, cb)
-    })
-  })
-}
-
-function copyDir (src, dest, opts, cb) {
-  fs.readdir(src, (err, items) => {
-    if (err) return cb(err)
-    return copyDirItems(items, src, dest, opts, cb)
-  })
-}
-
-function copyDirItems (items, src, dest, opts, cb) {
-  const item = items.pop()
-  if (!item) return cb()
-  return copyDirItem(items, item, src, dest, opts, cb)
-}
-
-function copyDirItem (items, item, src, dest, opts, cb) {
-  const srcItem = path.join(src, item)
-  const destItem = path.join(dest, item)
-  stat.checkPaths(srcItem, destItem, 'copy', opts, (err, stats) => {
-    if (err) return cb(err)
-    const { destStat } = stats
-    startCopy(destStat, srcItem, destItem, opts, err => {
-      if (err) return cb(err)
-      return copyDirItems(items, src, dest, opts, cb)
-    })
-  })
-}
-
-function onLink (destStat, src, dest, opts, cb) {
-  fs.readlink(src, (err, resolvedSrc) => {
-    if (err) return cb(err)
-    if (opts.dereference) {
-      resolvedSrc = path.resolve(process.cwd(), resolvedSrc)
-    }
-
-    if (!destStat) {
-      return fs.symlink(resolvedSrc, dest, cb)
+  while (position < length) {
+    next = string.indexOf('\n', position);
+    if (next === -1) {
+      line = string.slice(position);
+      position = length;
     } else {
-      fs.readlink(dest, (err, resolvedDest) => {
-        if (err) {
-          // dest exists and is a regular file or directory,
-          // Windows may throw UNKNOWN error. If dest already exists,
-          // fs throws error anyway, so no need to guard against it here.
-          if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return fs.symlink(resolvedSrc, dest, cb)
-          return cb(err)
-        }
-        if (opts.dereference) {
-          resolvedDest = path.resolve(process.cwd(), resolvedDest)
-        }
-        if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
-          return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`))
-        }
-
-        // do not copy if src is a subdir of dest since unlinking
-        // dest in this case would result in removing src contents
-        // and therefore a broken symlink would be created.
-        if (destStat.isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
-          return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`))
-        }
-        return copyLink(resolvedSrc, dest, cb)
-      })
-    }
-  })
-}
-
-function copyLink (resolvedSrc, dest, cb) {
-  fs.unlink(dest, err => {
-    if (err) return cb(err)
-    return fs.symlink(resolvedSrc, dest, cb)
-  })
-}
-
-module.exports = copy
-
-
-/***/ }),
-
-/***/ 1335:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromCallback
-module.exports = {
-  copy: u(__nccwpck_require__(8834))
-}
-
-
-/***/ }),
-
-/***/ 6970:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromPromise
-const fs = __nccwpck_require__(1176)
-const path = __nccwpck_require__(5622)
-const mkdir = __nccwpck_require__(2915)
-const remove = __nccwpck_require__(7357)
-
-const emptyDir = u(async function emptyDir (dir) {
-  let items
-  try {
-    items = await fs.readdir(dir)
-  } catch {
-    return mkdir.mkdirs(dir)
-  }
-
-  return Promise.all(items.map(item => remove.remove(path.join(dir, item))))
-})
-
-function emptyDirSync (dir) {
-  let items
-  try {
-    items = fs.readdirSync(dir)
-  } catch {
-    return mkdir.mkdirsSync(dir)
-  }
-
-  items.forEach(item => {
-    item = path.join(dir, item)
-    remove.removeSync(item)
-  })
-}
-
-module.exports = {
-  emptyDirSync,
-  emptydirSync: emptyDirSync,
-  emptyDir,
-  emptydir: emptyDir
-}
-
-
-/***/ }),
-
-/***/ 2164:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromCallback
-const path = __nccwpck_require__(5622)
-const fs = __nccwpck_require__(7758)
-const mkdir = __nccwpck_require__(2915)
-
-function createFile (file, callback) {
-  function makeFile () {
-    fs.writeFile(file, '', err => {
-      if (err) return callback(err)
-      callback()
-    })
-  }
-
-  fs.stat(file, (err, stats) => { // eslint-disable-line handle-callback-err
-    if (!err && stats.isFile()) return callback()
-    const dir = path.dirname(file)
-    fs.stat(dir, (err, stats) => {
-      if (err) {
-        // if the directory doesn't exist, make it
-        if (err.code === 'ENOENT') {
-          return mkdir.mkdirs(dir, err => {
-            if (err) return callback(err)
-            makeFile()
-          })
-        }
-        return callback(err)
-      }
-
-      if (stats.isDirectory()) makeFile()
-      else {
-        // parent is not a directory
-        // This is just to cause an internal ENOTDIR error to be thrown
-        fs.readdir(dir, err => {
-          if (err) return callback(err)
-        })
-      }
-    })
-  })
-}
-
-function createFileSync (file) {
-  let stats
-  try {
-    stats = fs.statSync(file)
-  } catch {}
-  if (stats && stats.isFile()) return
-
-  const dir = path.dirname(file)
-  try {
-    if (!fs.statSync(dir).isDirectory()) {
-      // parent is not a directory
-      // This is just to cause an internal ENOTDIR error to be thrown
-      fs.readdirSync(dir)
-    }
-  } catch (err) {
-    // If the stat call above failed because the directory doesn't exist, create it
-    if (err && err.code === 'ENOENT') mkdir.mkdirsSync(dir)
-    else throw err
-  }
-
-  fs.writeFileSync(file, '')
-}
-
-module.exports = {
-  createFile: u(createFile),
-  createFileSync
-}
-
-
-/***/ }),
-
-/***/ 55:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const file = __nccwpck_require__(2164)
-const link = __nccwpck_require__(3797)
-const symlink = __nccwpck_require__(2549)
-
-module.exports = {
-  // file
-  createFile: file.createFile,
-  createFileSync: file.createFileSync,
-  ensureFile: file.createFile,
-  ensureFileSync: file.createFileSync,
-  // link
-  createLink: link.createLink,
-  createLinkSync: link.createLinkSync,
-  ensureLink: link.createLink,
-  ensureLinkSync: link.createLinkSync,
-  // symlink
-  createSymlink: symlink.createSymlink,
-  createSymlinkSync: symlink.createSymlinkSync,
-  ensureSymlink: symlink.createSymlink,
-  ensureSymlinkSync: symlink.createSymlinkSync
-}
-
-
-/***/ }),
-
-/***/ 3797:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromCallback
-const path = __nccwpck_require__(5622)
-const fs = __nccwpck_require__(7758)
-const mkdir = __nccwpck_require__(2915)
-const pathExists = __nccwpck_require__(3835).pathExists
-const { areIdentical } = __nccwpck_require__(3901)
-
-function createLink (srcpath, dstpath, callback) {
-  function makeLink (srcpath, dstpath) {
-    fs.link(srcpath, dstpath, err => {
-      if (err) return callback(err)
-      callback(null)
-    })
-  }
-
-  fs.lstat(dstpath, (_, dstStat) => {
-    fs.lstat(srcpath, (err, srcStat) => {
-      if (err) {
-        err.message = err.message.replace('lstat', 'ensureLink')
-        return callback(err)
-      }
-      if (dstStat && areIdentical(srcStat, dstStat)) return callback(null)
-
-      const dir = path.dirname(dstpath)
-      pathExists(dir, (err, dirExists) => {
-        if (err) return callback(err)
-        if (dirExists) return makeLink(srcpath, dstpath)
-        mkdir.mkdirs(dir, err => {
-          if (err) return callback(err)
-          makeLink(srcpath, dstpath)
-        })
-      })
-    })
-  })
-}
-
-function createLinkSync (srcpath, dstpath) {
-  let dstStat
-  try {
-    dstStat = fs.lstatSync(dstpath)
-  } catch {}
-
-  try {
-    const srcStat = fs.lstatSync(srcpath)
-    if (dstStat && areIdentical(srcStat, dstStat)) return
-  } catch (err) {
-    err.message = err.message.replace('lstat', 'ensureLink')
-    throw err
-  }
-
-  const dir = path.dirname(dstpath)
-  const dirExists = fs.existsSync(dir)
-  if (dirExists) return fs.linkSync(srcpath, dstpath)
-  mkdir.mkdirsSync(dir)
-
-  return fs.linkSync(srcpath, dstpath)
-}
-
-module.exports = {
-  createLink: u(createLink),
-  createLinkSync
-}
-
-
-/***/ }),
-
-/***/ 3727:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const path = __nccwpck_require__(5622)
-const fs = __nccwpck_require__(7758)
-const pathExists = __nccwpck_require__(3835).pathExists
-
-/**
- * Function that returns two types of paths, one relative to symlink, and one
- * relative to the current working directory. Checks if path is absolute or
- * relative. If the path is relative, this function checks if the path is
- * relative to symlink or relative to current working directory. This is an
- * initiative to find a smarter `srcpath` to supply when building symlinks.
- * This allows you to determine which path to use out of one of three possible
- * types of source paths. The first is an absolute path. This is detected by
- * `path.isAbsolute()`. When an absolute path is provided, it is checked to
- * see if it exists. If it does it's used, if not an error is returned
- * (callback)/ thrown (sync). The other two options for `srcpath` are a
- * relative url. By default Node's `fs.symlink` works by creating a symlink
- * using `dstpath` and expects the `srcpath` to be relative to the newly
- * created symlink. If you provide a `srcpath` that does not exist on the file
- * system it results in a broken symlink. To minimize this, the function
- * checks to see if the 'relative to symlink' source file exists, and if it
- * does it will use it. If it does not, it checks if there's a file that
- * exists that is relative to the current working directory, if does its used.
- * This preserves the expectations of the original fs.symlink spec and adds
- * the ability to pass in `relative to current working direcotry` paths.
- */
-
-function symlinkPaths (srcpath, dstpath, callback) {
-  if (path.isAbsolute(srcpath)) {
-    return fs.lstat(srcpath, (err) => {
-      if (err) {
-        err.message = err.message.replace('lstat', 'ensureSymlink')
-        return callback(err)
-      }
-      return callback(null, {
-        toCwd: srcpath,
-        toDst: srcpath
-      })
-    })
-  } else {
-    const dstdir = path.dirname(dstpath)
-    const relativeToDst = path.join(dstdir, srcpath)
-    return pathExists(relativeToDst, (err, exists) => {
-      if (err) return callback(err)
-      if (exists) {
-        return callback(null, {
-          toCwd: relativeToDst,
-          toDst: srcpath
-        })
-      } else {
-        return fs.lstat(srcpath, (err) => {
-          if (err) {
-            err.message = err.message.replace('lstat', 'ensureSymlink')
-            return callback(err)
-          }
-          return callback(null, {
-            toCwd: srcpath,
-            toDst: path.relative(dstdir, srcpath)
-          })
-        })
-      }
-    })
-  }
-}
-
-function symlinkPathsSync (srcpath, dstpath) {
-  let exists
-  if (path.isAbsolute(srcpath)) {
-    exists = fs.existsSync(srcpath)
-    if (!exists) throw new Error('absolute srcpath does not exist')
-    return {
-      toCwd: srcpath,
-      toDst: srcpath
-    }
-  } else {
-    const dstdir = path.dirname(dstpath)
-    const relativeToDst = path.join(dstdir, srcpath)
-    exists = fs.existsSync(relativeToDst)
-    if (exists) {
-      return {
-        toCwd: relativeToDst,
-        toDst: srcpath
-      }
-    } else {
-      exists = fs.existsSync(srcpath)
-      if (!exists) throw new Error('relative srcpath does not exist')
-      return {
-        toCwd: srcpath,
-        toDst: path.relative(dstdir, srcpath)
-      }
-    }
-  }
-}
-
-module.exports = {
-  symlinkPaths,
-  symlinkPathsSync
-}
-
-
-/***/ }),
-
-/***/ 8254:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-
-function symlinkType (srcpath, type, callback) {
-  callback = (typeof type === 'function') ? type : callback
-  type = (typeof type === 'function') ? false : type
-  if (type) return callback(null, type)
-  fs.lstat(srcpath, (err, stats) => {
-    if (err) return callback(null, 'file')
-    type = (stats && stats.isDirectory()) ? 'dir' : 'file'
-    callback(null, type)
-  })
-}
-
-function symlinkTypeSync (srcpath, type) {
-  let stats
-
-  if (type) return type
-  try {
-    stats = fs.lstatSync(srcpath)
-  } catch {
-    return 'file'
-  }
-  return (stats && stats.isDirectory()) ? 'dir' : 'file'
-}
-
-module.exports = {
-  symlinkType,
-  symlinkTypeSync
-}
-
-
-/***/ }),
-
-/***/ 2549:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromCallback
-const path = __nccwpck_require__(5622)
-const fs = __nccwpck_require__(1176)
-const _mkdirs = __nccwpck_require__(2915)
-const mkdirs = _mkdirs.mkdirs
-const mkdirsSync = _mkdirs.mkdirsSync
-
-const _symlinkPaths = __nccwpck_require__(3727)
-const symlinkPaths = _symlinkPaths.symlinkPaths
-const symlinkPathsSync = _symlinkPaths.symlinkPathsSync
-
-const _symlinkType = __nccwpck_require__(8254)
-const symlinkType = _symlinkType.symlinkType
-const symlinkTypeSync = _symlinkType.symlinkTypeSync
-
-const pathExists = __nccwpck_require__(3835).pathExists
-
-const { areIdentical } = __nccwpck_require__(3901)
-
-function createSymlink (srcpath, dstpath, type, callback) {
-  callback = (typeof type === 'function') ? type : callback
-  type = (typeof type === 'function') ? false : type
-
-  fs.lstat(dstpath, (err, stats) => {
-    if (!err && stats.isSymbolicLink()) {
-      Promise.all([
-        fs.stat(srcpath),
-        fs.stat(dstpath)
-      ]).then(([srcStat, dstStat]) => {
-        if (areIdentical(srcStat, dstStat)) return callback(null)
-        _createSymlink(srcpath, dstpath, type, callback)
-      })
-    } else _createSymlink(srcpath, dstpath, type, callback)
-  })
-}
-
-function _createSymlink (srcpath, dstpath, type, callback) {
-  symlinkPaths(srcpath, dstpath, (err, relative) => {
-    if (err) return callback(err)
-    srcpath = relative.toDst
-    symlinkType(relative.toCwd, type, (err, type) => {
-      if (err) return callback(err)
-      const dir = path.dirname(dstpath)
-      pathExists(dir, (err, dirExists) => {
-        if (err) return callback(err)
-        if (dirExists) return fs.symlink(srcpath, dstpath, type, callback)
-        mkdirs(dir, err => {
-          if (err) return callback(err)
-          fs.symlink(srcpath, dstpath, type, callback)
-        })
-      })
-    })
-  })
-}
-
-function createSymlinkSync (srcpath, dstpath, type) {
-  let stats
-  try {
-    stats = fs.lstatSync(dstpath)
-  } catch {}
-  if (stats && stats.isSymbolicLink()) {
-    const srcStat = fs.statSync(srcpath)
-    const dstStat = fs.statSync(dstpath)
-    if (areIdentical(srcStat, dstStat)) return
-  }
-
-  const relative = symlinkPathsSync(srcpath, dstpath)
-  srcpath = relative.toDst
-  type = symlinkTypeSync(relative.toCwd, type)
-  const dir = path.dirname(dstpath)
-  const exists = fs.existsSync(dir)
-  if (exists) return fs.symlinkSync(srcpath, dstpath, type)
-  mkdirsSync(dir)
-  return fs.symlinkSync(srcpath, dstpath, type)
-}
-
-module.exports = {
-  createSymlink: u(createSymlink),
-  createSymlinkSync
-}
-
-
-/***/ }),
-
-/***/ 1176:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-// This is adapted from https://github.com/normalize/mz
-// Copyright (c) 2014-2016 Jonathan Ong me@jongleberry.com and Contributors
-const u = __nccwpck_require__(9046).fromCallback
-const fs = __nccwpck_require__(7758)
-
-const api = [
-  'access',
-  'appendFile',
-  'chmod',
-  'chown',
-  'close',
-  'copyFile',
-  'fchmod',
-  'fchown',
-  'fdatasync',
-  'fstat',
-  'fsync',
-  'ftruncate',
-  'futimes',
-  'lchmod',
-  'lchown',
-  'link',
-  'lstat',
-  'mkdir',
-  'mkdtemp',
-  'open',
-  'opendir',
-  'readdir',
-  'readFile',
-  'readlink',
-  'realpath',
-  'rename',
-  'rm',
-  'rmdir',
-  'stat',
-  'symlink',
-  'truncate',
-  'unlink',
-  'utimes',
-  'writeFile'
-].filter(key => {
-  // Some commands are not available on some systems. Ex:
-  // fs.opendir was added in Node.js v12.12.0
-  // fs.rm was added in Node.js v14.14.0
-  // fs.lchown is not available on at least some Linux
-  return typeof fs[key] === 'function'
-})
-
-// Export cloned fs:
-Object.assign(exports, fs)
-
-// Universalify async methods:
-api.forEach(method => {
-  exports[method] = u(fs[method])
-})
-exports.realpath.native = u(fs.realpath.native)
-
-// We differ from mz/fs in that we still ship the old, broken, fs.exists()
-// since we are a drop-in replacement for the native module
-exports.exists = function (filename, callback) {
-  if (typeof callback === 'function') {
-    return fs.exists(filename, callback)
-  }
-  return new Promise(resolve => {
-    return fs.exists(filename, resolve)
-  })
-}
-
-// fs.read(), fs.write(), & fs.writev() need special treatment due to multiple callback args
-
-exports.read = function (fd, buffer, offset, length, position, callback) {
-  if (typeof callback === 'function') {
-    return fs.read(fd, buffer, offset, length, position, callback)
-  }
-  return new Promise((resolve, reject) => {
-    fs.read(fd, buffer, offset, length, position, (err, bytesRead, buffer) => {
-      if (err) return reject(err)
-      resolve({ bytesRead, buffer })
-    })
-  })
-}
-
-// Function signature can be
-// fs.write(fd, buffer[, offset[, length[, position]]], callback)
-// OR
-// fs.write(fd, string[, position[, encoding]], callback)
-// We need to handle both cases, so we use ...args
-exports.write = function (fd, buffer, ...args) {
-  if (typeof args[args.length - 1] === 'function') {
-    return fs.write(fd, buffer, ...args)
-  }
-
-  return new Promise((resolve, reject) => {
-    fs.write(fd, buffer, ...args, (err, bytesWritten, buffer) => {
-      if (err) return reject(err)
-      resolve({ bytesWritten, buffer })
-    })
-  })
-}
-
-// fs.writev only available in Node v12.9.0+
-if (typeof fs.writev === 'function') {
-  // Function signature is
-  // s.writev(fd, buffers[, position], callback)
-  // We need to handle the optional arg, so we use ...args
-  exports.writev = function (fd, buffers, ...args) {
-    if (typeof args[args.length - 1] === 'function') {
-      return fs.writev(fd, buffers, ...args)
+      line = string.slice(position, next + 1);
+      position = next + 1;
     }
 
-    return new Promise((resolve, reject) => {
-      fs.writev(fd, buffers, ...args, (err, bytesWritten, buffers) => {
-        if (err) return reject(err)
-        resolve({ bytesWritten, buffers })
-      })
-    })
-  }
-}
+    if (line.length && line !== '\n') result += ind;
 
-
-/***/ }),
-
-/***/ 5630:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-module.exports = {
-  // Export promiseified graceful-fs:
-  ...__nccwpck_require__(1176),
-  // Export extra methods:
-  ...__nccwpck_require__(1135),
-  ...__nccwpck_require__(1335),
-  ...__nccwpck_require__(6970),
-  ...__nccwpck_require__(55),
-  ...__nccwpck_require__(213),
-  ...__nccwpck_require__(2915),
-  ...__nccwpck_require__(9665),
-  ...__nccwpck_require__(1497),
-  ...__nccwpck_require__(6570),
-  ...__nccwpck_require__(3835),
-  ...__nccwpck_require__(7357)
-}
-
-
-/***/ }),
-
-/***/ 213:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromPromise
-const jsonFile = __nccwpck_require__(8970)
-
-jsonFile.outputJson = u(__nccwpck_require__(531))
-jsonFile.outputJsonSync = __nccwpck_require__(9421)
-// aliases
-jsonFile.outputJSON = jsonFile.outputJson
-jsonFile.outputJSONSync = jsonFile.outputJsonSync
-jsonFile.writeJSON = jsonFile.writeJson
-jsonFile.writeJSONSync = jsonFile.writeJsonSync
-jsonFile.readJSON = jsonFile.readJson
-jsonFile.readJSONSync = jsonFile.readJsonSync
-
-module.exports = jsonFile
-
-
-/***/ }),
-
-/***/ 8970:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const jsonFile = __nccwpck_require__(6160)
-
-module.exports = {
-  // jsonfile exports
-  readJson: jsonFile.readFile,
-  readJsonSync: jsonFile.readFileSync,
-  writeJson: jsonFile.writeFile,
-  writeJsonSync: jsonFile.writeFileSync
-}
-
-
-/***/ }),
-
-/***/ 9421:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const { stringify } = __nccwpck_require__(5902)
-const { outputFileSync } = __nccwpck_require__(6570)
-
-function outputJsonSync (file, data, options) {
-  const str = stringify(data, options)
-
-  outputFileSync(file, str, options)
-}
-
-module.exports = outputJsonSync
-
-
-/***/ }),
-
-/***/ 531:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const { stringify } = __nccwpck_require__(5902)
-const { outputFile } = __nccwpck_require__(6570)
-
-async function outputJson (file, data, options = {}) {
-  const str = stringify(data, options)
-
-  await outputFile(file, str, options)
-}
-
-module.exports = outputJson
-
-
-/***/ }),
-
-/***/ 2915:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const u = __nccwpck_require__(9046).fromPromise
-const { makeDir: _makeDir, makeDirSync } = __nccwpck_require__(2751)
-const makeDir = u(_makeDir)
-
-module.exports = {
-  mkdirs: makeDir,
-  mkdirsSync: makeDirSync,
-  // alias
-  mkdirp: makeDir,
-  mkdirpSync: makeDirSync,
-  ensureDir: makeDir,
-  ensureDirSync: makeDirSync
-}
-
-
-/***/ }),
-
-/***/ 2751:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const fs = __nccwpck_require__(1176)
-const { checkPath } = __nccwpck_require__(9907)
-
-const getMode = options => {
-  const defaults = { mode: 0o777 }
-  if (typeof options === 'number') return options
-  return ({ ...defaults, ...options }).mode
-}
-
-module.exports.makeDir = async (dir, options) => {
-  checkPath(dir)
-
-  return fs.mkdir(dir, {
-    mode: getMode(options),
-    recursive: true
-  })
-}
-
-module.exports.makeDirSync = (dir, options) => {
-  checkPath(dir)
-
-  return fs.mkdirSync(dir, {
-    mode: getMode(options),
-    recursive: true
-  })
-}
-
-
-/***/ }),
-
-/***/ 9907:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-// Adapted from https://github.com/sindresorhus/make-dir
-// Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-const path = __nccwpck_require__(5622)
-
-// https://github.com/nodejs/node/issues/8987
-// https://github.com/libuv/libuv/pull/1088
-module.exports.checkPath = function checkPath (pth) {
-  if (process.platform === 'win32') {
-    const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path.parse(pth).root, ''))
-
-    if (pathHasInvalidWinCharacters) {
-      const error = new Error(`Path contains invalid characters: ${pth}`)
-      error.code = 'EINVAL'
-      throw error
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ 9665:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-module.exports = {
-  moveSync: __nccwpck_require__(6445)
-}
-
-
-/***/ }),
-
-/***/ 6445:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const copySync = __nccwpck_require__(1135).copySync
-const removeSync = __nccwpck_require__(7357).removeSync
-const mkdirpSync = __nccwpck_require__(2915).mkdirpSync
-const stat = __nccwpck_require__(3901)
-
-function moveSync (src, dest, opts) {
-  opts = opts || {}
-  const overwrite = opts.overwrite || opts.clobber || false
-
-  const { srcStat, isChangingCase = false } = stat.checkPathsSync(src, dest, 'move', opts)
-  stat.checkParentPathsSync(src, srcStat, dest, 'move')
-  if (!isParentRoot(dest)) mkdirpSync(path.dirname(dest))
-  return doRename(src, dest, overwrite, isChangingCase)
-}
-
-function isParentRoot (dest) {
-  const parent = path.dirname(dest)
-  const parsedPath = path.parse(parent)
-  return parsedPath.root === parent
-}
-
-function doRename (src, dest, overwrite, isChangingCase) {
-  if (isChangingCase) return rename(src, dest, overwrite)
-  if (overwrite) {
-    removeSync(dest)
-    return rename(src, dest, overwrite)
-  }
-  if (fs.existsSync(dest)) throw new Error('dest already exists.')
-  return rename(src, dest, overwrite)
-}
-
-function rename (src, dest, overwrite) {
-  try {
-    fs.renameSync(src, dest)
-  } catch (err) {
-    if (err.code !== 'EXDEV') throw err
-    return moveAcrossDevice(src, dest, overwrite)
-  }
-}
-
-function moveAcrossDevice (src, dest, overwrite) {
-  const opts = {
-    overwrite,
-    errorOnExist: true
-  }
-  copySync(src, dest, opts)
-  return removeSync(src)
-}
-
-module.exports = moveSync
-
-
-/***/ }),
-
-/***/ 1497:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromCallback
-module.exports = {
-  move: u(__nccwpck_require__(2231))
-}
-
-
-/***/ }),
-
-/***/ 2231:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const copy = __nccwpck_require__(1335).copy
-const remove = __nccwpck_require__(7357).remove
-const mkdirp = __nccwpck_require__(2915).mkdirp
-const pathExists = __nccwpck_require__(3835).pathExists
-const stat = __nccwpck_require__(3901)
-
-function move (src, dest, opts, cb) {
-  if (typeof opts === 'function') {
-    cb = opts
-    opts = {}
+    result += line;
   }
 
-  const overwrite = opts.overwrite || opts.clobber || false
-
-  stat.checkPaths(src, dest, 'move', opts, (err, stats) => {
-    if (err) return cb(err)
-    const { srcStat, isChangingCase = false } = stats
-    stat.checkParentPaths(src, srcStat, dest, 'move', err => {
-      if (err) return cb(err)
-      if (isParentRoot(dest)) return doRename(src, dest, overwrite, isChangingCase, cb)
-      mkdirp(path.dirname(dest), err => {
-        if (err) return cb(err)
-        return doRename(src, dest, overwrite, isChangingCase, cb)
-      })
-    })
-  })
+  return result;
 }
 
-function isParentRoot (dest) {
-  const parent = path.dirname(dest)
-  const parsedPath = path.parse(parent)
-  return parsedPath.root === parent
+function generateNextLine(state, level) {
+  return '\n' + common.repeat(' ', state.indent * level);
 }
 
-function doRename (src, dest, overwrite, isChangingCase, cb) {
-  if (isChangingCase) return rename(src, dest, overwrite, cb)
-  if (overwrite) {
-    return remove(dest, err => {
-      if (err) return cb(err)
-      return rename(src, dest, overwrite, cb)
-    })
-  }
-  pathExists(dest, (err, destExists) => {
-    if (err) return cb(err)
-    if (destExists) return cb(new Error('dest already exists.'))
-    return rename(src, dest, overwrite, cb)
-  })
-}
+function testImplicitResolving(state, str) {
+  var index, length, type;
 
-function rename (src, dest, overwrite, cb) {
-  fs.rename(src, dest, err => {
-    if (!err) return cb()
-    if (err.code !== 'EXDEV') return cb(err)
-    return moveAcrossDevice(src, dest, overwrite, cb)
-  })
-}
+  for (index = 0, length = state.implicitTypes.length; index < length; index += 1) {
+    type = state.implicitTypes[index];
 
-function moveAcrossDevice (src, dest, overwrite, cb) {
-  const opts = {
-    overwrite,
-    errorOnExist: true
-  }
-  copy(src, dest, opts, err => {
-    if (err) return cb(err)
-    return remove(src, cb)
-  })
-}
-
-module.exports = move
-
-
-/***/ }),
-
-/***/ 6570:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const u = __nccwpck_require__(9046).fromCallback
-const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const mkdir = __nccwpck_require__(2915)
-const pathExists = __nccwpck_require__(3835).pathExists
-
-function outputFile (file, data, encoding, callback) {
-  if (typeof encoding === 'function') {
-    callback = encoding
-    encoding = 'utf8'
-  }
-
-  const dir = path.dirname(file)
-  pathExists(dir, (err, itDoes) => {
-    if (err) return callback(err)
-    if (itDoes) return fs.writeFile(file, data, encoding, callback)
-
-    mkdir.mkdirs(dir, err => {
-      if (err) return callback(err)
-
-      fs.writeFile(file, data, encoding, callback)
-    })
-  })
-}
-
-function outputFileSync (file, ...args) {
-  const dir = path.dirname(file)
-  if (fs.existsSync(dir)) {
-    return fs.writeFileSync(file, ...args)
-  }
-  mkdir.mkdirsSync(dir)
-  fs.writeFileSync(file, ...args)
-}
-
-module.exports = {
-  outputFile: u(outputFile),
-  outputFileSync
-}
-
-
-/***/ }),
-
-/***/ 3835:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const u = __nccwpck_require__(9046).fromPromise
-const fs = __nccwpck_require__(1176)
-
-function pathExists (path) {
-  return fs.access(path).then(() => true).catch(() => false)
-}
-
-module.exports = {
-  pathExists: u(pathExists),
-  pathExistsSync: fs.existsSync
-}
-
-
-/***/ }),
-
-/***/ 7357:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-const u = __nccwpck_require__(9046).fromCallback
-const rimraf = __nccwpck_require__(7247)
-
-function remove (path, callback) {
-  // Node 14.14.0+
-  if (fs.rm) return fs.rm(path, { recursive: true, force: true }, callback)
-  rimraf(path, callback)
-}
-
-function removeSync (path) {
-  // Node 14.14.0+
-  if (fs.rmSync) return fs.rmSync(path, { recursive: true, force: true })
-  rimraf.sync(path)
-}
-
-module.exports = {
-  remove: u(remove),
-  removeSync
-}
-
-
-/***/ }),
-
-/***/ 7247:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-const path = __nccwpck_require__(5622)
-const assert = __nccwpck_require__(2357)
-
-const isWindows = (process.platform === 'win32')
-
-function defaults (options) {
-  const methods = [
-    'unlink',
-    'chmod',
-    'stat',
-    'lstat',
-    'rmdir',
-    'readdir'
-  ]
-  methods.forEach(m => {
-    options[m] = options[m] || fs[m]
-    m = m + 'Sync'
-    options[m] = options[m] || fs[m]
-  })
-
-  options.maxBusyTries = options.maxBusyTries || 3
-}
-
-function rimraf (p, options, cb) {
-  let busyTries = 0
-
-  if (typeof options === 'function') {
-    cb = options
-    options = {}
-  }
-
-  assert(p, 'rimraf: missing path')
-  assert.strictEqual(typeof p, 'string', 'rimraf: path should be a string')
-  assert.strictEqual(typeof cb, 'function', 'rimraf: callback function required')
-  assert(options, 'rimraf: invalid options argument provided')
-  assert.strictEqual(typeof options, 'object', 'rimraf: options should be object')
-
-  defaults(options)
-
-  rimraf_(p, options, function CB (er) {
-    if (er) {
-      if ((er.code === 'EBUSY' || er.code === 'ENOTEMPTY' || er.code === 'EPERM') &&
-          busyTries < options.maxBusyTries) {
-        busyTries++
-        const time = busyTries * 100
-        // try again, with the same exact callback as this one.
-        return setTimeout(() => rimraf_(p, options, CB), time)
-      }
-
-      // already gone
-      if (er.code === 'ENOENT') er = null
-    }
-
-    cb(er)
-  })
-}
-
-// Two possible strategies.
-// 1. Assume it's a file.  unlink it, then do the dir stuff on EPERM or EISDIR
-// 2. Assume it's a directory.  readdir, then do the file stuff on ENOTDIR
-//
-// Both result in an extra syscall when you guess wrong.  However, there
-// are likely far more normal files in the world than directories.  This
-// is based on the assumption that a the average number of files per
-// directory is >= 1.
-//
-// If anyone ever complains about this, then I guess the strategy could
-// be made configurable somehow.  But until then, YAGNI.
-function rimraf_ (p, options, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  // sunos lets the root user unlink directories, which is... weird.
-  // so we have to lstat here and make sure it's not a dir.
-  options.lstat(p, (er, st) => {
-    if (er && er.code === 'ENOENT') {
-      return cb(null)
-    }
-
-    // Windows can EPERM on stat.  Life is suffering.
-    if (er && er.code === 'EPERM' && isWindows) {
-      return fixWinEPERM(p, options, er, cb)
-    }
-
-    if (st && st.isDirectory()) {
-      return rmdir(p, options, er, cb)
-    }
-
-    options.unlink(p, er => {
-      if (er) {
-        if (er.code === 'ENOENT') {
-          return cb(null)
-        }
-        if (er.code === 'EPERM') {
-          return (isWindows)
-            ? fixWinEPERM(p, options, er, cb)
-            : rmdir(p, options, er, cb)
-        }
-        if (er.code === 'EISDIR') {
-          return rmdir(p, options, er, cb)
-        }
-      }
-      return cb(er)
-    })
-  })
-}
-
-function fixWinEPERM (p, options, er, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  options.chmod(p, 0o666, er2 => {
-    if (er2) {
-      cb(er2.code === 'ENOENT' ? null : er)
-    } else {
-      options.stat(p, (er3, stats) => {
-        if (er3) {
-          cb(er3.code === 'ENOENT' ? null : er)
-        } else if (stats.isDirectory()) {
-          rmdir(p, options, er, cb)
-        } else {
-          options.unlink(p, cb)
-        }
-      })
-    }
-  })
-}
-
-function fixWinEPERMSync (p, options, er) {
-  let stats
-
-  assert(p)
-  assert(options)
-
-  try {
-    options.chmodSync(p, 0o666)
-  } catch (er2) {
-    if (er2.code === 'ENOENT') {
-      return
-    } else {
-      throw er
+    if (type.resolve(str)) {
+      return true;
     }
   }
 
-  try {
-    stats = options.statSync(p)
-  } catch (er3) {
-    if (er3.code === 'ENOENT') {
-      return
-    } else {
-      throw er
-    }
-  }
-
-  if (stats.isDirectory()) {
-    rmdirSync(p, options, er)
-  } else {
-    options.unlinkSync(p)
-  }
+  return false;
 }
 
-function rmdir (p, options, originalEr, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  // try to rmdir first, and only readdir on ENOTEMPTY or EEXIST (SunOS)
-  // if we guessed wrong, and it's not a directory, then
-  // raise the original error.
-  options.rmdir(p, er => {
-    if (er && (er.code === 'ENOTEMPTY' || er.code === 'EEXIST' || er.code === 'EPERM')) {
-      rmkids(p, options, cb)
-    } else if (er && er.code === 'ENOTDIR') {
-      cb(originalEr)
-    } else {
-      cb(er)
-    }
-  })
+// [33] s-white ::= s-space | s-tab
+function isWhitespace(c) {
+  return c === CHAR_SPACE || c === CHAR_TAB;
 }
 
-function rmkids (p, options, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  options.readdir(p, (er, files) => {
-    if (er) return cb(er)
-
-    let n = files.length
-    let errState
-
-    if (n === 0) return options.rmdir(p, cb)
-
-    files.forEach(f => {
-      rimraf(path.join(p, f), options, er => {
-        if (errState) {
-          return
-        }
-        if (er) return cb(errState = er)
-        if (--n === 0) {
-          options.rmdir(p, cb)
-        }
-      })
-    })
-  })
+// Returns true if the character can be printed without escaping.
+// From YAML 1.2: "any allowed characters known to be non-printable
+// should also be escaped. [However,] This isn’t mandatory"
+// Derived from nb-char - \t - #x85 - #xA0 - #x2028 - #x2029.
+function isPrintable(c) {
+  return  (0x00020 <= c && c <= 0x00007E)
+      || ((0x000A1 <= c && c <= 0x00D7FF) && c !== 0x2028 && c !== 0x2029)
+      || ((0x0E000 <= c && c <= 0x00FFFD) && c !== CHAR_BOM)
+      ||  (0x10000 <= c && c <= 0x10FFFF);
 }
 
-// this looks simpler, and is strictly *faster*, but will
-// tie up the JavaScript thread and fail on excessively
-// deep directory trees.
-function rimrafSync (p, options) {
-  let st
-
-  options = options || {}
-  defaults(options)
-
-  assert(p, 'rimraf: missing path')
-  assert.strictEqual(typeof p, 'string', 'rimraf: path should be a string')
-  assert(options, 'rimraf: missing options')
-  assert.strictEqual(typeof options, 'object', 'rimraf: options should be object')
-
-  try {
-    st = options.lstatSync(p)
-  } catch (er) {
-    if (er.code === 'ENOENT') {
-      return
-    }
-
-    // Windows can EPERM on stat.  Life is suffering.
-    if (er.code === 'EPERM' && isWindows) {
-      fixWinEPERMSync(p, options, er)
-    }
-  }
-
-  try {
-    // sunos lets the root user unlink directories, which is... weird.
-    if (st && st.isDirectory()) {
-      rmdirSync(p, options, null)
-    } else {
-      options.unlinkSync(p)
-    }
-  } catch (er) {
-    if (er.code === 'ENOENT') {
-      return
-    } else if (er.code === 'EPERM') {
-      return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er)
-    } else if (er.code !== 'EISDIR') {
-      throw er
-    }
-    rmdirSync(p, options, er)
-  }
+// [34] ns-char ::= nb-char - s-white
+// [27] nb-char ::= c-printable - b-char - c-byte-order-mark
+// [26] b-char  ::= b-line-feed | b-carriage-return
+// Including s-white (for some reason, examples doesn't match specs in this aspect)
+// ns-char ::= c-printable - b-line-feed - b-carriage-return - c-byte-order-mark
+function isNsCharOrWhitespace(c) {
+  return isPrintable(c)
+    && c !== CHAR_BOM
+    // - b-char
+    && c !== CHAR_CARRIAGE_RETURN
+    && c !== CHAR_LINE_FEED;
 }
 
-function rmdirSync (p, options, originalEr) {
-  assert(p)
-  assert(options)
-
-  try {
-    options.rmdirSync(p)
-  } catch (er) {
-    if (er.code === 'ENOTDIR') {
-      throw originalEr
-    } else if (er.code === 'ENOTEMPTY' || er.code === 'EEXIST' || er.code === 'EPERM') {
-      rmkidsSync(p, options)
-    } else if (er.code !== 'ENOENT') {
-      throw er
-    }
-  }
-}
-
-function rmkidsSync (p, options) {
-  assert(p)
-  assert(options)
-  options.readdirSync(p).forEach(f => rimrafSync(path.join(p, f), options))
-
-  if (isWindows) {
-    // We only end up here once we got ENOTEMPTY at least once, and
-    // at this point, we are guaranteed to have removed all the kids.
-    // So, we know that it won't be ENOENT or ENOTDIR or anything else.
-    // try really hard to delete stuff on windows, because it has a
-    // PROFOUNDLY annoying habit of not closing handles promptly when
-    // files are deleted, resulting in spurious ENOTEMPTY errors.
-    const startTime = Date.now()
-    do {
-      try {
-        const ret = options.rmdirSync(p, options)
-        return ret
-      } catch {}
-    } while (Date.now() - startTime < 500) // give up after 500ms
-  } else {
-    const ret = options.rmdirSync(p, options)
-    return ret
-  }
-}
-
-module.exports = rimraf
-rimraf.sync = rimrafSync
-
-
-/***/ }),
-
-/***/ 3901:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(1176)
-const path = __nccwpck_require__(5622)
-const util = __nccwpck_require__(1669)
-
-function getStats (src, dest, opts) {
-  const statFunc = opts.dereference
-    ? (file) => fs.stat(file, { bigint: true })
-    : (file) => fs.lstat(file, { bigint: true })
-  return Promise.all([
-    statFunc(src),
-    statFunc(dest).catch(err => {
-      if (err.code === 'ENOENT') return null
-      throw err
-    })
-  ]).then(([srcStat, destStat]) => ({ srcStat, destStat }))
-}
-
-function getStatsSync (src, dest, opts) {
-  let destStat
-  const statFunc = opts.dereference
-    ? (file) => fs.statSync(file, { bigint: true })
-    : (file) => fs.lstatSync(file, { bigint: true })
-  const srcStat = statFunc(src)
-  try {
-    destStat = statFunc(dest)
-  } catch (err) {
-    if (err.code === 'ENOENT') return { srcStat, destStat: null }
-    throw err
-  }
-  return { srcStat, destStat }
-}
-
-function checkPaths (src, dest, funcName, opts, cb) {
-  util.callbackify(getStats)(src, dest, opts, (err, stats) => {
-    if (err) return cb(err)
-    const { srcStat, destStat } = stats
-
-    if (destStat) {
-      if (areIdentical(srcStat, destStat)) {
-        const srcBaseName = path.basename(src)
-        const destBaseName = path.basename(dest)
-        if (funcName === 'move' &&
-          srcBaseName !== destBaseName &&
-          srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
-          return cb(null, { srcStat, destStat, isChangingCase: true })
-        }
-        return cb(new Error('Source and destination must not be the same.'))
-      }
-      if (srcStat.isDirectory() && !destStat.isDirectory()) {
-        return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`))
-      }
-      if (!srcStat.isDirectory() && destStat.isDirectory()) {
-        return cb(new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`))
-      }
-    }
-
-    if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
-      return cb(new Error(errMsg(src, dest, funcName)))
-    }
-    return cb(null, { srcStat, destStat })
-  })
-}
-
-function checkPathsSync (src, dest, funcName, opts) {
-  const { srcStat, destStat } = getStatsSync(src, dest, opts)
-
-  if (destStat) {
-    if (areIdentical(srcStat, destStat)) {
-      const srcBaseName = path.basename(src)
-      const destBaseName = path.basename(dest)
-      if (funcName === 'move' &&
-        srcBaseName !== destBaseName &&
-        srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
-        return { srcStat, destStat, isChangingCase: true }
-      }
-      throw new Error('Source and destination must not be the same.')
-    }
-    if (srcStat.isDirectory() && !destStat.isDirectory()) {
-      throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`)
-    }
-    if (!srcStat.isDirectory() && destStat.isDirectory()) {
-      throw new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`)
-    }
-  }
-
-  if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
-    throw new Error(errMsg(src, dest, funcName))
-  }
-  return { srcStat, destStat }
-}
-
-// recursively check if dest parent is a subdirectory of src.
-// It works for all file types including symlinks since it
-// checks the src and dest inodes. It starts from the deepest
-// parent and stops once it reaches the src parent or the root path.
-function checkParentPaths (src, srcStat, dest, funcName, cb) {
-  const srcParent = path.resolve(path.dirname(src))
-  const destParent = path.resolve(path.dirname(dest))
-  if (destParent === srcParent || destParent === path.parse(destParent).root) return cb()
-  fs.stat(destParent, { bigint: true }, (err, destStat) => {
-    if (err) {
-      if (err.code === 'ENOENT') return cb()
-      return cb(err)
-    }
-    if (areIdentical(srcStat, destStat)) {
-      return cb(new Error(errMsg(src, dest, funcName)))
-    }
-    return checkParentPaths(src, srcStat, destParent, funcName, cb)
-  })
-}
-
-function checkParentPathsSync (src, srcStat, dest, funcName) {
-  const srcParent = path.resolve(path.dirname(src))
-  const destParent = path.resolve(path.dirname(dest))
-  if (destParent === srcParent || destParent === path.parse(destParent).root) return
-  let destStat
-  try {
-    destStat = fs.statSync(destParent, { bigint: true })
-  } catch (err) {
-    if (err.code === 'ENOENT') return
-    throw err
-  }
-  if (areIdentical(srcStat, destStat)) {
-    throw new Error(errMsg(src, dest, funcName))
-  }
-  return checkParentPathsSync(src, srcStat, destParent, funcName)
-}
-
-function areIdentical (srcStat, destStat) {
-  return destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev
-}
-
-// return true if dest is a subdir of src, otherwise false.
-// It only checks the path strings.
-function isSrcSubdir (src, dest) {
-  const srcArr = path.resolve(src).split(path.sep).filter(i => i)
-  const destArr = path.resolve(dest).split(path.sep).filter(i => i)
-  return srcArr.reduce((acc, cur, i) => acc && destArr[i] === cur, true)
-}
-
-function errMsg (src, dest, funcName) {
-  return `Cannot ${funcName} '${src}' to a subdirectory of itself, '${dest}'.`
-}
-
-module.exports = {
-  checkPaths,
-  checkPathsSync,
-  checkParentPaths,
-  checkParentPathsSync,
-  isSrcSubdir,
-  areIdentical
-}
-
-
-/***/ }),
-
-/***/ 2548:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(7758)
-
-function utimesMillis (path, atime, mtime, callback) {
-  // if (!HAS_MILLIS_RES) return fs.utimes(path, atime, mtime, callback)
-  fs.open(path, 'r+', (err, fd) => {
-    if (err) return callback(err)
-    fs.futimes(fd, atime, mtime, futimesErr => {
-      fs.close(fd, closeErr => {
-        if (callback) callback(futimesErr || closeErr)
-      })
-    })
-  })
-}
-
-function utimesMillisSync (path, atime, mtime) {
-  const fd = fs.openSync(path, 'r+')
-  fs.futimesSync(fd, atime, mtime)
-  return fs.closeSync(fd)
-}
-
-module.exports = {
-  utimesMillis,
-  utimesMillisSync
-}
-
-
-/***/ }),
-
-/***/ 6863:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-module.exports = realpath
-realpath.realpath = realpath
-realpath.sync = realpathSync
-realpath.realpathSync = realpathSync
-realpath.monkeypatch = monkeypatch
-realpath.unmonkeypatch = unmonkeypatch
-
-var fs = __nccwpck_require__(5747)
-var origRealpath = fs.realpath
-var origRealpathSync = fs.realpathSync
-
-var version = process.version
-var ok = /^v[0-5]\./.test(version)
-var old = __nccwpck_require__(1734)
-
-function newError (er) {
-  return er && er.syscall === 'realpath' && (
-    er.code === 'ELOOP' ||
-    er.code === 'ENOMEM' ||
-    er.code === 'ENAMETOOLONG'
+// [127]  ns-plain-safe(c) ::= c = flow-out  ⇒ ns-plain-safe-out
+//                             c = flow-in   ⇒ ns-plain-safe-in
+//                             c = block-key ⇒ ns-plain-safe-out
+//                             c = flow-key  ⇒ ns-plain-safe-in
+// [128] ns-plain-safe-out ::= ns-char
+// [129]  ns-plain-safe-in ::= ns-char - c-flow-indicator
+// [130]  ns-plain-char(c) ::=  ( ns-plain-safe(c) - “:” - “#” )
+//                            | ( /* An ns-char preceding */ “#” )
+//                            | ( “:” /* Followed by an ns-plain-safe(c) */ )
+function isPlainSafe(c, prev, inblock) {
+  var cIsNsCharOrWhitespace = isNsCharOrWhitespace(c);
+  var cIsNsChar = cIsNsCharOrWhitespace && !isWhitespace(c);
+  return (
+    // ns-plain-safe
+    inblock ? // c = flow-in
+      cIsNsCharOrWhitespace
+      : cIsNsCharOrWhitespace
+        // - c-flow-indicator
+        && c !== CHAR_COMMA
+        && c !== CHAR_LEFT_SQUARE_BRACKET
+        && c !== CHAR_RIGHT_SQUARE_BRACKET
+        && c !== CHAR_LEFT_CURLY_BRACKET
+        && c !== CHAR_RIGHT_CURLY_BRACKET
   )
+    // ns-plain-char
+    && c !== CHAR_SHARP // false on '#'
+    && !(prev === CHAR_COLON && !cIsNsChar) // false on ': '
+    || (isNsCharOrWhitespace(prev) && !isWhitespace(prev) && c === CHAR_SHARP) // change to true on '[^ ]#'
+    || (prev === CHAR_COLON && cIsNsChar); // change to true on ':[^ ]'
 }
 
-function realpath (p, cache, cb) {
-  if (ok) {
-    return origRealpath(p, cache, cb)
-  }
-
-  if (typeof cache === 'function') {
-    cb = cache
-    cache = null
-  }
-  origRealpath(p, cache, function (er, result) {
-    if (newError(er)) {
-      old.realpath(p, cache, cb)
-    } else {
-      cb(er, result)
-    }
-  })
+// Simplified test for values allowed as the first character in plain style.
+function isPlainSafeFirst(c) {
+  // Uses a subset of ns-char - c-indicator
+  // where ns-char = nb-char - s-white.
+  // No support of ( ( “?” | “:” | “-” ) /* Followed by an ns-plain-safe(c)) */ ) part
+  return isPrintable(c) && c !== CHAR_BOM
+    && !isWhitespace(c) // - s-white
+    // - (c-indicator ::=
+    // “-” | “?” | “:” | “,” | “[” | “]” | “{” | “}”
+    && c !== CHAR_MINUS
+    && c !== CHAR_QUESTION
+    && c !== CHAR_COLON
+    && c !== CHAR_COMMA
+    && c !== CHAR_LEFT_SQUARE_BRACKET
+    && c !== CHAR_RIGHT_SQUARE_BRACKET
+    && c !== CHAR_LEFT_CURLY_BRACKET
+    && c !== CHAR_RIGHT_CURLY_BRACKET
+    // | “#” | “&” | “*” | “!” | “|” | “=” | “>” | “'” | “"”
+    && c !== CHAR_SHARP
+    && c !== CHAR_AMPERSAND
+    && c !== CHAR_ASTERISK
+    && c !== CHAR_EXCLAMATION
+    && c !== CHAR_VERTICAL_LINE
+    && c !== CHAR_EQUALS
+    && c !== CHAR_GREATER_THAN
+    && c !== CHAR_SINGLE_QUOTE
+    && c !== CHAR_DOUBLE_QUOTE
+    // | “%” | “@” | “`”)
+    && c !== CHAR_PERCENT
+    && c !== CHAR_COMMERCIAL_AT
+    && c !== CHAR_GRAVE_ACCENT;
 }
 
-function realpathSync (p, cache) {
-  if (ok) {
-    return origRealpathSync(p, cache)
-  }
-
-  try {
-    return origRealpathSync(p, cache)
-  } catch (er) {
-    if (newError(er)) {
-      return old.realpathSync(p, cache)
-    } else {
-      throw er
-    }
-  }
+// Simplified test for values allowed as the last character in plain style.
+function isPlainSafeLast(c) {
+  // just not whitespace or colon, it will be checked to be plain character later
+  return !isWhitespace(c) && c !== CHAR_COLON;
 }
 
-function monkeypatch () {
-  fs.realpath = realpath
-  fs.realpathSync = realpathSync
-}
-
-function unmonkeypatch () {
-  fs.realpath = origRealpath
-  fs.realpathSync = origRealpathSync
-}
-
-
-/***/ }),
-
-/***/ 1734:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var pathModule = __nccwpck_require__(5622);
-var isWindows = process.platform === 'win32';
-var fs = __nccwpck_require__(5747);
-
-// JavaScript implementation of realpath, ported from node pre-v6
-
-var DEBUG = process.env.NODE_DEBUG && /fs/.test(process.env.NODE_DEBUG);
-
-function rethrow() {
-  // Only enable in debug mode. A backtrace uses ~1000 bytes of heap space and
-  // is fairly slow to generate.
-  var callback;
-  if (DEBUG) {
-    var backtrace = new Error;
-    callback = debugCallback;
-  } else
-    callback = missingCallback;
-
-  return callback;
-
-  function debugCallback(err) {
-    if (err) {
-      backtrace.message = err.message;
-      err = backtrace;
-      missingCallback(err);
+// Same as 'string'.codePointAt(pos), but works in older browsers.
+function codePointAt(string, pos) {
+  var first = string.charCodeAt(pos), second;
+  if (first >= 0xD800 && first <= 0xDBFF && pos + 1 < string.length) {
+    second = string.charCodeAt(pos + 1);
+    if (second >= 0xDC00 && second <= 0xDFFF) {
+      // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+      return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
     }
   }
+  return first;
+}
 
-  function missingCallback(err) {
-    if (err) {
-      if (process.throwDeprecation)
-        throw err;  // Forgot a callback but don't know where? Use NODE_DEBUG=fs
-      else if (!process.noDeprecation) {
-        var msg = 'fs: missing callback ' + (err.stack || err.message);
-        if (process.traceDeprecation)
-          console.trace(msg);
-        else
-          console.error(msg);
+// Determines whether block indentation indicator is required.
+function needIndentIndicator(string) {
+  var leadingSpaceRe = /^\n* /;
+  return leadingSpaceRe.test(string);
+}
+
+var STYLE_PLAIN   = 1,
+    STYLE_SINGLE  = 2,
+    STYLE_LITERAL = 3,
+    STYLE_FOLDED  = 4,
+    STYLE_DOUBLE  = 5;
+
+// Determines which scalar styles are possible and returns the preferred style.
+// lineWidth = -1 => no limit.
+// Pre-conditions: str.length > 0.
+// Post-conditions:
+//    STYLE_PLAIN or STYLE_SINGLE => no \n are in the string.
+//    STYLE_LITERAL => no lines are suitable for folding (or lineWidth is -1).
+//    STYLE_FOLDED => a line > lineWidth and can be folded (and lineWidth != -1).
+function chooseScalarStyle(string, singleLineOnly, indentPerLevel, lineWidth,
+  testAmbiguousType, quotingType, forceQuotes, inblock) {
+
+  var i;
+  var char = 0;
+  var prevChar = null;
+  var hasLineBreak = false;
+  var hasFoldableLine = false; // only checked if shouldTrackWidth
+  var shouldTrackWidth = lineWidth !== -1;
+  var previousLineBreak = -1; // count the first line correctly
+  var plain = isPlainSafeFirst(codePointAt(string, 0))
+          && isPlainSafeLast(codePointAt(string, string.length - 1));
+
+  if (singleLineOnly || forceQuotes) {
+    // Case: no block styles.
+    // Check for disallowed characters to rule out plain and single.
+    for (i = 0; i < string.length; char >= 0x10000 ? i += 2 : i++) {
+      char = codePointAt(string, i);
+      if (!isPrintable(char)) {
+        return STYLE_DOUBLE;
       }
+      plain = plain && isPlainSafe(char, prevChar, inblock);
+      prevChar = char;
     }
-  }
-}
-
-function maybeCallback(cb) {
-  return typeof cb === 'function' ? cb : rethrow();
-}
-
-var normalize = pathModule.normalize;
-
-// Regexp that finds the next partion of a (partial) path
-// result is [base_with_slash, base], e.g. ['somedir/', 'somedir']
-if (isWindows) {
-  var nextPartRe = /(.*?)(?:[\/\\]+|$)/g;
-} else {
-  var nextPartRe = /(.*?)(?:[\/]+|$)/g;
-}
-
-// Regex to find the device root, including trailing slash. E.g. 'c:\\'.
-if (isWindows) {
-  var splitRootRe = /^(?:[a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/][^\\\/]+)?[\\\/]*/;
-} else {
-  var splitRootRe = /^[\/]*/;
-}
-
-exports.realpathSync = function realpathSync(p, cache) {
-  // make p is absolute
-  p = pathModule.resolve(p);
-
-  if (cache && Object.prototype.hasOwnProperty.call(cache, p)) {
-    return cache[p];
-  }
-
-  var original = p,
-      seenLinks = {},
-      knownHard = {};
-
-  // current character position in p
-  var pos;
-  // the partial path so far, including a trailing slash if any
-  var current;
-  // the partial path without a trailing slash (except when pointing at a root)
-  var base;
-  // the partial path scanned in the previous round, with slash
-  var previous;
-
-  start();
-
-  function start() {
-    // Skip over roots
-    var m = splitRootRe.exec(p);
-    pos = m[0].length;
-    current = m[0];
-    base = m[0];
-    previous = '';
-
-    // On windows, check that the root exists. On unix there is no need.
-    if (isWindows && !knownHard[base]) {
-      fs.lstatSync(base);
-      knownHard[base] = true;
-    }
-  }
-
-  // walk down the path, swapping out linked pathparts for their real
-  // values
-  // NB: p.length changes.
-  while (pos < p.length) {
-    // find the next part
-    nextPartRe.lastIndex = pos;
-    var result = nextPartRe.exec(p);
-    previous = current;
-    current += result[0];
-    base = previous + result[1];
-    pos = nextPartRe.lastIndex;
-
-    // continue if not a symlink
-    if (knownHard[base] || (cache && cache[base] === base)) {
-      continue;
-    }
-
-    var resolvedLink;
-    if (cache && Object.prototype.hasOwnProperty.call(cache, base)) {
-      // some known symbolic link.  no need to stat again.
-      resolvedLink = cache[base];
-    } else {
-      var stat = fs.lstatSync(base);
-      if (!stat.isSymbolicLink()) {
-        knownHard[base] = true;
-        if (cache) cache[base] = base;
-        continue;
-      }
-
-      // read the link if it wasn't read before
-      // dev/ino always return 0 on windows, so skip the check.
-      var linkTarget = null;
-      if (!isWindows) {
-        var id = stat.dev.toString(32) + ':' + stat.ino.toString(32);
-        if (seenLinks.hasOwnProperty(id)) {
-          linkTarget = seenLinks[id];
-        }
-      }
-      if (linkTarget === null) {
-        fs.statSync(base);
-        linkTarget = fs.readlinkSync(base);
-      }
-      resolvedLink = pathModule.resolve(previous, linkTarget);
-      // track this, if given a cache.
-      if (cache) cache[base] = resolvedLink;
-      if (!isWindows) seenLinks[id] = linkTarget;
-    }
-
-    // resolve the link, then start over
-    p = pathModule.resolve(resolvedLink, p.slice(pos));
-    start();
-  }
-
-  if (cache) cache[original] = p;
-
-  return p;
-};
-
-
-exports.realpath = function realpath(p, cache, cb) {
-  if (typeof cb !== 'function') {
-    cb = maybeCallback(cache);
-    cache = null;
-  }
-
-  // make p is absolute
-  p = pathModule.resolve(p);
-
-  if (cache && Object.prototype.hasOwnProperty.call(cache, p)) {
-    return process.nextTick(cb.bind(null, null, cache[p]));
-  }
-
-  var original = p,
-      seenLinks = {},
-      knownHard = {};
-
-  // current character position in p
-  var pos;
-  // the partial path so far, including a trailing slash if any
-  var current;
-  // the partial path without a trailing slash (except when pointing at a root)
-  var base;
-  // the partial path scanned in the previous round, with slash
-  var previous;
-
-  start();
-
-  function start() {
-    // Skip over roots
-    var m = splitRootRe.exec(p);
-    pos = m[0].length;
-    current = m[0];
-    base = m[0];
-    previous = '';
-
-    // On windows, check that the root exists. On unix there is no need.
-    if (isWindows && !knownHard[base]) {
-      fs.lstat(base, function(err) {
-        if (err) return cb(err);
-        knownHard[base] = true;
-        LOOP();
-      });
-    } else {
-      process.nextTick(LOOP);
-    }
-  }
-
-  // walk down the path, swapping out linked pathparts for their real
-  // values
-  function LOOP() {
-    // stop if scanned past end of path
-    if (pos >= p.length) {
-      if (cache) cache[original] = p;
-      return cb(null, p);
-    }
-
-    // find the next part
-    nextPartRe.lastIndex = pos;
-    var result = nextPartRe.exec(p);
-    previous = current;
-    current += result[0];
-    base = previous + result[1];
-    pos = nextPartRe.lastIndex;
-
-    // continue if not a symlink
-    if (knownHard[base] || (cache && cache[base] === base)) {
-      return process.nextTick(LOOP);
-    }
-
-    if (cache && Object.prototype.hasOwnProperty.call(cache, base)) {
-      // known symbolic link.  no need to stat again.
-      return gotResolvedLink(cache[base]);
-    }
-
-    return fs.lstat(base, gotStat);
-  }
-
-  function gotStat(err, stat) {
-    if (err) return cb(err);
-
-    // if not a symlink, skip to the next path part
-    if (!stat.isSymbolicLink()) {
-      knownHard[base] = true;
-      if (cache) cache[base] = base;
-      return process.nextTick(LOOP);
-    }
-
-    // stat & read the link if not read before
-    // call gotTarget as soon as the link target is known
-    // dev/ino always return 0 on windows, so skip the check.
-    if (!isWindows) {
-      var id = stat.dev.toString(32) + ':' + stat.ino.toString(32);
-      if (seenLinks.hasOwnProperty(id)) {
-        return gotTarget(null, seenLinks[id], base);
-      }
-    }
-    fs.stat(base, function(err) {
-      if (err) return cb(err);
-
-      fs.readlink(base, function(err, target) {
-        if (!isWindows) seenLinks[id] = target;
-        gotTarget(err, target);
-      });
-    });
-  }
-
-  function gotTarget(err, target, base) {
-    if (err) return cb(err);
-
-    var resolvedLink = pathModule.resolve(previous, target);
-    if (cache) cache[base] = resolvedLink;
-    gotResolvedLink(resolvedLink);
-  }
-
-  function gotResolvedLink(resolvedLink) {
-    // resolve the link, then start over
-    p = pathModule.resolve(resolvedLink, p.slice(pos));
-    start();
-  }
-};
-
-
-/***/ }),
-
-/***/ 7625:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-exports.setopts = setopts
-exports.ownProp = ownProp
-exports.makeAbs = makeAbs
-exports.finish = finish
-exports.mark = mark
-exports.isIgnored = isIgnored
-exports.childrenIgnored = childrenIgnored
-
-function ownProp (obj, field) {
-  return Object.prototype.hasOwnProperty.call(obj, field)
-}
-
-var path = __nccwpck_require__(5622)
-var minimatch = __nccwpck_require__(3973)
-var isAbsolute = __nccwpck_require__(8714)
-var Minimatch = minimatch.Minimatch
-
-function alphasort (a, b) {
-  return a.localeCompare(b, 'en')
-}
-
-function setupIgnores (self, options) {
-  self.ignore = options.ignore || []
-
-  if (!Array.isArray(self.ignore))
-    self.ignore = [self.ignore]
-
-  if (self.ignore.length) {
-    self.ignore = self.ignore.map(ignoreMap)
-  }
-}
-
-// ignore patterns are always in dot:true mode.
-function ignoreMap (pattern) {
-  var gmatcher = null
-  if (pattern.slice(-3) === '/**') {
-    var gpattern = pattern.replace(/(\/\*\*)+$/, '')
-    gmatcher = new Minimatch(gpattern, { dot: true })
-  }
-
-  return {
-    matcher: new Minimatch(pattern, { dot: true }),
-    gmatcher: gmatcher
-  }
-}
-
-function setopts (self, pattern, options) {
-  if (!options)
-    options = {}
-
-  // base-matching: just use globstar for that.
-  if (options.matchBase && -1 === pattern.indexOf("/")) {
-    if (options.noglobstar) {
-      throw new Error("base matching requires globstar")
-    }
-    pattern = "**/" + pattern
-  }
-
-  self.silent = !!options.silent
-  self.pattern = pattern
-  self.strict = options.strict !== false
-  self.realpath = !!options.realpath
-  self.realpathCache = options.realpathCache || Object.create(null)
-  self.follow = !!options.follow
-  self.dot = !!options.dot
-  self.mark = !!options.mark
-  self.nodir = !!options.nodir
-  if (self.nodir)
-    self.mark = true
-  self.sync = !!options.sync
-  self.nounique = !!options.nounique
-  self.nonull = !!options.nonull
-  self.nosort = !!options.nosort
-  self.nocase = !!options.nocase
-  self.stat = !!options.stat
-  self.noprocess = !!options.noprocess
-  self.absolute = !!options.absolute
-
-  self.maxLength = options.maxLength || Infinity
-  self.cache = options.cache || Object.create(null)
-  self.statCache = options.statCache || Object.create(null)
-  self.symlinks = options.symlinks || Object.create(null)
-
-  setupIgnores(self, options)
-
-  self.changedCwd = false
-  var cwd = process.cwd()
-  if (!ownProp(options, "cwd"))
-    self.cwd = cwd
-  else {
-    self.cwd = path.resolve(options.cwd)
-    self.changedCwd = self.cwd !== cwd
-  }
-
-  self.root = options.root || path.resolve(self.cwd, "/")
-  self.root = path.resolve(self.root)
-  if (process.platform === "win32")
-    self.root = self.root.replace(/\\/g, "/")
-
-  // TODO: is an absolute `cwd` supposed to be resolved against `root`?
-  // e.g. { cwd: '/test', root: __dirname } === path.join(__dirname, '/test')
-  self.cwdAbs = isAbsolute(self.cwd) ? self.cwd : makeAbs(self, self.cwd)
-  if (process.platform === "win32")
-    self.cwdAbs = self.cwdAbs.replace(/\\/g, "/")
-  self.nomount = !!options.nomount
-
-  // disable comments and negation in Minimatch.
-  // Note that they are not supported in Glob itself anyway.
-  options.nonegate = true
-  options.nocomment = true
-
-  self.minimatch = new Minimatch(pattern, options)
-  self.options = self.minimatch.options
-}
-
-function finish (self) {
-  var nou = self.nounique
-  var all = nou ? [] : Object.create(null)
-
-  for (var i = 0, l = self.matches.length; i < l; i ++) {
-    var matches = self.matches[i]
-    if (!matches || Object.keys(matches).length === 0) {
-      if (self.nonull) {
-        // do like the shell, and spit out the literal glob
-        var literal = self.minimatch.globSet[i]
-        if (nou)
-          all.push(literal)
-        else
-          all[literal] = true
-      }
-    } else {
-      // had matches
-      var m = Object.keys(matches)
-      if (nou)
-        all.push.apply(all, m)
-      else
-        m.forEach(function (m) {
-          all[m] = true
-        })
-    }
-  }
-
-  if (!nou)
-    all = Object.keys(all)
-
-  if (!self.nosort)
-    all = all.sort(alphasort)
-
-  // at *some* point we statted all of these
-  if (self.mark) {
-    for (var i = 0; i < all.length; i++) {
-      all[i] = self._mark(all[i])
-    }
-    if (self.nodir) {
-      all = all.filter(function (e) {
-        var notDir = !(/\/$/.test(e))
-        var c = self.cache[e] || self.cache[makeAbs(self, e)]
-        if (notDir && c)
-          notDir = c !== 'DIR' && !Array.isArray(c)
-        return notDir
-      })
-    }
-  }
-
-  if (self.ignore.length)
-    all = all.filter(function(m) {
-      return !isIgnored(self, m)
-    })
-
-  self.found = all
-}
-
-function mark (self, p) {
-  var abs = makeAbs(self, p)
-  var c = self.cache[abs]
-  var m = p
-  if (c) {
-    var isDir = c === 'DIR' || Array.isArray(c)
-    var slash = p.slice(-1) === '/'
-
-    if (isDir && !slash)
-      m += '/'
-    else if (!isDir && slash)
-      m = m.slice(0, -1)
-
-    if (m !== p) {
-      var mabs = makeAbs(self, m)
-      self.statCache[mabs] = self.statCache[abs]
-      self.cache[mabs] = self.cache[abs]
-    }
-  }
-
-  return m
-}
-
-// lotta situps...
-function makeAbs (self, f) {
-  var abs = f
-  if (f.charAt(0) === '/') {
-    abs = path.join(self.root, f)
-  } else if (isAbsolute(f) || f === '') {
-    abs = f
-  } else if (self.changedCwd) {
-    abs = path.resolve(self.cwd, f)
   } else {
-    abs = path.resolve(f)
-  }
-
-  if (process.platform === 'win32')
-    abs = abs.replace(/\\/g, '/')
-
-  return abs
-}
-
-
-// Return true, if pattern ends with globstar '**', for the accompanying parent directory.
-// Ex:- If node_modules/** is the pattern, add 'node_modules' to ignore list along with it's contents
-function isIgnored (self, path) {
-  if (!self.ignore.length)
-    return false
-
-  return self.ignore.some(function(item) {
-    return item.matcher.match(path) || !!(item.gmatcher && item.gmatcher.match(path))
-  })
-}
-
-function childrenIgnored (self, path) {
-  if (!self.ignore.length)
-    return false
-
-  return self.ignore.some(function(item) {
-    return !!(item.gmatcher && item.gmatcher.match(path))
-  })
-}
-
-
-/***/ }),
-
-/***/ 1957:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// Approach:
-//
-// 1. Get the minimatch set
-// 2. For each pattern in the set, PROCESS(pattern, false)
-// 3. Store matches per-set, then uniq them
-//
-// PROCESS(pattern, inGlobStar)
-// Get the first [n] items from pattern that are all strings
-// Join these together.  This is PREFIX.
-//   If there is no more remaining, then stat(PREFIX) and
-//   add to matches if it succeeds.  END.
-//
-// If inGlobStar and PREFIX is symlink and points to dir
-//   set ENTRIES = []
-// else readdir(PREFIX) as ENTRIES
-//   If fail, END
-//
-// with ENTRIES
-//   If pattern[n] is GLOBSTAR
-//     // handle the case where the globstar match is empty
-//     // by pruning it out, and testing the resulting pattern
-//     PROCESS(pattern[0..n] + pattern[n+1 .. $], false)
-//     // handle other cases.
-//     for ENTRY in ENTRIES (not dotfiles)
-//       // attach globstar + tail onto the entry
-//       // Mark that this entry is a globstar match
-//       PROCESS(pattern[0..n] + ENTRY + pattern[n .. $], true)
-//
-//   else // not globstar
-//     for ENTRY in ENTRIES (not dotfiles, unless pattern[n] is dot)
-//       Test ENTRY against pattern[n]
-//       If fails, continue
-//       If passes, PROCESS(pattern[0..n] + item + pattern[n+1 .. $])
-//
-// Caveat:
-//   Cache all stats and readdirs results to minimize syscall.  Since all
-//   we ever care about is existence and directory-ness, we can just keep
-//   `true` for files, and [children,...] for directories, or `false` for
-//   things that don't exist.
-
-module.exports = glob
-
-var fs = __nccwpck_require__(5747)
-var rp = __nccwpck_require__(6863)
-var minimatch = __nccwpck_require__(3973)
-var Minimatch = minimatch.Minimatch
-var inherits = __nccwpck_require__(4124)
-var EE = __nccwpck_require__(8614).EventEmitter
-var path = __nccwpck_require__(5622)
-var assert = __nccwpck_require__(2357)
-var isAbsolute = __nccwpck_require__(8714)
-var globSync = __nccwpck_require__(9010)
-var common = __nccwpck_require__(7625)
-var setopts = common.setopts
-var ownProp = common.ownProp
-var inflight = __nccwpck_require__(2492)
-var util = __nccwpck_require__(1669)
-var childrenIgnored = common.childrenIgnored
-var isIgnored = common.isIgnored
-
-var once = __nccwpck_require__(1223)
-
-function glob (pattern, options, cb) {
-  if (typeof options === 'function') cb = options, options = {}
-  if (!options) options = {}
-
-  if (options.sync) {
-    if (cb)
-      throw new TypeError('callback provided to sync glob')
-    return globSync(pattern, options)
-  }
-
-  return new Glob(pattern, options, cb)
-}
-
-glob.sync = globSync
-var GlobSync = glob.GlobSync = globSync.GlobSync
-
-// old api surface
-glob.glob = glob
-
-function extend (origin, add) {
-  if (add === null || typeof add !== 'object') {
-    return origin
-  }
-
-  var keys = Object.keys(add)
-  var i = keys.length
-  while (i--) {
-    origin[keys[i]] = add[keys[i]]
-  }
-  return origin
-}
-
-glob.hasMagic = function (pattern, options_) {
-  var options = extend({}, options_)
-  options.noprocess = true
-
-  var g = new Glob(pattern, options)
-  var set = g.minimatch.set
-
-  if (!pattern)
-    return false
-
-  if (set.length > 1)
-    return true
-
-  for (var j = 0; j < set[0].length; j++) {
-    if (typeof set[0][j] !== 'string')
-      return true
-  }
-
-  return false
-}
-
-glob.Glob = Glob
-inherits(Glob, EE)
-function Glob (pattern, options, cb) {
-  if (typeof options === 'function') {
-    cb = options
-    options = null
-  }
-
-  if (options && options.sync) {
-    if (cb)
-      throw new TypeError('callback provided to sync glob')
-    return new GlobSync(pattern, options)
-  }
-
-  if (!(this instanceof Glob))
-    return new Glob(pattern, options, cb)
-
-  setopts(this, pattern, options)
-  this._didRealPath = false
-
-  // process each pattern in the minimatch set
-  var n = this.minimatch.set.length
-
-  // The matches are stored as {<filename>: true,...} so that
-  // duplicates are automagically pruned.
-  // Later, we do an Object.keys() on these.
-  // Keep them as a list so we can fill in when nonull is set.
-  this.matches = new Array(n)
-
-  if (typeof cb === 'function') {
-    cb = once(cb)
-    this.on('error', cb)
-    this.on('end', function (matches) {
-      cb(null, matches)
-    })
-  }
-
-  var self = this
-  this._processing = 0
-
-  this._emitQueue = []
-  this._processQueue = []
-  this.paused = false
-
-  if (this.noprocess)
-    return this
-
-  if (n === 0)
-    return done()
-
-  var sync = true
-  for (var i = 0; i < n; i ++) {
-    this._process(this.minimatch.set[i], i, false, done)
-  }
-  sync = false
-
-  function done () {
-    --self._processing
-    if (self._processing <= 0) {
-      if (sync) {
-        process.nextTick(function () {
-          self._finish()
-        })
-      } else {
-        self._finish()
-      }
-    }
-  }
-}
-
-Glob.prototype._finish = function () {
-  assert(this instanceof Glob)
-  if (this.aborted)
-    return
-
-  if (this.realpath && !this._didRealpath)
-    return this._realpath()
-
-  common.finish(this)
-  this.emit('end', this.found)
-}
-
-Glob.prototype._realpath = function () {
-  if (this._didRealpath)
-    return
-
-  this._didRealpath = true
-
-  var n = this.matches.length
-  if (n === 0)
-    return this._finish()
-
-  var self = this
-  for (var i = 0; i < this.matches.length; i++)
-    this._realpathSet(i, next)
-
-  function next () {
-    if (--n === 0)
-      self._finish()
-  }
-}
-
-Glob.prototype._realpathSet = function (index, cb) {
-  var matchset = this.matches[index]
-  if (!matchset)
-    return cb()
-
-  var found = Object.keys(matchset)
-  var self = this
-  var n = found.length
-
-  if (n === 0)
-    return cb()
-
-  var set = this.matches[index] = Object.create(null)
-  found.forEach(function (p, i) {
-    // If there's a problem with the stat, then it means that
-    // one or more of the links in the realpath couldn't be
-    // resolved.  just return the abs value in that case.
-    p = self._makeAbs(p)
-    rp.realpath(p, self.realpathCache, function (er, real) {
-      if (!er)
-        set[real] = true
-      else if (er.syscall === 'stat')
-        set[p] = true
-      else
-        self.emit('error', er) // srsly wtf right here
-
-      if (--n === 0) {
-        self.matches[index] = set
-        cb()
-      }
-    })
-  })
-}
-
-Glob.prototype._mark = function (p) {
-  return common.mark(this, p)
-}
-
-Glob.prototype._makeAbs = function (f) {
-  return common.makeAbs(this, f)
-}
-
-Glob.prototype.abort = function () {
-  this.aborted = true
-  this.emit('abort')
-}
-
-Glob.prototype.pause = function () {
-  if (!this.paused) {
-    this.paused = true
-    this.emit('pause')
-  }
-}
-
-Glob.prototype.resume = function () {
-  if (this.paused) {
-    this.emit('resume')
-    this.paused = false
-    if (this._emitQueue.length) {
-      var eq = this._emitQueue.slice(0)
-      this._emitQueue.length = 0
-      for (var i = 0; i < eq.length; i ++) {
-        var e = eq[i]
-        this._emitMatch(e[0], e[1])
-      }
-    }
-    if (this._processQueue.length) {
-      var pq = this._processQueue.slice(0)
-      this._processQueue.length = 0
-      for (var i = 0; i < pq.length; i ++) {
-        var p = pq[i]
-        this._processing--
-        this._process(p[0], p[1], p[2], p[3])
-      }
-    }
-  }
-}
-
-Glob.prototype._process = function (pattern, index, inGlobStar, cb) {
-  assert(this instanceof Glob)
-  assert(typeof cb === 'function')
-
-  if (this.aborted)
-    return
-
-  this._processing++
-  if (this.paused) {
-    this._processQueue.push([pattern, index, inGlobStar, cb])
-    return
-  }
-
-  //console.error('PROCESS %d', this._processing, pattern)
-
-  // Get the first [n] parts of pattern that are all strings.
-  var n = 0
-  while (typeof pattern[n] === 'string') {
-    n ++
-  }
-  // now n is the index of the first one that is *not* a string.
-
-  // see if there's anything else
-  var prefix
-  switch (n) {
-    // if not, then this is rather simple
-    case pattern.length:
-      this._processSimple(pattern.join('/'), index, cb)
-      return
-
-    case 0:
-      // pattern *starts* with some non-trivial item.
-      // going to readdir(cwd), but not include the prefix in matches.
-      prefix = null
-      break
-
-    default:
-      // pattern has some string bits in the front.
-      // whatever it starts with, whether that's 'absolute' like /foo/bar,
-      // or 'relative' like '../baz'
-      prefix = pattern.slice(0, n).join('/')
-      break
-  }
-
-  var remain = pattern.slice(n)
-
-  // get the list of entries.
-  var read
-  if (prefix === null)
-    read = '.'
-  else if (isAbsolute(prefix) || isAbsolute(pattern.join('/'))) {
-    if (!prefix || !isAbsolute(prefix))
-      prefix = '/' + prefix
-    read = prefix
-  } else
-    read = prefix
-
-  var abs = this._makeAbs(read)
-
-  //if ignored, skip _processing
-  if (childrenIgnored(this, read))
-    return cb()
-
-  var isGlobStar = remain[0] === minimatch.GLOBSTAR
-  if (isGlobStar)
-    this._processGlobStar(prefix, read, abs, remain, index, inGlobStar, cb)
-  else
-    this._processReaddir(prefix, read, abs, remain, index, inGlobStar, cb)
-}
-
-Glob.prototype._processReaddir = function (prefix, read, abs, remain, index, inGlobStar, cb) {
-  var self = this
-  this._readdir(abs, inGlobStar, function (er, entries) {
-    return self._processReaddir2(prefix, read, abs, remain, index, inGlobStar, entries, cb)
-  })
-}
-
-Glob.prototype._processReaddir2 = function (prefix, read, abs, remain, index, inGlobStar, entries, cb) {
-
-  // if the abs isn't a dir, then nothing can match!
-  if (!entries)
-    return cb()
-
-  // It will only match dot entries if it starts with a dot, or if
-  // dot is set.  Stuff like @(.foo|.bar) isn't allowed.
-  var pn = remain[0]
-  var negate = !!this.minimatch.negate
-  var rawGlob = pn._glob
-  var dotOk = this.dot || rawGlob.charAt(0) === '.'
-
-  var matchedEntries = []
-  for (var i = 0; i < entries.length; i++) {
-    var e = entries[i]
-    if (e.charAt(0) !== '.' || dotOk) {
-      var m
-      if (negate && !prefix) {
-        m = !e.match(pn)
-      } else {
-        m = e.match(pn)
-      }
-      if (m)
-        matchedEntries.push(e)
-    }
-  }
-
-  //console.error('prd2', prefix, entries, remain[0]._glob, matchedEntries)
-
-  var len = matchedEntries.length
-  // If there are no matched entries, then nothing matches.
-  if (len === 0)
-    return cb()
-
-  // if this is the last remaining pattern bit, then no need for
-  // an additional stat *unless* the user has specified mark or
-  // stat explicitly.  We know they exist, since readdir returned
-  // them.
-
-  if (remain.length === 1 && !this.mark && !this.stat) {
-    if (!this.matches[index])
-      this.matches[index] = Object.create(null)
-
-    for (var i = 0; i < len; i ++) {
-      var e = matchedEntries[i]
-      if (prefix) {
-        if (prefix !== '/')
-          e = prefix + '/' + e
-        else
-          e = prefix + e
-      }
-
-      if (e.charAt(0) === '/' && !this.nomount) {
-        e = path.join(this.root, e)
-      }
-      this._emitMatch(index, e)
-    }
-    // This was the last one, and no stats were needed
-    return cb()
-  }
-
-  // now test all matched entries as stand-ins for that part
-  // of the pattern.
-  remain.shift()
-  for (var i = 0; i < len; i ++) {
-    var e = matchedEntries[i]
-    var newPattern
-    if (prefix) {
-      if (prefix !== '/')
-        e = prefix + '/' + e
-      else
-        e = prefix + e
-    }
-    this._process([e].concat(remain), index, inGlobStar, cb)
-  }
-  cb()
-}
-
-Glob.prototype._emitMatch = function (index, e) {
-  if (this.aborted)
-    return
-
-  if (isIgnored(this, e))
-    return
-
-  if (this.paused) {
-    this._emitQueue.push([index, e])
-    return
-  }
-
-  var abs = isAbsolute(e) ? e : this._makeAbs(e)
-
-  if (this.mark)
-    e = this._mark(e)
-
-  if (this.absolute)
-    e = abs
-
-  if (this.matches[index][e])
-    return
-
-  if (this.nodir) {
-    var c = this.cache[abs]
-    if (c === 'DIR' || Array.isArray(c))
-      return
-  }
-
-  this.matches[index][e] = true
-
-  var st = this.statCache[abs]
-  if (st)
-    this.emit('stat', e, st)
-
-  this.emit('match', e)
-}
-
-Glob.prototype._readdirInGlobStar = function (abs, cb) {
-  if (this.aborted)
-    return
-
-  // follow all symlinked directories forever
-  // just proceed as if this is a non-globstar situation
-  if (this.follow)
-    return this._readdir(abs, false, cb)
-
-  var lstatkey = 'lstat\0' + abs
-  var self = this
-  var lstatcb = inflight(lstatkey, lstatcb_)
-
-  if (lstatcb)
-    fs.lstat(abs, lstatcb)
-
-  function lstatcb_ (er, lstat) {
-    if (er && er.code === 'ENOENT')
-      return cb()
-
-    var isSym = lstat && lstat.isSymbolicLink()
-    self.symlinks[abs] = isSym
-
-    // If it's not a symlink or a dir, then it's definitely a regular file.
-    // don't bother doing a readdir in that case.
-    if (!isSym && lstat && !lstat.isDirectory()) {
-      self.cache[abs] = 'FILE'
-      cb()
-    } else
-      self._readdir(abs, false, cb)
-  }
-}
-
-Glob.prototype._readdir = function (abs, inGlobStar, cb) {
-  if (this.aborted)
-    return
-
-  cb = inflight('readdir\0'+abs+'\0'+inGlobStar, cb)
-  if (!cb)
-    return
-
-  //console.error('RD %j %j', +inGlobStar, abs)
-  if (inGlobStar && !ownProp(this.symlinks, abs))
-    return this._readdirInGlobStar(abs, cb)
-
-  if (ownProp(this.cache, abs)) {
-    var c = this.cache[abs]
-    if (!c || c === 'FILE')
-      return cb()
-
-    if (Array.isArray(c))
-      return cb(null, c)
-  }
-
-  var self = this
-  fs.readdir(abs, readdirCb(this, abs, cb))
-}
-
-function readdirCb (self, abs, cb) {
-  return function (er, entries) {
-    if (er)
-      self._readdirError(abs, er, cb)
-    else
-      self._readdirEntries(abs, entries, cb)
-  }
-}
-
-Glob.prototype._readdirEntries = function (abs, entries, cb) {
-  if (this.aborted)
-    return
-
-  // if we haven't asked to stat everything, then just
-  // assume that everything in there exists, so we can avoid
-  // having to stat it a second time.
-  if (!this.mark && !this.stat) {
-    for (var i = 0; i < entries.length; i ++) {
-      var e = entries[i]
-      if (abs === '/')
-        e = abs + e
-      else
-        e = abs + '/' + e
-      this.cache[e] = true
-    }
-  }
-
-  this.cache[abs] = entries
-  return cb(null, entries)
-}
-
-Glob.prototype._readdirError = function (f, er, cb) {
-  if (this.aborted)
-    return
-
-  // handle errors, and cache the information
-  switch (er.code) {
-    case 'ENOTSUP': // https://github.com/isaacs/node-glob/issues/205
-    case 'ENOTDIR': // totally normal. means it *does* exist.
-      var abs = this._makeAbs(f)
-      this.cache[abs] = 'FILE'
-      if (abs === this.cwdAbs) {
-        var error = new Error(er.code + ' invalid cwd ' + this.cwd)
-        error.path = this.cwd
-        error.code = er.code
-        this.emit('error', error)
-        this.abort()
-      }
-      break
-
-    case 'ENOENT': // not terribly unusual
-    case 'ELOOP':
-    case 'ENAMETOOLONG':
-    case 'UNKNOWN':
-      this.cache[this._makeAbs(f)] = false
-      break
-
-    default: // some unusual error.  Treat as failure.
-      this.cache[this._makeAbs(f)] = false
-      if (this.strict) {
-        this.emit('error', er)
-        // If the error is handled, then we abort
-        // if not, we threw out of here
-        this.abort()
-      }
-      if (!this.silent)
-        console.error('glob error', er)
-      break
-  }
-
-  return cb()
-}
-
-Glob.prototype._processGlobStar = function (prefix, read, abs, remain, index, inGlobStar, cb) {
-  var self = this
-  this._readdir(abs, inGlobStar, function (er, entries) {
-    self._processGlobStar2(prefix, read, abs, remain, index, inGlobStar, entries, cb)
-  })
-}
-
-
-Glob.prototype._processGlobStar2 = function (prefix, read, abs, remain, index, inGlobStar, entries, cb) {
-  //console.error('pgs2', prefix, remain[0], entries)
-
-  // no entries means not a dir, so it can never have matches
-  // foo.txt/** doesn't match foo.txt
-  if (!entries)
-    return cb()
-
-  // test without the globstar, and with every child both below
-  // and replacing the globstar.
-  var remainWithoutGlobStar = remain.slice(1)
-  var gspref = prefix ? [ prefix ] : []
-  var noGlobStar = gspref.concat(remainWithoutGlobStar)
-
-  // the noGlobStar pattern exits the inGlobStar state
-  this._process(noGlobStar, index, false, cb)
-
-  var isSym = this.symlinks[abs]
-  var len = entries.length
-
-  // If it's a symlink, and we're in a globstar, then stop
-  if (isSym && inGlobStar)
-    return cb()
-
-  for (var i = 0; i < len; i++) {
-    var e = entries[i]
-    if (e.charAt(0) === '.' && !this.dot)
-      continue
-
-    // these two cases enter the inGlobStar state
-    var instead = gspref.concat(entries[i], remainWithoutGlobStar)
-    this._process(instead, index, true, cb)
-
-    var below = gspref.concat(entries[i], remain)
-    this._process(below, index, true, cb)
-  }
-
-  cb()
-}
-
-Glob.prototype._processSimple = function (prefix, index, cb) {
-  // XXX review this.  Shouldn't it be doing the mounting etc
-  // before doing stat?  kinda weird?
-  var self = this
-  this._stat(prefix, function (er, exists) {
-    self._processSimple2(prefix, index, er, exists, cb)
-  })
-}
-Glob.prototype._processSimple2 = function (prefix, index, er, exists, cb) {
-
-  //console.error('ps2', prefix, exists)
-
-  if (!this.matches[index])
-    this.matches[index] = Object.create(null)
-
-  // If it doesn't exist, then just mark the lack of results
-  if (!exists)
-    return cb()
-
-  if (prefix && isAbsolute(prefix) && !this.nomount) {
-    var trail = /[\/\\]$/.test(prefix)
-    if (prefix.charAt(0) === '/') {
-      prefix = path.join(this.root, prefix)
-    } else {
-      prefix = path.resolve(this.root, prefix)
-      if (trail)
-        prefix += '/'
-    }
-  }
-
-  if (process.platform === 'win32')
-    prefix = prefix.replace(/\\/g, '/')
-
-  // Mark this as a match
-  this._emitMatch(index, prefix)
-  cb()
-}
-
-// Returns either 'DIR', 'FILE', or false
-Glob.prototype._stat = function (f, cb) {
-  var abs = this._makeAbs(f)
-  var needDir = f.slice(-1) === '/'
-
-  if (f.length > this.maxLength)
-    return cb()
-
-  if (!this.stat && ownProp(this.cache, abs)) {
-    var c = this.cache[abs]
-
-    if (Array.isArray(c))
-      c = 'DIR'
-
-    // It exists, but maybe not how we need it
-    if (!needDir || c === 'DIR')
-      return cb(null, c)
-
-    if (needDir && c === 'FILE')
-      return cb()
-
-    // otherwise we have to stat, because maybe c=true
-    // if we know it exists, but not what it is.
-  }
-
-  var exists
-  var stat = this.statCache[abs]
-  if (stat !== undefined) {
-    if (stat === false)
-      return cb(null, stat)
-    else {
-      var type = stat.isDirectory() ? 'DIR' : 'FILE'
-      if (needDir && type === 'FILE')
-        return cb()
-      else
-        return cb(null, type, stat)
-    }
-  }
-
-  var self = this
-  var statcb = inflight('stat\0' + abs, lstatcb_)
-  if (statcb)
-    fs.lstat(abs, statcb)
-
-  function lstatcb_ (er, lstat) {
-    if (lstat && lstat.isSymbolicLink()) {
-      // If it's a symlink, then treat it as the target, unless
-      // the target does not exist, then treat it as a file.
-      return fs.stat(abs, function (er, stat) {
-        if (er)
-          self._stat2(f, abs, null, lstat, cb)
-        else
-          self._stat2(f, abs, er, stat, cb)
-      })
-    } else {
-      self._stat2(f, abs, er, lstat, cb)
-    }
-  }
-}
-
-Glob.prototype._stat2 = function (f, abs, er, stat, cb) {
-  if (er && (er.code === 'ENOENT' || er.code === 'ENOTDIR')) {
-    this.statCache[abs] = false
-    return cb()
-  }
-
-  var needDir = f.slice(-1) === '/'
-  this.statCache[abs] = stat
-
-  if (abs.slice(-1) === '/' && stat && !stat.isDirectory())
-    return cb(null, false, stat)
-
-  var c = true
-  if (stat)
-    c = stat.isDirectory() ? 'DIR' : 'FILE'
-  this.cache[abs] = this.cache[abs] || c
-
-  if (needDir && c === 'FILE')
-    return cb()
-
-  return cb(null, c, stat)
-}
-
-
-/***/ }),
-
-/***/ 9010:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-module.exports = globSync
-globSync.GlobSync = GlobSync
-
-var fs = __nccwpck_require__(5747)
-var rp = __nccwpck_require__(6863)
-var minimatch = __nccwpck_require__(3973)
-var Minimatch = minimatch.Minimatch
-var Glob = __nccwpck_require__(1957).Glob
-var util = __nccwpck_require__(1669)
-var path = __nccwpck_require__(5622)
-var assert = __nccwpck_require__(2357)
-var isAbsolute = __nccwpck_require__(8714)
-var common = __nccwpck_require__(7625)
-var setopts = common.setopts
-var ownProp = common.ownProp
-var childrenIgnored = common.childrenIgnored
-var isIgnored = common.isIgnored
-
-function globSync (pattern, options) {
-  if (typeof options === 'function' || arguments.length === 3)
-    throw new TypeError('callback provided to sync glob\n'+
-                        'See: https://github.com/isaacs/node-glob/issues/167')
-
-  return new GlobSync(pattern, options).found
-}
-
-function GlobSync (pattern, options) {
-  if (!pattern)
-    throw new Error('must provide pattern')
-
-  if (typeof options === 'function' || arguments.length === 3)
-    throw new TypeError('callback provided to sync glob\n'+
-                        'See: https://github.com/isaacs/node-glob/issues/167')
-
-  if (!(this instanceof GlobSync))
-    return new GlobSync(pattern, options)
-
-  setopts(this, pattern, options)
-
-  if (this.noprocess)
-    return this
-
-  var n = this.minimatch.set.length
-  this.matches = new Array(n)
-  for (var i = 0; i < n; i ++) {
-    this._process(this.minimatch.set[i], i, false)
-  }
-  this._finish()
-}
-
-GlobSync.prototype._finish = function () {
-  assert(this instanceof GlobSync)
-  if (this.realpath) {
-    var self = this
-    this.matches.forEach(function (matchset, index) {
-      var set = self.matches[index] = Object.create(null)
-      for (var p in matchset) {
-        try {
-          p = self._makeAbs(p)
-          var real = rp.realpathSync(p, self.realpathCache)
-          set[real] = true
-        } catch (er) {
-          if (er.syscall === 'stat')
-            set[self._makeAbs(p)] = true
-          else
-            throw er
+    // Case: block styles permitted.
+    for (i = 0; i < string.length; char >= 0x10000 ? i += 2 : i++) {
+      char = codePointAt(string, i);
+      if (char === CHAR_LINE_FEED) {
+        hasLineBreak = true;
+        // Check if any line can be folded.
+        if (shouldTrackWidth) {
+          hasFoldableLine = hasFoldableLine ||
+            // Foldable line = too long, and not more-indented.
+            (i - previousLineBreak - 1 > lineWidth &&
+             string[previousLineBreak + 1] !== ' ');
+          previousLineBreak = i;
         }
+      } else if (!isPrintable(char)) {
+        return STYLE_DOUBLE;
       }
-    })
-  }
-  common.finish(this)
-}
-
-
-GlobSync.prototype._process = function (pattern, index, inGlobStar) {
-  assert(this instanceof GlobSync)
-
-  // Get the first [n] parts of pattern that are all strings.
-  var n = 0
-  while (typeof pattern[n] === 'string') {
-    n ++
-  }
-  // now n is the index of the first one that is *not* a string.
-
-  // See if there's anything else
-  var prefix
-  switch (n) {
-    // if not, then this is rather simple
-    case pattern.length:
-      this._processSimple(pattern.join('/'), index)
-      return
-
-    case 0:
-      // pattern *starts* with some non-trivial item.
-      // going to readdir(cwd), but not include the prefix in matches.
-      prefix = null
-      break
-
-    default:
-      // pattern has some string bits in the front.
-      // whatever it starts with, whether that's 'absolute' like /foo/bar,
-      // or 'relative' like '../baz'
-      prefix = pattern.slice(0, n).join('/')
-      break
-  }
-
-  var remain = pattern.slice(n)
-
-  // get the list of entries.
-  var read
-  if (prefix === null)
-    read = '.'
-  else if (isAbsolute(prefix) || isAbsolute(pattern.join('/'))) {
-    if (!prefix || !isAbsolute(prefix))
-      prefix = '/' + prefix
-    read = prefix
-  } else
-    read = prefix
-
-  var abs = this._makeAbs(read)
-
-  //if ignored, skip processing
-  if (childrenIgnored(this, read))
-    return
-
-  var isGlobStar = remain[0] === minimatch.GLOBSTAR
-  if (isGlobStar)
-    this._processGlobStar(prefix, read, abs, remain, index, inGlobStar)
-  else
-    this._processReaddir(prefix, read, abs, remain, index, inGlobStar)
-}
-
-
-GlobSync.prototype._processReaddir = function (prefix, read, abs, remain, index, inGlobStar) {
-  var entries = this._readdir(abs, inGlobStar)
-
-  // if the abs isn't a dir, then nothing can match!
-  if (!entries)
-    return
-
-  // It will only match dot entries if it starts with a dot, or if
-  // dot is set.  Stuff like @(.foo|.bar) isn't allowed.
-  var pn = remain[0]
-  var negate = !!this.minimatch.negate
-  var rawGlob = pn._glob
-  var dotOk = this.dot || rawGlob.charAt(0) === '.'
-
-  var matchedEntries = []
-  for (var i = 0; i < entries.length; i++) {
-    var e = entries[i]
-    if (e.charAt(0) !== '.' || dotOk) {
-      var m
-      if (negate && !prefix) {
-        m = !e.match(pn)
-      } else {
-        m = e.match(pn)
-      }
-      if (m)
-        matchedEntries.push(e)
+      plain = plain && isPlainSafe(char, prevChar, inblock);
+      prevChar = char;
     }
+    // in case the end is missing a \n
+    hasFoldableLine = hasFoldableLine || (shouldTrackWidth &&
+      (i - previousLineBreak - 1 > lineWidth &&
+       string[previousLineBreak + 1] !== ' '));
   }
-
-  var len = matchedEntries.length
-  // If there are no matched entries, then nothing matches.
-  if (len === 0)
-    return
-
-  // if this is the last remaining pattern bit, then no need for
-  // an additional stat *unless* the user has specified mark or
-  // stat explicitly.  We know they exist, since readdir returned
-  // them.
-
-  if (remain.length === 1 && !this.mark && !this.stat) {
-    if (!this.matches[index])
-      this.matches[index] = Object.create(null)
-
-    for (var i = 0; i < len; i ++) {
-      var e = matchedEntries[i]
-      if (prefix) {
-        if (prefix.slice(-1) !== '/')
-          e = prefix + '/' + e
-        else
-          e = prefix + e
-      }
-
-      if (e.charAt(0) === '/' && !this.nomount) {
-        e = path.join(this.root, e)
-      }
-      this._emitMatch(index, e)
+  // Although every style can represent \n without escaping, prefer block styles
+  // for multiline, since they're more readable and they don't add empty lines.
+  // Also prefer folding a super-long line.
+  if (!hasLineBreak && !hasFoldableLine) {
+    // Strings interpretable as another type have to be quoted;
+    // e.g. the string 'true' vs. the boolean true.
+    if (plain && !forceQuotes && !testAmbiguousType(string)) {
+      return STYLE_PLAIN;
     }
-    // This was the last one, and no stats were needed
-    return
+    return quotingType === QUOTING_TYPE_DOUBLE ? STYLE_DOUBLE : STYLE_SINGLE;
   }
-
-  // now test all matched entries as stand-ins for that part
-  // of the pattern.
-  remain.shift()
-  for (var i = 0; i < len; i ++) {
-    var e = matchedEntries[i]
-    var newPattern
-    if (prefix)
-      newPattern = [prefix, e]
-    else
-      newPattern = [e]
-    this._process(newPattern.concat(remain), index, inGlobStar)
+  // Edge case: block indentation indicator can only have one digit.
+  if (indentPerLevel > 9 && needIndentIndicator(string)) {
+    return STYLE_DOUBLE;
   }
+  // At this point we know block styles are valid.
+  // Prefer literal style unless we want to fold.
+  if (!forceQuotes) {
+    return hasFoldableLine ? STYLE_FOLDED : STYLE_LITERAL;
+  }
+  return quotingType === QUOTING_TYPE_DOUBLE ? STYLE_DOUBLE : STYLE_SINGLE;
 }
 
-
-GlobSync.prototype._emitMatch = function (index, e) {
-  if (isIgnored(this, e))
-    return
-
-  var abs = this._makeAbs(e)
-
-  if (this.mark)
-    e = this._mark(e)
-
-  if (this.absolute) {
-    e = abs
-  }
-
-  if (this.matches[index][e])
-    return
-
-  if (this.nodir) {
-    var c = this.cache[abs]
-    if (c === 'DIR' || Array.isArray(c))
-      return
-  }
-
-  this.matches[index][e] = true
-
-  if (this.stat)
-    this._stat(e)
-}
-
-
-GlobSync.prototype._readdirInGlobStar = function (abs) {
-  // follow all symlinked directories forever
-  // just proceed as if this is a non-globstar situation
-  if (this.follow)
-    return this._readdir(abs, false)
-
-  var entries
-  var lstat
-  var stat
-  try {
-    lstat = fs.lstatSync(abs)
-  } catch (er) {
-    if (er.code === 'ENOENT') {
-      // lstat failed, doesn't exist
-      return null
+// Note: line breaking/folding is implemented for only the folded style.
+// NB. We drop the last trailing newline (if any) of a returned block scalar
+//  since the dumper adds its own newline. This always works:
+//    • No ending newline => unaffected; already using strip "-" chomping.
+//    • Ending newline    => removed then restored.
+//  Importantly, this keeps the "+" chomp indicator from gaining an extra line.
+function writeScalar(state, string, level, iskey, inblock) {
+  state.dump = (function () {
+    if (string.length === 0) {
+      return state.quotingType === QUOTING_TYPE_DOUBLE ? '""' : "''";
     }
-  }
-
-  var isSym = lstat && lstat.isSymbolicLink()
-  this.symlinks[abs] = isSym
-
-  // If it's not a symlink or a dir, then it's definitely a regular file.
-  // don't bother doing a readdir in that case.
-  if (!isSym && lstat && !lstat.isDirectory())
-    this.cache[abs] = 'FILE'
-  else
-    entries = this._readdir(abs, false)
-
-  return entries
-}
-
-GlobSync.prototype._readdir = function (abs, inGlobStar) {
-  var entries
-
-  if (inGlobStar && !ownProp(this.symlinks, abs))
-    return this._readdirInGlobStar(abs)
-
-  if (ownProp(this.cache, abs)) {
-    var c = this.cache[abs]
-    if (!c || c === 'FILE')
-      return null
-
-    if (Array.isArray(c))
-      return c
-  }
-
-  try {
-    return this._readdirEntries(abs, fs.readdirSync(abs))
-  } catch (er) {
-    this._readdirError(abs, er)
-    return null
-  }
-}
-
-GlobSync.prototype._readdirEntries = function (abs, entries) {
-  // if we haven't asked to stat everything, then just
-  // assume that everything in there exists, so we can avoid
-  // having to stat it a second time.
-  if (!this.mark && !this.stat) {
-    for (var i = 0; i < entries.length; i ++) {
-      var e = entries[i]
-      if (abs === '/')
-        e = abs + e
-      else
-        e = abs + '/' + e
-      this.cache[e] = true
-    }
-  }
-
-  this.cache[abs] = entries
-
-  // mark and cache dir-ness
-  return entries
-}
-
-GlobSync.prototype._readdirError = function (f, er) {
-  // handle errors, and cache the information
-  switch (er.code) {
-    case 'ENOTSUP': // https://github.com/isaacs/node-glob/issues/205
-    case 'ENOTDIR': // totally normal. means it *does* exist.
-      var abs = this._makeAbs(f)
-      this.cache[abs] = 'FILE'
-      if (abs === this.cwdAbs) {
-        var error = new Error(er.code + ' invalid cwd ' + this.cwd)
-        error.path = this.cwd
-        error.code = er.code
-        throw error
-      }
-      break
-
-    case 'ENOENT': // not terribly unusual
-    case 'ELOOP':
-    case 'ENAMETOOLONG':
-    case 'UNKNOWN':
-      this.cache[this._makeAbs(f)] = false
-      break
-
-    default: // some unusual error.  Treat as failure.
-      this.cache[this._makeAbs(f)] = false
-      if (this.strict)
-        throw er
-      if (!this.silent)
-        console.error('glob error', er)
-      break
-  }
-}
-
-GlobSync.prototype._processGlobStar = function (prefix, read, abs, remain, index, inGlobStar) {
-
-  var entries = this._readdir(abs, inGlobStar)
-
-  // no entries means not a dir, so it can never have matches
-  // foo.txt/** doesn't match foo.txt
-  if (!entries)
-    return
-
-  // test without the globstar, and with every child both below
-  // and replacing the globstar.
-  var remainWithoutGlobStar = remain.slice(1)
-  var gspref = prefix ? [ prefix ] : []
-  var noGlobStar = gspref.concat(remainWithoutGlobStar)
-
-  // the noGlobStar pattern exits the inGlobStar state
-  this._process(noGlobStar, index, false)
-
-  var len = entries.length
-  var isSym = this.symlinks[abs]
-
-  // If it's a symlink, and we're in a globstar, then stop
-  if (isSym && inGlobStar)
-    return
-
-  for (var i = 0; i < len; i++) {
-    var e = entries[i]
-    if (e.charAt(0) === '.' && !this.dot)
-      continue
-
-    // these two cases enter the inGlobStar state
-    var instead = gspref.concat(entries[i], remainWithoutGlobStar)
-    this._process(instead, index, true)
-
-    var below = gspref.concat(entries[i], remain)
-    this._process(below, index, true)
-  }
-}
-
-GlobSync.prototype._processSimple = function (prefix, index) {
-  // XXX review this.  Shouldn't it be doing the mounting etc
-  // before doing stat?  kinda weird?
-  var exists = this._stat(prefix)
-
-  if (!this.matches[index])
-    this.matches[index] = Object.create(null)
-
-  // If it doesn't exist, then just mark the lack of results
-  if (!exists)
-    return
-
-  if (prefix && isAbsolute(prefix) && !this.nomount) {
-    var trail = /[\/\\]$/.test(prefix)
-    if (prefix.charAt(0) === '/') {
-      prefix = path.join(this.root, prefix)
-    } else {
-      prefix = path.resolve(this.root, prefix)
-      if (trail)
-        prefix += '/'
-    }
-  }
-
-  if (process.platform === 'win32')
-    prefix = prefix.replace(/\\/g, '/')
-
-  // Mark this as a match
-  this._emitMatch(index, prefix)
-}
-
-// Returns either 'DIR', 'FILE', or false
-GlobSync.prototype._stat = function (f) {
-  var abs = this._makeAbs(f)
-  var needDir = f.slice(-1) === '/'
-
-  if (f.length > this.maxLength)
-    return false
-
-  if (!this.stat && ownProp(this.cache, abs)) {
-    var c = this.cache[abs]
-
-    if (Array.isArray(c))
-      c = 'DIR'
-
-    // It exists, but maybe not how we need it
-    if (!needDir || c === 'DIR')
-      return c
-
-    if (needDir && c === 'FILE')
-      return false
-
-    // otherwise we have to stat, because maybe c=true
-    // if we know it exists, but not what it is.
-  }
-
-  var exists
-  var stat = this.statCache[abs]
-  if (!stat) {
-    var lstat
-    try {
-      lstat = fs.lstatSync(abs)
-    } catch (er) {
-      if (er && (er.code === 'ENOENT' || er.code === 'ENOTDIR')) {
-        this.statCache[abs] = false
-        return false
+    if (!state.noCompatMode) {
+      if (DEPRECATED_BOOLEANS_SYNTAX.indexOf(string) !== -1 || DEPRECATED_BASE60_SYNTAX.test(string)) {
+        return state.quotingType === QUOTING_TYPE_DOUBLE ? ('"' + string + '"') : ("'" + string + "'");
       }
     }
 
-    if (lstat && lstat.isSymbolicLink()) {
-      try {
-        stat = fs.statSync(abs)
-      } catch (er) {
-        stat = lstat
-      }
-    } else {
-      stat = lstat
-    }
-  }
+    var indent = state.indent * Math.max(1, level); // no 0-indent scalars
+    // As indentation gets deeper, let the width decrease monotonically
+    // to the lower bound min(state.lineWidth, 40).
+    // Note that this implies
+    //  state.lineWidth ≤ 40 + state.indent: width is fixed at the lower bound.
+    //  state.lineWidth > 40 + state.indent: width decreases until the lower bound.
+    // This behaves better than a constant minimum width which disallows narrower options,
+    // or an indent threshold which causes the width to suddenly increase.
+    var lineWidth = state.lineWidth === -1
+      ? -1 : Math.max(Math.min(state.lineWidth, 40), state.lineWidth - indent);
 
-  this.statCache[abs] = stat
-
-  var c = true
-  if (stat)
-    c = stat.isDirectory() ? 'DIR' : 'FILE'
-
-  this.cache[abs] = this.cache[abs] || c
-
-  if (needDir && c === 'FILE')
-    return false
-
-  return c
-}
-
-GlobSync.prototype._mark = function (p) {
-  return common.mark(this, p)
-}
-
-GlobSync.prototype._makeAbs = function (f) {
-  return common.makeAbs(this, f)
-}
-
-
-/***/ }),
-
-/***/ 7356:
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = clone
-
-var getPrototypeOf = Object.getPrototypeOf || function (obj) {
-  return obj.__proto__
-}
-
-function clone (obj) {
-  if (obj === null || typeof obj !== 'object')
-    return obj
-
-  if (obj instanceof Object)
-    var copy = { __proto__: getPrototypeOf(obj) }
-  else
-    var copy = Object.create(null)
-
-  Object.getOwnPropertyNames(obj).forEach(function (key) {
-    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
-  })
-
-  return copy
-}
-
-
-/***/ }),
-
-/***/ 7758:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var fs = __nccwpck_require__(5747)
-var polyfills = __nccwpck_require__(263)
-var legacy = __nccwpck_require__(3086)
-var clone = __nccwpck_require__(7356)
-
-var util = __nccwpck_require__(1669)
-
-/* istanbul ignore next - node 0.x polyfill */
-var gracefulQueue
-var previousSymbol
-
-/* istanbul ignore else - node 0.x polyfill */
-if (typeof Symbol === 'function' && typeof Symbol.for === 'function') {
-  gracefulQueue = Symbol.for('graceful-fs.queue')
-  // This is used in testing by future versions
-  previousSymbol = Symbol.for('graceful-fs.previous')
-} else {
-  gracefulQueue = '___graceful-fs.queue'
-  previousSymbol = '___graceful-fs.previous'
-}
-
-function noop () {}
-
-function publishQueue(context, queue) {
-  Object.defineProperty(context, gracefulQueue, {
-    get: function() {
-      return queue
-    }
-  })
-}
-
-var debug = noop
-if (util.debuglog)
-  debug = util.debuglog('gfs4')
-else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || ''))
-  debug = function() {
-    var m = util.format.apply(util, arguments)
-    m = 'GFS4: ' + m.split(/\n/).join('\nGFS4: ')
-    console.error(m)
-  }
-
-// Once time initialization
-if (!fs[gracefulQueue]) {
-  // This queue can be shared by multiple loaded instances
-  var queue = global[gracefulQueue] || []
-  publishQueue(fs, queue)
-
-  // Patch fs.close/closeSync to shared queue version, because we need
-  // to retry() whenever a close happens *anywhere* in the program.
-  // This is essential when multiple graceful-fs instances are
-  // in play at the same time.
-  fs.close = (function (fs$close) {
-    function close (fd, cb) {
-      return fs$close.call(fs, fd, function (err) {
-        // This function uses the graceful-fs shared queue
-        if (!err) {
-          retry()
-        }
-
-        if (typeof cb === 'function')
-          cb.apply(this, arguments)
-      })
+    // Without knowing if keys are implicit/explicit, assume implicit for safety.
+    var singleLineOnly = iskey
+      // No block styles in flow mode.
+      || (state.flowLevel > -1 && level >= state.flowLevel);
+    function testAmbiguity(string) {
+      return testImplicitResolving(state, string);
     }
 
-    Object.defineProperty(close, previousSymbol, {
-      value: fs$close
-    })
-    return close
-  })(fs.close)
-
-  fs.closeSync = (function (fs$closeSync) {
-    function closeSync (fd) {
-      // This function uses the graceful-fs shared queue
-      fs$closeSync.apply(fs, arguments)
-      retry()
-    }
-
-    Object.defineProperty(closeSync, previousSymbol, {
-      value: fs$closeSync
-    })
-    return closeSync
-  })(fs.closeSync)
-
-  if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
-    process.on('exit', function() {
-      debug(fs[gracefulQueue])
-      __nccwpck_require__(2357).equal(fs[gracefulQueue].length, 0)
-    })
-  }
-}
-
-if (!global[gracefulQueue]) {
-  publishQueue(global, fs[gracefulQueue]);
-}
-
-module.exports = patch(clone(fs))
-if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs.__patched) {
-    module.exports = patch(fs)
-    fs.__patched = true;
-}
-
-function patch (fs) {
-  // Everything that references the open() function needs to be in here
-  polyfills(fs)
-  fs.gracefulify = patch
-
-  fs.createReadStream = createReadStream
-  fs.createWriteStream = createWriteStream
-  var fs$readFile = fs.readFile
-  fs.readFile = readFile
-  function readFile (path, options, cb) {
-    if (typeof options === 'function')
-      cb = options, options = null
-
-    return go$readFile(path, options, cb)
-
-    function go$readFile (path, options, cb) {
-      return fs$readFile(path, options, function (err) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$readFile, [path, options, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  var fs$writeFile = fs.writeFile
-  fs.writeFile = writeFile
-  function writeFile (path, data, options, cb) {
-    if (typeof options === 'function')
-      cb = options, options = null
-
-    return go$writeFile(path, data, options, cb)
-
-    function go$writeFile (path, data, options, cb) {
-      return fs$writeFile(path, data, options, function (err) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$writeFile, [path, data, options, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  var fs$appendFile = fs.appendFile
-  if (fs$appendFile)
-    fs.appendFile = appendFile
-  function appendFile (path, data, options, cb) {
-    if (typeof options === 'function')
-      cb = options, options = null
-
-    return go$appendFile(path, data, options, cb)
-
-    function go$appendFile (path, data, options, cb) {
-      return fs$appendFile(path, data, options, function (err) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$appendFile, [path, data, options, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  var fs$copyFile = fs.copyFile
-  if (fs$copyFile)
-    fs.copyFile = copyFile
-  function copyFile (src, dest, flags, cb) {
-    if (typeof flags === 'function') {
-      cb = flags
-      flags = 0
-    }
-    return fs$copyFile(src, dest, flags, function (err) {
-      if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-        enqueue([fs$copyFile, [src, dest, flags, cb]])
-      else {
-        if (typeof cb === 'function')
-          cb.apply(this, arguments)
-        retry()
-      }
-    })
-  }
-
-  var fs$readdir = fs.readdir
-  fs.readdir = readdir
-  function readdir (path, options, cb) {
-    var args = [path]
-    if (typeof options !== 'function') {
-      args.push(options)
-    } else {
-      cb = options
-    }
-    args.push(go$readdir$cb)
-
-    return go$readdir(args)
-
-    function go$readdir$cb (err, files) {
-      if (files && files.sort)
-        files.sort()
-
-      if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-        enqueue([go$readdir, [args]])
-
-      else {
-        if (typeof cb === 'function')
-          cb.apply(this, arguments)
-        retry()
-      }
-    }
-  }
-
-  function go$readdir (args) {
-    return fs$readdir.apply(fs, args)
-  }
-
-  if (process.version.substr(0, 4) === 'v0.8') {
-    var legStreams = legacy(fs)
-    ReadStream = legStreams.ReadStream
-    WriteStream = legStreams.WriteStream
-  }
-
-  var fs$ReadStream = fs.ReadStream
-  if (fs$ReadStream) {
-    ReadStream.prototype = Object.create(fs$ReadStream.prototype)
-    ReadStream.prototype.open = ReadStream$open
-  }
-
-  var fs$WriteStream = fs.WriteStream
-  if (fs$WriteStream) {
-    WriteStream.prototype = Object.create(fs$WriteStream.prototype)
-    WriteStream.prototype.open = WriteStream$open
-  }
-
-  Object.defineProperty(fs, 'ReadStream', {
-    get: function () {
-      return ReadStream
-    },
-    set: function (val) {
-      ReadStream = val
-    },
-    enumerable: true,
-    configurable: true
-  })
-  Object.defineProperty(fs, 'WriteStream', {
-    get: function () {
-      return WriteStream
-    },
-    set: function (val) {
-      WriteStream = val
-    },
-    enumerable: true,
-    configurable: true
-  })
-
-  // legacy names
-  var FileReadStream = ReadStream
-  Object.defineProperty(fs, 'FileReadStream', {
-    get: function () {
-      return FileReadStream
-    },
-    set: function (val) {
-      FileReadStream = val
-    },
-    enumerable: true,
-    configurable: true
-  })
-  var FileWriteStream = WriteStream
-  Object.defineProperty(fs, 'FileWriteStream', {
-    get: function () {
-      return FileWriteStream
-    },
-    set: function (val) {
-      FileWriteStream = val
-    },
-    enumerable: true,
-    configurable: true
-  })
-
-  function ReadStream (path, options) {
-    if (this instanceof ReadStream)
-      return fs$ReadStream.apply(this, arguments), this
-    else
-      return ReadStream.apply(Object.create(ReadStream.prototype), arguments)
-  }
-
-  function ReadStream$open () {
-    var that = this
-    open(that.path, that.flags, that.mode, function (err, fd) {
-      if (err) {
-        if (that.autoClose)
-          that.destroy()
-
-        that.emit('error', err)
-      } else {
-        that.fd = fd
-        that.emit('open', fd)
-        that.read()
-      }
-    })
-  }
-
-  function WriteStream (path, options) {
-    if (this instanceof WriteStream)
-      return fs$WriteStream.apply(this, arguments), this
-    else
-      return WriteStream.apply(Object.create(WriteStream.prototype), arguments)
-  }
-
-  function WriteStream$open () {
-    var that = this
-    open(that.path, that.flags, that.mode, function (err, fd) {
-      if (err) {
-        that.destroy()
-        that.emit('error', err)
-      } else {
-        that.fd = fd
-        that.emit('open', fd)
-      }
-    })
-  }
-
-  function createReadStream (path, options) {
-    return new fs.ReadStream(path, options)
-  }
-
-  function createWriteStream (path, options) {
-    return new fs.WriteStream(path, options)
-  }
-
-  var fs$open = fs.open
-  fs.open = open
-  function open (path, flags, mode, cb) {
-    if (typeof mode === 'function')
-      cb = mode, mode = null
-
-    return go$open(path, flags, mode, cb)
-
-    function go$open (path, flags, mode, cb) {
-      return fs$open(path, flags, mode, function (err, fd) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$open, [path, flags, mode, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  return fs
-}
-
-function enqueue (elem) {
-  debug('ENQUEUE', elem[0].name, elem[1])
-  fs[gracefulQueue].push(elem)
-}
-
-function retry () {
-  var elem = fs[gracefulQueue].shift()
-  if (elem) {
-    debug('RETRY', elem[0].name, elem[1])
-    elem[0].apply(null, elem[1])
-  }
-}
-
-
-/***/ }),
-
-/***/ 3086:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var Stream = __nccwpck_require__(2413).Stream
-
-module.exports = legacy
-
-function legacy (fs) {
-  return {
-    ReadStream: ReadStream,
-    WriteStream: WriteStream
-  }
-
-  function ReadStream (path, options) {
-    if (!(this instanceof ReadStream)) return new ReadStream(path, options);
-
-    Stream.call(this);
-
-    var self = this;
-
-    this.path = path;
-    this.fd = null;
-    this.readable = true;
-    this.paused = false;
-
-    this.flags = 'r';
-    this.mode = 438; /*=0666*/
-    this.bufferSize = 64 * 1024;
-
-    options = options || {};
-
-    // Mixin options into this
-    var keys = Object.keys(options);
-    for (var index = 0, length = keys.length; index < length; index++) {
-      var key = keys[index];
-      this[key] = options[key];
-    }
-
-    if (this.encoding) this.setEncoding(this.encoding);
-
-    if (this.start !== undefined) {
-      if ('number' !== typeof this.start) {
-        throw TypeError('start must be a Number');
-      }
-      if (this.end === undefined) {
-        this.end = Infinity;
-      } else if ('number' !== typeof this.end) {
-        throw TypeError('end must be a Number');
-      }
-
-      if (this.start > this.end) {
-        throw new Error('start must be <= end');
-      }
-
-      this.pos = this.start;
-    }
-
-    if (this.fd !== null) {
-      process.nextTick(function() {
-        self._read();
-      });
-      return;
-    }
-
-    fs.open(this.path, this.flags, this.mode, function (err, fd) {
-      if (err) {
-        self.emit('error', err);
-        self.readable = false;
-        return;
-      }
-
-      self.fd = fd;
-      self.emit('open', fd);
-      self._read();
-    })
-  }
-
-  function WriteStream (path, options) {
-    if (!(this instanceof WriteStream)) return new WriteStream(path, options);
-
-    Stream.call(this);
-
-    this.path = path;
-    this.fd = null;
-    this.writable = true;
-
-    this.flags = 'w';
-    this.encoding = 'binary';
-    this.mode = 438; /*=0666*/
-    this.bytesWritten = 0;
-
-    options = options || {};
-
-    // Mixin options into this
-    var keys = Object.keys(options);
-    for (var index = 0, length = keys.length; index < length; index++) {
-      var key = keys[index];
-      this[key] = options[key];
-    }
-
-    if (this.start !== undefined) {
-      if ('number' !== typeof this.start) {
-        throw TypeError('start must be a Number');
-      }
-      if (this.start < 0) {
-        throw new Error('start must be >= zero');
-      }
-
-      this.pos = this.start;
-    }
-
-    this.busy = false;
-    this._queue = [];
-
-    if (this.fd === null) {
-      this._open = fs.open;
-      this._queue.push([this._open, this.path, this.flags, this.mode, undefined]);
-      this.flush();
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ 263:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var constants = __nccwpck_require__(7619)
-
-var origCwd = process.cwd
-var cwd = null
-
-var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform
-
-process.cwd = function() {
-  if (!cwd)
-    cwd = origCwd.call(process)
-  return cwd
-}
-try {
-  process.cwd()
-} catch (er) {}
-
-// This check is needed until node.js 12 is required
-if (typeof process.chdir === 'function') {
-  var chdir = process.chdir
-  process.chdir = function (d) {
-    cwd = null
-    chdir.call(process, d)
-  }
-  if (Object.setPrototypeOf) Object.setPrototypeOf(process.chdir, chdir)
-}
-
-module.exports = patch
-
-function patch (fs) {
-  // (re-)implement some things that are known busted or missing.
-
-  // lchmod, broken prior to 0.6.2
-  // back-port the fix here.
-  if (constants.hasOwnProperty('O_SYMLINK') &&
-      process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
-    patchLchmod(fs)
-  }
-
-  // lutimes implementation, or no-op
-  if (!fs.lutimes) {
-    patchLutimes(fs)
-  }
-
-  // https://github.com/isaacs/node-graceful-fs/issues/4
-  // Chown should not fail on einval or eperm if non-root.
-  // It should not fail on enosys ever, as this just indicates
-  // that a fs doesn't support the intended operation.
-
-  fs.chown = chownFix(fs.chown)
-  fs.fchown = chownFix(fs.fchown)
-  fs.lchown = chownFix(fs.lchown)
-
-  fs.chmod = chmodFix(fs.chmod)
-  fs.fchmod = chmodFix(fs.fchmod)
-  fs.lchmod = chmodFix(fs.lchmod)
-
-  fs.chownSync = chownFixSync(fs.chownSync)
-  fs.fchownSync = chownFixSync(fs.fchownSync)
-  fs.lchownSync = chownFixSync(fs.lchownSync)
-
-  fs.chmodSync = chmodFixSync(fs.chmodSync)
-  fs.fchmodSync = chmodFixSync(fs.fchmodSync)
-  fs.lchmodSync = chmodFixSync(fs.lchmodSync)
-
-  fs.stat = statFix(fs.stat)
-  fs.fstat = statFix(fs.fstat)
-  fs.lstat = statFix(fs.lstat)
-
-  fs.statSync = statFixSync(fs.statSync)
-  fs.fstatSync = statFixSync(fs.fstatSync)
-  fs.lstatSync = statFixSync(fs.lstatSync)
-
-  // if lchmod/lchown do not exist, then make them no-ops
-  if (!fs.lchmod) {
-    fs.lchmod = function (path, mode, cb) {
-      if (cb) process.nextTick(cb)
-    }
-    fs.lchmodSync = function () {}
-  }
-  if (!fs.lchown) {
-    fs.lchown = function (path, uid, gid, cb) {
-      if (cb) process.nextTick(cb)
-    }
-    fs.lchownSync = function () {}
-  }
-
-  // on Windows, A/V software can lock the directory, causing this
-  // to fail with an EACCES or EPERM if the directory contains newly
-  // created files.  Try again on failure, for up to 60 seconds.
-
-  // Set the timeout this long because some Windows Anti-Virus, such as Parity
-  // bit9, may lock files for up to a minute, causing npm package install
-  // failures. Also, take care to yield the scheduler. Windows scheduling gives
-  // CPU to a busy looping process, which can cause the program causing the lock
-  // contention to be starved of CPU by node, so the contention doesn't resolve.
-  if (platform === "win32") {
-    fs.rename = (function (fs$rename) { return function (from, to, cb) {
-      var start = Date.now()
-      var backoff = 0;
-      fs$rename(from, to, function CB (er) {
-        if (er
-            && (er.code === "EACCES" || er.code === "EPERM")
-            && Date.now() - start < 60000) {
-          setTimeout(function() {
-            fs.stat(to, function (stater, st) {
-              if (stater && stater.code === "ENOENT")
-                fs$rename(from, to, CB);
-              else
-                cb(er)
-            })
-          }, backoff)
-          if (backoff < 100)
-            backoff += 10;
-          return;
-        }
-        if (cb) cb(er)
-      })
-    }})(fs.rename)
-  }
-
-  // if read() returns EAGAIN, then just try it again.
-  fs.read = (function (fs$read) {
-    function read (fd, buffer, offset, length, position, callback_) {
-      var callback
-      if (callback_ && typeof callback_ === 'function') {
-        var eagCounter = 0
-        callback = function (er, _, __) {
-          if (er && er.code === 'EAGAIN' && eagCounter < 10) {
-            eagCounter ++
-            return fs$read.call(fs, fd, buffer, offset, length, position, callback)
-          }
-          callback_.apply(this, arguments)
-        }
-      }
-      return fs$read.call(fs, fd, buffer, offset, length, position, callback)
-    }
-
-    // This ensures `util.promisify` works as it does for native `fs.read`.
-    if (Object.setPrototypeOf) Object.setPrototypeOf(read, fs$read)
-    return read
-  })(fs.read)
-
-  fs.readSync = (function (fs$readSync) { return function (fd, buffer, offset, length, position) {
-    var eagCounter = 0
-    while (true) {
-      try {
-        return fs$readSync.call(fs, fd, buffer, offset, length, position)
-      } catch (er) {
-        if (er.code === 'EAGAIN' && eagCounter < 10) {
-          eagCounter ++
-          continue
-        }
-        throw er
-      }
-    }
-  }})(fs.readSync)
-
-  function patchLchmod (fs) {
-    fs.lchmod = function (path, mode, callback) {
-      fs.open( path
-             , constants.O_WRONLY | constants.O_SYMLINK
-             , mode
-             , function (err, fd) {
-        if (err) {
-          if (callback) callback(err)
-          return
-        }
-        // prefer to return the chmod error, if one occurs,
-        // but still try to close, and report closing errors if they occur.
-        fs.fchmod(fd, mode, function (err) {
-          fs.close(fd, function(err2) {
-            if (callback) callback(err || err2)
-          })
-        })
-      })
-    }
-
-    fs.lchmodSync = function (path, mode) {
-      var fd = fs.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode)
-
-      // prefer to return the chmod error, if one occurs,
-      // but still try to close, and report closing errors if they occur.
-      var threw = true
-      var ret
-      try {
-        ret = fs.fchmodSync(fd, mode)
-        threw = false
-      } finally {
-        if (threw) {
-          try {
-            fs.closeSync(fd)
-          } catch (er) {}
-        } else {
-          fs.closeSync(fd)
-        }
-      }
-      return ret
-    }
-  }
-
-  function patchLutimes (fs) {
-    if (constants.hasOwnProperty("O_SYMLINK")) {
-      fs.lutimes = function (path, at, mt, cb) {
-        fs.open(path, constants.O_SYMLINK, function (er, fd) {
-          if (er) {
-            if (cb) cb(er)
-            return
-          }
-          fs.futimes(fd, at, mt, function (er) {
-            fs.close(fd, function (er2) {
-              if (cb) cb(er || er2)
-            })
-          })
-        })
-      }
-
-      fs.lutimesSync = function (path, at, mt) {
-        var fd = fs.openSync(path, constants.O_SYMLINK)
-        var ret
-        var threw = true
-        try {
-          ret = fs.futimesSync(fd, at, mt)
-          threw = false
-        } finally {
-          if (threw) {
-            try {
-              fs.closeSync(fd)
-            } catch (er) {}
-          } else {
-            fs.closeSync(fd)
-          }
-        }
-        return ret
-      }
-
-    } else {
-      fs.lutimes = function (_a, _b, _c, cb) { if (cb) process.nextTick(cb) }
-      fs.lutimesSync = function () {}
-    }
-  }
-
-  function chmodFix (orig) {
-    if (!orig) return orig
-    return function (target, mode, cb) {
-      return orig.call(fs, target, mode, function (er) {
-        if (chownErOk(er)) er = null
-        if (cb) cb.apply(this, arguments)
-      })
-    }
-  }
-
-  function chmodFixSync (orig) {
-    if (!orig) return orig
-    return function (target, mode) {
-      try {
-        return orig.call(fs, target, mode)
-      } catch (er) {
-        if (!chownErOk(er)) throw er
-      }
-    }
-  }
-
-
-  function chownFix (orig) {
-    if (!orig) return orig
-    return function (target, uid, gid, cb) {
-      return orig.call(fs, target, uid, gid, function (er) {
-        if (chownErOk(er)) er = null
-        if (cb) cb.apply(this, arguments)
-      })
-    }
-  }
-
-  function chownFixSync (orig) {
-    if (!orig) return orig
-    return function (target, uid, gid) {
-      try {
-        return orig.call(fs, target, uid, gid)
-      } catch (er) {
-        if (!chownErOk(er)) throw er
-      }
-    }
-  }
-
-  function statFix (orig) {
-    if (!orig) return orig
-    // Older versions of Node erroneously returned signed integers for
-    // uid + gid.
-    return function (target, options, cb) {
-      if (typeof options === 'function') {
-        cb = options
-        options = null
-      }
-      function callback (er, stats) {
-        if (stats) {
-          if (stats.uid < 0) stats.uid += 0x100000000
-          if (stats.gid < 0) stats.gid += 0x100000000
-        }
-        if (cb) cb.apply(this, arguments)
-      }
-      return options ? orig.call(fs, target, options, callback)
-        : orig.call(fs, target, callback)
-    }
-  }
-
-  function statFixSync (orig) {
-    if (!orig) return orig
-    // Older versions of Node erroneously returned signed integers for
-    // uid + gid.
-    return function (target, options) {
-      var stats = options ? orig.call(fs, target, options)
-        : orig.call(fs, target)
-      if (stats.uid < 0) stats.uid += 0x100000000
-      if (stats.gid < 0) stats.gid += 0x100000000
-      return stats;
-    }
-  }
-
-  // ENOSYS means that the fs doesn't support the op. Just ignore
-  // that, because it doesn't matter.
-  //
-  // if there's no getuid, or if getuid() is something other
-  // than 0, and the error is EINVAL or EPERM, then just ignore
-  // it.
-  //
-  // This specific case is a silent failure in cp, install, tar,
-  // and most other unix tools that manage permissions.
-  //
-  // When running as root, or if other types of errors are
-  // encountered, then it's strict.
-  function chownErOk (er) {
-    if (!er)
-      return true
-
-    if (er.code === "ENOSYS")
-      return true
-
-    var nonroot = !process.getuid || process.getuid() !== 0
-    if (nonroot) {
-      if (er.code === "EINVAL" || er.code === "EPERM")
-        return true
-    }
-
-    return false
-  }
-}
-
-
-/***/ }),
-
-/***/ 2492:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var wrappy = __nccwpck_require__(2940)
-var reqs = Object.create(null)
-var once = __nccwpck_require__(1223)
-
-module.exports = wrappy(inflight)
-
-function inflight (key, cb) {
-  if (reqs[key]) {
-    reqs[key].push(cb)
-    return null
-  } else {
-    reqs[key] = [cb]
-    return makeres(key)
-  }
-}
-
-function makeres (key) {
-  return once(function RES () {
-    var cbs = reqs[key]
-    var len = cbs.length
-    var args = slice(arguments)
-
-    // XXX It's somewhat ambiguous whether a new callback added in this
-    // pass should be queued for later execution if something in the
-    // list of callbacks throws, or if it should just be discarded.
-    // However, it's such an edge case that it hardly matters, and either
-    // choice is likely as surprising as the other.
-    // As it happens, we do go ahead and schedule it for later execution.
-    try {
-      for (var i = 0; i < len; i++) {
-        cbs[i].apply(null, args)
-      }
-    } finally {
-      if (cbs.length > len) {
-        // added more in the interim.
-        // de-zalgo, just in case, but don't call again.
-        cbs.splice(0, len)
-        process.nextTick(function () {
-          RES.apply(null, args)
-        })
-      } else {
-        delete reqs[key]
-      }
-    }
-  })
-}
-
-function slice (args) {
-  var length = args.length
-  var array = []
-
-  for (var i = 0; i < length; i++) array[i] = args[i]
-  return array
-}
-
-
-/***/ }),
-
-/***/ 4124:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-try {
-  var util = __nccwpck_require__(1669);
-  /* istanbul ignore next */
-  if (typeof util.inherits !== 'function') throw '';
-  module.exports = util.inherits;
-} catch (e) {
-  /* istanbul ignore next */
-  module.exports = __nccwpck_require__(8544);
-}
-
-
-/***/ }),
-
-/***/ 8544:
-/***/ ((module) => {
-
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    if (superCtor) {
-      ctor.super_ = superCtor
-      ctor.prototype = Object.create(superCtor.prototype, {
-        constructor: {
-          value: ctor,
-          enumerable: false,
-          writable: true,
-          configurable: true
-        }
-      })
-    }
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    if (superCtor) {
-      ctor.super_ = superCtor
-      var TempCtor = function () {}
-      TempCtor.prototype = superCtor.prototype
-      ctor.prototype = new TempCtor()
-      ctor.prototype.constructor = ctor
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ 6160:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-let _fs
-try {
-  _fs = __nccwpck_require__(7758)
-} catch (_) {
-  _fs = __nccwpck_require__(5747)
-}
-const universalify = __nccwpck_require__(9046)
-const { stringify, stripBom } = __nccwpck_require__(5902)
-
-async function _readFile (file, options = {}) {
-  if (typeof options === 'string') {
-    options = { encoding: options }
-  }
-
-  const fs = options.fs || _fs
-
-  const shouldThrow = 'throws' in options ? options.throws : true
-
-  let data = await universalify.fromCallback(fs.readFile)(file, options)
-
-  data = stripBom(data)
-
-  let obj
-  try {
-    obj = JSON.parse(data, options ? options.reviver : null)
-  } catch (err) {
-    if (shouldThrow) {
-      err.message = `${file}: ${err.message}`
-      throw err
-    } else {
-      return null
-    }
-  }
-
-  return obj
-}
-
-const readFile = universalify.fromPromise(_readFile)
-
-function readFileSync (file, options = {}) {
-  if (typeof options === 'string') {
-    options = { encoding: options }
-  }
-
-  const fs = options.fs || _fs
-
-  const shouldThrow = 'throws' in options ? options.throws : true
-
-  try {
-    let content = fs.readFileSync(file, options)
-    content = stripBom(content)
-    return JSON.parse(content, options.reviver)
-  } catch (err) {
-    if (shouldThrow) {
-      err.message = `${file}: ${err.message}`
-      throw err
-    } else {
-      return null
-    }
-  }
-}
-
-async function _writeFile (file, obj, options = {}) {
-  const fs = options.fs || _fs
-
-  const str = stringify(obj, options)
-
-  await universalify.fromCallback(fs.writeFile)(file, str, options)
-}
-
-const writeFile = universalify.fromPromise(_writeFile)
-
-function writeFileSync (file, obj, options = {}) {
-  const fs = options.fs || _fs
-
-  const str = stringify(obj, options)
-  // not sure if fs.writeFileSync returns anything, but just in case
-  return fs.writeFileSync(file, str, options)
-}
-
-const jsonfile = {
-  readFile,
-  readFileSync,
-  writeFile,
-  writeFileSync
-}
-
-module.exports = jsonfile
-
-
-/***/ }),
-
-/***/ 5902:
-/***/ ((module) => {
-
-function stringify (obj, { EOL = '\n', finalEOL = true, replacer = null, spaces } = {}) {
-  const EOF = finalEOL ? EOL : ''
-  const str = JSON.stringify(obj, replacer, spaces)
-
-  return str.replace(/\n/g, EOL) + EOF
-}
-
-function stripBom (content) {
-  // we do this because JSON.parse would convert it to a utf8 string if encoding wasn't specified
-  if (Buffer.isBuffer(content)) content = content.toString('utf8')
-  return content.replace(/^\uFEFF/, '')
-}
-
-module.exports = { stringify, stripBom }
-
-
-/***/ }),
-
-/***/ 3973:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-module.exports = minimatch
-minimatch.Minimatch = Minimatch
-
-var path = { sep: '/' }
-try {
-  path = __nccwpck_require__(5622)
-} catch (er) {}
-
-var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {}
-var expand = __nccwpck_require__(3717)
-
-var plTypes = {
-  '!': { open: '(?:(?!(?:', close: '))[^/]*?)'},
-  '?': { open: '(?:', close: ')?' },
-  '+': { open: '(?:', close: ')+' },
-  '*': { open: '(?:', close: ')*' },
-  '@': { open: '(?:', close: ')' }
-}
-
-// any single thing other than /
-// don't need to escape / when using new RegExp()
-var qmark = '[^/]'
-
-// * => any number of characters
-var star = qmark + '*?'
-
-// ** when dots are allowed.  Anything goes, except .. and .
-// not (^ or / followed by one or two dots followed by $ or /),
-// followed by anything, any number of times.
-var twoStarDot = '(?:(?!(?:\\\/|^)(?:\\.{1,2})($|\\\/)).)*?'
-
-// not a ^ or / followed by a dot,
-// followed by anything, any number of times.
-var twoStarNoDot = '(?:(?!(?:\\\/|^)\\.).)*?'
-
-// characters that need to be escaped in RegExp.
-var reSpecials = charSet('().*{}+?[]^$\\!')
-
-// "abc" -> { a:true, b:true, c:true }
-function charSet (s) {
-  return s.split('').reduce(function (set, c) {
-    set[c] = true
-    return set
-  }, {})
-}
-
-// normalizes slashes.
-var slashSplit = /\/+/
-
-minimatch.filter = filter
-function filter (pattern, options) {
-  options = options || {}
-  return function (p, i, list) {
-    return minimatch(p, pattern, options)
-  }
-}
-
-function ext (a, b) {
-  a = a || {}
-  b = b || {}
-  var t = {}
-  Object.keys(b).forEach(function (k) {
-    t[k] = b[k]
-  })
-  Object.keys(a).forEach(function (k) {
-    t[k] = a[k]
-  })
-  return t
-}
-
-minimatch.defaults = function (def) {
-  if (!def || !Object.keys(def).length) return minimatch
-
-  var orig = minimatch
-
-  var m = function minimatch (p, pattern, options) {
-    return orig.minimatch(p, pattern, ext(def, options))
-  }
-
-  m.Minimatch = function Minimatch (pattern, options) {
-    return new orig.Minimatch(pattern, ext(def, options))
-  }
-
-  return m
-}
-
-Minimatch.defaults = function (def) {
-  if (!def || !Object.keys(def).length) return Minimatch
-  return minimatch.defaults(def).Minimatch
-}
-
-function minimatch (p, pattern, options) {
-  if (typeof pattern !== 'string') {
-    throw new TypeError('glob pattern string required')
-  }
-
-  if (!options) options = {}
-
-  // shortcut: comments match nothing.
-  if (!options.nocomment && pattern.charAt(0) === '#') {
-    return false
-  }
-
-  // "" only matches ""
-  if (pattern.trim() === '') return p === ''
-
-  return new Minimatch(pattern, options).match(p)
-}
-
-function Minimatch (pattern, options) {
-  if (!(this instanceof Minimatch)) {
-    return new Minimatch(pattern, options)
-  }
-
-  if (typeof pattern !== 'string') {
-    throw new TypeError('glob pattern string required')
-  }
-
-  if (!options) options = {}
-  pattern = pattern.trim()
-
-  // windows support: need to use /, not \
-  if (path.sep !== '/') {
-    pattern = pattern.split(path.sep).join('/')
-  }
-
-  this.options = options
-  this.set = []
-  this.pattern = pattern
-  this.regexp = null
-  this.negate = false
-  this.comment = false
-  this.empty = false
-
-  // make the set of regexps etc.
-  this.make()
-}
-
-Minimatch.prototype.debug = function () {}
-
-Minimatch.prototype.make = make
-function make () {
-  // don't do it more than once.
-  if (this._made) return
-
-  var pattern = this.pattern
-  var options = this.options
-
-  // empty patterns and comments match nothing.
-  if (!options.nocomment && pattern.charAt(0) === '#') {
-    this.comment = true
-    return
-  }
-  if (!pattern) {
-    this.empty = true
-    return
-  }
-
-  // step 1: figure out negation, etc.
-  this.parseNegate()
-
-  // step 2: expand braces
-  var set = this.globSet = this.braceExpand()
-
-  if (options.debug) this.debug = console.error
-
-  this.debug(this.pattern, set)
-
-  // step 3: now we have a set, so turn each one into a series of path-portion
-  // matching patterns.
-  // These will be regexps, except in the case of "**", which is
-  // set to the GLOBSTAR object for globstar behavior,
-  // and will not contain any / characters
-  set = this.globParts = set.map(function (s) {
-    return s.split(slashSplit)
-  })
-
-  this.debug(this.pattern, set)
-
-  // glob --> regexps
-  set = set.map(function (s, si, set) {
-    return s.map(this.parse, this)
-  }, this)
-
-  this.debug(this.pattern, set)
-
-  // filter out everything that didn't compile properly.
-  set = set.filter(function (s) {
-    return s.indexOf(false) === -1
-  })
-
-  this.debug(this.pattern, set)
-
-  this.set = set
-}
-
-Minimatch.prototype.parseNegate = parseNegate
-function parseNegate () {
-  var pattern = this.pattern
-  var negate = false
-  var options = this.options
-  var negateOffset = 0
-
-  if (options.nonegate) return
-
-  for (var i = 0, l = pattern.length
-    ; i < l && pattern.charAt(i) === '!'
-    ; i++) {
-    negate = !negate
-    negateOffset++
-  }
-
-  if (negateOffset) this.pattern = pattern.substr(negateOffset)
-  this.negate = negate
-}
-
-// Brace expansion:
-// a{b,c}d -> abd acd
-// a{b,}c -> abc ac
-// a{0..3}d -> a0d a1d a2d a3d
-// a{b,c{d,e}f}g -> abg acdfg acefg
-// a{b,c}d{e,f}g -> abdeg acdeg abdeg abdfg
-//
-// Invalid sets are not expanded.
-// a{2..}b -> a{2..}b
-// a{b}c -> a{b}c
-minimatch.braceExpand = function (pattern, options) {
-  return braceExpand(pattern, options)
-}
-
-Minimatch.prototype.braceExpand = braceExpand
-
-function braceExpand (pattern, options) {
-  if (!options) {
-    if (this instanceof Minimatch) {
-      options = this.options
-    } else {
-      options = {}
-    }
-  }
-
-  pattern = typeof pattern === 'undefined'
-    ? this.pattern : pattern
-
-  if (typeof pattern === 'undefined') {
-    throw new TypeError('undefined pattern')
-  }
-
-  if (options.nobrace ||
-    !pattern.match(/\{.*\}/)) {
-    // shortcut. no need to expand.
-    return [pattern]
-  }
-
-  return expand(pattern)
-}
-
-// parse a component of the expanded set.
-// At this point, no pattern may contain "/" in it
-// so we're going to return a 2d array, where each entry is the full
-// pattern, split on '/', and then turned into a regular expression.
-// A regexp is made at the end which joins each array with an
-// escaped /, and another full one which joins each regexp with |.
-//
-// Following the lead of Bash 4.1, note that "**" only has special meaning
-// when it is the *only* thing in a path portion.  Otherwise, any series
-// of * is equivalent to a single *.  Globstar behavior is enabled by
-// default, and can be disabled by setting options.noglobstar.
-Minimatch.prototype.parse = parse
-var SUBPARSE = {}
-function parse (pattern, isSub) {
-  if (pattern.length > 1024 * 64) {
-    throw new TypeError('pattern is too long')
-  }
-
-  var options = this.options
-
-  // shortcuts
-  if (!options.noglobstar && pattern === '**') return GLOBSTAR
-  if (pattern === '') return ''
-
-  var re = ''
-  var hasMagic = !!options.nocase
-  var escaping = false
-  // ? => one single character
-  var patternListStack = []
-  var negativeLists = []
-  var stateChar
-  var inClass = false
-  var reClassStart = -1
-  var classStart = -1
-  // . and .. never match anything that doesn't start with .,
-  // even when options.dot is set.
-  var patternStart = pattern.charAt(0) === '.' ? '' // anything
-  // not (start or / followed by . or .. followed by / or end)
-  : options.dot ? '(?!(?:^|\\\/)\\.{1,2}(?:$|\\\/))'
-  : '(?!\\.)'
-  var self = this
-
-  function clearStateChar () {
-    if (stateChar) {
-      // we had some state-tracking character
-      // that wasn't consumed by this pass.
-      switch (stateChar) {
-        case '*':
-          re += star
-          hasMagic = true
-        break
-        case '?':
-          re += qmark
-          hasMagic = true
-        break
-        default:
-          re += '\\' + stateChar
-        break
-      }
-      self.debug('clearStateChar %j %j', stateChar, re)
-      stateChar = false
-    }
-  }
-
-  for (var i = 0, len = pattern.length, c
-    ; (i < len) && (c = pattern.charAt(i))
-    ; i++) {
-    this.debug('%s\t%s %s %j', pattern, i, re, c)
-
-    // skip over any that are escaped.
-    if (escaping && reSpecials[c]) {
-      re += '\\' + c
-      escaping = false
-      continue
-    }
-
-    switch (c) {
-      case '/':
-        // completely not allowed, even escaped.
-        // Should already be path-split by now.
-        return false
-
-      case '\\':
-        clearStateChar()
-        escaping = true
-      continue
-
-      // the various stateChar values
-      // for the "extglob" stuff.
-      case '?':
-      case '*':
-      case '+':
-      case '@':
-      case '!':
-        this.debug('%s\t%s %s %j <-- stateChar', pattern, i, re, c)
-
-        // all of those are literals inside a class, except that
-        // the glob [!a] means [^a] in regexp
-        if (inClass) {
-          this.debug('  in class')
-          if (c === '!' && i === classStart + 1) c = '^'
-          re += c
-          continue
-        }
-
-        // if we already have a stateChar, then it means
-        // that there was something like ** or +? in there.
-        // Handle the stateChar, then proceed with this one.
-        self.debug('call clearStateChar %j', stateChar)
-        clearStateChar()
-        stateChar = c
-        // if extglob is disabled, then +(asdf|foo) isn't a thing.
-        // just clear the statechar *now*, rather than even diving into
-        // the patternList stuff.
-        if (options.noext) clearStateChar()
-      continue
-
-      case '(':
-        if (inClass) {
-          re += '('
-          continue
-        }
-
-        if (!stateChar) {
-          re += '\\('
-          continue
-        }
-
-        patternListStack.push({
-          type: stateChar,
-          start: i - 1,
-          reStart: re.length,
-          open: plTypes[stateChar].open,
-          close: plTypes[stateChar].close
-        })
-        // negation is (?:(?!js)[^/]*)
-        re += stateChar === '!' ? '(?:(?!(?:' : '(?:'
-        this.debug('plType %j %j', stateChar, re)
-        stateChar = false
-      continue
-
-      case ')':
-        if (inClass || !patternListStack.length) {
-          re += '\\)'
-          continue
-        }
-
-        clearStateChar()
-        hasMagic = true
-        var pl = patternListStack.pop()
-        // negation is (?:(?!js)[^/]*)
-        // The others are (?:<pattern>)<type>
-        re += pl.close
-        if (pl.type === '!') {
-          negativeLists.push(pl)
-        }
-        pl.reEnd = re.length
-      continue
-
-      case '|':
-        if (inClass || !patternListStack.length || escaping) {
-          re += '\\|'
-          escaping = false
-          continue
-        }
-
-        clearStateChar()
-        re += '|'
-      continue
-
-      // these are mostly the same in regexp and glob
-      case '[':
-        // swallow any state-tracking char before the [
-        clearStateChar()
-
-        if (inClass) {
-          re += '\\' + c
-          continue
-        }
-
-        inClass = true
-        classStart = i
-        reClassStart = re.length
-        re += c
-      continue
-
-      case ']':
-        //  a right bracket shall lose its special
-        //  meaning and represent itself in
-        //  a bracket expression if it occurs
-        //  first in the list.  -- POSIX.2 2.8.3.2
-        if (i === classStart + 1 || !inClass) {
-          re += '\\' + c
-          escaping = false
-          continue
-        }
-
-        // handle the case where we left a class open.
-        // "[z-a]" is valid, equivalent to "\[z-a\]"
-        if (inClass) {
-          // split where the last [ was, make sure we don't have
-          // an invalid re. if so, re-walk the contents of the
-          // would-be class to re-translate any characters that
-          // were passed through as-is
-          // TODO: It would probably be faster to determine this
-          // without a try/catch and a new RegExp, but it's tricky
-          // to do safely.  For now, this is safe and works.
-          var cs = pattern.substring(classStart + 1, i)
-          try {
-            RegExp('[' + cs + ']')
-          } catch (er) {
-            // not a valid class!
-            var sp = this.parse(cs, SUBPARSE)
-            re = re.substr(0, reClassStart) + '\\[' + sp[0] + '\\]'
-            hasMagic = hasMagic || sp[1]
-            inClass = false
-            continue
-          }
-        }
-
-        // finish up the class.
-        hasMagic = true
-        inClass = false
-        re += c
-      continue
-
+    switch (chooseScalarStyle(string, singleLineOnly, state.indent, lineWidth,
+      testAmbiguity, state.quotingType, state.forceQuotes && !iskey, inblock)) {
+
+      case STYLE_PLAIN:
+        return string;
+      case STYLE_SINGLE:
+        return "'" + string.replace(/'/g, "''") + "'";
+      case STYLE_LITERAL:
+        return '|' + blockHeader(string, state.indent)
+          + dropEndingNewline(indentString(string, indent));
+      case STYLE_FOLDED:
+        return '>' + blockHeader(string, state.indent)
+          + dropEndingNewline(indentString(foldString(string, lineWidth), indent));
+      case STYLE_DOUBLE:
+        return '"' + escapeString(string, lineWidth) + '"';
       default:
-        // swallow any state char that wasn't consumed
-        clearStateChar()
-
-        if (escaping) {
-          // no need
-          escaping = false
-        } else if (reSpecials[c]
-          && !(c === '^' && inClass)) {
-          re += '\\'
-        }
-
-        re += c
-
-    } // switch
-  } // for
-
-  // handle the case where we left a class open.
-  // "[abc" is valid, equivalent to "\[abc"
-  if (inClass) {
-    // split where the last [ was, and escape it
-    // this is a huge pita.  We now have to re-walk
-    // the contents of the would-be class to re-translate
-    // any characters that were passed through as-is
-    cs = pattern.substr(classStart + 1)
-    sp = this.parse(cs, SUBPARSE)
-    re = re.substr(0, reClassStart) + '\\[' + sp[0]
-    hasMagic = hasMagic || sp[1]
-  }
-
-  // handle the case where we had a +( thing at the *end*
-  // of the pattern.
-  // each pattern list stack adds 3 chars, and we need to go through
-  // and escape any | chars that were passed through as-is for the regexp.
-  // Go through and escape them, taking care not to double-escape any
-  // | chars that were already escaped.
-  for (pl = patternListStack.pop(); pl; pl = patternListStack.pop()) {
-    var tail = re.slice(pl.reStart + pl.open.length)
-    this.debug('setting tail', re, pl)
-    // maybe some even number of \, then maybe 1 \, followed by a |
-    tail = tail.replace(/((?:\\{2}){0,64})(\\?)\|/g, function (_, $1, $2) {
-      if (!$2) {
-        // the | isn't already escaped, so escape it.
-        $2 = '\\'
-      }
-
-      // need to escape all those slashes *again*, without escaping the
-      // one that we need for escaping the | character.  As it works out,
-      // escaping an even number of slashes can be done by simply repeating
-      // it exactly after itself.  That's why this trick works.
-      //
-      // I am sorry that you have to see this.
-      return $1 + $1 + $2 + '|'
-    })
-
-    this.debug('tail=%j\n   %s', tail, tail, pl, re)
-    var t = pl.type === '*' ? star
-      : pl.type === '?' ? qmark
-      : '\\' + pl.type
-
-    hasMagic = true
-    re = re.slice(0, pl.reStart) + t + '\\(' + tail
-  }
-
-  // handle trailing things that only matter at the very end.
-  clearStateChar()
-  if (escaping) {
-    // trailing \\
-    re += '\\\\'
-  }
-
-  // only need to apply the nodot start if the re starts with
-  // something that could conceivably capture a dot
-  var addPatternStart = false
-  switch (re.charAt(0)) {
-    case '.':
-    case '[':
-    case '(': addPatternStart = true
-  }
-
-  // Hack to work around lack of negative lookbehind in JS
-  // A pattern like: *.!(x).!(y|z) needs to ensure that a name
-  // like 'a.xyz.yz' doesn't match.  So, the first negative
-  // lookahead, has to look ALL the way ahead, to the end of
-  // the pattern.
-  for (var n = negativeLists.length - 1; n > -1; n--) {
-    var nl = negativeLists[n]
-
-    var nlBefore = re.slice(0, nl.reStart)
-    var nlFirst = re.slice(nl.reStart, nl.reEnd - 8)
-    var nlLast = re.slice(nl.reEnd - 8, nl.reEnd)
-    var nlAfter = re.slice(nl.reEnd)
-
-    nlLast += nlAfter
-
-    // Handle nested stuff like *(*.js|!(*.json)), where open parens
-    // mean that we should *not* include the ) in the bit that is considered
-    // "after" the negated section.
-    var openParensBefore = nlBefore.split('(').length - 1
-    var cleanAfter = nlAfter
-    for (i = 0; i < openParensBefore; i++) {
-      cleanAfter = cleanAfter.replace(/\)[+*?]?/, '')
-    }
-    nlAfter = cleanAfter
-
-    var dollar = ''
-    if (nlAfter === '' && isSub !== SUBPARSE) {
-      dollar = '$'
-    }
-    var newRe = nlBefore + nlFirst + nlAfter + dollar + nlLast
-    re = newRe
-  }
-
-  // if the re is not "" at this point, then we need to make sure
-  // it doesn't match against an empty path part.
-  // Otherwise a/* will match a/, which it should not.
-  if (re !== '' && hasMagic) {
-    re = '(?=.)' + re
-  }
-
-  if (addPatternStart) {
-    re = patternStart + re
-  }
-
-  // parsing just a piece of a larger pattern.
-  if (isSub === SUBPARSE) {
-    return [re, hasMagic]
-  }
-
-  // skip the regexp for non-magical patterns
-  // unescape anything in it, though, so that it'll be
-  // an exact match against a file etc.
-  if (!hasMagic) {
-    return globUnescape(pattern)
-  }
-
-  var flags = options.nocase ? 'i' : ''
-  try {
-    var regExp = new RegExp('^' + re + '$', flags)
-  } catch (er) {
-    // If it was an invalid regular expression, then it can't match
-    // anything.  This trick looks for a character after the end of
-    // the string, which is of course impossible, except in multi-line
-    // mode, but it's not a /m regex.
-    return new RegExp('$.')
-  }
-
-  regExp._glob = pattern
-  regExp._src = re
-
-  return regExp
-}
-
-minimatch.makeRe = function (pattern, options) {
-  return new Minimatch(pattern, options || {}).makeRe()
-}
-
-Minimatch.prototype.makeRe = makeRe
-function makeRe () {
-  if (this.regexp || this.regexp === false) return this.regexp
-
-  // at this point, this.set is a 2d array of partial
-  // pattern strings, or "**".
-  //
-  // It's better to use .match().  This function shouldn't
-  // be used, really, but it's pretty convenient sometimes,
-  // when you just want to work with a regex.
-  var set = this.set
-
-  if (!set.length) {
-    this.regexp = false
-    return this.regexp
-  }
-  var options = this.options
-
-  var twoStar = options.noglobstar ? star
-    : options.dot ? twoStarDot
-    : twoStarNoDot
-  var flags = options.nocase ? 'i' : ''
-
-  var re = set.map(function (pattern) {
-    return pattern.map(function (p) {
-      return (p === GLOBSTAR) ? twoStar
-      : (typeof p === 'string') ? regExpEscape(p)
-      : p._src
-    }).join('\\\/')
-  }).join('|')
-
-  // must match entire pattern
-  // ending in a * or ** will make it less strict.
-  re = '^(?:' + re + ')$'
-
-  // can match anything, as long as it's not this.
-  if (this.negate) re = '^(?!' + re + ').*$'
-
-  try {
-    this.regexp = new RegExp(re, flags)
-  } catch (ex) {
-    this.regexp = false
-  }
-  return this.regexp
-}
-
-minimatch.match = function (list, pattern, options) {
-  options = options || {}
-  var mm = new Minimatch(pattern, options)
-  list = list.filter(function (f) {
-    return mm.match(f)
-  })
-  if (mm.options.nonull && !list.length) {
-    list.push(pattern)
-  }
-  return list
-}
-
-Minimatch.prototype.match = match
-function match (f, partial) {
-  this.debug('match', f, this.pattern)
-  // short-circuit in the case of busted things.
-  // comments, etc.
-  if (this.comment) return false
-  if (this.empty) return f === ''
-
-  if (f === '/' && partial) return true
-
-  var options = this.options
-
-  // windows: need to use /, not \
-  if (path.sep !== '/') {
-    f = f.split(path.sep).join('/')
-  }
-
-  // treat the test path as a set of pathparts.
-  f = f.split(slashSplit)
-  this.debug(this.pattern, 'split', f)
-
-  // just ONE of the pattern sets in this.set needs to match
-  // in order for it to be valid.  If negating, then just one
-  // match means that we have failed.
-  // Either way, return on the first hit.
-
-  var set = this.set
-  this.debug(this.pattern, 'set', set)
-
-  // Find the basename of the path by looking for the last non-empty segment
-  var filename
-  var i
-  for (i = f.length - 1; i >= 0; i--) {
-    filename = f[i]
-    if (filename) break
-  }
-
-  for (i = 0; i < set.length; i++) {
-    var pattern = set[i]
-    var file = f
-    if (options.matchBase && pattern.length === 1) {
-      file = [filename]
-    }
-    var hit = this.matchOne(file, pattern, partial)
-    if (hit) {
-      if (options.flipNegate) return true
-      return !this.negate
-    }
-  }
-
-  // didn't get any hits.  this is success if it's a negative
-  // pattern, failure otherwise.
-  if (options.flipNegate) return false
-  return this.negate
-}
-
-// set partial to true to test if, for example,
-// "/a/b" matches the start of "/*/b/*/d"
-// Partial means, if you run out of file before you run
-// out of pattern, then that's fine, as long as all
-// the parts match.
-Minimatch.prototype.matchOne = function (file, pattern, partial) {
-  var options = this.options
-
-  this.debug('matchOne',
-    { 'this': this, file: file, pattern: pattern })
-
-  this.debug('matchOne', file.length, pattern.length)
-
-  for (var fi = 0,
-      pi = 0,
-      fl = file.length,
-      pl = pattern.length
-      ; (fi < fl) && (pi < pl)
-      ; fi++, pi++) {
-    this.debug('matchOne loop')
-    var p = pattern[pi]
-    var f = file[fi]
-
-    this.debug(pattern, p, f)
-
-    // should be impossible.
-    // some invalid regexp stuff in the set.
-    if (p === false) return false
-
-    if (p === GLOBSTAR) {
-      this.debug('GLOBSTAR', [pattern, p, f])
-
-      // "**"
-      // a/**/b/**/c would match the following:
-      // a/b/x/y/z/c
-      // a/x/y/z/b/c
-      // a/b/x/b/x/c
-      // a/b/c
-      // To do this, take the rest of the pattern after
-      // the **, and see if it would match the file remainder.
-      // If so, return success.
-      // If not, the ** "swallows" a segment, and try again.
-      // This is recursively awful.
-      //
-      // a/**/b/**/c matching a/b/x/y/z/c
-      // - a matches a
-      // - doublestar
-      //   - matchOne(b/x/y/z/c, b/**/c)
-      //     - b matches b
-      //     - doublestar
-      //       - matchOne(x/y/z/c, c) -> no
-      //       - matchOne(y/z/c, c) -> no
-      //       - matchOne(z/c, c) -> no
-      //       - matchOne(c, c) yes, hit
-      var fr = fi
-      var pr = pi + 1
-      if (pr === pl) {
-        this.debug('** at the end')
-        // a ** at the end will just swallow the rest.
-        // We have found a match.
-        // however, it will not swallow /.x, unless
-        // options.dot is set.
-        // . and .. are *never* matched by **, for explosively
-        // exponential reasons.
-        for (; fi < fl; fi++) {
-          if (file[fi] === '.' || file[fi] === '..' ||
-            (!options.dot && file[fi].charAt(0) === '.')) return false
-        }
-        return true
-      }
-
-      // ok, let's see if we can swallow whatever we can.
-      while (fr < fl) {
-        var swallowee = file[fr]
-
-        this.debug('\nglobstar while', file, fr, pattern, pr, swallowee)
-
-        // XXX remove this slice.  Just pass the start index.
-        if (this.matchOne(file.slice(fr), pattern.slice(pr), partial)) {
-          this.debug('globstar found match!', fr, fl, swallowee)
-          // found a match.
-          return true
-        } else {
-          // can't swallow "." or ".." ever.
-          // can only swallow ".foo" when explicitly asked.
-          if (swallowee === '.' || swallowee === '..' ||
-            (!options.dot && swallowee.charAt(0) === '.')) {
-            this.debug('dot detected!', file, fr, pattern, pr)
-            break
-          }
-
-          // ** swallows a segment, and continue.
-          this.debug('globstar swallow a segment, and continue')
-          fr++
-        }
-      }
-
-      // no match was found.
-      // However, in partial mode, we can't say this is necessarily over.
-      // If there's more *pattern* left, then
-      if (partial) {
-        // ran out of file
-        this.debug('\n>>> no match, partial?', file, fr, pattern, pr)
-        if (fr === fl) return true
-      }
-      return false
-    }
-
-    // something other than **
-    // non-magic patterns just have to match exactly
-    // patterns with magic have been turned into regexps.
-    var hit
-    if (typeof p === 'string') {
-      if (options.nocase) {
-        hit = f.toLowerCase() === p.toLowerCase()
-      } else {
-        hit = f === p
-      }
-      this.debug('string match', p, f, hit)
-    } else {
-      hit = f.match(p)
-      this.debug('pattern match', p, f, hit)
-    }
-
-    if (!hit) return false
-  }
-
-  // Note: ending in / means that we'll get a final ""
-  // at the end of the pattern.  This can only match a
-  // corresponding "" at the end of the file.
-  // If the file ends in /, then it can only match a
-  // a pattern that ends in /, unless the pattern just
-  // doesn't have any more for it. But, a/b/ should *not*
-  // match "a/b/*", even though "" matches against the
-  // [^/]*? pattern, except in partial mode, where it might
-  // simply not be reached yet.
-  // However, a/b/ should still satisfy a/*
-
-  // now either we fell off the end of the pattern, or we're done.
-  if (fi === fl && pi === pl) {
-    // ran out of pattern and filename at the same time.
-    // an exact hit!
-    return true
-  } else if (fi === fl) {
-    // ran out of file, but still had pattern left.
-    // this is ok if we're doing the match as part of
-    // a glob fs traversal.
-    return partial
-  } else if (pi === pl) {
-    // ran out of pattern, still have file left.
-    // this is only acceptable if we're on the very last
-    // empty segment of a file with a trailing slash.
-    // a/* should match a/b/
-    var emptyFileEnd = (fi === fl - 1) && (file[fi] === '')
-    return emptyFileEnd
-  }
-
-  // should be unreachable.
-  throw new Error('wtf?')
-}
-
-// replace stuff like \* with *
-function globUnescape (s) {
-  return s.replace(/\\(.)/g, '$1')
-}
-
-function regExpEscape (s) {
-  return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
-
-
-/***/ }),
-
-/***/ 1223:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var wrappy = __nccwpck_require__(2940)
-module.exports = wrappy(once)
-module.exports.strict = wrappy(onceStrict)
-
-once.proto = once(function () {
-  Object.defineProperty(Function.prototype, 'once', {
-    value: function () {
-      return once(this)
-    },
-    configurable: true
-  })
-
-  Object.defineProperty(Function.prototype, 'onceStrict', {
-    value: function () {
-      return onceStrict(this)
-    },
-    configurable: true
-  })
-})
-
-function once (fn) {
-  var f = function () {
-    if (f.called) return f.value
-    f.called = true
-    return f.value = fn.apply(this, arguments)
-  }
-  f.called = false
-  return f
-}
-
-function onceStrict (fn) {
-  var f = function () {
-    if (f.called)
-      throw new Error(f.onceError)
-    f.called = true
-    return f.value = fn.apply(this, arguments)
-  }
-  var name = fn.name || 'Function wrapped with `once`'
-  f.onceError = name + " shouldn't be called more than once"
-  f.called = false
-  return f
-}
-
-
-/***/ }),
-
-/***/ 8714:
-/***/ ((module) => {
-
-"use strict";
-
-
-function posix(path) {
-	return path.charAt(0) === '/';
-}
-
-function win32(path) {
-	// https://github.com/nodejs/node/blob/b3fcc245fb25539909ef1d5eaa01dbf92e168633/lib/path.js#L56
-	var splitDeviceRe = /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/;
-	var result = splitDeviceRe.exec(path);
-	var device = result[1] || '';
-	var isUnc = Boolean(device && device.charAt(1) !== ':');
-
-	// UNC paths are always absolute
-	return Boolean(result[2] || isUnc);
-}
-
-module.exports = process.platform === 'win32' ? win32 : posix;
-module.exports.posix = posix;
-module.exports.win32 = win32;
-
-
-/***/ }),
-
-/***/ 8065:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const {promisify} = __nccwpck_require__(1669);
-const tmp = __nccwpck_require__(8517);
-
-// file
-module.exports.fileSync = tmp.fileSync;
-const fileWithOptions = promisify((options, cb) =>
-  tmp.file(options, (err, path, fd, cleanup) =>
-    err ? cb(err) : cb(undefined, { path, fd, cleanup: promisify(cleanup) })
-  )
-);
-module.exports.file = async (options) => fileWithOptions(options);
-
-module.exports.withFile = async function withFile(fn, options) {
-  const { path, fd, cleanup } = await module.exports.file(options);
-  try {
-    return await fn({ path, fd });
-  } finally {
-    await cleanup();
-  }
-};
-
-
-// directory
-module.exports.dirSync = tmp.dirSync;
-const dirWithOptions = promisify((options, cb) =>
-  tmp.dir(options, (err, path, cleanup) =>
-    err ? cb(err) : cb(undefined, { path, cleanup: promisify(cleanup) })
-  )
-);
-module.exports.dir = async (options) => dirWithOptions(options);
-
-module.exports.withDir = async function withDir(fn, options) {
-  const { path, cleanup } = await module.exports.dir(options);
-  try {
-    return await fn({ path });
-  } finally {
-    await cleanup();
-  }
-};
-
-
-// name generation
-module.exports.tmpNameSync = tmp.tmpNameSync;
-module.exports.tmpName = promisify(tmp.tmpName);
-
-module.exports.tmpdir = tmp.tmpdir;
-
-module.exports.setGracefulCleanup = tmp.setGracefulCleanup;
-
-
-/***/ }),
-
-/***/ 8517:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-/*!
- * Tmp
- *
- * Copyright (c) 2011-2017 KARASZI Istvan <github@spam.raszi.hu>
- *
- * MIT Licensed
- */
-
-/*
- * Module dependencies.
- */
-const fs = __nccwpck_require__(5747);
-const os = __nccwpck_require__(2087);
-const path = __nccwpck_require__(5622);
-const crypto = __nccwpck_require__(6417);
-const _c = fs.constants && os.constants ?
-  { fs: fs.constants, os: os.constants } :
-  process.binding('constants');
-const rimraf = __nccwpck_require__(2371);
-
-/*
- * The working inner variables.
- */
-const
-  // the random characters to choose from
-  RANDOM_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-
-  TEMPLATE_PATTERN = /XXXXXX/,
-
-  DEFAULT_TRIES = 3,
-
-  CREATE_FLAGS = (_c.O_CREAT || _c.fs.O_CREAT) | (_c.O_EXCL || _c.fs.O_EXCL) | (_c.O_RDWR || _c.fs.O_RDWR),
-
-  EBADF = _c.EBADF || _c.os.errno.EBADF,
-  ENOENT = _c.ENOENT || _c.os.errno.ENOENT,
-
-  DIR_MODE = 448 /* 0o700 */,
-  FILE_MODE = 384 /* 0o600 */,
-
-  EXIT = 'exit',
-
-  SIGINT = 'SIGINT',
-
-  // this will hold the objects need to be removed on exit
-  _removeObjects = [];
-
-var
-  _gracefulCleanup = false;
-
-/**
- * Random name generator based on crypto.
- * Adapted from http://blog.tompawlak.org/how-to-generate-random-values-nodejs-javascript
- *
- * @param {number} howMany
- * @returns {string} the generated random name
- * @private
- */
-function _randomChars(howMany) {
-  var
-    value = [],
-    rnd = null;
-
-  // make sure that we do not fail because we ran out of entropy
-  try {
-    rnd = crypto.randomBytes(howMany);
-  } catch (e) {
-    rnd = crypto.pseudoRandomBytes(howMany);
-  }
-
-  for (var i = 0; i < howMany; i++) {
-    value.push(RANDOM_CHARS[rnd[i] % RANDOM_CHARS.length]);
-  }
-
-  return value.join('');
-}
-
-/**
- * Checks whether the `obj` parameter is defined or not.
- *
- * @param {Object} obj
- * @returns {boolean} true if the object is undefined
- * @private
- */
-function _isUndefined(obj) {
-  return typeof obj === 'undefined';
-}
-
-/**
- * Parses the function arguments.
- *
- * This function helps to have optional arguments.
- *
- * @param {(Options|Function)} options
- * @param {Function} callback
- * @returns {Array} parsed arguments
- * @private
- */
-function _parseArguments(options, callback) {
-  /* istanbul ignore else */
-  if (typeof options === 'function') {
-    return [{}, options];
-  }
-
-  /* istanbul ignore else */
-  if (_isUndefined(options)) {
-    return [{}, callback];
-  }
-
-  return [options, callback];
-}
-
-/**
- * Generates a new temporary name.
- *
- * @param {Object} opts
- * @returns {string} the new random name according to opts
- * @private
- */
-function _generateTmpName(opts) {
-
-  const tmpDir = _getTmpDir();
-
-  // fail early on missing tmp dir
-  if (isBlank(opts.dir) && isBlank(tmpDir)) {
-    throw new Error('No tmp dir specified');
-  }
-
-  /* istanbul ignore else */
-  if (!isBlank(opts.name)) {
-    return path.join(opts.dir || tmpDir, opts.name);
-  }
-
-  // mkstemps like template
-  // opts.template has already been guarded in tmpName() below
-  /* istanbul ignore else */
-  if (opts.template) {
-    var template = opts.template;
-    // make sure that we prepend the tmp path if none was given
-    /* istanbul ignore else */
-    if (path.basename(template) === template)
-      template = path.join(opts.dir || tmpDir, template);
-    return template.replace(TEMPLATE_PATTERN, _randomChars(6));
-  }
-
-  // prefix and postfix
-  const name = [
-    (isBlank(opts.prefix) ? 'tmp-' : opts.prefix),
-    process.pid,
-    _randomChars(12),
-    (opts.postfix ? opts.postfix : '')
-  ].join('');
-
-  return path.join(opts.dir || tmpDir, name);
-}
-
-/**
- * Gets a temporary file name.
- *
- * @param {(Options|tmpNameCallback)} options options or callback
- * @param {?tmpNameCallback} callback the callback function
- */
-function tmpName(options, callback) {
-  var
-    args = _parseArguments(options, callback),
-    opts = args[0],
-    cb = args[1],
-    tries = !isBlank(opts.name) ? 1 : opts.tries || DEFAULT_TRIES;
-
-  /* istanbul ignore else */
-  if (isNaN(tries) || tries < 0)
-    return cb(new Error('Invalid tries'));
-
-  /* istanbul ignore else */
-  if (opts.template && !opts.template.match(TEMPLATE_PATTERN))
-    return cb(new Error('Invalid template provided'));
-
-  (function _getUniqueName() {
-    try {
-      const name = _generateTmpName(opts);
-
-      // check whether the path exists then retry if needed
-      fs.stat(name, function (err) {
-        /* istanbul ignore else */
-        if (!err) {
-          /* istanbul ignore else */
-          if (tries-- > 0) return _getUniqueName();
-
-          return cb(new Error('Could not get a unique tmp filename, max tries reached ' + name));
-        }
-
-        cb(null, name);
-      });
-    } catch (err) {
-      cb(err);
+        throw new YAMLException('impossible error: invalid scalar style');
     }
   }());
 }
 
-/**
- * Synchronous version of tmpName.
- *
- * @param {Object} options
- * @returns {string} the generated random name
- * @throws {Error} if the options are invalid or could not generate a filename
- */
-function tmpNameSync(options) {
-  var
-    args = _parseArguments(options),
-    opts = args[0],
-    tries = !isBlank(opts.name) ? 1 : opts.tries || DEFAULT_TRIES;
+// Pre-conditions: string is valid for a block scalar, 1 <= indentPerLevel <= 9.
+function blockHeader(string, indentPerLevel) {
+  var indentIndicator = needIndentIndicator(string) ? String(indentPerLevel) : '';
 
-  /* istanbul ignore else */
-  if (isNaN(tries) || tries < 0)
-    throw new Error('Invalid tries');
+  // note the special case: the string '\n' counts as a "trailing" empty line.
+  var clip =          string[string.length - 1] === '\n';
+  var keep = clip && (string[string.length - 2] === '\n' || string === '\n');
+  var chomp = keep ? '+' : (clip ? '' : '-');
 
-  /* istanbul ignore else */
-  if (opts.template && !opts.template.match(TEMPLATE_PATTERN))
-    throw new Error('Invalid template provided');
+  return indentIndicator + chomp + '\n';
+}
 
-  do {
-    const name = _generateTmpName(opts);
-    try {
-      fs.statSync(name);
-    } catch (e) {
-      return name;
+// (See the note for writeScalar.)
+function dropEndingNewline(string) {
+  return string[string.length - 1] === '\n' ? string.slice(0, -1) : string;
+}
+
+// Note: a long line without a suitable break point will exceed the width limit.
+// Pre-conditions: every char in str isPrintable, str.length > 0, width > 0.
+function foldString(string, width) {
+  // In folded style, $k$ consecutive newlines output as $k+1$ newlines—
+  // unless they're before or after a more-indented line, or at the very
+  // beginning or end, in which case $k$ maps to $k$.
+  // Therefore, parse each chunk as newline(s) followed by a content line.
+  var lineRe = /(\n+)([^\n]*)/g;
+
+  // first line (possibly an empty line)
+  var result = (function () {
+    var nextLF = string.indexOf('\n');
+    nextLF = nextLF !== -1 ? nextLF : string.length;
+    lineRe.lastIndex = nextLF;
+    return foldLine(string.slice(0, nextLF), width);
+  }());
+  // If we haven't reached the first content line yet, don't add an extra \n.
+  var prevMoreIndented = string[0] === '\n' || string[0] === ' ';
+  var moreIndented;
+
+  // rest of the lines
+  var match;
+  while ((match = lineRe.exec(string))) {
+    var prefix = match[1], line = match[2];
+    moreIndented = (line[0] === ' ');
+    result += prefix
+      + (!prevMoreIndented && !moreIndented && line !== ''
+        ? '\n' : '')
+      + foldLine(line, width);
+    prevMoreIndented = moreIndented;
+  }
+
+  return result;
+}
+
+// Greedy line breaking.
+// Picks the longest line under the limit each time,
+// otherwise settles for the shortest line over the limit.
+// NB. More-indented lines *cannot* be folded, as that would add an extra \n.
+function foldLine(line, width) {
+  if (line === '' || line[0] === ' ') return line;
+
+  // Since a more-indented line adds a \n, breaks can't be followed by a space.
+  var breakRe = / [^ ]/g; // note: the match index will always be <= length-2.
+  var match;
+  // start is an inclusive index. end, curr, and next are exclusive.
+  var start = 0, end, curr = 0, next = 0;
+  var result = '';
+
+  // Invariants: 0 <= start <= length-1.
+  //   0 <= curr <= next <= max(0, length-2). curr - start <= width.
+  // Inside the loop:
+  //   A match implies length >= 2, so curr and next are <= length-2.
+  while ((match = breakRe.exec(line))) {
+    next = match.index;
+    // maintain invariant: curr - start <= width
+    if (next - start > width) {
+      end = (curr > start) ? curr : next; // derive end <= length-2
+      result += '\n' + line.slice(start, end);
+      // skip the space that was output as \n
+      start = end + 1;                    // derive start <= length-1
     }
-  } while (tries-- > 0);
-
-  throw new Error('Could not get a unique tmp filename, max tries reached');
-}
-
-/**
- * Creates and opens a temporary file.
- *
- * @param {(Options|fileCallback)} options the config options or the callback function
- * @param {?fileCallback} callback
- */
-function file(options, callback) {
-  var
-    args = _parseArguments(options, callback),
-    opts = args[0],
-    cb = args[1];
-
-  // gets a temporary filename
-  tmpName(opts, function _tmpNameCreated(err, name) {
-    /* istanbul ignore else */
-    if (err) return cb(err);
-
-    // create and open the file
-    fs.open(name, CREATE_FLAGS, opts.mode || FILE_MODE, function _fileCreated(err, fd) {
-      /* istanbul ignore else */
-      if (err) return cb(err);
-
-      if (opts.discardDescriptor) {
-        return fs.close(fd, function _discardCallback(err) {
-          /* istanbul ignore else */
-          if (err) {
-            // Low probability, and the file exists, so this could be
-            // ignored.  If it isn't we certainly need to unlink the
-            // file, and if that fails too its error is more
-            // important.
-            try {
-              fs.unlinkSync(name);
-            } catch (e) {
-              if (!isENOENT(e)) {
-                err = e;
-              }
-            }
-            return cb(err);
-          }
-          cb(null, name, undefined, _prepareTmpFileRemoveCallback(name, -1, opts));
-        });
-      }
-      /* istanbul ignore else */
-      if (opts.detachDescriptor) {
-        return cb(null, name, fd, _prepareTmpFileRemoveCallback(name, -1, opts));
-      }
-      cb(null, name, fd, _prepareTmpFileRemoveCallback(name, fd, opts));
-    });
-  });
-}
-
-/**
- * Synchronous version of file.
- *
- * @param {Options} options
- * @returns {FileSyncObject} object consists of name, fd and removeCallback
- * @throws {Error} if cannot create a file
- */
-function fileSync(options) {
-  var
-    args = _parseArguments(options),
-    opts = args[0];
-
-  const discardOrDetachDescriptor = opts.discardDescriptor || opts.detachDescriptor;
-  const name = tmpNameSync(opts);
-  var fd = fs.openSync(name, CREATE_FLAGS, opts.mode || FILE_MODE);
-  /* istanbul ignore else */
-  if (opts.discardDescriptor) {
-    fs.closeSync(fd);
-    fd = undefined;
+    curr = next;
   }
 
-  return {
-    name: name,
-    fd: fd,
-    removeCallback: _prepareTmpFileRemoveCallback(name, discardOrDetachDescriptor ? -1 : fd, opts)
-  };
-}
-
-/**
- * Creates a temporary directory.
- *
- * @param {(Options|dirCallback)} options the options or the callback function
- * @param {?dirCallback} callback
- */
-function dir(options, callback) {
-  var
-    args = _parseArguments(options, callback),
-    opts = args[0],
-    cb = args[1];
-
-  // gets a temporary filename
-  tmpName(opts, function _tmpNameCreated(err, name) {
-    /* istanbul ignore else */
-    if (err) return cb(err);
-
-    // create the directory
-    fs.mkdir(name, opts.mode || DIR_MODE, function _dirCreated(err) {
-      /* istanbul ignore else */
-      if (err) return cb(err);
-
-      cb(null, name, _prepareTmpDirRemoveCallback(name, opts));
-    });
-  });
-}
-
-/**
- * Synchronous version of dir.
- *
- * @param {Options} options
- * @returns {DirSyncObject} object consists of name and removeCallback
- * @throws {Error} if it cannot create a directory
- */
-function dirSync(options) {
-  var
-    args = _parseArguments(options),
-    opts = args[0];
-
-  const name = tmpNameSync(opts);
-  fs.mkdirSync(name, opts.mode || DIR_MODE);
-
-  return {
-    name: name,
-    removeCallback: _prepareTmpDirRemoveCallback(name, opts)
-  };
-}
-
-/**
- * Removes files asynchronously.
- *
- * @param {Object} fdPath
- * @param {Function} next
- * @private
- */
-function _removeFileAsync(fdPath, next) {
-  const _handler = function (err) {
-    if (err && !isENOENT(err)) {
-      // reraise any unanticipated error
-      return next(err);
-    }
-    next();
-  }
-
-  if (0 <= fdPath[0])
-    fs.close(fdPath[0], function (err) {
-      fs.unlink(fdPath[1], _handler);
-    });
-  else fs.unlink(fdPath[1], _handler);
-}
-
-/**
- * Removes files synchronously.
- *
- * @param {Object} fdPath
- * @private
- */
-function _removeFileSync(fdPath) {
-  try {
-    if (0 <= fdPath[0]) fs.closeSync(fdPath[0]);
-  } catch (e) {
-    // reraise any unanticipated error
-    if (!isEBADF(e) && !isENOENT(e)) throw e;
-  } finally {
-    try {
-      fs.unlinkSync(fdPath[1]);
-    }
-    catch (e) {
-      // reraise any unanticipated error
-      if (!isENOENT(e)) throw e;
-    }
-  }
-}
-
-/**
- * Prepares the callback for removal of the temporary file.
- *
- * @param {string} name the path of the file
- * @param {number} fd file descriptor
- * @param {Object} opts
- * @returns {fileCallback}
- * @private
- */
-function _prepareTmpFileRemoveCallback(name, fd, opts) {
-  const removeCallbackSync = _prepareRemoveCallback(_removeFileSync, [fd, name]);
-  const removeCallback = _prepareRemoveCallback(_removeFileAsync, [fd, name], removeCallbackSync);
-
-  if (!opts.keep) _removeObjects.unshift(removeCallbackSync);
-
-  return removeCallback;
-}
-
-/**
- * Simple wrapper for rimraf.
- *
- * @param {string} dirPath
- * @param {Function} next
- * @private
- */
-function _rimrafRemoveDirWrapper(dirPath, next) {
-  rimraf(dirPath, next);
-}
-
-/**
- * Simple wrapper for rimraf.sync.
- *
- * @param {string} dirPath
- * @private
- */
-function _rimrafRemoveDirSyncWrapper(dirPath, next) {
-  try {
-    return next(null, rimraf.sync(dirPath));
-  } catch (err) {
-    return next(err);
-  }
-}
-
-/**
- * Prepares the callback for removal of the temporary directory.
- *
- * @param {string} name
- * @param {Object} opts
- * @returns {Function} the callback
- * @private
- */
-function _prepareTmpDirRemoveCallback(name, opts) {
-  const removeFunction = opts.unsafeCleanup ? _rimrafRemoveDirWrapper : fs.rmdir.bind(fs);
-  const removeFunctionSync = opts.unsafeCleanup ? _rimrafRemoveDirSyncWrapper : fs.rmdirSync.bind(fs);
-  const removeCallbackSync = _prepareRemoveCallback(removeFunctionSync, name);
-  const removeCallback = _prepareRemoveCallback(removeFunction, name, removeCallbackSync);
-  if (!opts.keep) _removeObjects.unshift(removeCallbackSync);
-
-  return removeCallback;
-}
-
-/**
- * Creates a guarded function wrapping the removeFunction call.
- *
- * @param {Function} removeFunction
- * @param {Object} arg
- * @returns {Function}
- * @private
- */
-function _prepareRemoveCallback(removeFunction, arg, cleanupCallbackSync) {
-  var called = false;
-
-  return function _cleanupCallback(next) {
-    next = next || function () {};
-    if (!called) {
-      const toRemove = cleanupCallbackSync || _cleanupCallback;
-      const index = _removeObjects.indexOf(toRemove);
-      /* istanbul ignore else */
-      if (index >= 0) _removeObjects.splice(index, 1);
-
-      called = true;
-      // sync?
-      if (removeFunction.length === 1) {
-        try {
-          removeFunction(arg);
-          return next(null);
-        }
-        catch (err) {
-          // if no next is provided and since we are
-          // in silent cleanup mode on process exit,
-          // we will ignore the error
-          return next(err);
-        }
-      } else return removeFunction(arg, next);
-    } else return next(new Error('cleanup callback has already been called'));
-  };
-}
-
-/**
- * The garbage collector.
- *
- * @private
- */
-function _garbageCollector() {
-  /* istanbul ignore else */
-  if (!_gracefulCleanup) return;
-
-  // the function being called removes itself from _removeObjects,
-  // loop until _removeObjects is empty
-  while (_removeObjects.length) {
-    try {
-      _removeObjects[0]();
-    } catch (e) {
-      // already removed?
-    }
-  }
-}
-
-/**
- * Helper for testing against EBADF to compensate changes made to Node 7.x under Windows.
- */
-function isEBADF(error) {
-  return isExpectedError(error, -EBADF, 'EBADF');
-}
-
-/**
- * Helper for testing against ENOENT to compensate changes made to Node 7.x under Windows.
- */
-function isENOENT(error) {
-  return isExpectedError(error, -ENOENT, 'ENOENT');
-}
-
-/**
- * Helper to determine whether the expected error code matches the actual code and errno,
- * which will differ between the supported node versions.
- *
- * - Node >= 7.0:
- *   error.code {string}
- *   error.errno {string|number} any numerical value will be negated
- *
- * - Node >= 6.0 < 7.0:
- *   error.code {string}
- *   error.errno {number} negated
- *
- * - Node >= 4.0 < 6.0: introduces SystemError
- *   error.code {string}
- *   error.errno {number} negated
- *
- * - Node >= 0.10 < 4.0:
- *   error.code {number} negated
- *   error.errno n/a
- */
-function isExpectedError(error, code, errno) {
-  return error.code === code || error.code === errno;
-}
-
-/**
- * Helper which determines whether a string s is blank, that is undefined, or empty or null.
- *
- * @private
- * @param {string} s
- * @returns {Boolean} true whether the string s is blank, false otherwise
- */
-function isBlank(s) {
-  return s === null || s === undefined || !s.trim();
-}
-
-/**
- * Sets the graceful cleanup.
- */
-function setGracefulCleanup() {
-  _gracefulCleanup = true;
-}
-
-/**
- * Returns the currently configured tmp dir from os.tmpdir().
- *
- * @private
- * @returns {string} the currently configured tmp dir
- */
-function _getTmpDir() {
-  return os.tmpdir();
-}
-
-/**
- * If there are multiple different versions of tmp in place, make sure that
- * we recognize the old listeners.
- *
- * @param {Function} listener
- * @private
- * @returns {Boolean} true whether listener is a legacy listener
- */
-function _is_legacy_listener(listener) {
-  return (listener.name === '_exit' || listener.name === '_uncaughtExceptionThrown')
-    && listener.toString().indexOf('_garbageCollector();') > -1;
-}
-
-/**
- * Safely install SIGINT listener.
- *
- * NOTE: this will only work on OSX and Linux.
- *
- * @private
- */
-function _safely_install_sigint_listener() {
-
-  const listeners = process.listeners(SIGINT);
-  const existingListeners = [];
-  for (let i = 0, length = listeners.length; i < length; i++) {
-    const lstnr = listeners[i];
-    /* istanbul ignore else */
-    if (lstnr.name === '_tmp$sigint_listener') {
-      existingListeners.push(lstnr);
-      process.removeListener(SIGINT, lstnr);
-    }
-  }
-  process.on(SIGINT, function _tmp$sigint_listener(doExit) {
-    for (let i = 0, length = existingListeners.length; i < length; i++) {
-      // let the existing listener do the garbage collection (e.g. jest sandbox)
-      try {
-        existingListeners[i](false);
-      } catch (err) {
-        // ignore
-      }
-    }
-    try {
-      // force the garbage collector even it is called again in the exit listener
-      _garbageCollector();
-    } finally {
-      if (!!doExit) {
-        process.exit(0);
-      }
-    }
-  });
-}
-
-/**
- * Safely install process exit listener.
- *
- * @private
- */
-function _safely_install_exit_listener() {
-  const listeners = process.listeners(EXIT);
-
-  // collect any existing listeners
-  const existingListeners = [];
-  for (let i = 0, length = listeners.length; i < length; i++) {
-    const lstnr = listeners[i];
-    /* istanbul ignore else */
-    // TODO: remove support for legacy listeners once release 1.0.0 is out
-    if (lstnr.name === '_tmp$safe_listener' || _is_legacy_listener(lstnr)) {
-      // we must forget about the uncaughtException listener, hopefully it is ours
-      if (lstnr.name !== '_uncaughtExceptionThrown') {
-        existingListeners.push(lstnr);
-      }
-      process.removeListener(EXIT, lstnr);
-    }
-  }
-  // TODO: what was the data parameter good for?
-  process.addListener(EXIT, function _tmp$safe_listener(data) {
-    for (let i = 0, length = existingListeners.length; i < length; i++) {
-      // let the existing listener do the garbage collection (e.g. jest sandbox)
-      try {
-        existingListeners[i](data);
-      } catch (err) {
-        // ignore
-      }
-    }
-    _garbageCollector();
-  });
-}
-
-_safely_install_exit_listener();
-_safely_install_sigint_listener();
-
-/**
- * Configuration options.
- *
- * @typedef {Object} Options
- * @property {?number} tries the number of tries before give up the name generation
- * @property {?string} template the "mkstemp" like filename template
- * @property {?string} name fix name
- * @property {?string} dir the tmp directory to use
- * @property {?string} prefix prefix for the generated name
- * @property {?string} postfix postfix for the generated name
- * @property {?boolean} unsafeCleanup recursively removes the created temporary directory, even when it's not empty
- */
-
-/**
- * @typedef {Object} FileSyncObject
- * @property {string} name the name of the file
- * @property {string} fd the file descriptor
- * @property {fileCallback} removeCallback the callback function to remove the file
- */
-
-/**
- * @typedef {Object} DirSyncObject
- * @property {string} name the name of the directory
- * @property {fileCallback} removeCallback the callback function to remove the directory
- */
-
-/**
- * @callback tmpNameCallback
- * @param {?Error} err the error object if anything goes wrong
- * @param {string} name the temporary file name
- */
-
-/**
- * @callback fileCallback
- * @param {?Error} err the error object if anything goes wrong
- * @param {string} name the temporary file name
- * @param {number} fd the file descriptor
- * @param {cleanupCallback} fn the cleanup callback function
- */
-
-/**
- * @callback dirCallback
- * @param {?Error} err the error object if anything goes wrong
- * @param {string} name the temporary file name
- * @param {cleanupCallback} fn the cleanup callback function
- */
-
-/**
- * Removes the temporary created file or directory.
- *
- * @callback cleanupCallback
- * @param {simpleCallback} [next] function to call after entry was removed
- */
-
-/**
- * Callback function for function composition.
- * @see {@link https://github.com/raszi/node-tmp/issues/57|raszi/node-tmp#57}
- *
- * @callback simpleCallback
- */
-
-// exporting all the needed methods
-
-// evaluate os.tmpdir() lazily, mainly for simplifying testing but it also will
-// allow users to reconfigure the temporary directory
-Object.defineProperty(module.exports, "tmpdir", ({
-  enumerable: true,
-  configurable: false,
-  get: function () {
-    return _getTmpDir();
-  }
-}));
-
-module.exports.dir = dir;
-module.exports.dirSync = dirSync;
-
-module.exports.file = file;
-module.exports.fileSync = fileSync;
-
-module.exports.tmpName = tmpName;
-module.exports.tmpNameSync = tmpNameSync;
-
-module.exports.setGracefulCleanup = setGracefulCleanup;
-
-
-/***/ }),
-
-/***/ 2371:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-module.exports = rimraf
-rimraf.sync = rimrafSync
-
-var assert = __nccwpck_require__(2357)
-var path = __nccwpck_require__(5622)
-var fs = __nccwpck_require__(5747)
-var glob = undefined
-try {
-  glob = __nccwpck_require__(1957)
-} catch (_err) {
-  // treat glob as optional.
-}
-var _0666 = parseInt('666', 8)
-
-var defaultGlobOpts = {
-  nosort: true,
-  silent: true
-}
-
-// for EMFILE handling
-var timeout = 0
-
-var isWindows = (process.platform === "win32")
-
-function defaults (options) {
-  var methods = [
-    'unlink',
-    'chmod',
-    'stat',
-    'lstat',
-    'rmdir',
-    'readdir'
-  ]
-  methods.forEach(function(m) {
-    options[m] = options[m] || fs[m]
-    m = m + 'Sync'
-    options[m] = options[m] || fs[m]
-  })
-
-  options.maxBusyTries = options.maxBusyTries || 3
-  options.emfileWait = options.emfileWait || 1000
-  if (options.glob === false) {
-    options.disableGlob = true
-  }
-  if (options.disableGlob !== true && glob === undefined) {
-    throw Error('glob dependency not found, set `options.disableGlob = true` if intentional')
-  }
-  options.disableGlob = options.disableGlob || false
-  options.glob = options.glob || defaultGlobOpts
-}
-
-function rimraf (p, options, cb) {
-  if (typeof options === 'function') {
-    cb = options
-    options = {}
-  }
-
-  assert(p, 'rimraf: missing path')
-  assert.equal(typeof p, 'string', 'rimraf: path should be a string')
-  assert.equal(typeof cb, 'function', 'rimraf: callback function required')
-  assert(options, 'rimraf: invalid options argument provided')
-  assert.equal(typeof options, 'object', 'rimraf: options should be object')
-
-  defaults(options)
-
-  var busyTries = 0
-  var errState = null
-  var n = 0
-
-  if (options.disableGlob || !glob.hasMagic(p))
-    return afterGlob(null, [p])
-
-  options.lstat(p, function (er, stat) {
-    if (!er)
-      return afterGlob(null, [p])
-
-    glob(p, options.glob, afterGlob)
-  })
-
-  function next (er) {
-    errState = errState || er
-    if (--n === 0)
-      cb(errState)
-  }
-
-  function afterGlob (er, results) {
-    if (er)
-      return cb(er)
-
-    n = results.length
-    if (n === 0)
-      return cb()
-
-    results.forEach(function (p) {
-      rimraf_(p, options, function CB (er) {
-        if (er) {
-          if ((er.code === "EBUSY" || er.code === "ENOTEMPTY" || er.code === "EPERM") &&
-              busyTries < options.maxBusyTries) {
-            busyTries ++
-            var time = busyTries * 100
-            // try again, with the same exact callback as this one.
-            return setTimeout(function () {
-              rimraf_(p, options, CB)
-            }, time)
-          }
-
-          // this one won't happen if graceful-fs is used.
-          if (er.code === "EMFILE" && timeout < options.emfileWait) {
-            return setTimeout(function () {
-              rimraf_(p, options, CB)
-            }, timeout ++)
-          }
-
-          // already gone
-          if (er.code === "ENOENT") er = null
-        }
-
-        timeout = 0
-        next(er)
-      })
-    })
-  }
-}
-
-// Two possible strategies.
-// 1. Assume it's a file.  unlink it, then do the dir stuff on EPERM or EISDIR
-// 2. Assume it's a directory.  readdir, then do the file stuff on ENOTDIR
-//
-// Both result in an extra syscall when you guess wrong.  However, there
-// are likely far more normal files in the world than directories.  This
-// is based on the assumption that a the average number of files per
-// directory is >= 1.
-//
-// If anyone ever complains about this, then I guess the strategy could
-// be made configurable somehow.  But until then, YAGNI.
-function rimraf_ (p, options, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  // sunos lets the root user unlink directories, which is... weird.
-  // so we have to lstat here and make sure it's not a dir.
-  options.lstat(p, function (er, st) {
-    if (er && er.code === "ENOENT")
-      return cb(null)
-
-    // Windows can EPERM on stat.  Life is suffering.
-    if (er && er.code === "EPERM" && isWindows)
-      fixWinEPERM(p, options, er, cb)
-
-    if (st && st.isDirectory())
-      return rmdir(p, options, er, cb)
-
-    options.unlink(p, function (er) {
-      if (er) {
-        if (er.code === "ENOENT")
-          return cb(null)
-        if (er.code === "EPERM")
-          return (isWindows)
-            ? fixWinEPERM(p, options, er, cb)
-            : rmdir(p, options, er, cb)
-        if (er.code === "EISDIR")
-          return rmdir(p, options, er, cb)
-      }
-      return cb(er)
-    })
-  })
-}
-
-function fixWinEPERM (p, options, er, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-  if (er)
-    assert(er instanceof Error)
-
-  options.chmod(p, _0666, function (er2) {
-    if (er2)
-      cb(er2.code === "ENOENT" ? null : er)
-    else
-      options.stat(p, function(er3, stats) {
-        if (er3)
-          cb(er3.code === "ENOENT" ? null : er)
-        else if (stats.isDirectory())
-          rmdir(p, options, er, cb)
-        else
-          options.unlink(p, cb)
-      })
-  })
-}
-
-function fixWinEPERMSync (p, options, er) {
-  assert(p)
-  assert(options)
-  if (er)
-    assert(er instanceof Error)
-
-  try {
-    options.chmodSync(p, _0666)
-  } catch (er2) {
-    if (er2.code === "ENOENT")
-      return
-    else
-      throw er
-  }
-
-  try {
-    var stats = options.statSync(p)
-  } catch (er3) {
-    if (er3.code === "ENOENT")
-      return
-    else
-      throw er
-  }
-
-  if (stats.isDirectory())
-    rmdirSync(p, options, er)
-  else
-    options.unlinkSync(p)
-}
-
-function rmdir (p, options, originalEr, cb) {
-  assert(p)
-  assert(options)
-  if (originalEr)
-    assert(originalEr instanceof Error)
-  assert(typeof cb === 'function')
-
-  // try to rmdir first, and only readdir on ENOTEMPTY or EEXIST (SunOS)
-  // if we guessed wrong, and it's not a directory, then
-  // raise the original error.
-  options.rmdir(p, function (er) {
-    if (er && (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM"))
-      rmkids(p, options, cb)
-    else if (er && er.code === "ENOTDIR")
-      cb(originalEr)
-    else
-      cb(er)
-  })
-}
-
-function rmkids(p, options, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  options.readdir(p, function (er, files) {
-    if (er)
-      return cb(er)
-    var n = files.length
-    if (n === 0)
-      return options.rmdir(p, cb)
-    var errState
-    files.forEach(function (f) {
-      rimraf(path.join(p, f), options, function (er) {
-        if (errState)
-          return
-        if (er)
-          return cb(errState = er)
-        if (--n === 0)
-          options.rmdir(p, cb)
-      })
-    })
-  })
-}
-
-// this looks simpler, and is strictly *faster*, but will
-// tie up the JavaScript thread and fail on excessively
-// deep directory trees.
-function rimrafSync (p, options) {
-  options = options || {}
-  defaults(options)
-
-  assert(p, 'rimraf: missing path')
-  assert.equal(typeof p, 'string', 'rimraf: path should be a string')
-  assert(options, 'rimraf: missing options')
-  assert.equal(typeof options, 'object', 'rimraf: options should be object')
-
-  var results
-
-  if (options.disableGlob || !glob.hasMagic(p)) {
-    results = [p]
+  // By the invariants, start <= length-1, so there is something left over.
+  // It is either the whole string or a part starting from non-whitespace.
+  result += '\n';
+  // Insert a break if the remainder is too long and there is a break available.
+  if (line.length - start > width && curr > start) {
+    result += line.slice(start, curr) + '\n' + line.slice(curr + 1);
   } else {
-    try {
-      options.lstatSync(p)
-      results = [p]
-    } catch (er) {
-      results = glob.sync(p, options.glob)
+    result += line.slice(start);
+  }
+
+  return result.slice(1); // drop extra \n joiner
+}
+
+// Escapes a double-quoted string.
+function escapeString(string) {
+  var result = '';
+  var char = 0;
+  var escapeSeq;
+
+  for (var i = 0; i < string.length; char >= 0x10000 ? i += 2 : i++) {
+    char = codePointAt(string, i);
+    escapeSeq = ESCAPE_SEQUENCES[char];
+
+    if (!escapeSeq && isPrintable(char)) {
+      result += string[i];
+      if (char >= 0x10000) result += string[i + 1];
+    } else {
+      result += escapeSeq || encodeHex(char);
     }
   }
 
-  if (!results.length)
-    return
+  return result;
+}
 
-  for (var i = 0; i < results.length; i++) {
-    var p = results[i]
+function writeFlowSequence(state, level, object) {
+  var _result = '',
+      _tag    = state.tag,
+      index,
+      length,
+      value;
 
-    try {
-      var st = options.lstatSync(p)
-    } catch (er) {
-      if (er.code === "ENOENT")
-        return
+  for (index = 0, length = object.length; index < length; index += 1) {
+    value = object[index];
 
-      // Windows can EPERM on stat.  Life is suffering.
-      if (er.code === "EPERM" && isWindows)
-        fixWinEPERMSync(p, options, er)
+    if (state.replacer) {
+      value = state.replacer.call(object, String(index), value);
     }
 
-    try {
-      // sunos lets the root user unlink directories, which is... weird.
-      if (st && st.isDirectory())
-        rmdirSync(p, options, null)
-      else
-        options.unlinkSync(p)
-    } catch (er) {
-      if (er.code === "ENOENT")
-        return
-      if (er.code === "EPERM")
-        return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er)
-      if (er.code !== "EISDIR")
-        throw er
+    // Write only valid elements, put null instead of invalid elements.
+    if (writeNode(state, level, value, false, false) ||
+        (typeof value === 'undefined' &&
+         writeNode(state, level, null, false, false))) {
 
-      rmdirSync(p, options, er)
+      if (_result !== '') _result += ',' + (!state.condenseFlow ? ' ' : '');
+      _result += state.dump;
     }
   }
+
+  state.tag = _tag;
+  state.dump = '[' + _result + ']';
 }
 
-function rmdirSync (p, options, originalEr) {
-  assert(p)
-  assert(options)
-  if (originalEr)
-    assert(originalEr instanceof Error)
+function writeBlockSequence(state, level, object, compact) {
+  var _result = '',
+      _tag    = state.tag,
+      index,
+      length,
+      value;
 
-  try {
-    options.rmdirSync(p)
-  } catch (er) {
-    if (er.code === "ENOENT")
-      return
-    if (er.code === "ENOTDIR")
-      throw originalEr
-    if (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM")
-      rmkidsSync(p, options)
-  }
-}
+  for (index = 0, length = object.length; index < length; index += 1) {
+    value = object[index];
 
-function rmkidsSync (p, options) {
-  assert(p)
-  assert(options)
-  options.readdirSync(p).forEach(function (f) {
-    rimrafSync(path.join(p, f), options)
-  })
-
-  // We only end up here once we got ENOTEMPTY at least once, and
-  // at this point, we are guaranteed to have removed all the kids.
-  // So, we know that it won't be ENOENT or ENOTDIR or anything else.
-  // try really hard to delete stuff on windows, because it has a
-  // PROFOUNDLY annoying habit of not closing handles promptly when
-  // files are deleted, resulting in spurious ENOTEMPTY errors.
-  var retries = isWindows ? 100 : 1
-  var i = 0
-  do {
-    var threw = true
-    try {
-      var ret = options.rmdirSync(p, options)
-      threw = false
-      return ret
-    } finally {
-      if (++i < retries && threw)
-        continue
+    if (state.replacer) {
+      value = state.replacer.call(object, String(index), value);
     }
-  } while (true)
+
+    // Write only valid elements, put null instead of invalid elements.
+    if (writeNode(state, level + 1, value, true, true, false, true) ||
+        (typeof value === 'undefined' &&
+         writeNode(state, level + 1, null, true, true, false, true))) {
+
+      if (!compact || _result !== '') {
+        _result += generateNextLine(state, level);
+      }
+
+      if (state.dump && CHAR_LINE_FEED === state.dump.charCodeAt(0)) {
+        _result += '-';
+      } else {
+        _result += '- ';
+      }
+
+      _result += state.dump;
+    }
+  }
+
+  state.tag = _tag;
+  state.dump = _result || '[]'; // Empty sequence if no valid values.
 }
 
+function writeFlowMapping(state, level, object) {
+  var _result       = '',
+      _tag          = state.tag,
+      objectKeyList = Object.keys(object),
+      index,
+      length,
+      objectKey,
+      objectValue,
+      pairBuffer;
 
-/***/ }),
+  for (index = 0, length = objectKeyList.length; index < length; index += 1) {
 
-/***/ 4294:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+    pairBuffer = '';
+    if (_result !== '') pairBuffer += ', ';
 
-module.exports = __nccwpck_require__(4219);
+    if (state.condenseFlow) pairBuffer += '"';
 
+    objectKey = objectKeyList[index];
+    objectValue = object[objectKey];
 
-/***/ }),
+    if (state.replacer) {
+      objectValue = state.replacer.call(object, objectKey, objectValue);
+    }
 
-/***/ 4219:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+    if (!writeNode(state, level, objectKey, false, false)) {
+      continue; // Skip this pair because of invalid key;
+    }
 
-"use strict";
+    if (state.dump.length > 1024) pairBuffer += '? ';
 
+    pairBuffer += state.dump + (state.condenseFlow ? '"' : '') + ':' + (state.condenseFlow ? '' : ' ');
 
-var net = __nccwpck_require__(1631);
-var tls = __nccwpck_require__(4016);
-var http = __nccwpck_require__(8605);
-var https = __nccwpck_require__(7211);
-var events = __nccwpck_require__(8614);
-var assert = __nccwpck_require__(2357);
-var util = __nccwpck_require__(1669);
+    if (!writeNode(state, level, objectValue, false, false)) {
+      continue; // Skip this pair because of invalid value.
+    }
 
+    pairBuffer += state.dump;
 
-exports.httpOverHttp = httpOverHttp;
-exports.httpsOverHttp = httpsOverHttp;
-exports.httpOverHttps = httpOverHttps;
-exports.httpsOverHttps = httpsOverHttps;
+    // Both key and value are valid.
+    _result += pairBuffer;
+  }
 
-
-function httpOverHttp(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = http.request;
-  return agent;
+  state.tag = _tag;
+  state.dump = '{' + _result + '}';
 }
 
-function httpsOverHttp(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = http.request;
-  agent.createSocket = createSecureSocket;
-  agent.defaultPort = 443;
-  return agent;
-}
+function writeBlockMapping(state, level, object, compact) {
+  var _result       = '',
+      _tag          = state.tag,
+      objectKeyList = Object.keys(object),
+      index,
+      length,
+      objectKey,
+      objectValue,
+      explicitPair,
+      pairBuffer;
 
-function httpOverHttps(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = https.request;
-  return agent;
-}
+  // Allow sorting keys so that the output file is deterministic
+  if (state.sortKeys === true) {
+    // Default sorting
+    objectKeyList.sort();
+  } else if (typeof state.sortKeys === 'function') {
+    // Custom sort function
+    objectKeyList.sort(state.sortKeys);
+  } else if (state.sortKeys) {
+    // Something is wrong
+    throw new YAMLException('sortKeys must be a boolean or a function');
+  }
 
-function httpsOverHttps(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = https.request;
-  agent.createSocket = createSecureSocket;
-  agent.defaultPort = 443;
-  return agent;
-}
+  for (index = 0, length = objectKeyList.length; index < length; index += 1) {
+    pairBuffer = '';
 
+    if (!compact || _result !== '') {
+      pairBuffer += generateNextLine(state, level);
+    }
 
-function TunnelingAgent(options) {
-  var self = this;
-  self.options = options || {};
-  self.proxyOptions = self.options.proxy || {};
-  self.maxSockets = self.options.maxSockets || http.Agent.defaultMaxSockets;
-  self.requests = [];
-  self.sockets = [];
+    objectKey = objectKeyList[index];
+    objectValue = object[objectKey];
 
-  self.on('free', function onFree(socket, host, port, localAddress) {
-    var options = toOptions(host, port, localAddress);
-    for (var i = 0, len = self.requests.length; i < len; ++i) {
-      var pending = self.requests[i];
-      if (pending.host === options.host && pending.port === options.port) {
-        // Detect the request to connect same origin server,
-        // reuse the connection.
-        self.requests.splice(i, 1);
-        pending.request.onSocket(socket);
-        return;
+    if (state.replacer) {
+      objectValue = state.replacer.call(object, objectKey, objectValue);
+    }
+
+    if (!writeNode(state, level + 1, objectKey, true, true, true)) {
+      continue; // Skip this pair because of invalid key.
+    }
+
+    explicitPair = (state.tag !== null && state.tag !== '?') ||
+                   (state.dump && state.dump.length > 1024);
+
+    if (explicitPair) {
+      if (state.dump && CHAR_LINE_FEED === state.dump.charCodeAt(0)) {
+        pairBuffer += '?';
+      } else {
+        pairBuffer += '? ';
       }
     }
-    socket.destroy();
-    self.removeSocket(socket);
-  });
-}
-util.inherits(TunnelingAgent, events.EventEmitter);
 
-TunnelingAgent.prototype.addRequest = function addRequest(req, host, port, localAddress) {
-  var self = this;
-  var options = mergeOptions({request: req}, self.options, toOptions(host, port, localAddress));
+    pairBuffer += state.dump;
 
-  if (self.sockets.length >= this.maxSockets) {
-    // We are over limit so we'll add it to the queue.
-    self.requests.push(options);
-    return;
-  }
-
-  // If we are under maxSockets create a new one.
-  self.createSocket(options, function(socket) {
-    socket.on('free', onFree);
-    socket.on('close', onCloseOrRemove);
-    socket.on('agentRemove', onCloseOrRemove);
-    req.onSocket(socket);
-
-    function onFree() {
-      self.emit('free', socket, options);
+    if (explicitPair) {
+      pairBuffer += generateNextLine(state, level);
     }
 
-    function onCloseOrRemove(err) {
-      self.removeSocket(socket);
-      socket.removeListener('free', onFree);
-      socket.removeListener('close', onCloseOrRemove);
-      socket.removeListener('agentRemove', onCloseOrRemove);
+    if (!writeNode(state, level + 1, objectValue, true, explicitPair)) {
+      continue; // Skip this pair because of invalid value.
     }
-  });
-};
 
-TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
-  var self = this;
-  var placeholder = {};
-  self.sockets.push(placeholder);
-
-  var connectOptions = mergeOptions({}, self.proxyOptions, {
-    method: 'CONNECT',
-    path: options.host + ':' + options.port,
-    agent: false,
-    headers: {
-      host: options.host + ':' + options.port
+    if (state.dump && CHAR_LINE_FEED === state.dump.charCodeAt(0)) {
+      pairBuffer += ':';
+    } else {
+      pairBuffer += ': ';
     }
-  });
-  if (options.localAddress) {
-    connectOptions.localAddress = options.localAddress;
-  }
-  if (connectOptions.proxyAuth) {
-    connectOptions.headers = connectOptions.headers || {};
-    connectOptions.headers['Proxy-Authorization'] = 'Basic ' +
-        new Buffer(connectOptions.proxyAuth).toString('base64');
+
+    pairBuffer += state.dump;
+
+    // Both key and value are valid.
+    _result += pairBuffer;
   }
 
-  debug('making CONNECT request');
-  var connectReq = self.request(connectOptions);
-  connectReq.useChunkedEncodingByDefault = false; // for v0.6
-  connectReq.once('response', onResponse); // for v0.6
-  connectReq.once('upgrade', onUpgrade);   // for v0.6
-  connectReq.once('connect', onConnect);   // for v0.7 or later
-  connectReq.once('error', onError);
-  connectReq.end();
-
-  function onResponse(res) {
-    // Very hacky. This is necessary to avoid http-parser leaks.
-    res.upgrade = true;
-  }
-
-  function onUpgrade(res, socket, head) {
-    // Hacky.
-    process.nextTick(function() {
-      onConnect(res, socket, head);
-    });
-  }
-
-  function onConnect(res, socket, head) {
-    connectReq.removeAllListeners();
-    socket.removeAllListeners();
-
-    if (res.statusCode !== 200) {
-      debug('tunneling socket could not be established, statusCode=%d',
-        res.statusCode);
-      socket.destroy();
-      var error = new Error('tunneling socket could not be established, ' +
-        'statusCode=' + res.statusCode);
-      error.code = 'ECONNRESET';
-      options.request.emit('error', error);
-      self.removeSocket(placeholder);
-      return;
-    }
-    if (head.length > 0) {
-      debug('got illegal response body from proxy');
-      socket.destroy();
-      var error = new Error('got illegal response body from proxy');
-      error.code = 'ECONNRESET';
-      options.request.emit('error', error);
-      self.removeSocket(placeholder);
-      return;
-    }
-    debug('tunneling connection has established');
-    self.sockets[self.sockets.indexOf(placeholder)] = socket;
-    return cb(socket);
-  }
-
-  function onError(cause) {
-    connectReq.removeAllListeners();
-
-    debug('tunneling socket could not be established, cause=%s\n',
-          cause.message, cause.stack);
-    var error = new Error('tunneling socket could not be established, ' +
-                          'cause=' + cause.message);
-    error.code = 'ECONNRESET';
-    options.request.emit('error', error);
-    self.removeSocket(placeholder);
-  }
-};
-
-TunnelingAgent.prototype.removeSocket = function removeSocket(socket) {
-  var pos = this.sockets.indexOf(socket)
-  if (pos === -1) {
-    return;
-  }
-  this.sockets.splice(pos, 1);
-
-  var pending = this.requests.shift();
-  if (pending) {
-    // If we have pending requests and a socket gets closed a new one
-    // needs to be created to take over in the pool for the one that closed.
-    this.createSocket(pending, function(socket) {
-      pending.request.onSocket(socket);
-    });
-  }
-};
-
-function createSecureSocket(options, cb) {
-  var self = this;
-  TunnelingAgent.prototype.createSocket.call(self, options, function(socket) {
-    var hostHeader = options.request.getHeader('host');
-    var tlsOptions = mergeOptions({}, self.options, {
-      socket: socket,
-      servername: hostHeader ? hostHeader.replace(/:.*$/, '') : options.host
-    });
-
-    // 0 is dummy port for v0.6
-    var secureSocket = tls.connect(0, tlsOptions);
-    self.sockets[self.sockets.indexOf(socket)] = secureSocket;
-    cb(secureSocket);
-  });
+  state.tag = _tag;
+  state.dump = _result || '{}'; // Empty mapping if no valid pairs.
 }
 
+function detectType(state, object, explicit) {
+  var _result, typeList, index, length, type, style;
 
-function toOptions(host, port, localAddress) {
-  if (typeof host === 'string') { // since v0.10
-    return {
-      host: host,
-      port: port,
-      localAddress: localAddress
-    };
+  typeList = explicit ? state.explicitTypes : state.implicitTypes;
+
+  for (index = 0, length = typeList.length; index < length; index += 1) {
+    type = typeList[index];
+
+    if ((type.instanceOf  || type.predicate) &&
+        (!type.instanceOf || ((typeof object === 'object') && (object instanceof type.instanceOf))) &&
+        (!type.predicate  || type.predicate(object))) {
+
+      if (explicit) {
+        if (type.multi && type.representName) {
+          state.tag = type.representName(object);
+        } else {
+          state.tag = type.tag;
+        }
+      } else {
+        state.tag = '?';
+      }
+
+      if (type.represent) {
+        style = state.styleMap[type.tag] || type.defaultStyle;
+
+        if (_toString.call(type.represent) === '[object Function]') {
+          _result = type.represent(object, style);
+        } else if (_hasOwnProperty.call(type.represent, style)) {
+          _result = type.represent[style](object, style);
+        } else {
+          throw new YAMLException('!<' + type.tag + '> tag resolver accepts not "' + style + '" style');
+        }
+
+        state.dump = _result;
+      }
+
+      return true;
+    }
   }
-  return host; // for v0.11 or later
+
+  return false;
 }
 
-function mergeOptions(target) {
-  for (var i = 1, len = arguments.length; i < len; ++i) {
-    var overrides = arguments[i];
-    if (typeof overrides === 'object') {
-      var keys = Object.keys(overrides);
-      for (var j = 0, keyLen = keys.length; j < keyLen; ++j) {
-        var k = keys[j];
-        if (overrides[k] !== undefined) {
-          target[k] = overrides[k];
+// Serializes `object` and writes it to global `result`.
+// Returns true on success, or false on invalid object.
+//
+function writeNode(state, level, object, block, compact, iskey, isblockseq) {
+  state.tag = null;
+  state.dump = object;
+
+  if (!detectType(state, object, false)) {
+    detectType(state, object, true);
+  }
+
+  var type = _toString.call(state.dump);
+  var inblock = block;
+  var tagStr;
+
+  if (block) {
+    block = (state.flowLevel < 0 || state.flowLevel > level);
+  }
+
+  var objectOrArray = type === '[object Object]' || type === '[object Array]',
+      duplicateIndex,
+      duplicate;
+
+  if (objectOrArray) {
+    duplicateIndex = state.duplicates.indexOf(object);
+    duplicate = duplicateIndex !== -1;
+  }
+
+  if ((state.tag !== null && state.tag !== '?') || duplicate || (state.indent !== 2 && level > 0)) {
+    compact = false;
+  }
+
+  if (duplicate && state.usedDuplicates[duplicateIndex]) {
+    state.dump = '*ref_' + duplicateIndex;
+  } else {
+    if (objectOrArray && duplicate && !state.usedDuplicates[duplicateIndex]) {
+      state.usedDuplicates[duplicateIndex] = true;
+    }
+    if (type === '[object Object]') {
+      if (block && (Object.keys(state.dump).length !== 0)) {
+        writeBlockMapping(state, level, state.dump, compact);
+        if (duplicate) {
+          state.dump = '&ref_' + duplicateIndex + state.dump;
+        }
+      } else {
+        writeFlowMapping(state, level, state.dump);
+        if (duplicate) {
+          state.dump = '&ref_' + duplicateIndex + ' ' + state.dump;
+        }
+      }
+    } else if (type === '[object Array]') {
+      if (block && (state.dump.length !== 0)) {
+        if (state.noArrayIndent && !isblockseq && level > 0) {
+          writeBlockSequence(state, level - 1, state.dump, compact);
+        } else {
+          writeBlockSequence(state, level, state.dump, compact);
+        }
+        if (duplicate) {
+          state.dump = '&ref_' + duplicateIndex + state.dump;
+        }
+      } else {
+        writeFlowSequence(state, level, state.dump);
+        if (duplicate) {
+          state.dump = '&ref_' + duplicateIndex + ' ' + state.dump;
+        }
+      }
+    } else if (type === '[object String]') {
+      if (state.tag !== '?') {
+        writeScalar(state, state.dump, level, iskey, inblock);
+      }
+    } else if (type === '[object Undefined]') {
+      return false;
+    } else {
+      if (state.skipInvalid) return false;
+      throw new YAMLException('unacceptable kind of an object to dump ' + type);
+    }
+
+    if (state.tag !== null && state.tag !== '?') {
+      // Need to encode all characters except those allowed by the spec:
+      //
+      // [35] ns-dec-digit    ::=  [#x30-#x39] /* 0-9 */
+      // [36] ns-hex-digit    ::=  ns-dec-digit
+      //                         | [#x41-#x46] /* A-F */ | [#x61-#x66] /* a-f */
+      // [37] ns-ascii-letter ::=  [#x41-#x5A] /* A-Z */ | [#x61-#x7A] /* a-z */
+      // [38] ns-word-char    ::=  ns-dec-digit | ns-ascii-letter | “-”
+      // [39] ns-uri-char     ::=  “%” ns-hex-digit ns-hex-digit | ns-word-char | “#”
+      //                         | “;” | “/” | “?” | “:” | “@” | “&” | “=” | “+” | “$” | “,”
+      //                         | “_” | “.” | “!” | “~” | “*” | “'” | “(” | “)” | “[” | “]”
+      //
+      // Also need to encode '!' because it has special meaning (end of tag prefix).
+      //
+      tagStr = encodeURI(
+        state.tag[0] === '!' ? state.tag.slice(1) : state.tag
+      ).replace(/!/g, '%21');
+
+      if (state.tag[0] === '!') {
+        tagStr = '!' + tagStr;
+      } else if (tagStr.slice(0, 18) === 'tag:yaml.org,2002:') {
+        tagStr = '!!' + tagStr.slice(18);
+      } else {
+        tagStr = '!<' + tagStr + '>';
+      }
+
+      state.dump = tagStr + ' ' + state.dump;
+    }
+  }
+
+  return true;
+}
+
+function getDuplicateReferences(object, state) {
+  var objects = [],
+      duplicatesIndexes = [],
+      index,
+      length;
+
+  inspectNode(object, objects, duplicatesIndexes);
+
+  for (index = 0, length = duplicatesIndexes.length; index < length; index += 1) {
+    state.duplicates.push(objects[duplicatesIndexes[index]]);
+  }
+  state.usedDuplicates = new Array(length);
+}
+
+function inspectNode(object, objects, duplicatesIndexes) {
+  var objectKeyList,
+      index,
+      length;
+
+  if (object !== null && typeof object === 'object') {
+    index = objects.indexOf(object);
+    if (index !== -1) {
+      if (duplicatesIndexes.indexOf(index) === -1) {
+        duplicatesIndexes.push(index);
+      }
+    } else {
+      objects.push(object);
+
+      if (Array.isArray(object)) {
+        for (index = 0, length = object.length; index < length; index += 1) {
+          inspectNode(object[index], objects, duplicatesIndexes);
+        }
+      } else {
+        objectKeyList = Object.keys(object);
+
+        for (index = 0, length = objectKeyList.length; index < length; index += 1) {
+          inspectNode(object[objectKeyList[index]], objects, duplicatesIndexes);
         }
       }
     }
   }
-  return target;
 }
 
+function dump(input, options) {
+  options = options || {};
 
-var debug;
-if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-  debug = function() {
-    var args = Array.prototype.slice.call(arguments);
-    if (typeof args[0] === 'string') {
-      args[0] = 'TUNNEL: ' + args[0];
-    } else {
-      args.unshift('TUNNEL:');
-    }
-    console.error.apply(console, args);
+  var state = new State(options);
+
+  if (!state.noRefs) getDuplicateReferences(input, state);
+
+  var value = input;
+
+  if (state.replacer) {
+    value = state.replacer.call({ '': value }, '', value);
   }
-} else {
-  debug = function() {};
+
+  if (writeNode(state, 0, value, true, true)) return state.dump + '\n';
+
+  return '';
 }
-exports.debug = debug; // for test
+
+module.exports.dump = dump;
+
+
+/***/ }),
+
+/***/ 8179:
+/***/ ((module) => {
+
+// YAML error class. http://stackoverflow.com/questions/8458984
+//
+
+
+
+function formatError(exception, compact) {
+  var where = '', message = exception.reason || '(unknown reason)';
+
+  if (!exception.mark) return message;
+
+  if (exception.mark.name) {
+    where += 'in "' + exception.mark.name + '" ';
+  }
+
+  where += '(' + (exception.mark.line + 1) + ':' + (exception.mark.column + 1) + ')';
+
+  if (!compact && exception.mark.snippet) {
+    where += '\n\n' + exception.mark.snippet;
+  }
+
+  return message + ' ' + where;
+}
+
+
+function YAMLException(reason, mark) {
+  // Super constructor
+  Error.call(this);
+
+  this.name = 'YAMLException';
+  this.reason = reason;
+  this.mark = mark;
+  this.message = formatError(this, false);
+
+  // Include stack trace in error object
+  if (Error.captureStackTrace) {
+    // Chrome and NodeJS
+    Error.captureStackTrace(this, this.constructor);
+  } else {
+    // FF, IE 10+ and Safari 6+. Fallback for others
+    this.stack = (new Error()).stack || '';
+  }
+}
+
+
+// Inherit from Error
+YAMLException.prototype = Object.create(Error.prototype);
+YAMLException.prototype.constructor = YAMLException;
+
+
+YAMLException.prototype.toString = function toString(compact) {
+  return this.name + ': ' + formatError(this, compact);
+};
+
+
+module.exports = YAMLException;
+
+
+/***/ }),
+
+/***/ 1161:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+/*eslint-disable max-len,no-use-before-define*/
+
+var common              = __nccwpck_require__(6829);
+var YAMLException       = __nccwpck_require__(8179);
+var makeSnippet         = __nccwpck_require__(6975);
+var DEFAULT_SCHEMA      = __nccwpck_require__(8759);
+
+
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+
+
+var CONTEXT_FLOW_IN   = 1;
+var CONTEXT_FLOW_OUT  = 2;
+var CONTEXT_BLOCK_IN  = 3;
+var CONTEXT_BLOCK_OUT = 4;
+
+
+var CHOMPING_CLIP  = 1;
+var CHOMPING_STRIP = 2;
+var CHOMPING_KEEP  = 3;
+
+
+var PATTERN_NON_PRINTABLE         = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x84\x86-\x9F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
+var PATTERN_NON_ASCII_LINE_BREAKS = /[\x85\u2028\u2029]/;
+var PATTERN_FLOW_INDICATORS       = /[,\[\]\{\}]/;
+var PATTERN_TAG_HANDLE            = /^(?:!|!!|![a-z\-]+!)$/i;
+var PATTERN_TAG_URI               = /^(?:!|[^,\[\]\{\}])(?:%[0-9a-f]{2}|[0-9a-z\-#;\/\?:@&=\+\$,_\.!~\*'\(\)\[\]])*$/i;
+
+
+function _class(obj) { return Object.prototype.toString.call(obj); }
+
+function is_EOL(c) {
+  return (c === 0x0A/* LF */) || (c === 0x0D/* CR */);
+}
+
+function is_WHITE_SPACE(c) {
+  return (c === 0x09/* Tab */) || (c === 0x20/* Space */);
+}
+
+function is_WS_OR_EOL(c) {
+  return (c === 0x09/* Tab */) ||
+         (c === 0x20/* Space */) ||
+         (c === 0x0A/* LF */) ||
+         (c === 0x0D/* CR */);
+}
+
+function is_FLOW_INDICATOR(c) {
+  return c === 0x2C/* , */ ||
+         c === 0x5B/* [ */ ||
+         c === 0x5D/* ] */ ||
+         c === 0x7B/* { */ ||
+         c === 0x7D/* } */;
+}
+
+function fromHexCode(c) {
+  var lc;
+
+  if ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */)) {
+    return c - 0x30;
+  }
+
+  /*eslint-disable no-bitwise*/
+  lc = c | 0x20;
+
+  if ((0x61/* a */ <= lc) && (lc <= 0x66/* f */)) {
+    return lc - 0x61 + 10;
+  }
+
+  return -1;
+}
+
+function escapedHexLen(c) {
+  if (c === 0x78/* x */) { return 2; }
+  if (c === 0x75/* u */) { return 4; }
+  if (c === 0x55/* U */) { return 8; }
+  return 0;
+}
+
+function fromDecimalCode(c) {
+  if ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */)) {
+    return c - 0x30;
+  }
+
+  return -1;
+}
+
+function simpleEscapeSequence(c) {
+  /* eslint-disable indent */
+  return (c === 0x30/* 0 */) ? '\x00' :
+        (c === 0x61/* a */) ? '\x07' :
+        (c === 0x62/* b */) ? '\x08' :
+        (c === 0x74/* t */) ? '\x09' :
+        (c === 0x09/* Tab */) ? '\x09' :
+        (c === 0x6E/* n */) ? '\x0A' :
+        (c === 0x76/* v */) ? '\x0B' :
+        (c === 0x66/* f */) ? '\x0C' :
+        (c === 0x72/* r */) ? '\x0D' :
+        (c === 0x65/* e */) ? '\x1B' :
+        (c === 0x20/* Space */) ? ' ' :
+        (c === 0x22/* " */) ? '\x22' :
+        (c === 0x2F/* / */) ? '/' :
+        (c === 0x5C/* \ */) ? '\x5C' :
+        (c === 0x4E/* N */) ? '\x85' :
+        (c === 0x5F/* _ */) ? '\xA0' :
+        (c === 0x4C/* L */) ? '\u2028' :
+        (c === 0x50/* P */) ? '\u2029' : '';
+}
+
+function charFromCodepoint(c) {
+  if (c <= 0xFFFF) {
+    return String.fromCharCode(c);
+  }
+  // Encode UTF-16 surrogate pair
+  // https://en.wikipedia.org/wiki/UTF-16#Code_points_U.2B010000_to_U.2B10FFFF
+  return String.fromCharCode(
+    ((c - 0x010000) >> 10) + 0xD800,
+    ((c - 0x010000) & 0x03FF) + 0xDC00
+  );
+}
+
+var simpleEscapeCheck = new Array(256); // integer, for fast access
+var simpleEscapeMap = new Array(256);
+for (var i = 0; i < 256; i++) {
+  simpleEscapeCheck[i] = simpleEscapeSequence(i) ? 1 : 0;
+  simpleEscapeMap[i] = simpleEscapeSequence(i);
+}
+
+
+function State(input, options) {
+  this.input = input;
+
+  this.filename  = options['filename']  || null;
+  this.schema    = options['schema']    || DEFAULT_SCHEMA;
+  this.onWarning = options['onWarning'] || null;
+  // (Hidden) Remove? makes the loader to expect YAML 1.1 documents
+  // if such documents have no explicit %YAML directive
+  this.legacy    = options['legacy']    || false;
+
+  this.json      = options['json']      || false;
+  this.listener  = options['listener']  || null;
+
+  this.implicitTypes = this.schema.compiledImplicit;
+  this.typeMap       = this.schema.compiledTypeMap;
+
+  this.length     = input.length;
+  this.position   = 0;
+  this.line       = 0;
+  this.lineStart  = 0;
+  this.lineIndent = 0;
+
+  // position of first leading tab in the current line,
+  // used to make sure there are no tabs in the indentation
+  this.firstTabInLine = -1;
+
+  this.documents = [];
+
+  /*
+  this.version;
+  this.checkLineBreaks;
+  this.tagMap;
+  this.anchorMap;
+  this.tag;
+  this.anchor;
+  this.kind;
+  this.result;*/
+
+}
+
+
+function generateError(state, message) {
+  var mark = {
+    name:     state.filename,
+    buffer:   state.input.slice(0, -1), // omit trailing \0
+    position: state.position,
+    line:     state.line,
+    column:   state.position - state.lineStart
+  };
+
+  mark.snippet = makeSnippet(mark);
+
+  return new YAMLException(message, mark);
+}
+
+function throwError(state, message) {
+  throw generateError(state, message);
+}
+
+function throwWarning(state, message) {
+  if (state.onWarning) {
+    state.onWarning.call(null, generateError(state, message));
+  }
+}
+
+
+var directiveHandlers = {
+
+  YAML: function handleYamlDirective(state, name, args) {
+
+    var match, major, minor;
+
+    if (state.version !== null) {
+      throwError(state, 'duplication of %YAML directive');
+    }
+
+    if (args.length !== 1) {
+      throwError(state, 'YAML directive accepts exactly one argument');
+    }
+
+    match = /^([0-9]+)\.([0-9]+)$/.exec(args[0]);
+
+    if (match === null) {
+      throwError(state, 'ill-formed argument of the YAML directive');
+    }
+
+    major = parseInt(match[1], 10);
+    minor = parseInt(match[2], 10);
+
+    if (major !== 1) {
+      throwError(state, 'unacceptable YAML version of the document');
+    }
+
+    state.version = args[0];
+    state.checkLineBreaks = (minor < 2);
+
+    if (minor !== 1 && minor !== 2) {
+      throwWarning(state, 'unsupported YAML version of the document');
+    }
+  },
+
+  TAG: function handleTagDirective(state, name, args) {
+
+    var handle, prefix;
+
+    if (args.length !== 2) {
+      throwError(state, 'TAG directive accepts exactly two arguments');
+    }
+
+    handle = args[0];
+    prefix = args[1];
+
+    if (!PATTERN_TAG_HANDLE.test(handle)) {
+      throwError(state, 'ill-formed tag handle (first argument) of the TAG directive');
+    }
+
+    if (_hasOwnProperty.call(state.tagMap, handle)) {
+      throwError(state, 'there is a previously declared suffix for "' + handle + '" tag handle');
+    }
+
+    if (!PATTERN_TAG_URI.test(prefix)) {
+      throwError(state, 'ill-formed tag prefix (second argument) of the TAG directive');
+    }
+
+    try {
+      prefix = decodeURIComponent(prefix);
+    } catch (err) {
+      throwError(state, 'tag prefix is malformed: ' + prefix);
+    }
+
+    state.tagMap[handle] = prefix;
+  }
+};
+
+
+function captureSegment(state, start, end, checkJson) {
+  var _position, _length, _character, _result;
+
+  if (start < end) {
+    _result = state.input.slice(start, end);
+
+    if (checkJson) {
+      for (_position = 0, _length = _result.length; _position < _length; _position += 1) {
+        _character = _result.charCodeAt(_position);
+        if (!(_character === 0x09 ||
+              (0x20 <= _character && _character <= 0x10FFFF))) {
+          throwError(state, 'expected valid JSON character');
+        }
+      }
+    } else if (PATTERN_NON_PRINTABLE.test(_result)) {
+      throwError(state, 'the stream contains non-printable characters');
+    }
+
+    state.result += _result;
+  }
+}
+
+function mergeMappings(state, destination, source, overridableKeys) {
+  var sourceKeys, key, index, quantity;
+
+  if (!common.isObject(source)) {
+    throwError(state, 'cannot merge mappings; the provided source object is unacceptable');
+  }
+
+  sourceKeys = Object.keys(source);
+
+  for (index = 0, quantity = sourceKeys.length; index < quantity; index += 1) {
+    key = sourceKeys[index];
+
+    if (!_hasOwnProperty.call(destination, key)) {
+      destination[key] = source[key];
+      overridableKeys[key] = true;
+    }
+  }
+}
+
+function storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, valueNode,
+  startLine, startLineStart, startPos) {
+
+  var index, quantity;
+
+  // The output is a plain object here, so keys can only be strings.
+  // We need to convert keyNode to a string, but doing so can hang the process
+  // (deeply nested arrays that explode exponentially using aliases).
+  if (Array.isArray(keyNode)) {
+    keyNode = Array.prototype.slice.call(keyNode);
+
+    for (index = 0, quantity = keyNode.length; index < quantity; index += 1) {
+      if (Array.isArray(keyNode[index])) {
+        throwError(state, 'nested arrays are not supported inside keys');
+      }
+
+      if (typeof keyNode === 'object' && _class(keyNode[index]) === '[object Object]') {
+        keyNode[index] = '[object Object]';
+      }
+    }
+  }
+
+  // Avoid code execution in load() via toString property
+  // (still use its own toString for arrays, timestamps,
+  // and whatever user schema extensions happen to have @@toStringTag)
+  if (typeof keyNode === 'object' && _class(keyNode) === '[object Object]') {
+    keyNode = '[object Object]';
+  }
+
+
+  keyNode = String(keyNode);
+
+  if (_result === null) {
+    _result = {};
+  }
+
+  if (keyTag === 'tag:yaml.org,2002:merge') {
+    if (Array.isArray(valueNode)) {
+      for (index = 0, quantity = valueNode.length; index < quantity; index += 1) {
+        mergeMappings(state, _result, valueNode[index], overridableKeys);
+      }
+    } else {
+      mergeMappings(state, _result, valueNode, overridableKeys);
+    }
+  } else {
+    if (!state.json &&
+        !_hasOwnProperty.call(overridableKeys, keyNode) &&
+        _hasOwnProperty.call(_result, keyNode)) {
+      state.line = startLine || state.line;
+      state.lineStart = startLineStart || state.lineStart;
+      state.position = startPos || state.position;
+      throwError(state, 'duplicated mapping key');
+    }
+
+    // used for this specific key only because Object.defineProperty is slow
+    if (keyNode === '__proto__') {
+      Object.defineProperty(_result, keyNode, {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: valueNode
+      });
+    } else {
+      _result[keyNode] = valueNode;
+    }
+    delete overridableKeys[keyNode];
+  }
+
+  return _result;
+}
+
+function readLineBreak(state) {
+  var ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch === 0x0A/* LF */) {
+    state.position++;
+  } else if (ch === 0x0D/* CR */) {
+    state.position++;
+    if (state.input.charCodeAt(state.position) === 0x0A/* LF */) {
+      state.position++;
+    }
+  } else {
+    throwError(state, 'a line break is expected');
+  }
+
+  state.line += 1;
+  state.lineStart = state.position;
+  state.firstTabInLine = -1;
+}
+
+function skipSeparationSpace(state, allowComments, checkIndent) {
+  var lineBreaks = 0,
+      ch = state.input.charCodeAt(state.position);
+
+  while (ch !== 0) {
+    while (is_WHITE_SPACE(ch)) {
+      if (ch === 0x09/* Tab */ && state.firstTabInLine === -1) {
+        state.firstTabInLine = state.position;
+      }
+      ch = state.input.charCodeAt(++state.position);
+    }
+
+    if (allowComments && ch === 0x23/* # */) {
+      do {
+        ch = state.input.charCodeAt(++state.position);
+      } while (ch !== 0x0A/* LF */ && ch !== 0x0D/* CR */ && ch !== 0);
+    }
+
+    if (is_EOL(ch)) {
+      readLineBreak(state);
+
+      ch = state.input.charCodeAt(state.position);
+      lineBreaks++;
+      state.lineIndent = 0;
+
+      while (ch === 0x20/* Space */) {
+        state.lineIndent++;
+        ch = state.input.charCodeAt(++state.position);
+      }
+    } else {
+      break;
+    }
+  }
+
+  if (checkIndent !== -1 && lineBreaks !== 0 && state.lineIndent < checkIndent) {
+    throwWarning(state, 'deficient indentation');
+  }
+
+  return lineBreaks;
+}
+
+function testDocumentSeparator(state) {
+  var _position = state.position,
+      ch;
+
+  ch = state.input.charCodeAt(_position);
+
+  // Condition state.position === state.lineStart is tested
+  // in parent on each call, for efficiency. No needs to test here again.
+  if ((ch === 0x2D/* - */ || ch === 0x2E/* . */) &&
+      ch === state.input.charCodeAt(_position + 1) &&
+      ch === state.input.charCodeAt(_position + 2)) {
+
+    _position += 3;
+
+    ch = state.input.charCodeAt(_position);
+
+    if (ch === 0 || is_WS_OR_EOL(ch)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function writeFoldedLines(state, count) {
+  if (count === 1) {
+    state.result += ' ';
+  } else if (count > 1) {
+    state.result += common.repeat('\n', count - 1);
+  }
+}
+
+
+function readPlainScalar(state, nodeIndent, withinFlowCollection) {
+  var preceding,
+      following,
+      captureStart,
+      captureEnd,
+      hasPendingContent,
+      _line,
+      _lineStart,
+      _lineIndent,
+      _kind = state.kind,
+      _result = state.result,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (is_WS_OR_EOL(ch)      ||
+      is_FLOW_INDICATOR(ch) ||
+      ch === 0x23/* # */    ||
+      ch === 0x26/* & */    ||
+      ch === 0x2A/* * */    ||
+      ch === 0x21/* ! */    ||
+      ch === 0x7C/* | */    ||
+      ch === 0x3E/* > */    ||
+      ch === 0x27/* ' */    ||
+      ch === 0x22/* " */    ||
+      ch === 0x25/* % */    ||
+      ch === 0x40/* @ */    ||
+      ch === 0x60/* ` */) {
+    return false;
+  }
+
+  if (ch === 0x3F/* ? */ || ch === 0x2D/* - */) {
+    following = state.input.charCodeAt(state.position + 1);
+
+    if (is_WS_OR_EOL(following) ||
+        withinFlowCollection && is_FLOW_INDICATOR(following)) {
+      return false;
+    }
+  }
+
+  state.kind = 'scalar';
+  state.result = '';
+  captureStart = captureEnd = state.position;
+  hasPendingContent = false;
+
+  while (ch !== 0) {
+    if (ch === 0x3A/* : */) {
+      following = state.input.charCodeAt(state.position + 1);
+
+      if (is_WS_OR_EOL(following) ||
+          withinFlowCollection && is_FLOW_INDICATOR(following)) {
+        break;
+      }
+
+    } else if (ch === 0x23/* # */) {
+      preceding = state.input.charCodeAt(state.position - 1);
+
+      if (is_WS_OR_EOL(preceding)) {
+        break;
+      }
+
+    } else if ((state.position === state.lineStart && testDocumentSeparator(state)) ||
+               withinFlowCollection && is_FLOW_INDICATOR(ch)) {
+      break;
+
+    } else if (is_EOL(ch)) {
+      _line = state.line;
+      _lineStart = state.lineStart;
+      _lineIndent = state.lineIndent;
+      skipSeparationSpace(state, false, -1);
+
+      if (state.lineIndent >= nodeIndent) {
+        hasPendingContent = true;
+        ch = state.input.charCodeAt(state.position);
+        continue;
+      } else {
+        state.position = captureEnd;
+        state.line = _line;
+        state.lineStart = _lineStart;
+        state.lineIndent = _lineIndent;
+        break;
+      }
+    }
+
+    if (hasPendingContent) {
+      captureSegment(state, captureStart, captureEnd, false);
+      writeFoldedLines(state, state.line - _line);
+      captureStart = captureEnd = state.position;
+      hasPendingContent = false;
+    }
+
+    if (!is_WHITE_SPACE(ch)) {
+      captureEnd = state.position + 1;
+    }
+
+    ch = state.input.charCodeAt(++state.position);
+  }
+
+  captureSegment(state, captureStart, captureEnd, false);
+
+  if (state.result) {
+    return true;
+  }
+
+  state.kind = _kind;
+  state.result = _result;
+  return false;
+}
+
+function readSingleQuotedScalar(state, nodeIndent) {
+  var ch,
+      captureStart, captureEnd;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch !== 0x27/* ' */) {
+    return false;
+  }
+
+  state.kind = 'scalar';
+  state.result = '';
+  state.position++;
+  captureStart = captureEnd = state.position;
+
+  while ((ch = state.input.charCodeAt(state.position)) !== 0) {
+    if (ch === 0x27/* ' */) {
+      captureSegment(state, captureStart, state.position, true);
+      ch = state.input.charCodeAt(++state.position);
+
+      if (ch === 0x27/* ' */) {
+        captureStart = state.position;
+        state.position++;
+        captureEnd = state.position;
+      } else {
+        return true;
+      }
+
+    } else if (is_EOL(ch)) {
+      captureSegment(state, captureStart, captureEnd, true);
+      writeFoldedLines(state, skipSeparationSpace(state, false, nodeIndent));
+      captureStart = captureEnd = state.position;
+
+    } else if (state.position === state.lineStart && testDocumentSeparator(state)) {
+      throwError(state, 'unexpected end of the document within a single quoted scalar');
+
+    } else {
+      state.position++;
+      captureEnd = state.position;
+    }
+  }
+
+  throwError(state, 'unexpected end of the stream within a single quoted scalar');
+}
+
+function readDoubleQuotedScalar(state, nodeIndent) {
+  var captureStart,
+      captureEnd,
+      hexLength,
+      hexResult,
+      tmp,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch !== 0x22/* " */) {
+    return false;
+  }
+
+  state.kind = 'scalar';
+  state.result = '';
+  state.position++;
+  captureStart = captureEnd = state.position;
+
+  while ((ch = state.input.charCodeAt(state.position)) !== 0) {
+    if (ch === 0x22/* " */) {
+      captureSegment(state, captureStart, state.position, true);
+      state.position++;
+      return true;
+
+    } else if (ch === 0x5C/* \ */) {
+      captureSegment(state, captureStart, state.position, true);
+      ch = state.input.charCodeAt(++state.position);
+
+      if (is_EOL(ch)) {
+        skipSeparationSpace(state, false, nodeIndent);
+
+        // TODO: rework to inline fn with no type cast?
+      } else if (ch < 256 && simpleEscapeCheck[ch]) {
+        state.result += simpleEscapeMap[ch];
+        state.position++;
+
+      } else if ((tmp = escapedHexLen(ch)) > 0) {
+        hexLength = tmp;
+        hexResult = 0;
+
+        for (; hexLength > 0; hexLength--) {
+          ch = state.input.charCodeAt(++state.position);
+
+          if ((tmp = fromHexCode(ch)) >= 0) {
+            hexResult = (hexResult << 4) + tmp;
+
+          } else {
+            throwError(state, 'expected hexadecimal character');
+          }
+        }
+
+        state.result += charFromCodepoint(hexResult);
+
+        state.position++;
+
+      } else {
+        throwError(state, 'unknown escape sequence');
+      }
+
+      captureStart = captureEnd = state.position;
+
+    } else if (is_EOL(ch)) {
+      captureSegment(state, captureStart, captureEnd, true);
+      writeFoldedLines(state, skipSeparationSpace(state, false, nodeIndent));
+      captureStart = captureEnd = state.position;
+
+    } else if (state.position === state.lineStart && testDocumentSeparator(state)) {
+      throwError(state, 'unexpected end of the document within a double quoted scalar');
+
+    } else {
+      state.position++;
+      captureEnd = state.position;
+    }
+  }
+
+  throwError(state, 'unexpected end of the stream within a double quoted scalar');
+}
+
+function readFlowCollection(state, nodeIndent) {
+  var readNext = true,
+      _line,
+      _lineStart,
+      _pos,
+      _tag     = state.tag,
+      _result,
+      _anchor  = state.anchor,
+      following,
+      terminator,
+      isPair,
+      isExplicitPair,
+      isMapping,
+      overridableKeys = Object.create(null),
+      keyNode,
+      keyTag,
+      valueNode,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch === 0x5B/* [ */) {
+    terminator = 0x5D;/* ] */
+    isMapping = false;
+    _result = [];
+  } else if (ch === 0x7B/* { */) {
+    terminator = 0x7D;/* } */
+    isMapping = true;
+    _result = {};
+  } else {
+    return false;
+  }
+
+  if (state.anchor !== null) {
+    state.anchorMap[state.anchor] = _result;
+  }
+
+  ch = state.input.charCodeAt(++state.position);
+
+  while (ch !== 0) {
+    skipSeparationSpace(state, true, nodeIndent);
+
+    ch = state.input.charCodeAt(state.position);
+
+    if (ch === terminator) {
+      state.position++;
+      state.tag = _tag;
+      state.anchor = _anchor;
+      state.kind = isMapping ? 'mapping' : 'sequence';
+      state.result = _result;
+      return true;
+    } else if (!readNext) {
+      throwError(state, 'missed comma between flow collection entries');
+    } else if (ch === 0x2C/* , */) {
+      // "flow collection entries can never be completely empty", as per YAML 1.2, section 7.4
+      throwError(state, "expected the node content, but found ','");
+    }
+
+    keyTag = keyNode = valueNode = null;
+    isPair = isExplicitPair = false;
+
+    if (ch === 0x3F/* ? */) {
+      following = state.input.charCodeAt(state.position + 1);
+
+      if (is_WS_OR_EOL(following)) {
+        isPair = isExplicitPair = true;
+        state.position++;
+        skipSeparationSpace(state, true, nodeIndent);
+      }
+    }
+
+    _line = state.line; // Save the current line.
+    _lineStart = state.lineStart;
+    _pos = state.position;
+    composeNode(state, nodeIndent, CONTEXT_FLOW_IN, false, true);
+    keyTag = state.tag;
+    keyNode = state.result;
+    skipSeparationSpace(state, true, nodeIndent);
+
+    ch = state.input.charCodeAt(state.position);
+
+    if ((isExplicitPair || state.line === _line) && ch === 0x3A/* : */) {
+      isPair = true;
+      ch = state.input.charCodeAt(++state.position);
+      skipSeparationSpace(state, true, nodeIndent);
+      composeNode(state, nodeIndent, CONTEXT_FLOW_IN, false, true);
+      valueNode = state.result;
+    }
+
+    if (isMapping) {
+      storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, valueNode, _line, _lineStart, _pos);
+    } else if (isPair) {
+      _result.push(storeMappingPair(state, null, overridableKeys, keyTag, keyNode, valueNode, _line, _lineStart, _pos));
+    } else {
+      _result.push(keyNode);
+    }
+
+    skipSeparationSpace(state, true, nodeIndent);
+
+    ch = state.input.charCodeAt(state.position);
+
+    if (ch === 0x2C/* , */) {
+      readNext = true;
+      ch = state.input.charCodeAt(++state.position);
+    } else {
+      readNext = false;
+    }
+  }
+
+  throwError(state, 'unexpected end of the stream within a flow collection');
+}
+
+function readBlockScalar(state, nodeIndent) {
+  var captureStart,
+      folding,
+      chomping       = CHOMPING_CLIP,
+      didReadContent = false,
+      detectedIndent = false,
+      textIndent     = nodeIndent,
+      emptyLines     = 0,
+      atMoreIndented = false,
+      tmp,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch === 0x7C/* | */) {
+    folding = false;
+  } else if (ch === 0x3E/* > */) {
+    folding = true;
+  } else {
+    return false;
+  }
+
+  state.kind = 'scalar';
+  state.result = '';
+
+  while (ch !== 0) {
+    ch = state.input.charCodeAt(++state.position);
+
+    if (ch === 0x2B/* + */ || ch === 0x2D/* - */) {
+      if (CHOMPING_CLIP === chomping) {
+        chomping = (ch === 0x2B/* + */) ? CHOMPING_KEEP : CHOMPING_STRIP;
+      } else {
+        throwError(state, 'repeat of a chomping mode identifier');
+      }
+
+    } else if ((tmp = fromDecimalCode(ch)) >= 0) {
+      if (tmp === 0) {
+        throwError(state, 'bad explicit indentation width of a block scalar; it cannot be less than one');
+      } else if (!detectedIndent) {
+        textIndent = nodeIndent + tmp - 1;
+        detectedIndent = true;
+      } else {
+        throwError(state, 'repeat of an indentation width identifier');
+      }
+
+    } else {
+      break;
+    }
+  }
+
+  if (is_WHITE_SPACE(ch)) {
+    do { ch = state.input.charCodeAt(++state.position); }
+    while (is_WHITE_SPACE(ch));
+
+    if (ch === 0x23/* # */) {
+      do { ch = state.input.charCodeAt(++state.position); }
+      while (!is_EOL(ch) && (ch !== 0));
+    }
+  }
+
+  while (ch !== 0) {
+    readLineBreak(state);
+    state.lineIndent = 0;
+
+    ch = state.input.charCodeAt(state.position);
+
+    while ((!detectedIndent || state.lineIndent < textIndent) &&
+           (ch === 0x20/* Space */)) {
+      state.lineIndent++;
+      ch = state.input.charCodeAt(++state.position);
+    }
+
+    if (!detectedIndent && state.lineIndent > textIndent) {
+      textIndent = state.lineIndent;
+    }
+
+    if (is_EOL(ch)) {
+      emptyLines++;
+      continue;
+    }
+
+    // End of the scalar.
+    if (state.lineIndent < textIndent) {
+
+      // Perform the chomping.
+      if (chomping === CHOMPING_KEEP) {
+        state.result += common.repeat('\n', didReadContent ? 1 + emptyLines : emptyLines);
+      } else if (chomping === CHOMPING_CLIP) {
+        if (didReadContent) { // i.e. only if the scalar is not empty.
+          state.result += '\n';
+        }
+      }
+
+      // Break this `while` cycle and go to the funciton's epilogue.
+      break;
+    }
+
+    // Folded style: use fancy rules to handle line breaks.
+    if (folding) {
+
+      // Lines starting with white space characters (more-indented lines) are not folded.
+      if (is_WHITE_SPACE(ch)) {
+        atMoreIndented = true;
+        // except for the first content line (cf. Example 8.1)
+        state.result += common.repeat('\n', didReadContent ? 1 + emptyLines : emptyLines);
+
+      // End of more-indented block.
+      } else if (atMoreIndented) {
+        atMoreIndented = false;
+        state.result += common.repeat('\n', emptyLines + 1);
+
+      // Just one line break - perceive as the same line.
+      } else if (emptyLines === 0) {
+        if (didReadContent) { // i.e. only if we have already read some scalar content.
+          state.result += ' ';
+        }
+
+      // Several line breaks - perceive as different lines.
+      } else {
+        state.result += common.repeat('\n', emptyLines);
+      }
+
+    // Literal style: just add exact number of line breaks between content lines.
+    } else {
+      // Keep all line breaks except the header line break.
+      state.result += common.repeat('\n', didReadContent ? 1 + emptyLines : emptyLines);
+    }
+
+    didReadContent = true;
+    detectedIndent = true;
+    emptyLines = 0;
+    captureStart = state.position;
+
+    while (!is_EOL(ch) && (ch !== 0)) {
+      ch = state.input.charCodeAt(++state.position);
+    }
+
+    captureSegment(state, captureStart, state.position, false);
+  }
+
+  return true;
+}
+
+function readBlockSequence(state, nodeIndent) {
+  var _line,
+      _tag      = state.tag,
+      _anchor   = state.anchor,
+      _result   = [],
+      following,
+      detected  = false,
+      ch;
+
+  // there is a leading tab before this token, so it can't be a block sequence/mapping;
+  // it can still be flow sequence/mapping or a scalar
+  if (state.firstTabInLine !== -1) return false;
+
+  if (state.anchor !== null) {
+    state.anchorMap[state.anchor] = _result;
+  }
+
+  ch = state.input.charCodeAt(state.position);
+
+  while (ch !== 0) {
+    if (state.firstTabInLine !== -1) {
+      state.position = state.firstTabInLine;
+      throwError(state, 'tab characters must not be used in indentation');
+    }
+
+    if (ch !== 0x2D/* - */) {
+      break;
+    }
+
+    following = state.input.charCodeAt(state.position + 1);
+
+    if (!is_WS_OR_EOL(following)) {
+      break;
+    }
+
+    detected = true;
+    state.position++;
+
+    if (skipSeparationSpace(state, true, -1)) {
+      if (state.lineIndent <= nodeIndent) {
+        _result.push(null);
+        ch = state.input.charCodeAt(state.position);
+        continue;
+      }
+    }
+
+    _line = state.line;
+    composeNode(state, nodeIndent, CONTEXT_BLOCK_IN, false, true);
+    _result.push(state.result);
+    skipSeparationSpace(state, true, -1);
+
+    ch = state.input.charCodeAt(state.position);
+
+    if ((state.line === _line || state.lineIndent > nodeIndent) && (ch !== 0)) {
+      throwError(state, 'bad indentation of a sequence entry');
+    } else if (state.lineIndent < nodeIndent) {
+      break;
+    }
+  }
+
+  if (detected) {
+    state.tag = _tag;
+    state.anchor = _anchor;
+    state.kind = 'sequence';
+    state.result = _result;
+    return true;
+  }
+  return false;
+}
+
+function readBlockMapping(state, nodeIndent, flowIndent) {
+  var following,
+      allowCompact,
+      _line,
+      _keyLine,
+      _keyLineStart,
+      _keyPos,
+      _tag          = state.tag,
+      _anchor       = state.anchor,
+      _result       = {},
+      overridableKeys = Object.create(null),
+      keyTag        = null,
+      keyNode       = null,
+      valueNode     = null,
+      atExplicitKey = false,
+      detected      = false,
+      ch;
+
+  // there is a leading tab before this token, so it can't be a block sequence/mapping;
+  // it can still be flow sequence/mapping or a scalar
+  if (state.firstTabInLine !== -1) return false;
+
+  if (state.anchor !== null) {
+    state.anchorMap[state.anchor] = _result;
+  }
+
+  ch = state.input.charCodeAt(state.position);
+
+  while (ch !== 0) {
+    if (!atExplicitKey && state.firstTabInLine !== -1) {
+      state.position = state.firstTabInLine;
+      throwError(state, 'tab characters must not be used in indentation');
+    }
+
+    following = state.input.charCodeAt(state.position + 1);
+    _line = state.line; // Save the current line.
+
+    //
+    // Explicit notation case. There are two separate blocks:
+    // first for the key (denoted by "?") and second for the value (denoted by ":")
+    //
+    if ((ch === 0x3F/* ? */ || ch === 0x3A/* : */) && is_WS_OR_EOL(following)) {
+
+      if (ch === 0x3F/* ? */) {
+        if (atExplicitKey) {
+          storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, null, _keyLine, _keyLineStart, _keyPos);
+          keyTag = keyNode = valueNode = null;
+        }
+
+        detected = true;
+        atExplicitKey = true;
+        allowCompact = true;
+
+      } else if (atExplicitKey) {
+        // i.e. 0x3A/* : */ === character after the explicit key.
+        atExplicitKey = false;
+        allowCompact = true;
+
+      } else {
+        throwError(state, 'incomplete explicit mapping pair; a key node is missed; or followed by a non-tabulated empty line');
+      }
+
+      state.position += 1;
+      ch = following;
+
+    //
+    // Implicit notation case. Flow-style node as the key first, then ":", and the value.
+    //
+    } else {
+      _keyLine = state.line;
+      _keyLineStart = state.lineStart;
+      _keyPos = state.position;
+
+      if (!composeNode(state, flowIndent, CONTEXT_FLOW_OUT, false, true)) {
+        // Neither implicit nor explicit notation.
+        // Reading is done. Go to the epilogue.
+        break;
+      }
+
+      if (state.line === _line) {
+        ch = state.input.charCodeAt(state.position);
+
+        while (is_WHITE_SPACE(ch)) {
+          ch = state.input.charCodeAt(++state.position);
+        }
+
+        if (ch === 0x3A/* : */) {
+          ch = state.input.charCodeAt(++state.position);
+
+          if (!is_WS_OR_EOL(ch)) {
+            throwError(state, 'a whitespace character is expected after the key-value separator within a block mapping');
+          }
+
+          if (atExplicitKey) {
+            storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, null, _keyLine, _keyLineStart, _keyPos);
+            keyTag = keyNode = valueNode = null;
+          }
+
+          detected = true;
+          atExplicitKey = false;
+          allowCompact = false;
+          keyTag = state.tag;
+          keyNode = state.result;
+
+        } else if (detected) {
+          throwError(state, 'can not read an implicit mapping pair; a colon is missed');
+
+        } else {
+          state.tag = _tag;
+          state.anchor = _anchor;
+          return true; // Keep the result of `composeNode`.
+        }
+
+      } else if (detected) {
+        throwError(state, 'can not read a block mapping entry; a multiline key may not be an implicit key');
+
+      } else {
+        state.tag = _tag;
+        state.anchor = _anchor;
+        return true; // Keep the result of `composeNode`.
+      }
+    }
+
+    //
+    // Common reading code for both explicit and implicit notations.
+    //
+    if (state.line === _line || state.lineIndent > nodeIndent) {
+      if (atExplicitKey) {
+        _keyLine = state.line;
+        _keyLineStart = state.lineStart;
+        _keyPos = state.position;
+      }
+
+      if (composeNode(state, nodeIndent, CONTEXT_BLOCK_OUT, true, allowCompact)) {
+        if (atExplicitKey) {
+          keyNode = state.result;
+        } else {
+          valueNode = state.result;
+        }
+      }
+
+      if (!atExplicitKey) {
+        storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, valueNode, _keyLine, _keyLineStart, _keyPos);
+        keyTag = keyNode = valueNode = null;
+      }
+
+      skipSeparationSpace(state, true, -1);
+      ch = state.input.charCodeAt(state.position);
+    }
+
+    if ((state.line === _line || state.lineIndent > nodeIndent) && (ch !== 0)) {
+      throwError(state, 'bad indentation of a mapping entry');
+    } else if (state.lineIndent < nodeIndent) {
+      break;
+    }
+  }
+
+  //
+  // Epilogue.
+  //
+
+  // Special case: last mapping's node contains only the key in explicit notation.
+  if (atExplicitKey) {
+    storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, null, _keyLine, _keyLineStart, _keyPos);
+  }
+
+  // Expose the resulting mapping.
+  if (detected) {
+    state.tag = _tag;
+    state.anchor = _anchor;
+    state.kind = 'mapping';
+    state.result = _result;
+  }
+
+  return detected;
+}
+
+function readTagProperty(state) {
+  var _position,
+      isVerbatim = false,
+      isNamed    = false,
+      tagHandle,
+      tagName,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch !== 0x21/* ! */) return false;
+
+  if (state.tag !== null) {
+    throwError(state, 'duplication of a tag property');
+  }
+
+  ch = state.input.charCodeAt(++state.position);
+
+  if (ch === 0x3C/* < */) {
+    isVerbatim = true;
+    ch = state.input.charCodeAt(++state.position);
+
+  } else if (ch === 0x21/* ! */) {
+    isNamed = true;
+    tagHandle = '!!';
+    ch = state.input.charCodeAt(++state.position);
+
+  } else {
+    tagHandle = '!';
+  }
+
+  _position = state.position;
+
+  if (isVerbatim) {
+    do { ch = state.input.charCodeAt(++state.position); }
+    while (ch !== 0 && ch !== 0x3E/* > */);
+
+    if (state.position < state.length) {
+      tagName = state.input.slice(_position, state.position);
+      ch = state.input.charCodeAt(++state.position);
+    } else {
+      throwError(state, 'unexpected end of the stream within a verbatim tag');
+    }
+  } else {
+    while (ch !== 0 && !is_WS_OR_EOL(ch)) {
+
+      if (ch === 0x21/* ! */) {
+        if (!isNamed) {
+          tagHandle = state.input.slice(_position - 1, state.position + 1);
+
+          if (!PATTERN_TAG_HANDLE.test(tagHandle)) {
+            throwError(state, 'named tag handle cannot contain such characters');
+          }
+
+          isNamed = true;
+          _position = state.position + 1;
+        } else {
+          throwError(state, 'tag suffix cannot contain exclamation marks');
+        }
+      }
+
+      ch = state.input.charCodeAt(++state.position);
+    }
+
+    tagName = state.input.slice(_position, state.position);
+
+    if (PATTERN_FLOW_INDICATORS.test(tagName)) {
+      throwError(state, 'tag suffix cannot contain flow indicator characters');
+    }
+  }
+
+  if (tagName && !PATTERN_TAG_URI.test(tagName)) {
+    throwError(state, 'tag name cannot contain such characters: ' + tagName);
+  }
+
+  try {
+    tagName = decodeURIComponent(tagName);
+  } catch (err) {
+    throwError(state, 'tag name is malformed: ' + tagName);
+  }
+
+  if (isVerbatim) {
+    state.tag = tagName;
+
+  } else if (_hasOwnProperty.call(state.tagMap, tagHandle)) {
+    state.tag = state.tagMap[tagHandle] + tagName;
+
+  } else if (tagHandle === '!') {
+    state.tag = '!' + tagName;
+
+  } else if (tagHandle === '!!') {
+    state.tag = 'tag:yaml.org,2002:' + tagName;
+
+  } else {
+    throwError(state, 'undeclared tag handle "' + tagHandle + '"');
+  }
+
+  return true;
+}
+
+function readAnchorProperty(state) {
+  var _position,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch !== 0x26/* & */) return false;
+
+  if (state.anchor !== null) {
+    throwError(state, 'duplication of an anchor property');
+  }
+
+  ch = state.input.charCodeAt(++state.position);
+  _position = state.position;
+
+  while (ch !== 0 && !is_WS_OR_EOL(ch) && !is_FLOW_INDICATOR(ch)) {
+    ch = state.input.charCodeAt(++state.position);
+  }
+
+  if (state.position === _position) {
+    throwError(state, 'name of an anchor node must contain at least one character');
+  }
+
+  state.anchor = state.input.slice(_position, state.position);
+  return true;
+}
+
+function readAlias(state) {
+  var _position, alias,
+      ch;
+
+  ch = state.input.charCodeAt(state.position);
+
+  if (ch !== 0x2A/* * */) return false;
+
+  ch = state.input.charCodeAt(++state.position);
+  _position = state.position;
+
+  while (ch !== 0 && !is_WS_OR_EOL(ch) && !is_FLOW_INDICATOR(ch)) {
+    ch = state.input.charCodeAt(++state.position);
+  }
+
+  if (state.position === _position) {
+    throwError(state, 'name of an alias node must contain at least one character');
+  }
+
+  alias = state.input.slice(_position, state.position);
+
+  if (!_hasOwnProperty.call(state.anchorMap, alias)) {
+    throwError(state, 'unidentified alias "' + alias + '"');
+  }
+
+  state.result = state.anchorMap[alias];
+  skipSeparationSpace(state, true, -1);
+  return true;
+}
+
+function composeNode(state, parentIndent, nodeContext, allowToSeek, allowCompact) {
+  var allowBlockStyles,
+      allowBlockScalars,
+      allowBlockCollections,
+      indentStatus = 1, // 1: this>parent, 0: this=parent, -1: this<parent
+      atNewLine  = false,
+      hasContent = false,
+      typeIndex,
+      typeQuantity,
+      typeList,
+      type,
+      flowIndent,
+      blockIndent;
+
+  if (state.listener !== null) {
+    state.listener('open', state);
+  }
+
+  state.tag    = null;
+  state.anchor = null;
+  state.kind   = null;
+  state.result = null;
+
+  allowBlockStyles = allowBlockScalars = allowBlockCollections =
+    CONTEXT_BLOCK_OUT === nodeContext ||
+    CONTEXT_BLOCK_IN  === nodeContext;
+
+  if (allowToSeek) {
+    if (skipSeparationSpace(state, true, -1)) {
+      atNewLine = true;
+
+      if (state.lineIndent > parentIndent) {
+        indentStatus = 1;
+      } else if (state.lineIndent === parentIndent) {
+        indentStatus = 0;
+      } else if (state.lineIndent < parentIndent) {
+        indentStatus = -1;
+      }
+    }
+  }
+
+  if (indentStatus === 1) {
+    while (readTagProperty(state) || readAnchorProperty(state)) {
+      if (skipSeparationSpace(state, true, -1)) {
+        atNewLine = true;
+        allowBlockCollections = allowBlockStyles;
+
+        if (state.lineIndent > parentIndent) {
+          indentStatus = 1;
+        } else if (state.lineIndent === parentIndent) {
+          indentStatus = 0;
+        } else if (state.lineIndent < parentIndent) {
+          indentStatus = -1;
+        }
+      } else {
+        allowBlockCollections = false;
+      }
+    }
+  }
+
+  if (allowBlockCollections) {
+    allowBlockCollections = atNewLine || allowCompact;
+  }
+
+  if (indentStatus === 1 || CONTEXT_BLOCK_OUT === nodeContext) {
+    if (CONTEXT_FLOW_IN === nodeContext || CONTEXT_FLOW_OUT === nodeContext) {
+      flowIndent = parentIndent;
+    } else {
+      flowIndent = parentIndent + 1;
+    }
+
+    blockIndent = state.position - state.lineStart;
+
+    if (indentStatus === 1) {
+      if (allowBlockCollections &&
+          (readBlockSequence(state, blockIndent) ||
+           readBlockMapping(state, blockIndent, flowIndent)) ||
+          readFlowCollection(state, flowIndent)) {
+        hasContent = true;
+      } else {
+        if ((allowBlockScalars && readBlockScalar(state, flowIndent)) ||
+            readSingleQuotedScalar(state, flowIndent) ||
+            readDoubleQuotedScalar(state, flowIndent)) {
+          hasContent = true;
+
+        } else if (readAlias(state)) {
+          hasContent = true;
+
+          if (state.tag !== null || state.anchor !== null) {
+            throwError(state, 'alias node should not have any properties');
+          }
+
+        } else if (readPlainScalar(state, flowIndent, CONTEXT_FLOW_IN === nodeContext)) {
+          hasContent = true;
+
+          if (state.tag === null) {
+            state.tag = '?';
+          }
+        }
+
+        if (state.anchor !== null) {
+          state.anchorMap[state.anchor] = state.result;
+        }
+      }
+    } else if (indentStatus === 0) {
+      // Special case: block sequences are allowed to have same indentation level as the parent.
+      // http://www.yaml.org/spec/1.2/spec.html#id2799784
+      hasContent = allowBlockCollections && readBlockSequence(state, blockIndent);
+    }
+  }
+
+  if (state.tag === null) {
+    if (state.anchor !== null) {
+      state.anchorMap[state.anchor] = state.result;
+    }
+
+  } else if (state.tag === '?') {
+    // Implicit resolving is not allowed for non-scalar types, and '?'
+    // non-specific tag is only automatically assigned to plain scalars.
+    //
+    // We only need to check kind conformity in case user explicitly assigns '?'
+    // tag, for example like this: "!<?> [0]"
+    //
+    if (state.result !== null && state.kind !== 'scalar') {
+      throwError(state, 'unacceptable node kind for !<?> tag; it should be "scalar", not "' + state.kind + '"');
+    }
+
+    for (typeIndex = 0, typeQuantity = state.implicitTypes.length; typeIndex < typeQuantity; typeIndex += 1) {
+      type = state.implicitTypes[typeIndex];
+
+      if (type.resolve(state.result)) { // `state.result` updated in resolver if matched
+        state.result = type.construct(state.result);
+        state.tag = type.tag;
+        if (state.anchor !== null) {
+          state.anchorMap[state.anchor] = state.result;
+        }
+        break;
+      }
+    }
+  } else if (state.tag !== '!') {
+    if (_hasOwnProperty.call(state.typeMap[state.kind || 'fallback'], state.tag)) {
+      type = state.typeMap[state.kind || 'fallback'][state.tag];
+    } else {
+      // looking for multi type
+      type = null;
+      typeList = state.typeMap.multi[state.kind || 'fallback'];
+
+      for (typeIndex = 0, typeQuantity = typeList.length; typeIndex < typeQuantity; typeIndex += 1) {
+        if (state.tag.slice(0, typeList[typeIndex].tag.length) === typeList[typeIndex].tag) {
+          type = typeList[typeIndex];
+          break;
+        }
+      }
+    }
+
+    if (!type) {
+      throwError(state, 'unknown tag !<' + state.tag + '>');
+    }
+
+    if (state.result !== null && type.kind !== state.kind) {
+      throwError(state, 'unacceptable node kind for !<' + state.tag + '> tag; it should be "' + type.kind + '", not "' + state.kind + '"');
+    }
+
+    if (!type.resolve(state.result, state.tag)) { // `state.result` updated in resolver if matched
+      throwError(state, 'cannot resolve a node with !<' + state.tag + '> explicit tag');
+    } else {
+      state.result = type.construct(state.result, state.tag);
+      if (state.anchor !== null) {
+        state.anchorMap[state.anchor] = state.result;
+      }
+    }
+  }
+
+  if (state.listener !== null) {
+    state.listener('close', state);
+  }
+  return state.tag !== null ||  state.anchor !== null || hasContent;
+}
+
+function readDocument(state) {
+  var documentStart = state.position,
+      _position,
+      directiveName,
+      directiveArgs,
+      hasDirectives = false,
+      ch;
+
+  state.version = null;
+  state.checkLineBreaks = state.legacy;
+  state.tagMap = Object.create(null);
+  state.anchorMap = Object.create(null);
+
+  while ((ch = state.input.charCodeAt(state.position)) !== 0) {
+    skipSeparationSpace(state, true, -1);
+
+    ch = state.input.charCodeAt(state.position);
+
+    if (state.lineIndent > 0 || ch !== 0x25/* % */) {
+      break;
+    }
+
+    hasDirectives = true;
+    ch = state.input.charCodeAt(++state.position);
+    _position = state.position;
+
+    while (ch !== 0 && !is_WS_OR_EOL(ch)) {
+      ch = state.input.charCodeAt(++state.position);
+    }
+
+    directiveName = state.input.slice(_position, state.position);
+    directiveArgs = [];
+
+    if (directiveName.length < 1) {
+      throwError(state, 'directive name must not be less than one character in length');
+    }
+
+    while (ch !== 0) {
+      while (is_WHITE_SPACE(ch)) {
+        ch = state.input.charCodeAt(++state.position);
+      }
+
+      if (ch === 0x23/* # */) {
+        do { ch = state.input.charCodeAt(++state.position); }
+        while (ch !== 0 && !is_EOL(ch));
+        break;
+      }
+
+      if (is_EOL(ch)) break;
+
+      _position = state.position;
+
+      while (ch !== 0 && !is_WS_OR_EOL(ch)) {
+        ch = state.input.charCodeAt(++state.position);
+      }
+
+      directiveArgs.push(state.input.slice(_position, state.position));
+    }
+
+    if (ch !== 0) readLineBreak(state);
+
+    if (_hasOwnProperty.call(directiveHandlers, directiveName)) {
+      directiveHandlers[directiveName](state, directiveName, directiveArgs);
+    } else {
+      throwWarning(state, 'unknown document directive "' + directiveName + '"');
+    }
+  }
+
+  skipSeparationSpace(state, true, -1);
+
+  if (state.lineIndent === 0 &&
+      state.input.charCodeAt(state.position)     === 0x2D/* - */ &&
+      state.input.charCodeAt(state.position + 1) === 0x2D/* - */ &&
+      state.input.charCodeAt(state.position + 2) === 0x2D/* - */) {
+    state.position += 3;
+    skipSeparationSpace(state, true, -1);
+
+  } else if (hasDirectives) {
+    throwError(state, 'directives end mark is expected');
+  }
+
+  composeNode(state, state.lineIndent - 1, CONTEXT_BLOCK_OUT, false, true);
+  skipSeparationSpace(state, true, -1);
+
+  if (state.checkLineBreaks &&
+      PATTERN_NON_ASCII_LINE_BREAKS.test(state.input.slice(documentStart, state.position))) {
+    throwWarning(state, 'non-ASCII line breaks are interpreted as content');
+  }
+
+  state.documents.push(state.result);
+
+  if (state.position === state.lineStart && testDocumentSeparator(state)) {
+
+    if (state.input.charCodeAt(state.position) === 0x2E/* . */) {
+      state.position += 3;
+      skipSeparationSpace(state, true, -1);
+    }
+    return;
+  }
+
+  if (state.position < (state.length - 1)) {
+    throwError(state, 'end of the stream or a document separator is expected');
+  } else {
+    return;
+  }
+}
+
+
+function loadDocuments(input, options) {
+  input = String(input);
+  options = options || {};
+
+  if (input.length !== 0) {
+
+    // Add tailing `\n` if not exists
+    if (input.charCodeAt(input.length - 1) !== 0x0A/* LF */ &&
+        input.charCodeAt(input.length - 1) !== 0x0D/* CR */) {
+      input += '\n';
+    }
+
+    // Strip BOM
+    if (input.charCodeAt(0) === 0xFEFF) {
+      input = input.slice(1);
+    }
+  }
+
+  var state = new State(input, options);
+
+  var nullpos = input.indexOf('\0');
+
+  if (nullpos !== -1) {
+    state.position = nullpos;
+    throwError(state, 'null byte is not allowed in input');
+  }
+
+  // Use 0 as string terminator. That significantly simplifies bounds check.
+  state.input += '\0';
+
+  while (state.input.charCodeAt(state.position) === 0x20/* Space */) {
+    state.lineIndent += 1;
+    state.position += 1;
+  }
+
+  while (state.position < (state.length - 1)) {
+    readDocument(state);
+  }
+
+  return state.documents;
+}
+
+
+function loadAll(input, iterator, options) {
+  if (iterator !== null && typeof iterator === 'object' && typeof options === 'undefined') {
+    options = iterator;
+    iterator = null;
+  }
+
+  var documents = loadDocuments(input, options);
+
+  if (typeof iterator !== 'function') {
+    return documents;
+  }
+
+  for (var index = 0, length = documents.length; index < length; index += 1) {
+    iterator(documents[index]);
+  }
+}
+
+
+function load(input, options) {
+  var documents = loadDocuments(input, options);
+
+  if (documents.length === 0) {
+    /*eslint-disable no-undefined*/
+    return undefined;
+  } else if (documents.length === 1) {
+    return documents[0];
+  }
+  throw new YAMLException('expected a single document in the stream, but found more');
+}
+
+
+module.exports.loadAll = loadAll;
+module.exports.load    = load;
+
+
+/***/ }),
+
+/***/ 1082:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+/*eslint-disable max-len*/
+
+var YAMLException = __nccwpck_require__(8179);
+var Type          = __nccwpck_require__(6073);
+
+
+function compileList(schema, name) {
+  var result = [];
+
+  schema[name].forEach(function (currentType) {
+    var newIndex = result.length;
+
+    result.forEach(function (previousType, previousIndex) {
+      if (previousType.tag === currentType.tag &&
+          previousType.kind === currentType.kind &&
+          previousType.multi === currentType.multi) {
+
+        newIndex = previousIndex;
+      }
+    });
+
+    result[newIndex] = currentType;
+  });
+
+  return result;
+}
+
+
+function compileMap(/* lists... */) {
+  var result = {
+        scalar: {},
+        sequence: {},
+        mapping: {},
+        fallback: {},
+        multi: {
+          scalar: [],
+          sequence: [],
+          mapping: [],
+          fallback: []
+        }
+      }, index, length;
+
+  function collectType(type) {
+    if (type.multi) {
+      result.multi[type.kind].push(type);
+      result.multi['fallback'].push(type);
+    } else {
+      result[type.kind][type.tag] = result['fallback'][type.tag] = type;
+    }
+  }
+
+  for (index = 0, length = arguments.length; index < length; index += 1) {
+    arguments[index].forEach(collectType);
+  }
+  return result;
+}
+
+
+function Schema(definition) {
+  return this.extend(definition);
+}
+
+
+Schema.prototype.extend = function extend(definition) {
+  var implicit = [];
+  var explicit = [];
+
+  if (definition instanceof Type) {
+    // Schema.extend(type)
+    explicit.push(definition);
+
+  } else if (Array.isArray(definition)) {
+    // Schema.extend([ type1, type2, ... ])
+    explicit = explicit.concat(definition);
+
+  } else if (definition && (Array.isArray(definition.implicit) || Array.isArray(definition.explicit))) {
+    // Schema.extend({ explicit: [ type1, type2, ... ], implicit: [ type1, type2, ... ] })
+    if (definition.implicit) implicit = implicit.concat(definition.implicit);
+    if (definition.explicit) explicit = explicit.concat(definition.explicit);
+
+  } else {
+    throw new YAMLException('Schema.extend argument should be a Type, [ Type ], ' +
+      'or a schema definition ({ implicit: [...], explicit: [...] })');
+  }
+
+  implicit.forEach(function (type) {
+    if (!(type instanceof Type)) {
+      throw new YAMLException('Specified list of YAML types (or a single Type object) contains a non-Type object.');
+    }
+
+    if (type.loadKind && type.loadKind !== 'scalar') {
+      throw new YAMLException('There is a non-scalar type in the implicit list of a schema. Implicit resolving of such types is not supported.');
+    }
+
+    if (type.multi) {
+      throw new YAMLException('There is a multi type in the implicit list of a schema. Multi tags can only be listed as explicit.');
+    }
+  });
+
+  explicit.forEach(function (type) {
+    if (!(type instanceof Type)) {
+      throw new YAMLException('Specified list of YAML types (or a single Type object) contains a non-Type object.');
+    }
+  });
+
+  var result = Object.create(Schema.prototype);
+
+  result.implicit = (this.implicit || []).concat(implicit);
+  result.explicit = (this.explicit || []).concat(explicit);
+
+  result.compiledImplicit = compileList(result, 'implicit');
+  result.compiledExplicit = compileList(result, 'explicit');
+  result.compiledTypeMap  = compileMap(result.compiledImplicit, result.compiledExplicit);
+
+  return result;
+};
+
+
+module.exports = Schema;
+
+
+/***/ }),
+
+/***/ 2011:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// Standard YAML's Core schema.
+// http://www.yaml.org/spec/1.2/spec.html#id2804923
+//
+// NOTE: JS-YAML does not support schema-specific tag resolution restrictions.
+// So, Core schema has no distinctions from JSON schema is JS-YAML.
+
+
+
+
+
+module.exports = __nccwpck_require__(1035);
+
+
+/***/ }),
+
+/***/ 8759:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// JS-YAML's default schema for `safeLoad` function.
+// It is not described in the YAML specification.
+//
+// This schema is based on standard YAML's Core schema and includes most of
+// extra types described at YAML tag repository. (http://yaml.org/type/)
+
+
+
+
+
+module.exports = __nccwpck_require__(2011).extend({
+  implicit: [
+    __nccwpck_require__(9212),
+    __nccwpck_require__(6104)
+  ],
+  explicit: [
+    __nccwpck_require__(7900),
+    __nccwpck_require__(9046),
+    __nccwpck_require__(6860),
+    __nccwpck_require__(9548)
+  ]
+});
+
+
+/***/ }),
+
+/***/ 8562:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// Standard YAML's Failsafe schema.
+// http://www.yaml.org/spec/1.2/spec.html#id2802346
+
+
+
+
+
+var Schema = __nccwpck_require__(1082);
+
+
+module.exports = new Schema({
+  explicit: [
+    __nccwpck_require__(3619),
+    __nccwpck_require__(7283),
+    __nccwpck_require__(6150)
+  ]
+});
+
+
+/***/ }),
+
+/***/ 1035:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// Standard YAML's JSON schema.
+// http://www.yaml.org/spec/1.2/spec.html#id2803231
+//
+// NOTE: JS-YAML does not support schema-specific tag resolution restrictions.
+// So, this schema is not such strict as defined in the YAML specification.
+// It allows numbers in binary notaion, use `Null` and `NULL` as `null`, etc.
+
+
+
+
+
+module.exports = __nccwpck_require__(8562).extend({
+  implicit: [
+    __nccwpck_require__(721),
+    __nccwpck_require__(4993),
+    __nccwpck_require__(1615),
+    __nccwpck_require__(2705)
+  ]
+});
+
+
+/***/ }),
+
+/***/ 6975:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+
+var common = __nccwpck_require__(6829);
+
+
+// get snippet for a single line, respecting maxLength
+function getLine(buffer, lineStart, lineEnd, position, maxLineLength) {
+  var head = '';
+  var tail = '';
+  var maxHalfLength = Math.floor(maxLineLength / 2) - 1;
+
+  if (position - lineStart > maxHalfLength) {
+    head = ' ... ';
+    lineStart = position - maxHalfLength + head.length;
+  }
+
+  if (lineEnd - position > maxHalfLength) {
+    tail = ' ...';
+    lineEnd = position + maxHalfLength - tail.length;
+  }
+
+  return {
+    str: head + buffer.slice(lineStart, lineEnd).replace(/\t/g, '→') + tail,
+    pos: position - lineStart + head.length // relative position
+  };
+}
+
+
+function padStart(string, max) {
+  return common.repeat(' ', max - string.length) + string;
+}
+
+
+function makeSnippet(mark, options) {
+  options = Object.create(options || null);
+
+  if (!mark.buffer) return null;
+
+  if (!options.maxLength) options.maxLength = 79;
+  if (typeof options.indent      !== 'number') options.indent      = 1;
+  if (typeof options.linesBefore !== 'number') options.linesBefore = 3;
+  if (typeof options.linesAfter  !== 'number') options.linesAfter  = 2;
+
+  var re = /\r?\n|\r|\0/g;
+  var lineStarts = [ 0 ];
+  var lineEnds = [];
+  var match;
+  var foundLineNo = -1;
+
+  while ((match = re.exec(mark.buffer))) {
+    lineEnds.push(match.index);
+    lineStarts.push(match.index + match[0].length);
+
+    if (mark.position <= match.index && foundLineNo < 0) {
+      foundLineNo = lineStarts.length - 2;
+    }
+  }
+
+  if (foundLineNo < 0) foundLineNo = lineStarts.length - 1;
+
+  var result = '', i, line;
+  var lineNoLength = Math.min(mark.line + options.linesAfter, lineEnds.length).toString().length;
+  var maxLineLength = options.maxLength - (options.indent + lineNoLength + 3);
+
+  for (i = 1; i <= options.linesBefore; i++) {
+    if (foundLineNo - i < 0) break;
+    line = getLine(
+      mark.buffer,
+      lineStarts[foundLineNo - i],
+      lineEnds[foundLineNo - i],
+      mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo - i]),
+      maxLineLength
+    );
+    result = common.repeat(' ', options.indent) + padStart((mark.line - i + 1).toString(), lineNoLength) +
+      ' | ' + line.str + '\n' + result;
+  }
+
+  line = getLine(mark.buffer, lineStarts[foundLineNo], lineEnds[foundLineNo], mark.position, maxLineLength);
+  result += common.repeat(' ', options.indent) + padStart((mark.line + 1).toString(), lineNoLength) +
+    ' | ' + line.str + '\n';
+  result += common.repeat('-', options.indent + lineNoLength + 3 + line.pos) + '^' + '\n';
+
+  for (i = 1; i <= options.linesAfter; i++) {
+    if (foundLineNo + i >= lineEnds.length) break;
+    line = getLine(
+      mark.buffer,
+      lineStarts[foundLineNo + i],
+      lineEnds[foundLineNo + i],
+      mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo + i]),
+      maxLineLength
+    );
+    result += common.repeat(' ', options.indent) + padStart((mark.line + i + 1).toString(), lineNoLength) +
+      ' | ' + line.str + '\n';
+  }
+
+  return result.replace(/\n$/, '');
+}
+
+
+module.exports = makeSnippet;
+
+
+/***/ }),
+
+/***/ 6073:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var YAMLException = __nccwpck_require__(8179);
+
+var TYPE_CONSTRUCTOR_OPTIONS = [
+  'kind',
+  'multi',
+  'resolve',
+  'construct',
+  'instanceOf',
+  'predicate',
+  'represent',
+  'representName',
+  'defaultStyle',
+  'styleAliases'
+];
+
+var YAML_NODE_KINDS = [
+  'scalar',
+  'sequence',
+  'mapping'
+];
+
+function compileStyleAliases(map) {
+  var result = {};
+
+  if (map !== null) {
+    Object.keys(map).forEach(function (style) {
+      map[style].forEach(function (alias) {
+        result[String(alias)] = style;
+      });
+    });
+  }
+
+  return result;
+}
+
+function Type(tag, options) {
+  options = options || {};
+
+  Object.keys(options).forEach(function (name) {
+    if (TYPE_CONSTRUCTOR_OPTIONS.indexOf(name) === -1) {
+      throw new YAMLException('Unknown option "' + name + '" is met in definition of "' + tag + '" YAML type.');
+    }
+  });
+
+  // TODO: Add tag format check.
+  this.options       = options; // keep original options in case user wants to extend this type later
+  this.tag           = tag;
+  this.kind          = options['kind']          || null;
+  this.resolve       = options['resolve']       || function () { return true; };
+  this.construct     = options['construct']     || function (data) { return data; };
+  this.instanceOf    = options['instanceOf']    || null;
+  this.predicate     = options['predicate']     || null;
+  this.represent     = options['represent']     || null;
+  this.representName = options['representName'] || null;
+  this.defaultStyle  = options['defaultStyle']  || null;
+  this.multi         = options['multi']         || false;
+  this.styleAliases  = compileStyleAliases(options['styleAliases'] || null);
+
+  if (YAML_NODE_KINDS.indexOf(this.kind) === -1) {
+    throw new YAMLException('Unknown kind "' + this.kind + '" is specified for "' + tag + '" YAML type.');
+  }
+}
+
+module.exports = Type;
+
+
+/***/ }),
+
+/***/ 7900:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+/*eslint-disable no-bitwise*/
+
+
+var Type = __nccwpck_require__(6073);
+
+
+// [ 64, 65, 66 ] -> [ padding, CR, LF ]
+var BASE64_MAP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\n\r';
+
+
+function resolveYamlBinary(data) {
+  if (data === null) return false;
+
+  var code, idx, bitlen = 0, max = data.length, map = BASE64_MAP;
+
+  // Convert one by one.
+  for (idx = 0; idx < max; idx++) {
+    code = map.indexOf(data.charAt(idx));
+
+    // Skip CR/LF
+    if (code > 64) continue;
+
+    // Fail on illegal characters
+    if (code < 0) return false;
+
+    bitlen += 6;
+  }
+
+  // If there are any bits left, source was corrupted
+  return (bitlen % 8) === 0;
+}
+
+function constructYamlBinary(data) {
+  var idx, tailbits,
+      input = data.replace(/[\r\n=]/g, ''), // remove CR/LF & padding to simplify scan
+      max = input.length,
+      map = BASE64_MAP,
+      bits = 0,
+      result = [];
+
+  // Collect by 6*4 bits (3 bytes)
+
+  for (idx = 0; idx < max; idx++) {
+    if ((idx % 4 === 0) && idx) {
+      result.push((bits >> 16) & 0xFF);
+      result.push((bits >> 8) & 0xFF);
+      result.push(bits & 0xFF);
+    }
+
+    bits = (bits << 6) | map.indexOf(input.charAt(idx));
+  }
+
+  // Dump tail
+
+  tailbits = (max % 4) * 6;
+
+  if (tailbits === 0) {
+    result.push((bits >> 16) & 0xFF);
+    result.push((bits >> 8) & 0xFF);
+    result.push(bits & 0xFF);
+  } else if (tailbits === 18) {
+    result.push((bits >> 10) & 0xFF);
+    result.push((bits >> 2) & 0xFF);
+  } else if (tailbits === 12) {
+    result.push((bits >> 4) & 0xFF);
+  }
+
+  return new Uint8Array(result);
+}
+
+function representYamlBinary(object /*, style*/) {
+  var result = '', bits = 0, idx, tail,
+      max = object.length,
+      map = BASE64_MAP;
+
+  // Convert every three bytes to 4 ASCII characters.
+
+  for (idx = 0; idx < max; idx++) {
+    if ((idx % 3 === 0) && idx) {
+      result += map[(bits >> 18) & 0x3F];
+      result += map[(bits >> 12) & 0x3F];
+      result += map[(bits >> 6) & 0x3F];
+      result += map[bits & 0x3F];
+    }
+
+    bits = (bits << 8) + object[idx];
+  }
+
+  // Dump tail
+
+  tail = max % 3;
+
+  if (tail === 0) {
+    result += map[(bits >> 18) & 0x3F];
+    result += map[(bits >> 12) & 0x3F];
+    result += map[(bits >> 6) & 0x3F];
+    result += map[bits & 0x3F];
+  } else if (tail === 2) {
+    result += map[(bits >> 10) & 0x3F];
+    result += map[(bits >> 4) & 0x3F];
+    result += map[(bits << 2) & 0x3F];
+    result += map[64];
+  } else if (tail === 1) {
+    result += map[(bits >> 2) & 0x3F];
+    result += map[(bits << 4) & 0x3F];
+    result += map[64];
+    result += map[64];
+  }
+
+  return result;
+}
+
+function isBinary(obj) {
+  return Object.prototype.toString.call(obj) ===  '[object Uint8Array]';
+}
+
+module.exports = new Type('tag:yaml.org,2002:binary', {
+  kind: 'scalar',
+  resolve: resolveYamlBinary,
+  construct: constructYamlBinary,
+  predicate: isBinary,
+  represent: representYamlBinary
+});
+
+
+/***/ }),
+
+/***/ 4993:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+function resolveYamlBoolean(data) {
+  if (data === null) return false;
+
+  var max = data.length;
+
+  return (max === 4 && (data === 'true' || data === 'True' || data === 'TRUE')) ||
+         (max === 5 && (data === 'false' || data === 'False' || data === 'FALSE'));
+}
+
+function constructYamlBoolean(data) {
+  return data === 'true' ||
+         data === 'True' ||
+         data === 'TRUE';
+}
+
+function isBoolean(object) {
+  return Object.prototype.toString.call(object) === '[object Boolean]';
+}
+
+module.exports = new Type('tag:yaml.org,2002:bool', {
+  kind: 'scalar',
+  resolve: resolveYamlBoolean,
+  construct: constructYamlBoolean,
+  predicate: isBoolean,
+  represent: {
+    lowercase: function (object) { return object ? 'true' : 'false'; },
+    uppercase: function (object) { return object ? 'TRUE' : 'FALSE'; },
+    camelcase: function (object) { return object ? 'True' : 'False'; }
+  },
+  defaultStyle: 'lowercase'
+});
+
+
+/***/ }),
+
+/***/ 2705:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var common = __nccwpck_require__(6829);
+var Type   = __nccwpck_require__(6073);
+
+var YAML_FLOAT_PATTERN = new RegExp(
+  // 2.5e4, 2.5 and integers
+  '^(?:[-+]?(?:[0-9][0-9_]*)(?:\\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?' +
+  // .2e4, .2
+  // special case, seems not from spec
+  '|\\.[0-9_]+(?:[eE][-+]?[0-9]+)?' +
+  // .inf
+  '|[-+]?\\.(?:inf|Inf|INF)' +
+  // .nan
+  '|\\.(?:nan|NaN|NAN))$');
+
+function resolveYamlFloat(data) {
+  if (data === null) return false;
+
+  if (!YAML_FLOAT_PATTERN.test(data) ||
+      // Quick hack to not allow integers end with `_`
+      // Probably should update regexp & check speed
+      data[data.length - 1] === '_') {
+    return false;
+  }
+
+  return true;
+}
+
+function constructYamlFloat(data) {
+  var value, sign;
+
+  value  = data.replace(/_/g, '').toLowerCase();
+  sign   = value[0] === '-' ? -1 : 1;
+
+  if ('+-'.indexOf(value[0]) >= 0) {
+    value = value.slice(1);
+  }
+
+  if (value === '.inf') {
+    return (sign === 1) ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+
+  } else if (value === '.nan') {
+    return NaN;
+  }
+  return sign * parseFloat(value, 10);
+}
+
+
+var SCIENTIFIC_WITHOUT_DOT = /^[-+]?[0-9]+e/;
+
+function representYamlFloat(object, style) {
+  var res;
+
+  if (isNaN(object)) {
+    switch (style) {
+      case 'lowercase': return '.nan';
+      case 'uppercase': return '.NAN';
+      case 'camelcase': return '.NaN';
+    }
+  } else if (Number.POSITIVE_INFINITY === object) {
+    switch (style) {
+      case 'lowercase': return '.inf';
+      case 'uppercase': return '.INF';
+      case 'camelcase': return '.Inf';
+    }
+  } else if (Number.NEGATIVE_INFINITY === object) {
+    switch (style) {
+      case 'lowercase': return '-.inf';
+      case 'uppercase': return '-.INF';
+      case 'camelcase': return '-.Inf';
+    }
+  } else if (common.isNegativeZero(object)) {
+    return '-0.0';
+  }
+
+  res = object.toString(10);
+
+  // JS stringifier can build scientific format without dots: 5e-100,
+  // while YAML requres dot: 5.e-100. Fix it with simple hack
+
+  return SCIENTIFIC_WITHOUT_DOT.test(res) ? res.replace('e', '.e') : res;
+}
+
+function isFloat(object) {
+  return (Object.prototype.toString.call(object) === '[object Number]') &&
+         (object % 1 !== 0 || common.isNegativeZero(object));
+}
+
+module.exports = new Type('tag:yaml.org,2002:float', {
+  kind: 'scalar',
+  resolve: resolveYamlFloat,
+  construct: constructYamlFloat,
+  predicate: isFloat,
+  represent: representYamlFloat,
+  defaultStyle: 'lowercase'
+});
+
+
+/***/ }),
+
+/***/ 1615:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var common = __nccwpck_require__(6829);
+var Type   = __nccwpck_require__(6073);
+
+function isHexCode(c) {
+  return ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */)) ||
+         ((0x41/* A */ <= c) && (c <= 0x46/* F */)) ||
+         ((0x61/* a */ <= c) && (c <= 0x66/* f */));
+}
+
+function isOctCode(c) {
+  return ((0x30/* 0 */ <= c) && (c <= 0x37/* 7 */));
+}
+
+function isDecCode(c) {
+  return ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */));
+}
+
+function resolveYamlInteger(data) {
+  if (data === null) return false;
+
+  var max = data.length,
+      index = 0,
+      hasDigits = false,
+      ch;
+
+  if (!max) return false;
+
+  ch = data[index];
+
+  // sign
+  if (ch === '-' || ch === '+') {
+    ch = data[++index];
+  }
+
+  if (ch === '0') {
+    // 0
+    if (index + 1 === max) return true;
+    ch = data[++index];
+
+    // base 2, base 8, base 16
+
+    if (ch === 'b') {
+      // base 2
+      index++;
+
+      for (; index < max; index++) {
+        ch = data[index];
+        if (ch === '_') continue;
+        if (ch !== '0' && ch !== '1') return false;
+        hasDigits = true;
+      }
+      return hasDigits && ch !== '_';
+    }
+
+
+    if (ch === 'x') {
+      // base 16
+      index++;
+
+      for (; index < max; index++) {
+        ch = data[index];
+        if (ch === '_') continue;
+        if (!isHexCode(data.charCodeAt(index))) return false;
+        hasDigits = true;
+      }
+      return hasDigits && ch !== '_';
+    }
+
+
+    if (ch === 'o') {
+      // base 8
+      index++;
+
+      for (; index < max; index++) {
+        ch = data[index];
+        if (ch === '_') continue;
+        if (!isOctCode(data.charCodeAt(index))) return false;
+        hasDigits = true;
+      }
+      return hasDigits && ch !== '_';
+    }
+  }
+
+  // base 10 (except 0)
+
+  // value should not start with `_`;
+  if (ch === '_') return false;
+
+  for (; index < max; index++) {
+    ch = data[index];
+    if (ch === '_') continue;
+    if (!isDecCode(data.charCodeAt(index))) {
+      return false;
+    }
+    hasDigits = true;
+  }
+
+  // Should have digits and should not end with `_`
+  if (!hasDigits || ch === '_') return false;
+
+  return true;
+}
+
+function constructYamlInteger(data) {
+  var value = data, sign = 1, ch;
+
+  if (value.indexOf('_') !== -1) {
+    value = value.replace(/_/g, '');
+  }
+
+  ch = value[0];
+
+  if (ch === '-' || ch === '+') {
+    if (ch === '-') sign = -1;
+    value = value.slice(1);
+    ch = value[0];
+  }
+
+  if (value === '0') return 0;
+
+  if (ch === '0') {
+    if (value[1] === 'b') return sign * parseInt(value.slice(2), 2);
+    if (value[1] === 'x') return sign * parseInt(value.slice(2), 16);
+    if (value[1] === 'o') return sign * parseInt(value.slice(2), 8);
+  }
+
+  return sign * parseInt(value, 10);
+}
+
+function isInteger(object) {
+  return (Object.prototype.toString.call(object)) === '[object Number]' &&
+         (object % 1 === 0 && !common.isNegativeZero(object));
+}
+
+module.exports = new Type('tag:yaml.org,2002:int', {
+  kind: 'scalar',
+  resolve: resolveYamlInteger,
+  construct: constructYamlInteger,
+  predicate: isInteger,
+  represent: {
+    binary:      function (obj) { return obj >= 0 ? '0b' + obj.toString(2) : '-0b' + obj.toString(2).slice(1); },
+    octal:       function (obj) { return obj >= 0 ? '0o'  + obj.toString(8) : '-0o'  + obj.toString(8).slice(1); },
+    decimal:     function (obj) { return obj.toString(10); },
+    /* eslint-disable max-len */
+    hexadecimal: function (obj) { return obj >= 0 ? '0x' + obj.toString(16).toUpperCase() :  '-0x' + obj.toString(16).toUpperCase().slice(1); }
+  },
+  defaultStyle: 'decimal',
+  styleAliases: {
+    binary:      [ 2,  'bin' ],
+    octal:       [ 8,  'oct' ],
+    decimal:     [ 10, 'dec' ],
+    hexadecimal: [ 16, 'hex' ]
+  }
+});
+
+
+/***/ }),
+
+/***/ 6150:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+module.exports = new Type('tag:yaml.org,2002:map', {
+  kind: 'mapping',
+  construct: function (data) { return data !== null ? data : {}; }
+});
+
+
+/***/ }),
+
+/***/ 6104:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+function resolveYamlMerge(data) {
+  return data === '<<' || data === null;
+}
+
+module.exports = new Type('tag:yaml.org,2002:merge', {
+  kind: 'scalar',
+  resolve: resolveYamlMerge
+});
+
+
+/***/ }),
+
+/***/ 721:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+function resolveYamlNull(data) {
+  if (data === null) return true;
+
+  var max = data.length;
+
+  return (max === 1 && data === '~') ||
+         (max === 4 && (data === 'null' || data === 'Null' || data === 'NULL'));
+}
+
+function constructYamlNull() {
+  return null;
+}
+
+function isNull(object) {
+  return object === null;
+}
+
+module.exports = new Type('tag:yaml.org,2002:null', {
+  kind: 'scalar',
+  resolve: resolveYamlNull,
+  construct: constructYamlNull,
+  predicate: isNull,
+  represent: {
+    canonical: function () { return '~';    },
+    lowercase: function () { return 'null'; },
+    uppercase: function () { return 'NULL'; },
+    camelcase: function () { return 'Null'; },
+    empty:     function () { return '';     }
+  },
+  defaultStyle: 'lowercase'
+});
 
 
 /***/ }),
 
 /***/ 9046:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
-exports.fromCallback = function (fn) {
-  return Object.defineProperty(function (...args) {
-    if (typeof args[args.length - 1] === 'function') fn.apply(this, args)
-    else {
-      return new Promise((resolve, reject) => {
-        fn.call(
-          this,
-          ...args,
-          (err, res) => (err != null) ? reject(err) : resolve(res)
-        )
-      })
+
+var Type = __nccwpck_require__(6073);
+
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+var _toString       = Object.prototype.toString;
+
+function resolveYamlOmap(data) {
+  if (data === null) return true;
+
+  var objectKeys = [], index, length, pair, pairKey, pairHasKey,
+      object = data;
+
+  for (index = 0, length = object.length; index < length; index += 1) {
+    pair = object[index];
+    pairHasKey = false;
+
+    if (_toString.call(pair) !== '[object Object]') return false;
+
+    for (pairKey in pair) {
+      if (_hasOwnProperty.call(pair, pairKey)) {
+        if (!pairHasKey) pairHasKey = true;
+        else return false;
+      }
     }
-  }, 'name', { value: fn.name })
+
+    if (!pairHasKey) return false;
+
+    if (objectKeys.indexOf(pairKey) === -1) objectKeys.push(pairKey);
+    else return false;
+  }
+
+  return true;
 }
 
-exports.fromPromise = function (fn) {
-  return Object.defineProperty(function (...args) {
-    const cb = args[args.length - 1]
-    if (typeof cb !== 'function') return fn.apply(this, args)
-    else fn.apply(this, args.slice(0, -1)).then(r => cb(null, r), cb)
-  }, 'name', { value: fn.name })
+function constructYamlOmap(data) {
+  return data !== null ? data : [];
 }
+
+module.exports = new Type('tag:yaml.org,2002:omap', {
+  kind: 'sequence',
+  resolve: resolveYamlOmap,
+  construct: constructYamlOmap
+});
 
 
 /***/ }),
 
-/***/ 2940:
-/***/ ((module) => {
+/***/ 6860:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-// Returns a wrapper function that returns a wrapped callback
-// The wrapper function should do some stuff, and return a
-// presumably different callback function.
-// This makes sure that own properties are retained, so that
-// decorations and such are not lost along the way.
-module.exports = wrappy
-function wrappy (fn, cb) {
-  if (fn && cb) return wrappy(fn)(cb)
 
-  if (typeof fn !== 'function')
-    throw new TypeError('need wrapper function')
 
-  Object.keys(fn).forEach(function (k) {
-    wrapper[k] = fn[k]
-  })
+var Type = __nccwpck_require__(6073);
 
-  return wrapper
+var _toString = Object.prototype.toString;
 
-  function wrapper() {
-    var args = new Array(arguments.length)
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i]
-    }
-    var ret = fn.apply(this, args)
-    var cb = args[args.length-1]
-    if (typeof ret === 'function' && ret !== cb) {
-      Object.keys(cb).forEach(function (k) {
-        ret[k] = cb[k]
-      })
-    }
-    return ret
+function resolveYamlPairs(data) {
+  if (data === null) return true;
+
+  var index, length, pair, keys, result,
+      object = data;
+
+  result = new Array(object.length);
+
+  for (index = 0, length = object.length; index < length; index += 1) {
+    pair = object[index];
+
+    if (_toString.call(pair) !== '[object Object]') return false;
+
+    keys = Object.keys(pair);
+
+    if (keys.length !== 1) return false;
+
+    result[index] = [ keys[0], pair[keys[0]] ];
   }
+
+  return true;
 }
+
+function constructYamlPairs(data) {
+  if (data === null) return [];
+
+  var index, length, pair, keys, result,
+      object = data;
+
+  result = new Array(object.length);
+
+  for (index = 0, length = object.length; index < length; index += 1) {
+    pair = object[index];
+
+    keys = Object.keys(pair);
+
+    result[index] = [ keys[0], pair[keys[0]] ];
+  }
+
+  return result;
+}
+
+module.exports = new Type('tag:yaml.org,2002:pairs', {
+  kind: 'sequence',
+  resolve: resolveYamlPairs,
+  construct: constructYamlPairs
+});
+
+
+/***/ }),
+
+/***/ 7283:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+module.exports = new Type('tag:yaml.org,2002:seq', {
+  kind: 'sequence',
+  construct: function (data) { return data !== null ? data : []; }
+});
+
+
+/***/ }),
+
+/***/ 9548:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function resolveYamlSet(data) {
+  if (data === null) return true;
+
+  var key, object = data;
+
+  for (key in object) {
+    if (_hasOwnProperty.call(object, key)) {
+      if (object[key] !== null) return false;
+    }
+  }
+
+  return true;
+}
+
+function constructYamlSet(data) {
+  return data !== null ? data : {};
+}
+
+module.exports = new Type('tag:yaml.org,2002:set', {
+  kind: 'mapping',
+  resolve: resolveYamlSet,
+  construct: constructYamlSet
+});
+
+
+/***/ }),
+
+/***/ 3619:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+module.exports = new Type('tag:yaml.org,2002:str', {
+  kind: 'scalar',
+  construct: function (data) { return data !== null ? data : ''; }
+});
+
+
+/***/ }),
+
+/***/ 9212:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+var Type = __nccwpck_require__(6073);
+
+var YAML_DATE_REGEXP = new RegExp(
+  '^([0-9][0-9][0-9][0-9])'          + // [1] year
+  '-([0-9][0-9])'                    + // [2] month
+  '-([0-9][0-9])$');                   // [3] day
+
+var YAML_TIMESTAMP_REGEXP = new RegExp(
+  '^([0-9][0-9][0-9][0-9])'          + // [1] year
+  '-([0-9][0-9]?)'                   + // [2] month
+  '-([0-9][0-9]?)'                   + // [3] day
+  '(?:[Tt]|[ \\t]+)'                 + // ...
+  '([0-9][0-9]?)'                    + // [4] hour
+  ':([0-9][0-9])'                    + // [5] minute
+  ':([0-9][0-9])'                    + // [6] second
+  '(?:\\.([0-9]*))?'                 + // [7] fraction
+  '(?:[ \\t]*(Z|([-+])([0-9][0-9]?)' + // [8] tz [9] tz_sign [10] tz_hour
+  '(?::([0-9][0-9]))?))?$');           // [11] tz_minute
+
+function resolveYamlTimestamp(data) {
+  if (data === null) return false;
+  if (YAML_DATE_REGEXP.exec(data) !== null) return true;
+  if (YAML_TIMESTAMP_REGEXP.exec(data) !== null) return true;
+  return false;
+}
+
+function constructYamlTimestamp(data) {
+  var match, year, month, day, hour, minute, second, fraction = 0,
+      delta = null, tz_hour, tz_minute, date;
+
+  match = YAML_DATE_REGEXP.exec(data);
+  if (match === null) match = YAML_TIMESTAMP_REGEXP.exec(data);
+
+  if (match === null) throw new Error('Date resolve error');
+
+  // match: [1] year [2] month [3] day
+
+  year = +(match[1]);
+  month = +(match[2]) - 1; // JS month starts with 0
+  day = +(match[3]);
+
+  if (!match[4]) { // no hour
+    return new Date(Date.UTC(year, month, day));
+  }
+
+  // match: [4] hour [5] minute [6] second [7] fraction
+
+  hour = +(match[4]);
+  minute = +(match[5]);
+  second = +(match[6]);
+
+  if (match[7]) {
+    fraction = match[7].slice(0, 3);
+    while (fraction.length < 3) { // milli-seconds
+      fraction += '0';
+    }
+    fraction = +fraction;
+  }
+
+  // match: [8] tz [9] tz_sign [10] tz_hour [11] tz_minute
+
+  if (match[9]) {
+    tz_hour = +(match[10]);
+    tz_minute = +(match[11] || 0);
+    delta = (tz_hour * 60 + tz_minute) * 60000; // delta in mili-seconds
+    if (match[9] === '-') delta = -delta;
+  }
+
+  date = new Date(Date.UTC(year, month, day, hour, minute, second, fraction));
+
+  if (delta) date.setTime(date.getTime() - delta);
+
+  return date;
+}
+
+function representYamlTimestamp(object /*, style*/) {
+  return object.toISOString();
+}
+
+module.exports = new Type('tag:yaml.org,2002:timestamp', {
+  kind: 'scalar',
+  resolve: resolveYamlTimestamp,
+  construct: constructYamlTimestamp,
+  instanceOf: Date,
+  represent: representYamlTimestamp
+});
 
 
 /***/ }),
@@ -10724,7 +5912,6 @@ function wrappy (fn, cb) {
 /***/ 5730:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
-"use strict";
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -10739,79 +5926,32 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const core = __nccwpck_require__(2186);
-const artifact = __nccwpck_require__(2605);
-const glob_1 = __nccwpck_require__(1957);
-const lib_1 = __nccwpck_require__(2806);
-const path = __nccwpck_require__(5622);
-const fs = __nccwpck_require__(5630);
-core.startGroup('check-solution:');
-const workingDir = lib_1.getWorkingDirectory('working-directory', false);
-const solutionPathCandidate = core.getInput('path', { required: true });
-const solutionPath = path.isAbsolute(solutionPathCandidate) ? solutionPathCandidate : path.resolve(workingDir, solutionPathCandidate);
-core.info(`solution path: ${solutionPath}`);
-const outputDirectory = path.join(process.env['RUNNER_TEMP'] || workingDir, "checker-output");
-fs.ensureDirSync(outputDirectory);
-core.info(`output directory: ${outputDirectory}`);
-const geo = core.getInput('geo', { required: false });
-const ruleLevelOverride = core.getInput('rule-level-override', { required: false });
-const artifactName = core.getInput('checker-logs-artifact-name', { required: false }) || 'CheckSolutionLogs';
-const logger = new lib_1.ActionLogger();
-let pac;
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const actions_1 = __nccwpck_require__(7765);
+const YamlParser_1 = __nccwpck_require__(734);
+const ActionsHost_1 = __nccwpck_require__(5726);
+const getCredentials_1 = __nccwpck_require__(2429);
+const getEnvironmentUrl_1 = __nccwpck_require__(699);
+const runnerParameters_1 = __nccwpck_require__(7727);
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    if (!fs.existsSync(solutionPath)) {
-        throw new Error(`The solution file could not be found at ${solutionPath}`);
-    }
-    pac = new lib_1.PacRunner(workingDir, logger);
-    yield new lib_1.AuthHandler(pac).authenticate(lib_1.AuthKind.CDS);
-    const checkArgs = ['solution', 'check', '--path', solutionPath, '--outputDirectory', outputDirectory];
-    if (geo) {
-        checkArgs.push('--geo', geo);
-    }
-    if (ruleLevelOverride) {
-        checkArgs.push('--ruleLevelOverride', ruleLevelOverride);
-    }
-    yield pac.run(checkArgs);
-    const artifactClient = artifact.create();
-    const files = glob_1.glob.sync('**/*', { cwd: outputDirectory, absolute: true });
-    const options = { continueOnError: true };
-    yield artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
-    core.info(`checked solution results in folder [${outputDirectory}] and uploaded as artifacts.`);
+    core.startGroup('check-solution:');
+    const taskParser = new YamlParser_1.YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters_1.runnerParameters.workingDir, "check-solution");
+    yield actions_1.checkSolution({
+        credentials: getCredentials_1.default(),
+        environmentUrl: getEnvironmentUrl_1.default(),
+        solutionPath: parameterMap["path"],
+        geoInstance: parameterMap["geo"],
+        ruleLevelOverride: parameterMap["rule-level-override"],
+        outputDirectory: parameterMap["checker-logs-artifact-name"]
+    }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
     core.endGroup();
 }))().catch(error => {
-    core.setFailed(`failed: ${error}`);
+    const logger = runnerParameters_1.runnerParameters.logger;
+    logger.error(`failed: ${error}`);
     core.endGroup();
-}).finally(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield (pac === null || pac === void 0 ? void 0 : pac.run(["auth", "clear"]));
-}));
+});
 
 //# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 1434:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkingDirectory = exports.getInputAsBool = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const core = __nccwpck_require__(2186);
-function getInputAsBool(name, required, defaultValue) {
-    const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? defaultValue : textValue.toLowerCase() === 'true';
-}
-exports.getInputAsBool = getInputAsBool;
-function getWorkingDirectory(name, required, defaultValue) {
-    const textValue = core.getInput(name, { required: required });
-    return (!textValue) ? (defaultValue !== null && defaultValue !== void 0 ? defaultValue : process.cwd()) : textValue;
-}
-exports.getWorkingDirectory = getWorkingDirectory;
-
-//# sourceMappingURL=actionInput.js.map
 
 
 /***/ }),
@@ -10819,7 +5959,6 @@ exports.getWorkingDirectory = getWorkingDirectory;
 /***/ 3970:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ActionLogger = void 0;
@@ -10852,224 +5991,49 @@ exports.ActionLogger = ActionLogger;
 
 /***/ }),
 
-/***/ 3677:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 2429:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-"use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const core = __nccwpck_require__(2186);
-const createLegacyRunnerPacAuthenticator_1 = __nccwpck_require__(6687);
-class AuthHandler {
-    constructor(pac) {
-        if ("run" in pac) {
-            this._pacAuthenticator = createLegacyRunnerPacAuthenticator_1.default(pac);
-        }
-        else {
-            this._pacAuthenticator = pac;
-        }
-    }
-    authenticate(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.startGroup("authentication");
-            this._envUrl = core.getInput("environment-url", { required: false });
-            const authType = this.determineAuthType();
-            if (authType === AuthTypes.USERNAME_PASSWORD) {
-                yield this.authenticateWithUsernamePassword(authKind);
-            }
-            else if (authType == AuthTypes.APPID_SECRET) {
-                yield this.authenticateWithClientCredentials(authKind);
-            }
-            else {
-                throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
-            }
-            core.endGroup();
-        });
-    }
-    determineAuthType() {
-        const validUsernameAuth = this.isValidUsernameAuth();
-        const validSPNAuth = this.isValidSPNAuth();
-        try {
-            if (validUsernameAuth && validSPNAuth) {
-                throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
-            }
-            if (validUsernameAuth) {
-                return AuthTypes.USERNAME_PASSWORD;
-            }
-            else if (validSPNAuth) {
-                return AuthTypes.APPID_SECRET;
-            }
-        }
-        catch (error) {
-            core.setFailed(`failed: ${error.message}`);
-            throw error;
-        }
-        return AuthTypes.INVALID_AUTH_TYPE;
-    }
-    isValidUsernameAuth() {
-        this._username = core.getInput("user-name", { required: false });
-        this._password = core.getInput("password-secret", { required: false });
-        return !!this._username && !!this._password;
-    }
-    isValidSPNAuth() {
-        this._appId = core.getInput("app-id", { required: false });
-        this._clientSecret = core.getInput("client-secret", {
-            required: false,
-        });
-        this._tenantId = core.getInput("tenant-id", { required: false });
-        return !!this._appId && !!this._clientSecret && !!this._tenantId;
-    }
-    authenticateWithClientCredentials(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
-            if (authKind === AuthKind.CDS) {
-                yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
-                    tenantId: this._tenantId,
-                    appId: this._appId,
-                    clientSecret: this._clientSecret,
-                });
-            }
-            else {
-                yield this._pacAuthenticator.authenticateAdminWithClientCredentials({
-                    tenantId: this._tenantId,
-                    appId: this._appId,
-                    clientSecret: this._clientSecret,
-                });
-            }
-        });
-    }
-    authenticateWithUsernamePassword(authKind) {
-        return __awaiter(this, void 0, void 0, function* () {
-            core.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
-            if (authKind == AuthKind.CDS) {
-                yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-                    username: this._username,
-                    password: this._password,
-                });
-            }
-            else {
-                yield this._pacAuthenticator.authenticateAdminWithUsernamePassword({
-                    username: this._username,
-                    password: this._password,
-                });
-            }
-        });
-    }
-}
-exports.AuthHandler = AuthHandler;
-var AuthTypes;
-(function (AuthTypes) {
-    AuthTypes[AuthTypes["USERNAME_PASSWORD"] = 0] = "USERNAME_PASSWORD";
-    AuthTypes[AuthTypes["APPID_SECRET"] = 1] = "APPID_SECRET";
-    AuthTypes[AuthTypes["INVALID_AUTH_TYPE"] = 2] = "INVALID_AUTH_TYPE";
-})(AuthTypes || (AuthTypes = {}));
-var AuthKind;
-(function (AuthKind) {
-    AuthKind[AuthKind["CDS"] = 0] = "CDS";
-    AuthKind[AuthKind["ADMIN"] = 1] = "ADMIN";
-})(AuthKind = exports.AuthKind || (exports.AuthKind = {}));
-
-//# sourceMappingURL=authHandler.js.map
-
-
-/***/ }),
-
-/***/ 6687:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const getEnvironmentUrl_1 = __nccwpck_require__(699);
-function createLegacyRunnerPacAuthenticator(pac) {
-    return {
-        authenticateCdsWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--url",
-                getEnvironmentUrl_1.default(),
-                "--applicationId",
-                parameters.appId,
-                "--clientSecret",
-                parameters.clientSecret,
-                "--tenant",
-                parameters.tenantId,
-            ]);
-        }),
-        authenticateAdminWithClientCredentials: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--kind",
-                "ADMIN",
-                "--applicationId",
-                parameters.appId,
-                "--clientSecret",
-                parameters.clientSecret,
-                "--tenant",
-                parameters.tenantId,
-            ]);
-        }),
-        authenticateCdsWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--url",
-                getEnvironmentUrl_1.default(),
-                "--username",
-                parameters.username,
-                "--password",
-                parameters.password,
-            ]);
-        }),
-        authenticateAdminWithUsernamePassword: (parameters) => __awaiter(this, void 0, void 0, function* () {
-            yield clearAuth();
-            yield pac.run([
-                "auth",
-                "create",
-                "--kind",
-                "ADMIN",
-                "--username",
-                parameters.username,
-                "--password",
-                parameters.password,
-            ]);
-        }),
+const core_1 = __nccwpck_require__(2186);
+function getCredentials() {
+    const usernamePassword = {
+        username: getInput("user-name"),
+        password: getInput("password-secret"),
     };
-    function clearAuth() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield pac.run(["auth", "clear"]);
-        });
+    const isUpValid = isUsernamePasswordValid(usernamePassword);
+    const clientCredentials = {
+        appId: getInput("app-id"),
+        clientSecret: getInput("client-secret"),
+        tenantId: getInput("tenant-id"),
+    };
+    const isCcValid = isClientCredentialsValid(clientCredentials);
+    if (isUpValid && isCcValid) {
+        throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
     }
+    if (isUpValid) {
+        return usernamePassword;
+    }
+    if (isCcValid) {
+        return clientCredentials;
+    }
+    throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
 }
-exports.default = createLegacyRunnerPacAuthenticator;
+exports.default = getCredentials;
+function getInput(name) {
+    return core_1.getInput(name, { required: false });
+}
+function isUsernamePasswordValid(usernamePassword) {
+    return !!usernamePassword.username && !!usernamePassword.password;
+}
+function isClientCredentialsValid(clientCredentials) {
+    return (!!clientCredentials.appId &&
+        !!clientCredentials.clientSecret &&
+        !!clientCredentials.tenantId);
+}
 
-//# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
+//# sourceMappingURL=getCredentials.js.map
 
 
 /***/ }),
@@ -11077,7 +6041,6 @@ exports.default = createLegacyRunnerPacAuthenticator;
 /***/ 699:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
@@ -11091,111 +6054,9 @@ exports.default = getEnvironmentUrl;
 
 /***/ }),
 
-/***/ 7021:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RunnerError = exports.ExeRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const child_process_1 = __nccwpck_require__(3129);
-const os = __nccwpck_require__(2087);
-const getExePath_1 = __nccwpck_require__(309);
-const runnerParameters_1 = __nccwpck_require__(7727);
-const process = __nccwpck_require__(1765);
-class ExeRunner {
-    constructor(_workingDir, logger, exeName, exeRelativePath) {
-        this._workingDir = _workingDir;
-        this.logger = logger;
-        if (exeRelativePath) {
-            this._exePath = getExePath_1.default(...exeRelativePath, exeName);
-        }
-        else {
-            this._exePath = exeName;
-        }
-    }
-    get workingDir() {
-        return this._workingDir;
-    }
-    run(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                const stdout = new Array();
-                const stderr = new Array();
-                this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
-                const cp = child_process_1.spawn(this._exePath, args, {
-                    cwd: this.workingDir,
-                    env: Object.assign(Object.assign({}, process.env), { "PP_TOOLS_AUTOMATION_AGENT": runnerParameters_1.getAutomationAgent() })
-                });
-                cp.stdout.on('data', (data) => stdout.push(...data.toString().split(os.EOL)));
-                cp.stderr.on('data', (data) => stderr.push(...data.toString().split(os.EOL)));
-                cp.on('exit', (code) => {
-                    if (code === 0) {
-                        this.logger.info(`success: ${stdout.join(os.EOL)}`);
-                        resolve(stdout);
-                    }
-                    else {
-                        const allOutput = stderr.concat(stdout);
-                        this.logger.error(`error: ${code}: ${allOutput.join(os.EOL)}`);
-                        reject(new RunnerError(code !== null && code !== void 0 ? code : 99999, allOutput.join()));
-                    }
-                    // Close out handles to the output streams so that we don't wait on grandchild processes like pacTelemetryUpload
-                    cp.stdout.destroy();
-                    cp.stderr.destroy();
-                });
-            });
-        });
-    }
-    runSync(args) {
-        var _a;
-        this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : '<none>'}`);
-        const proc = child_process_1.spawnSync(this._exePath, args, {
-            cwd: this.workingDir,
-            env: Object.assign(Object.assign({}, process.env), { "PP_TOOLS_AUTOMATION_AGENT": runnerParameters_1.getAutomationAgent() })
-        });
-        if (proc.status === 0) {
-            const output = proc.output
-                .filter(line => !!line) // can have null entries
-                .map(line => line.toString());
-            this.logger.info(`success: ${output.join(os.EOL)}`);
-            return output;
-        }
-        else {
-            const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
-            this.logger.error(`error: ${proc.status}: ${allOutput}`);
-            throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
-        }
-    }
-}
-exports.ExeRunner = ExeRunner;
-class RunnerError extends Error {
-    constructor(exitCode, message) {
-        super(message);
-        this.exitCode = exitCode;
-    }
-}
-exports.RunnerError = RunnerError;
-
-//# sourceMappingURL=exeRunner.js.map
-
-
-/***/ }),
-
 /***/ 309:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const path_1 = __nccwpck_require__(5622);
@@ -11227,116 +6088,66 @@ exports.default = getExePath;
 
 /***/ }),
 
-/***/ 5973:
+/***/ 5726:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GitRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __nccwpck_require__(7021);
-class GitRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, 'git');
-    }
-}
-exports.GitRunner = GitRunner;
-
-//# sourceMappingURL=gitRunner.js.map
-
-
-/***/ }),
-
-/***/ 2806:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthKind = exports.AuthHandler = exports.PacRunner = exports.GitRunner = exports.ActionLogger = exports.DefaultRunnerFactory = exports.RunnerError = exports.getWorkingDirectory = exports.getInputAsBool = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-var actionInput_1 = __nccwpck_require__(1434);
-Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: function () { return actionInput_1.getInputAsBool; } }));
-Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
-var exeRunner_1 = __nccwpck_require__(7021);
-Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
-var runnerFactory_1 = __nccwpck_require__(7147);
-Object.defineProperty(exports, "DefaultRunnerFactory", ({ enumerable: true, get: function () { return runnerFactory_1.DefaultRunnerFactory; } }));
-// TODO: delete exports once all actions are converted:
-var actionLogger_1 = __nccwpck_require__(3970);
-Object.defineProperty(exports, "ActionLogger", ({ enumerable: true, get: function () { return actionLogger_1.ActionLogger; } }));
-var gitRunner_1 = __nccwpck_require__(5973);
-Object.defineProperty(exports, "GitRunner", ({ enumerable: true, get: function () { return gitRunner_1.GitRunner; } }));
-var pacRunner_1 = __nccwpck_require__(7366);
-Object.defineProperty(exports, "PacRunner", ({ enumerable: true, get: function () { return pacRunner_1.PacRunner; } }));
-var authHandler_1 = __nccwpck_require__(3677);
-Object.defineProperty(exports, "AuthHandler", ({ enumerable: true, get: function () { return authHandler_1.AuthHandler; } }));
-Object.defineProperty(exports, "AuthKind", ({ enumerable: true, get: function () { return authHandler_1.AuthKind; } }));
-
-//# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 7366:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PacRunner = void 0;
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-const exeRunner_1 = __nccwpck_require__(7021);
-const os = __nccwpck_require__(2087);
-const platform = os.platform();
-const programName = platform === "win32" ? 'pac.exe' : 'pac';
-const programPath = platform === "win32" ? ['pac', 'tools'] : ['pac_linux', 'tools'];
-class PacRunner extends exeRunner_1.ExeRunner {
-    constructor(workingDir, logger) {
-        super(workingDir, logger, programName, programPath);
-    }
-}
-exports.PacRunner = PacRunner;
-
-//# sourceMappingURL=pacRunner.js.map
-
-
-/***/ }),
-
-/***/ 7147:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DefaultRunnerFactory = void 0;
-const actionLogger_1 = __nccwpck_require__(3970);
-const gitRunner_1 = __nccwpck_require__(5973);
-const pacRunner_1 = __nccwpck_require__(7366);
-class RealRunnerFactory {
+exports.ActionsHost = void 0;
+const core = __nccwpck_require__(2186);
+class ActionsHost {
     constructor() {
-        this._logger = new actionLogger_1.ActionLogger();
+        this.name = "GitHub-Actions";
     }
-    getRunner(runnerName, workingDir) {
-        switch (runnerName) {
-            case 'pac':
-                return new pacRunner_1.PacRunner(workingDir, this._logger);
-            case 'git':
-                return new gitRunner_1.GitRunner(workingDir, this._logger);
-            default:
-                throw new Error(`Unknown runner type requested: ${runnerName}`);
+    getInput(entry) {
+        const value = core.getInput(entry.name, { required: entry.required });
+        // normalize value to always be undefined if the user has not declared the input value
+        return (value && value.trim() !== '') ? value : undefined;
+    }
+}
+exports.ActionsHost = ActionsHost;
+
+//# sourceMappingURL=ActionsHost.js.map
+
+
+/***/ }),
+
+/***/ 734:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.YamlParser = void 0;
+const fs = __nccwpck_require__(5747);
+const yaml = __nccwpck_require__(1917);
+const path = __nccwpck_require__(5622);
+class YamlParser {
+    getHostParameterEntries(workingDir, actionFolder) {
+        var _a;
+        const parameterMap = {};
+        try {
+            const file = path.join(workingDir, actionFolder, 'action.yml');
+            console.log(`loading action yaml file: ${file}`);
+            const fileContents = fs.readFileSync(file, 'utf8');
+            const data = yaml.load(fileContents);
+            for (const [name, inputInfo] of Object.entries(data.inputs)) {
+                const typedData = {
+                    name: name,
+                    required: (_a = inputInfo.required) !== null && _a !== void 0 ? _a : false,
+                    defaultValue: inputInfo.default,
+                };
+                parameterMap[name] = typedData;
+            }
+            return parameterMap;
+        }
+        catch (e) {
+            throw new Error(`Error parsing yaml file for ${actionFolder}: ${e}`);
         }
     }
 }
-exports.DefaultRunnerFactory = new RealRunnerFactory();
+exports.YamlParser = YamlParser;
 
-//# sourceMappingURL=runnerFactory.js.map
+//# sourceMappingURL=YamlParser.js.map
 
 
 /***/ }),
@@ -11344,7 +6155,6 @@ exports.DefaultRunnerFactory = new RealRunnerFactory();
 /***/ 7727:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAutomationAgent = exports.runnerParameters = void 0;
@@ -11374,152 +6184,42 @@ exports.runnerParameters = runnerParameters;
 /***/ 306:
 /***/ ((module) => {
 
-"use strict";
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.28.6","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.25","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
-
-/***/ }),
-
-/***/ 2357:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("assert");;
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.31.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.32","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
 
 /***/ }),
 
 /***/ 3129:
 /***/ ((module) => {
 
-"use strict";
-module.exports = require("child_process");;
-
-/***/ }),
-
-/***/ 7619:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("constants");;
-
-/***/ }),
-
-/***/ 6417:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("crypto");;
-
-/***/ }),
-
-/***/ 8614:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("events");;
+module.exports = require("child_process");
 
 /***/ }),
 
 /***/ 5747:
 /***/ ((module) => {
 
-"use strict";
-module.exports = require("fs");;
-
-/***/ }),
-
-/***/ 8605:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("http");;
-
-/***/ }),
-
-/***/ 7211:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("https");;
-
-/***/ }),
-
-/***/ 1631:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("net");;
+module.exports = require("fs");
 
 /***/ }),
 
 /***/ 2087:
 /***/ ((module) => {
 
-"use strict";
-module.exports = require("os");;
+module.exports = require("os");
 
 /***/ }),
 
 /***/ 5622:
 /***/ ((module) => {
 
-"use strict";
-module.exports = require("path");;
-
-/***/ }),
-
-/***/ 630:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("perf_hooks");;
+module.exports = require("path");
 
 /***/ }),
 
 /***/ 1765:
 /***/ ((module) => {
 
-"use strict";
-module.exports = require("process");;
-
-/***/ }),
-
-/***/ 2413:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("stream");;
-
-/***/ }),
-
-/***/ 4016:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("tls");;
-
-/***/ }),
-
-/***/ 8835:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("url");;
-
-/***/ }),
-
-/***/ 1669:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("util");;
-
-/***/ }),
-
-/***/ 8761:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("zlib");;
+module.exports = require("process");
 
 /***/ })
 
@@ -11558,7 +6258,9 @@ module.exports = require("zlib");;
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
-/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";/************************************************************************/
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
+/******/ 	
+/************************************************************************/
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
