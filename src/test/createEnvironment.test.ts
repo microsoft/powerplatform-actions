@@ -18,6 +18,10 @@ describe("create-environment tests", () => {
     const createEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
     const credentials: UsernamePassword = stubInterface<UsernamePassword>();
     const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
+    createEnvironmentStub.returns({
+        environmentId: "mock-env-id",
+        environmentUrl: "mock-env-url"
+    });
 
     async function callActionWithMocks(): Promise<void> {
         const mockedModule = await rewiremock.around(() => import("../../src/actions/create-environment/index"),
