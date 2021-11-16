@@ -5,7 +5,6 @@ import * as core from '@actions/core';
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
 import getCredentials from "../../lib/auth/getCredentials";
-import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
@@ -23,10 +22,10 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "backup-environment");
 
     core.startGroup('backup-environment:');
-
+    const envUrl = core.getInput('environment-url', { required: true });
     await backupEnvironment({
         credentials: getCredentials(),
-        environmentUrl: getEnvironmentUrl(),
+        environmentUrl: envUrl,
         backupLabel: parameterMap['backup-label']
     }, runnerParameters, new ActionsHost());
     core.endGroup();

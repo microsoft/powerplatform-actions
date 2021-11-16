@@ -26,6 +26,7 @@ describe("copy-environment tests", () => {
                 mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
                 mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
                 mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+                mock(() => import("@actions/core")).with({ getInput: () => mockEnvironmentUrl, startGroup: () => undefined, endGroup: () => undefined });
             });
         await mockedModule.main();
     }
