@@ -27,7 +27,29 @@ inputs:
     description: 'URL of Power Platform environment to reset; e.g. "https://test-env.crm.dynamics.com"'
     required: true
 
+  language:
+    description: 'Sets the language used for your environment.'
+    required: true
+    default: 'English'
+
+  override-domain-name:
+    description: 'Check to override the domain name while resetting the instance.'
+    required: false
+    default: 'false'
+
+  domain-name:
+    description: 'The domain name is part of the environment URL. If you enter a domain name that is already in use, then the task appends a numeric value to the domain name, starting with 0 and sets the environment URL. For example - If the domain name contoso is already in use, then the environment URL will be updated to https://{contoso}0.crm.dynamics.com.'
+    required: false
+
+  override-friendly-name:
+    description: 'Check to override the friendly name while resetting the instance.'
+    required: false
+    default: 'false'
+
+  friendly-name:
+    description: 'Set the display name of the reset instance.'
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/reset-environment/index.js'
-

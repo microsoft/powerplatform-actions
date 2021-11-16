@@ -1,41 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+import { deleteEnvironment } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
-import { AuthKind, AuthHandler, DefaultRunnerFactory, RunnerFactory} from '../../lib';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
-})();
+})().catch(error => {
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
+    core.endGroup();
+});
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
-    try {
-        core.startGroup('delete-environment:');
-        const envUrl = core.getInput('environment-url', { required: false });
-        const envId = core.getInput('environment-id', { required: false });
+export async function main(): Promise<void> {
+    core.startGroup('delete-environment:');
 
-        let deleteEnvArgs;
-        if (envUrl) {
-            deleteEnvArgs = ['admin', 'delete', '--url', envUrl];
-        } else if (envId) {
-            deleteEnvArgs = ['admin', 'delete', '-id', envId];
-        } else {
-            throw new Error(
-                "Must provide either environment-id or environment-url to delete an environment!"
-            );
-        }
+    await deleteEnvironment({
+        credentials: getCredentials(),
+        environmentUrl: getEnvironmentUrl(),
+    }, runnerParameters);
 
-        pac = factory.getRunner('pac', process.cwd());
-        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
-        await pac.run(deleteEnvArgs);
-        core.info('environment deleted');
-        core.endGroup();
-    } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
-    } finally {
-        await pac?.run(["auth", "clear"]);
-    }
+    core.info('environment deleted');
+    core.endGroup();
 }

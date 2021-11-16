@@ -1,33 +1,36 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+import { restoreEnvironment } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
-import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory} from '../../lib';
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
-})();
+})().catch(error => {
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
+    core.endGroup();
+});
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
-    try {
-        core.startGroup('restore-environment:');
-        const sourceUrl = core.getInput('source-url', { required: true});
-        const targetUrl = core.getInput('target-url', { required: true});
-        const selectedBackup = core.getInput('selected-backup', { required: true});
+export async function main(): Promise<void> {
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "restore-environment");
 
-        pac = factory.getRunner('pac', process.cwd());
-        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
+    core.startGroup('restore-environment:');
+    const sourceUrl = core.getInput('source-url', { required: true});
 
-        const restoreEnvArgs = ['admin', 'restore', '--source-url', sourceUrl, '--target-url', targetUrl, '--selected-backup', selectedBackup];
-        await pac.run(restoreEnvArgs);
-        core.info('environment restored');
-        core.endGroup();
-    } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
-    } finally {
-        await pac?.run(["auth", "clear"]);
-    }
+    await restoreEnvironment({
+        credentials: getCredentials(),
+        sourceEnvironmentUrl: sourceUrl,
+        targetEnvironmentUrl: parameterMap['target-url'],
+        restoreLatestBackup: parameterMap['latest-backup'],
+        backupDateTime: parameterMap['selected-backup'],
+        targetEnvironmentName: parameterMap['friendly-name'],
+    }, runnerParameters, new ActionsHost());
+    core.endGroup();
 }

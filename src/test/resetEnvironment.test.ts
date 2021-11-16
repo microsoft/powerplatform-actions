@@ -1,55 +1,48 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { forEachOf } from 'async';
-import { expect } from 'chai';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { main as resetEnvironment } from '../actions/reset-environment';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
+should();
+use(sinonChai);
 
-describe('reset-environment#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir)
+describe("reset-environment tests", () => {
+    const resetEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
+    const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
-    const requiredParams = [
-        { Name: 'environment-url', Value: 'aUrl', required: true}
-    ];
+    async function callActionWithMocks(): Promise<void> {
+        const mockedModule = await rewiremock.around(() => import("../../src/actions/reset-environment/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ resetEnvironment: resetEnvironmentStub });
+                mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
+                mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+                mock(() => import("@actions/core")).with({ getInput: () => mockEnvironmentUrl, startGroup: () => undefined, endGroup: () => undefined });
+            });
+        await mockedModule.main();
+    }
 
-    const inputParams = [
-        { Name: 'environment-url', Value: 'aUrl', required: true},
-        { Name: 'user-name', Value: 'aUserName', required: false},
-        { Name: 'password-secret', Value: 'aSecret', required: false},
-    ];
-    const actionsInput = new ActionInputsEmulator(inputParams);
+    it("fetches parameters from index.ts, calls resetEnvironmentStub properly", async () => {
 
-    forEachOf(requiredParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionsInput.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                res = await resetEnvironment(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
+        await callActionWithMocks();
+
+        resetEnvironmentStub.should.have.been.calledWithExactly({
+            credentials: credentials,
+            environmentUrl: mockEnvironmentUrl,
+            language: { name: 'language', required: true, defaultValue: 'English' },
+            overrideDomainName: { name: 'override-domain-name', required: false, defaultValue: 'false' },
+            domainName: { name: 'domain-name', required: false, defaultValue: undefined },
+            overrideFriendlyName: { name: 'override-friendly-name', required: false, defaultValue: 'false' },
+            friendlyEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined },
+        }, runnerParameters, new ActionsHost());
     });
-
-    it('call action', async() => {
-        actionsInput.defineInputs();
-        let err;
-        try {
-            await resetEnvironment(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret']});
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: ['admin', 'reset', '--url', 'aUrl' ]});
-    }).timeout(5000);
 });

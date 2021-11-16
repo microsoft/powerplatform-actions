@@ -1,36 +1,41 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { expect } from 'chai';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { main as deleteEnvironment } from '../actions/delete-environment';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+should();
+use(sinonChai);
 
-describe('delete-environment#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
+describe("delete-environment tests", () => {
+    const deleteEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
+    const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
-    const inputParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
-        { Name: 'environment-id', Value: 'envId' },
-        { Name: 'user-name', Value: 'aUserName' },
-        { Name: 'password-secret', Value: 'aSecret' },
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+    async function callActionWithMocks(): Promise<void> {
+        const mockedModule = await rewiremock.around(() => import("../../src/actions/delete-environment/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ deleteEnvironment: deleteEnvironmentStub });
+                mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
+                mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+            });
+        await mockedModule.main();
+    }
 
-    it('call action', async() => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await deleteEnvironment(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'delete', '--url', 'aUrl' ] });
-    }).timeout(5000);
+    it("fetches parameters from index.ts, calls deleteEnvironmentStub properly", async () => {
+
+        await callActionWithMocks();
+
+        deleteEnvironmentStub.should.have.been.calledWithExactly({
+            credentials: credentials,
+            environmentUrl: mockEnvironmentUrl
+        }, runnerParameters);
+    });
 });
