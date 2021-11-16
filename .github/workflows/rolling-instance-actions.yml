@@ -132,6 +132,14 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
+    - name: Test delete-solution action with username/password
+      uses: ./delete-solution
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        solution-name: emptySolution
+
     - name: Test deploy-package action with username-password
       if: matrix.os == 'windows-latest'
       uses: ./deploy-package
