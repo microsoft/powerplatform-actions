@@ -2,8 +2,9 @@
 // Licensed under the MIT License.
 import { deleteEnvironment } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
 import getCredentials from "../../lib/auth/getCredentials";
-import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
@@ -17,13 +18,14 @@ import { runnerParameters } from '../../lib/runnerParameters';
 });
 
 export async function main(): Promise<void> {
-    core.startGroup('delete-environment:');
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "delete-environment");
 
+    core.startGroup('delete-environment:');
     await deleteEnvironment({
         credentials: getCredentials(),
-        environmentUrl: getEnvironmentUrl(),
-    }, runnerParameters);
-
+        environmentUrl: parameterMap['environment-url'],
+    }, runnerParameters, new ActionsHost());
     core.info('environment deleted');
     core.endGroup();
 }

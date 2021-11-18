@@ -22,11 +22,9 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "restore-environment");
 
     core.startGroup('restore-environment:');
-    const sourceUrl = core.getInput('source-url', { required: true});
-
     await restoreEnvironment({
         credentials: getCredentials(),
-        sourceEnvironmentUrl: sourceUrl,
+        sourceEnvironmentUrl: parameterMap['source-url'],
         targetEnvironmentUrl: parameterMap['target-url'],
         restoreLatestBackup: parameterMap['latest-backup'],
         backupDateTime: parameterMap['selected-backup'],

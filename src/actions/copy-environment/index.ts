@@ -22,10 +22,9 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "copy-environment");
 
     core.startGroup('copy-environment:');
-    const sourceUrl = core.getInput('source-url', { required: true});
     await copyEnvironment({
         credentials: getCredentials(),
-        sourceEnvironmentUrl: sourceUrl,
+        sourceEnvironmentUrl: parameterMap['source-url'],
         targetEnvironmentUrl: parameterMap['target-url'],
         copyType: parameterMap['copy-type'],
         overrideFriendlyName: parameterMap['override-friendly-name'],

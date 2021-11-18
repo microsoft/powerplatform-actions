@@ -9,6 +9,7 @@ import rewiremock from "./rewiremock";
 import { stub } from "sinon";
 import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
 import { runnerParameters } from "../../src/lib/runnerParameters";
+import { ActionsHost } from "../lib/host/ActionsHost";
 import Sinon = require("sinon");
 should();
 use(sinonChai);
@@ -35,7 +36,7 @@ describe("delete-environment tests", () => {
 
         deleteEnvironmentStub.should.have.been.calledWithExactly({
             credentials: credentials,
-            environmentUrl: mockEnvironmentUrl
-        }, runnerParameters);
+            environmentUrl: { name: 'environment-url', required: true, defaultValue: undefined }
+        }, runnerParameters, new ActionsHost());
     });
 });

@@ -22,10 +22,9 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "backup-environment");
 
     core.startGroup('backup-environment:');
-    const envUrl = core.getInput('environment-url', { required: true });
     await backupEnvironment({
         credentials: getCredentials(),
-        environmentUrl: envUrl,
+        environmentUrl: parameterMap['environment-url'],
         backupLabel: parameterMap['backup-label']
     }, runnerParameters, new ActionsHost());
     core.endGroup();

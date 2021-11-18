@@ -22,10 +22,9 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "reset-environment");
 
     core.startGroup('reset-environment:');
-    const envUrl = core.getInput('environment-url', { required: true });
     await resetEnvironment({
         credentials: getCredentials(),
-        environmentUrl: envUrl,
+        environmentUrl: parameterMap['environment-url'],
         language: parameterMap['language'],
         overrideDomainName: parameterMap['override-domain-name'],
         domainName: parameterMap['domain-name'],
