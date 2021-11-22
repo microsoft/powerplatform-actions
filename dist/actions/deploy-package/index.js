@@ -572,8 +572,9 @@ function backupEnvironment(parameters, runnerParameters, host) {
             const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
             logger.log("The Authentication Result: " + authenticateResult);
             // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
-            const pacArgs = ["admin", "backup", "--url", parameters.environmentUrl];
+            const pacArgs = ["admin", "backup"];
             const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--url", parameters.environmentUrl);
             validator.pushInput(pacArgs, "--label", parameters.backupLabel);
             logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
             const pacResult = yield pac(...pacArgs);
@@ -765,9 +766,9 @@ function copyEnvironment(parameters, runnerParameters, host) {
             const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
             logger.log("The Authentication Result: " + authenticateResult);
             // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
-            const pacArgs = ["admin", "copy", "--source-url", parameters.sourceEnvironmentUrl];
-            logger.log("Source Url: " + parameters.sourceEnvironmentUrl);
+            const pacArgs = ["admin", "copy"];
             const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--source-url", parameters.sourceEnvironmentUrl);
             validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
             if (validator.getInput(parameters.overrideFriendlyName) === 'true') {
                 validator.pushInput(pacArgs, "--name", parameters.friendlyTargetEnvironmentName);
@@ -875,9 +876,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deleteEnvironment = void 0;
+const InputValidator_1 = __nccwpck_require__(9988);
 const authenticate_1 = __nccwpck_require__(192);
 const createPacRunner_1 = __nccwpck_require__(2226);
-function deleteEnvironment(parameters, runnerParameters) {
+function deleteEnvironment(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = createPacRunner_1.default(runnerParameters);
@@ -885,8 +887,9 @@ function deleteEnvironment(parameters, runnerParameters) {
             const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
             logger.log("The Authentication Result: " + authenticateResult);
             // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
-            const pacArgs = ["admin", "delete", "--url", parameters.environmentUrl];
-            logger.log("Url: " + parameters.environmentUrl);
+            const pacArgs = ["admin", "delete"];
+            const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--url", parameters.environmentUrl);
             logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
             const pacResult = yield pac(...pacArgs);
             logger.log("DeleteEnvironment Action Result: " + pacResult);
@@ -1379,9 +1382,9 @@ function resetEnvironment(parameters, runnerParameters, host) {
             const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
             logger.log("The Authentication Result: " + authenticateResult);
             // Made environment url mandatory and removed environment id as there are planned changes in PAC CLI on the parameter.
-            const pacArgs = ["admin", "reset", "--url", parameters.environmentUrl];
-            logger.log("Url: " + parameters.environmentUrl);
+            const pacArgs = ["admin", "reset"];
             const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--url", parameters.environmentUrl);
             validator.pushInput(pacArgs, "--language", parameters.language);
             if (validator.getInput(parameters.overrideDomainName) === 'true') {
                 validator.pushInput(pacArgs, "--domain", parameters.domainName);
@@ -1435,9 +1438,9 @@ function restoreEnvironment(parameters, runnerParameters, host) {
         try {
             const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
             logger.log("The Authentication Result: " + authenticateResult);
-            const pacArgs = ["admin", "restore", "--source-url", parameters.sourceEnvironmentUrl];
-            logger.log("Source Url: " + parameters.sourceEnvironmentUrl);
+            const pacArgs = ["admin", "restore"];
             const validator = new InputValidator_1.InputValidator(host);
+            validator.pushInput(pacArgs, "--source-url", parameters.sourceEnvironmentUrl);
             validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
             validator.pushInput(pacArgs, "--name", parameters.targetEnvironmentName);
             if (validator.getInput(parameters.restoreLatestBackup) === 'true') {
@@ -6193,7 +6196,7 @@ exports.runnerParameters = runnerParameters;
 /***/ 306:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.31.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.32","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.31.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.33","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
 
 /***/ }),
 
