@@ -22,6 +22,7 @@ export async function main(): Promise<void> {
     const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "reset-environment");
 
     core.startGroup('reset-environment:');
+
     await resetEnvironment({
         credentials: getCredentials(),
         environmentUrl: parameterMap['environment-url'],
@@ -31,5 +32,6 @@ export async function main(): Promise<void> {
         overrideFriendlyName: parameterMap['override-friendly-name'],
         friendlyEnvironmentName: parameterMap['friendly-name'],
     }, runnerParameters, new ActionsHost());
+
     core.endGroup();
 }
