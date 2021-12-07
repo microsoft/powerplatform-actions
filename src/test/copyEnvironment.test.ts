@@ -17,14 +17,12 @@ use(sinonChai);
 describe("copy-environment tests", () => {
     const copyEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
     const credentials: UsernamePassword = stubInterface<UsernamePassword>();
-    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
     async function callActionWithMocks(): Promise<void> {
         const mockedModule = await rewiremock.around(() => import("../../src/actions/copy-environment/index"),
             (mock) => {
                 mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ copyEnvironment: copyEnvironmentStub });
                 mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
-                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
                 mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
             });
         await mockedModule.main();
@@ -36,9 +34,13 @@ describe("copy-environment tests", () => {
 
         copyEnvironmentStub.should.have.been.calledWithExactly({
             credentials: credentials,
-            sourceEnvironmentUrl: { name: 'source-url', required: true, defaultValue: undefined },
-            targetEnvironmentUrl: { name: 'target-url', required: true, defaultValue: undefined },
-            copyType: { name: 'copy-type', required: false, defaultValue: 'FullCopy' },
+            sourceEnvironmentUrl: { name: 'source-url', required: false, defaultValue: undefined },
+            targetEnvironmentUrl: { name: 'target-url', required: false, defaultValue: undefined },
+            sourceEnvironmentId: { name: 'source-id', required: false, defaultValue: undefined },
+            targetEnvironmentId: { name: 'target-id', required: false, defaultValue: undefined },
+            sourceEnvironment: { name: 'source-env', required: false, defaultValue: undefined },
+            targetEnvironment: { name: 'target-env', required: false, defaultValue: undefined },
+            copyType: { name: 'copy-type', required: false, defaultValue: 'Full Copy' },
             overrideFriendlyName: { name: 'override-friendly-name', required: false, defaultValue: 'false' },
             friendlyTargetEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined }
         }, runnerParameters, new ActionsHost());

@@ -1,59 +1,51 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { forEachOf } from 'async';
-import { expect } from 'chai';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { main as restoreEnvironment } from '../actions/restore-environment';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
+should();
+use(sinonChai);
 
-describe('restore-environment#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
-    // TODO: read in params and their required state from the action.yml
-    const requiredParams = [
-        { Name: 'source-url', Value: 'sourceUrl', required: true},
-        { Name: 'target-url', Value: 'targetUrl', required: true},
-        { Name: 'selected-backup', Value: 'latest', required: true},
-    ];
+describe("restore-environment tests", () => {
+    const restoreEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
+    const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
-    const inputParams = [
-        { Name: 'user-name', Value: 'aUserName', required: false},
-        { Name: 'password-secret', Value: 'aSecret', required: false},
-        { Name: 'source-url', Value: 'sourceUrl', required: true},
-        { Name: 'target-url', Value: 'targetUrl', required: true},
-        { Name: 'selected-backup', Value: 'latest', required: true},
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+    async function callActionWithMocks(): Promise<void> {
+        const mockedModule = await rewiremock.around(() => import("../../src/actions/restore-environment/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ restoreEnvironment: restoreEnvironmentStub });
+                mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
+                mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+                mock(() => import("@actions/core")).with({ getInput: () => mockEnvironmentUrl, startGroup: () => undefined, endGroup: () => undefined });
+            });
+        await mockedModule.main();
+    }
 
-    forEachOf(requiredParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                 res = await restoreEnvironment(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
+    it("fetches parameters from index.ts, calls restoreEnvironmentStub properly", async () => {
+
+        await callActionWithMocks();
+
+        restoreEnvironmentStub.should.have.been.calledWithExactly({
+            credentials: credentials,
+            sourceEnvironmentUrl: { name: 'source-url', required: false, defaultValue: undefined },
+            targetEnvironmentUrl: { name: 'target-url', required: false, defaultValue: undefined },
+            sourceEnvironmentId: { name: 'source-id', required: false, defaultValue: undefined },
+            targetEnvironmentId: { name: 'target-id', required: false, defaultValue: undefined },
+            sourceEnvironment: { name: 'source-env', required: false, defaultValue: undefined },
+            targetEnvironment: { name: 'target-env', required: false, defaultValue: undefined },
+            restoreLatestBackup: { name: 'latest-backup', required: false, defaultValue: 'true' },
+            backupDateTime: { name: 'selected-backup', required: false, defaultValue: undefined },
+            targetEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined },
+        }, runnerParameters, new ActionsHost());
     });
-
-    it('call action', async() => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await restoreEnvironment(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'restore', '--source-url', 'sourceUrl', '--target-url', 'targetUrl', '--selected-backup', 'latest'] });
-    }).timeout(5000);
 });

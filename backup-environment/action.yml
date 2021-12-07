@@ -5,7 +5,15 @@ description: "Power Platform Backup Environment Action"
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to backup; e.g. "https://test-env.crm.dynamics.com"'
-    required: true
+    required: false
+
+  environment-id:
+    description: 'Id of Power Platform environment to backup.'
+    required: false
+
+  environment:
+    description: 'Id or URL of Power Platform environment to backup.'
+    required: false
 
   backup-label:
     description: "Label to add to the Power Platform environment backup."

@@ -25,7 +25,9 @@ export async function main(): Promise<void> {
 
     await backupEnvironment({
         credentials: getCredentials(),
+        environment: parameterMap['environment'],
         environmentUrl: parameterMap['environment-url'],
+        environmentId: parameterMap['environment-id'],
         backupLabel: parameterMap['backup-label'],
         notes: parameterMap['notes']
     }, runnerParameters, new ActionsHost());
