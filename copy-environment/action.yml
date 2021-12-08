@@ -32,9 +32,9 @@ inputs:
     required: false
 
   copy-type:
-    description: "Type of copy - Full Copy or Minimal Copy"
+    description: "Type of copy - FullCopy or MinimalCopy"
     required: false
-    default: "Full Copy"
+    default: "FullCopy"
 
   override-friendly-name:
     description: "Check to override the friendly name of the target environment."

@@ -36,8 +36,9 @@ describe("backup-environment tests", () => {
 
         backupEnvironmentStub.should.have.been.calledWithExactly({
             credentials: credentials,
-            environmentUrl: mockEnvironmentUrl,
+            environmentUrl: { name: 'environment-url', required: true, defaultValue: undefined },
             backupLabel: { name: 'backup-label', required: true, defaultValue: undefined },
+            notes: { name: 'notes', required: false, defaultValue: undefined }
         }, runnerParameters, new ActionsHost());
     });
 });
