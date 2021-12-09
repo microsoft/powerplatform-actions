@@ -1,8 +1,10 @@
 ﻿import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
+import * as React from "react";
 
-export class $controlnameplaceholder$ implements ComponentFramework.VirtualControl<IInputs, IOutputs> {
-	private theComponent: ComponentFramework.VirtualComponent;
+export class $controlnameplaceholder$ implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+	private theComponent: ComponentFramework.ReactControl<IInputs, IOutputs>;
+    private notifyOutputChanged: () => void;
 
 	/**
 	 * Empty constructor.
@@ -20,24 +22,20 @@ export class $controlnameplaceholder$ implements ComponentFramework.VirtualContr
 	public init(
 		context: ComponentFramework.Context<IInputs>,
 		notifyOutputChanged: () => void,
-		state: ComponentFramework.Dictionary,
-		container: HTMLDivElement
+		state: ComponentFramework.Dictionary
 	): void {
+        this.notifyOutputChanged = notifyOutputChanged;
 	}
 
 	/**
 	 * Called when any value in the property bag has changed. This includes field values, data-sets, global values such as container height and width, offline status, control metadata values such as label, visible, etc.
 	 * @param context The entire property bag available to control via Context Object; It contains values as set up by the customizer mapped to names defined in the manifest, as well as utility functions
 	 */
-	public updateView(context: ComponentFramework.Context<IInputs>): ComponentFramework.VirtualComponent {
-		return ComponentFramework.createComponent(
-			HelloWorld,
-			{
-				id: "HelloWorld",
-				name: context.parameters.sampleProperty.raw
-			}
-		);
-	}
+    public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
+      return React.createElement(
+        HelloWorld
+      );
+    }
 
 	/**
 	 * It is called by the framework prior to a control receiving new data.
