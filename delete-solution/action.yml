@@ -34,5 +34,5 @@ inputs:
 
 runs:
   using: 'node12'
-  main: '../dist/actions/publish-solution/index.js'
-  # main: '../out/actions/publish-solution/index.js'
+  main: '../dist/actions/delete-solution/index.js'
+  # main: '../out/actions/delete-solution/index.js'

@@ -1,56 +1,36 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import { DefaultRunnerFactory, getWorkingDirectory, RunnerFactory } from '../../lib';
-import path = require('path');
+import { updateVersionSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from "../../lib/runnerParameters";
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
 })();
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
+export async function main(): Promise<void> {
     try {
         core.startGroup('update-solution-version:');
-        const patchVersion = core.getInput('patch-version', { required: false });
-        const strategy = core.getInput('strategy', { required: false });
+        const taskParser = new YamlParser();
+        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "update-solution-version");
 
-        if (!!patchVersion === !!strategy) {
-            const error = new Error("Input 'patch-version': not allowed with input 'strategy'");
-            core.setFailed(error);
-            throw error;
-        }
-
-        pac = factory.getRunner('pac', process.cwd());
-        const updateSolutionVersionArgs = ['solution', 'version'];
-
-        if (patchVersion) {
-            updateSolutionVersionArgs.push('--patchversion', patchVersion);
-        }
-
-        if (strategy) {
-            updateSolutionVersionArgs.push('--strategy', strategy);
-        }
-
-        const workingDir = getWorkingDirectory('working-directory', false);
-        const trackerFileCandidate = core.getInput('tracker-file', { required: false });
-        if (trackerFileCandidate) {
-            const trackerFile = path.isAbsolute(trackerFileCandidate)
-                ? trackerFileCandidate
-                : path.resolve(workingDir, trackerFileCandidate);
-
-            updateSolutionVersionArgs.push('--filename', trackerFile);
-        }
-
-        await pac.run(updateSolutionVersionArgs);
-        core.info('updated solution version');
+        await updateVersionSolution({
+            credentials: getCredentials(),
+            environmentUrl: getEnvironmentUrl(),
+            patchVersion: parameterMap['patch-version'],
+            strategy: parameterMap['strategy'],
+            fileName: parameterMap['tracker-file'],
+        }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
-    } finally {
-        await pac?.run(["auth", "clear"]);
+        const logger = runnerParameters.logger;
+        logger.error(`failed: ${error}`);
+        core.endGroup();
     }
 }

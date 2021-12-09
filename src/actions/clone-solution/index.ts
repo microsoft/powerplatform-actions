@@ -22,7 +22,6 @@ let pac: Runner;
 (async () => {
     pac = new PacRunner(workingDir, logger);
     await new AuthHandler(pac).authenticate(AuthKind.CDS);
-
     const cloneArgs = ['solution', 'clone', '--name', solutionName, '--outputDirectory', targetFolder];
     if (solutionVersion) {
         cloneArgs.push('--targetVersion', solutionVersion);
@@ -30,7 +29,6 @@ let pac: Runner;
     await pac.run(cloneArgs);
     core.info(`cloned solution into folder: ${targetFolder}`);
     core.endGroup();
-
 })().catch(error => {
     core.setFailed(`failed: ${error}`);
     core.endGroup();
