@@ -21,17 +21,17 @@ namespace $safeprojectname$
         {
             if (localPluginContext == null)
             {
-                throw new ArgumentNullException("localPluginContext");
+                throw new ArgumentNullException(nameof(localPluginContext));
             }
 
-            IPluginExecutionContext context = localPluginContext.PluginExecutionContext;
+            var context = localPluginContext.PluginExecutionContext;
 
             // TODO: Implement your custom business logic
 
             // Check for the entity on which the plugin would be registered
             //if (context.InputParameters.Contains("Target") && context.InputParameters["Target"] is Entity)
             //{
-            //    Entity entity = (Entity)context.InputParameters["Target"];
+            //    var entity = (Entity)context.InputParameters["Target"];
 
             //    // Check for entity name on which this plugin would be registered
             //    if (entity.LogicalName == "account")

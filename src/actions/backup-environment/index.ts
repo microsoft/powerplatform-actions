@@ -5,7 +5,6 @@ import * as core from '@actions/core';
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
 import getCredentials from "../../lib/auth/getCredentials";
-import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
@@ -26,8 +25,9 @@ export async function main(): Promise<void> {
 
     await backupEnvironment({
         credentials: getCredentials(),
-        environmentUrl: getEnvironmentUrl(),
-        backupLabel: parameterMap['backup-label']
+        environmentUrl: parameterMap['environment-url'],
+        backupLabel: parameterMap['backup-label'],
+        notes: parameterMap['notes']
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 }

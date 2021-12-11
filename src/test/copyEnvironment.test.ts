@@ -36,9 +36,9 @@ describe("copy-environment tests", () => {
 
         copyEnvironmentStub.should.have.been.calledWithExactly({
             credentials: credentials,
-            sourceEnvironmentUrl: mockEnvironmentUrl,
+            sourceEnvironmentUrl: { name: 'source-url', required: true, defaultValue: undefined },
             targetEnvironmentUrl: { name: 'target-url', required: true, defaultValue: undefined },
-            copyType: { name: 'copy-type', required: false, defaultValue: 'Full Copy' },
+            copyType: { name: 'copy-type', required: false, defaultValue: 'FullCopy' },
             overrideFriendlyName: { name: 'override-friendly-name', required: false, defaultValue: 'false' },
             friendlyTargetEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined }
         }, runnerParameters, new ActionsHost());
