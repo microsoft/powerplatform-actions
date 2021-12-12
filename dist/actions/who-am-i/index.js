@@ -1877,13 +1877,14 @@ const core = __nccwpck_require__(186);
 const getCredentials_1 = __nccwpck_require__(429);
 const getEnvironmentUrl_1 = __nccwpck_require__(699);
 const runnerParameters_1 = __nccwpck_require__(727);
+const OutputVariables_1 = __nccwpck_require__(848);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     core.startGroup('who-am-i:');
     const result = yield actions_1.whoAmI({
         credentials: getCredentials_1.default(),
         environmentUrl: getEnvironmentUrl_1.default(),
     }, runnerParameters_1.runnerParameters);
-    core.setOutput('environment-id', result.environmentId);
+    core.setOutput(OutputVariables_1.EnvIdVariableName, result.environmentId);
     core.endGroup();
 }))().catch(error => {
     const logger = runnerParameters_1.runnerParameters.logger;
@@ -1892,6 +1893,21 @@ const runnerParameters_1 = __nccwpck_require__(727);
 });
 
 //# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 848:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.EnvIdVariableName = void 0;
+exports.EnvIdVariableName = "environment-id";
+
+//# sourceMappingURL=OutputVariables.js.map
 
 
 /***/ }),
@@ -2103,7 +2119,7 @@ module.exports = require("process");
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -2117,7 +2133,7 @@ module.exports = require("process");
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -2126,23 +2142,23 @@ module.exports = require("process");
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
-/******/
+/******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/
+/******/ 	
 /************************************************************************/
-/******/
+/******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __nccwpck_require__(274);
 /******/ 	module.exports = __webpack_exports__;
-/******/
+/******/ 	
 /******/ })()
 ;
