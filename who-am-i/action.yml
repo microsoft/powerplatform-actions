@@ -27,6 +27,10 @@ inputs:
     description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
+outputs:
+  environment-id:
+    description: ID of the environment connected with
+
 runs:
   using: 'node12'
   main: '../dist/actions/who-am-i/index.js'

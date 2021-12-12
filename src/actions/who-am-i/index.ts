@@ -8,12 +8,13 @@ import { runnerParameters } from "../../lib/runnerParameters";
 
 (async () => {
     core.startGroup('who-am-i:');
-    await whoAmI({
+    const result = await whoAmI({
         credentials: getCredentials(),
         environmentUrl: getEnvironmentUrl(),
     }, runnerParameters
     );
 
+    core.setOutput('environment-id', result.environmentId);
     core.endGroup();
 })().catch(error => {
     const logger = runnerParameters.logger;
