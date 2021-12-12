@@ -10,6 +10,8 @@ import {
     UsernamePassword,
 } from "@microsoft/powerplatform-cli-wrapper";
 import * as core from '@actions/core';
+import { EnvIdVariableName } from "../host/OutputVariables";
+
 should();
 use(sinonChai);
 
@@ -59,6 +61,6 @@ describe("WhoAmI tests", () => {
             environmentUrl: environmentUrl,
         }, runnerParameters);
 
-        coreSetOutputSpy.should.have.been.calledOnceWith("environment-id", mockEnvironmentIdReturn);
+        coreSetOutputSpy.should.have.been.calledOnceWith(EnvIdVariableName, mockEnvironmentIdReturn);
     });
 });

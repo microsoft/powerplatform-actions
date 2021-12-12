@@ -5,6 +5,7 @@ import * as core from '@actions/core';
 import getCredentials from "../../lib/auth/getCredentials";
 import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from "../../lib/runnerParameters";
+import { EnvIdVariableName } from "../../host/OutputVariables";
 
 (async () => {
     core.startGroup('who-am-i:');
@@ -14,7 +15,7 @@ import { runnerParameters } from "../../lib/runnerParameters";
     }, runnerParameters
     );
 
-    core.setOutput('environment-id', result.environmentId);
+    core.setOutput(EnvIdVariableName, result.environmentId);
     core.endGroup();
 })().catch(error => {
     const logger = runnerParameters.logger;
