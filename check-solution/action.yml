@@ -32,7 +32,7 @@ inputs:
     required: true
 
   geo:
-    description: Which geo location of the PowerPlatform Checker Service to use.  Default value is \'UnitedStates\'.
+    description: 'Which geo location of the PowerPlatform Checker Service to use.  Default value is "UnitedStates".'
     required: false
 
   rule-level-override:
