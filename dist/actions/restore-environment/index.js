@@ -27,7 +27,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
-const os = __importStar(__nccwpck_require__(87));
+const os = __importStar(__nccwpck_require__(37));
 const utils_1 = __nccwpck_require__(278);
 /**
  * Commands
@@ -137,8 +137,8 @@ exports.getState = exports.saveState = exports.group = exports.endGroup = export
 const command_1 = __nccwpck_require__(351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
-const os = __importStar(__nccwpck_require__(87));
-const path = __importStar(__nccwpck_require__(622));
+const os = __importStar(__nccwpck_require__(37));
+const path = __importStar(__nccwpck_require__(17));
 /**
  * The code to exit an action
  */
@@ -428,8 +428,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__nccwpck_require__(747));
-const os = __importStar(__nccwpck_require__(87));
+const fs = __importStar(__nccwpck_require__(147));
+const os = __importStar(__nccwpck_require__(37));
 const utils_1 = __nccwpck_require__(278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -802,7 +802,7 @@ function createLegacyRunnerPacAuthenticator(pac) {
         });
     }
 }
-exports.default = createLegacyRunnerPacAuthenticator;
+exports["default"] = createLegacyRunnerPacAuthenticator;
 
 //# sourceMappingURL=createLegacyRunnerPacAuthenticator.js.map
 
@@ -818,7 +818,7 @@ const core_1 = __nccwpck_require__(186);
 function getEnvironmentUrl() {
     return core_1.getInput("environment-url", { required: false });
 }
-exports.default = getEnvironmentUrl;
+exports["default"] = getEnvironmentUrl;
 
 //# sourceMappingURL=getEnvironmentUrl.js.map
 
@@ -842,11 +842,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RunnerError = exports.ExeRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-const child_process_1 = __nccwpck_require__(129);
-const os = __nccwpck_require__(87);
+const child_process_1 = __nccwpck_require__(81);
+const os = __nccwpck_require__(37);
 const getExePath_1 = __nccwpck_require__(309);
 const runnerParameters_1 = __nccwpck_require__(727);
-const process = __nccwpck_require__(765);
+const process = __nccwpck_require__(282);
 class ExeRunner {
     constructor(_workingDir, logger, exeName, exeRelativePath) {
         this._workingDir = _workingDir;
@@ -930,7 +930,7 @@ exports.RunnerError = RunnerError;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const path_1 = __nccwpck_require__(622);
+const path_1 = __nccwpck_require__(17);
 function getExePath(...relativePath) {
     // in mocha, __dirname resolves to the src folder of the .ts file,
     // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
@@ -952,7 +952,7 @@ function getExePath(...relativePath) {
     }
     return path_1.resolve(outDirRoot, ...relativePath);
 }
-exports.default = getExePath;
+exports["default"] = getExePath;
 
 //# sourceMappingURL=getExePath.js.map
 
@@ -993,7 +993,7 @@ Object.defineProperty(exports, "getInputAsBool", ({ enumerable: true, get: funct
 Object.defineProperty(exports, "getWorkingDirectory", ({ enumerable: true, get: function () { return actionInput_1.getWorkingDirectory; } }));
 var exeRunner_1 = __nccwpck_require__(21);
 Object.defineProperty(exports, "RunnerError", ({ enumerable: true, get: function () { return exeRunner_1.RunnerError; } }));
-var runnerFactory_1 = __nccwpck_require__(147);
+var runnerFactory_1 = __nccwpck_require__(597);
 Object.defineProperty(exports, "DefaultRunnerFactory", ({ enumerable: true, get: function () { return runnerFactory_1.DefaultRunnerFactory; } }));
 // TODO: delete exports once all actions are converted:
 var actionLogger_1 = __nccwpck_require__(970);
@@ -1020,7 +1020,7 @@ exports.PacRunner = void 0;
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 const exeRunner_1 = __nccwpck_require__(21);
-const os = __nccwpck_require__(87);
+const os = __nccwpck_require__(37);
 const platform = os.platform();
 const programName = platform === "win32" ? 'pac.exe' : 'pac';
 const programPath = platform === "win32" ? ['pac', 'tools'] : ['pac_linux', 'tools'];
@@ -1036,7 +1036,7 @@ exports.PacRunner = PacRunner;
 
 /***/ }),
 
-/***/ 147:
+/***/ 597:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
@@ -1075,12 +1075,12 @@ exports.DefaultRunnerFactory = new RealRunnerFactory();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAutomationAgent = exports.runnerParameters = void 0;
-const process_1 = __nccwpck_require__(765);
+const process_1 = __nccwpck_require__(282);
 const actionLogger_1 = __nccwpck_require__(970);
 const getExePath_1 = __nccwpck_require__(309);
 function getAutomationAgent() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const jsonPackage = __nccwpck_require__(306);
+    const jsonPackage = __nccwpck_require__(598);
     const productName = jsonPackage.name.split("/")[1];
     return productName + "/" + jsonPackage.version;
 }
@@ -1098,45 +1098,45 @@ exports.runnerParameters = runnerParameters;
 
 /***/ }),
 
-/***/ 306:
-/***/ ((module) => {
-
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.31.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.36","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
-
-/***/ }),
-
-/***/ 129:
+/***/ 81:
 /***/ ((module) => {
 
 module.exports = require("child_process");
 
 /***/ }),
 
-/***/ 747:
+/***/ 147:
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
 
-/***/ 87:
+/***/ 37:
 /***/ ((module) => {
 
 module.exports = require("os");
 
 /***/ }),
 
-/***/ 622:
+/***/ 17:
 /***/ ((module) => {
 
 module.exports = require("path");
 
 /***/ }),
 
-/***/ 765:
+/***/ 282:
 /***/ ((module) => {
 
 module.exports = require("process");
+
+/***/ }),
+
+/***/ 598:
+/***/ ((module) => {
+
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.33.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.36","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
 
 /***/ })
 
