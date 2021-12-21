@@ -18,7 +18,7 @@ export async function main(): Promise<void> {
     try {
         core.startGroup('delete-solution:');
         const taskParser = new YamlParser();
-        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "delete-solution");
+        const parameterMap = taskParser.getHostParameterEntries('delete-solution');
 
         await deleteSolution({
             credentials: getCredentials(),

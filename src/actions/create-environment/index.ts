@@ -19,7 +19,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 export async function main(): Promise<void> {
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "create-environment");
+    const parameterMap = taskParser.getHostParameterEntries('create-environment');
 
     core.startGroup('create-environment:');
     const result = await createEnvironment({

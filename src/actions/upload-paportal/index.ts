@@ -10,7 +10,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "upload-paportal");
+    const parameterMap = taskParser.getHostParameterEntries('upload-paportal');
 
     await uploadPaportal({
         credentials: getCredentials(),

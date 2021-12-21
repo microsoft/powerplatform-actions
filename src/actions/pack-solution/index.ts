@@ -9,7 +9,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 (async () => {
     core.startGroup('pack-solution:');
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "pack-solution");
+    const parameterMap = taskParser.getHostParameterEntries('pack-solution');
 
     await packSolution({
       solutionZipFile: parameterMap['solution-file'],
