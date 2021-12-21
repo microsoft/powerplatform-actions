@@ -27,7 +27,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
-const os = __importStar(__nccwpck_require__(2087));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 /**
  * Commands
@@ -137,8 +137,8 @@ exports.getState = exports.saveState = exports.group = exports.endGroup = export
 const command_1 = __nccwpck_require__(7351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(5278);
-const os = __importStar(__nccwpck_require__(2087));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 /**
  * The code to exit an action
  */
@@ -428,8 +428,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__nccwpck_require__(5747));
-const os = __importStar(__nccwpck_require__(2087));
+const fs = __importStar(__nccwpck_require__(7147));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -489,10 +489,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RunnerError = exports.createCommandRunner = void 0;
-const child_process_1 = __nccwpck_require__(3129);
-const process_1 = __nccwpck_require__(1765);
-const os_1 = __nccwpck_require__(2087);
-const process = __nccwpck_require__(1765);
+const child_process_1 = __nccwpck_require__(2081);
+const process_1 = __nccwpck_require__(7282);
+const os_1 = __nccwpck_require__(2037);
+const process = __nccwpck_require__(7282);
 function createCommandRunner(workingDir, commandPath, logger, options, agent) {
     return function run(...args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -618,7 +618,7 @@ exports.checkSolution = void 0;
 const InputValidator_1 = __nccwpck_require__(9988);
 const authenticate_1 = __nccwpck_require__(192);
 const createPacRunner_1 = __nccwpck_require__(2226);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 function checkSolution(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -987,8 +987,8 @@ exports.deployPackage = void 0;
 const InputValidator_1 = __nccwpck_require__(9988);
 const authenticate_1 = __nccwpck_require__(192);
 const createPacRunner_1 = __nccwpck_require__(2226);
-const path = __nccwpck_require__(5622);
-const os = __nccwpck_require__(2087);
+const path = __nccwpck_require__(1017);
+const os = __nccwpck_require__(2037);
 function deployPackage(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1094,7 +1094,7 @@ exports.exportSolution = void 0;
 const InputValidator_1 = __nccwpck_require__(9988);
 const authenticate_1 = __nccwpck_require__(192);
 const createPacRunner_1 = __nccwpck_require__(2226);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 function exportSolution(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1188,7 +1188,7 @@ exports.importSolution = void 0;
 const InputValidator_1 = __nccwpck_require__(9988);
 const authenticate_1 = __nccwpck_require__(192);
 const createPacRunner_1 = __nccwpck_require__(2226);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 function importSolution(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1293,7 +1293,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.packSolution = void 0;
 const InputValidator_1 = __nccwpck_require__(9988);
 const createPacRunner_1 = __nccwpck_require__(2226);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 function packSolution(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1510,7 +1510,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.unpackSolution = void 0;
 const InputValidator_1 = __nccwpck_require__(9988);
 const createPacRunner_1 = __nccwpck_require__(2226);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 function unpackSolution(parameters, runnerParameters, host) {
     return __awaiter(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1832,15 +1832,15 @@ function addUsernamePassword(parameters) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const os_1 = __nccwpck_require__(2087);
-const path_1 = __nccwpck_require__(5622);
+const os_1 = __nccwpck_require__(2037);
+const path_1 = __nccwpck_require__(1017);
 const CommandRunner_1 = __nccwpck_require__(5892);
 function createPacRunner({ workingDir, runnersDir, logger, agent }) {
     return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32"
         ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe")
         : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger, undefined, agent);
 }
-exports.default = createPacRunner;
+exports["default"] = createPacRunner;
 
 //# sourceMappingURL=createPacRunner.js.map
 
@@ -4894,7 +4894,7 @@ module.exports = __nccwpck_require__(1035);
 
 
 
-module.exports = __nccwpck_require__(2011).extend({
+module.exports = (__nccwpck_require__(2011).extend)({
   implicit: [
     __nccwpck_require__(9212),
     __nccwpck_require__(6104)
@@ -4948,7 +4948,7 @@ module.exports = new Schema({
 
 
 
-module.exports = __nccwpck_require__(8562).extend({
+module.exports = (__nccwpck_require__(8562).extend)({
   implicit: [
     __nccwpck_require__(721),
     __nccwpck_require__(4993),
@@ -5964,7 +5964,7 @@ function main() {
         try {
             core.startGroup('update-solution-version:');
             const taskParser = new YamlParser_1.YamlParser();
-            const parameterMap = taskParser.getHostParameterEntries(runnerParameters_1.runnerParameters.workingDir, "update-solution-version");
+            const parameterMap = taskParser.getHostParameterEntries('update-solution-version');
             yield actions_1.updateVersionSolution({
                 credentials: getCredentials_1.default(),
                 environmentUrl: getEnvironmentUrl_1.default(),
@@ -6052,7 +6052,7 @@ function getCredentials() {
     }
     throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
 }
-exports.default = getCredentials;
+exports["default"] = getCredentials;
 function getInput(name) {
     return core_1.getInput(name, { required: false });
 }
@@ -6079,7 +6079,7 @@ const core_1 = __nccwpck_require__(2186);
 function getEnvironmentUrl() {
     return core_1.getInput("environment-url", { required: false });
 }
-exports.default = getEnvironmentUrl;
+exports["default"] = getEnvironmentUrl;
 
 //# sourceMappingURL=getEnvironmentUrl.js.map
 
@@ -6091,7 +6091,7 @@ exports.default = getEnvironmentUrl;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const path_1 = __nccwpck_require__(5622);
+const path_1 = __nccwpck_require__(1017);
 function getExePath(...relativePath) {
     // in mocha, __dirname resolves to the src folder of the .ts file,
     // but when running the .js file directly, e.g. from the /dist folder, it will be from that folder
@@ -6113,7 +6113,7 @@ function getExePath(...relativePath) {
     }
     return path_1.resolve(outDirRoot, ...relativePath);
 }
-exports.default = getExePath;
+exports["default"] = getExePath;
 
 //# sourceMappingURL=getExePath.js.map
 
@@ -6150,15 +6150,18 @@ exports.ActionsHost = ActionsHost;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.YamlParser = void 0;
-const fs = __nccwpck_require__(5747);
+const fs = __nccwpck_require__(7147);
 const yaml = __nccwpck_require__(1917);
-const path = __nccwpck_require__(5622);
+const path = __nccwpck_require__(1017);
 class YamlParser {
-    getHostParameterEntries(workingDir, actionFolder) {
+    constructor() {
+        this._actionsArchiveRoot = this.findArchiveRoot(__dirname);
+    }
+    getHostParameterEntries(actionFolder) {
         var _a;
         const parameterMap = {};
         try {
-            const file = path.join(workingDir, actionFolder, 'action.yml');
+            const file = path.resolve(this._actionsArchiveRoot, actionFolder, 'action.yml');
             console.log(`loading action yaml file: ${file}`);
             const fileContents = fs.readFileSync(file, 'utf8');
             const data = yaml.load(fileContents);
@@ -6176,6 +6179,25 @@ class YamlParser {
             throw new Error(`Error parsing yaml file for ${actionFolder}: ${e}`);
         }
     }
+    findArchiveRoot(startSearchFolder) {
+        // determine actions archive root, relative to this source file:
+        // walk up until the root action.yml is found, with pseudo/marketplace action named: 'powerplatform-actions'
+        let candidateDir = startSearchFolder;
+        const fsRoot = path.parse(candidateDir).root;
+        do {
+            const candidateActionYml = path.join(candidateDir, 'action.yml');
+            if (fs.existsSync(candidateActionYml)) {
+                const actionInfo = yaml.load(fs.readFileSync(candidateActionYml, 'utf-8'));
+                if (actionInfo.name === 'powerplatform-actions') {
+                    return candidateDir;
+                }
+            }
+            else {
+                candidateDir = path.resolve(candidateDir, '..');
+            }
+        } while (candidateDir !== fsRoot);
+        throw new Error(`Cannot find pp-actions' archive root folder. Started search at: ${startSearchFolder}`);
+    }
 }
 exports.YamlParser = YamlParser;
 
@@ -6190,12 +6212,12 @@ exports.YamlParser = YamlParser;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAutomationAgent = exports.runnerParameters = void 0;
-const process_1 = __nccwpck_require__(1765);
+const process_1 = __nccwpck_require__(7282);
 const actionLogger_1 = __nccwpck_require__(3970);
 const getExePath_1 = __nccwpck_require__(309);
 function getAutomationAgent() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const jsonPackage = __nccwpck_require__(306);
+    const jsonPackage = __nccwpck_require__(4147);
     const productName = jsonPackage.name.split("/")[1];
     return productName + "/" + jsonPackage.version;
 }
@@ -6213,45 +6235,45 @@ exports.runnerParameters = runnerParameters;
 
 /***/ }),
 
-/***/ 306:
-/***/ ((module) => {
-
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.31.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.36","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
-
-/***/ }),
-
-/***/ 3129:
+/***/ 2081:
 /***/ ((module) => {
 
 module.exports = require("child_process");
 
 /***/ }),
 
-/***/ 5747:
+/***/ 7147:
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
 
-/***/ 2087:
+/***/ 2037:
 /***/ ((module) => {
 
 module.exports = require("os");
 
 /***/ }),
 
-/***/ 5622:
+/***/ 1017:
 /***/ ((module) => {
 
 module.exports = require("path");
 
 /***/ }),
 
-/***/ 1765:
+/***/ 7282:
 /***/ ((module) => {
 
 module.exports = require("process");
+
+/***/ }),
+
+/***/ 4147:
+/***/ ((module) => {
+
+module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.33.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.36","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
 
 /***/ })
 
