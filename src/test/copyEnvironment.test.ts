@@ -40,7 +40,7 @@ describe("copy-environment tests", () => {
             targetEnvironmentId: { name: 'target-id', required: false, defaultValue: undefined },
             sourceEnvironment: { name: 'source-env', required: false, defaultValue: undefined },
             targetEnvironment: { name: 'target-env', required: false, defaultValue: undefined },
-            copyType: { name: 'copy-type', required: false, defaultValue: 'Full Copy' },
+            copyType: { name: 'copy-type', required: false, defaultValue: 'FullCopy' },
             overrideFriendlyName: { name: 'override-friendly-name', required: false, defaultValue: 'false' },
             friendlyTargetEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined }
         }, runnerParameters, new ActionsHost());

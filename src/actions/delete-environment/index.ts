@@ -19,7 +19,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 export async function main(): Promise<void> {
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "delete-environment");
+    const parameterMap = taskParser.getHostParameterEntries('delete-environment');
 
     core.startGroup('delete-environment:');
     await deleteEnvironment({
