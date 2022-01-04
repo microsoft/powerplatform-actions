@@ -5,9 +5,9 @@
 "use strict";
 require("dotenv").config();
 const gulp = require('gulp');
+const esbuild = require('esbuild');
 const eslint = require('gulp-eslint');
 const mocha = require('gulp-mocha');
-const ncc = require('@vercel/ncc');
 const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 
@@ -160,30 +160,24 @@ async function dist() {
     binplace('pac CLI', path.join('pac_linux', 'tools'));
     await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
 
-    const allBundles =
-        glob.sync('**/action.yml', {
-                cwd: __dirname
-            })
-        // ignore the toplevel action.yml that is needed for GH Marketplace
-        .filter(actionYaml => path.dirname(actionYaml) !== '.')
-        .map(actionYaml => path.basename(path.dirname(actionYaml)))
-        .filter(actionName => !skippedActionYamls.includes(actionName))
-        .map((actionName, idx) => {
-            const actionDir = path.resolve(distdir, 'actions', actionName)
-            log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
-            // return a promise for each bundled action:
-            return ncc(path.resolve(outdir, 'actions', actionName), {
-                minify: false,
-            })
-                .then(({code, map, assets}) => {
-                    fs.emptyDirSync(actionDir);
-                    fs.writeFileSync(path.resolve(actionDir, 'index.js'), code);
-                })
-                .catch(err => {
-                    console.log(err);
-                });
+    glob.sync('**/action.yml', {
+            cwd: __dirname
+        })
+    // ignore the toplevel action.yml that is needed for GH Marketplace
+    .filter(actionYaml => path.dirname(actionYaml) !== '.')
+    .map(actionYaml => path.basename(path.dirname(actionYaml)))
+    .filter(actionName => !skippedActionYamls.includes(actionName))
+    .map((actionName, idx) => {
+        const actionPath = path.join('actions', actionName);
+        const actionDistDir = path.resolve(distdir, actionPath);
+        log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDistDir})...`);
+        esbuild.buildSync({
+            bundle: true,
+            entryPoints: [ path.resolve(outdir, actionPath, 'index.js') ],
+            outfile: path.join(actionDistDir, 'index.js'),
+            platform: 'node',
         });
-    await Promise.all(allBundles);
+    });
 }
 
 // Unzipping the pac program from the nuget package does not set the
