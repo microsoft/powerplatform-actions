@@ -39,7 +39,6 @@ describe("reset-environment tests", () => {
             credentials: credentials,
             environment: { name: 'environment', required: false, defaultValue: undefined },
             environmentUrl: { name: 'environment-url', required: false, defaultValue: undefined },
-            environmentId: { name: 'environment-id', required: false, defaultValue: undefined },
             currency: { name: 'currency', required: false, defaultValue: 'USD' },
             purpose: { name: 'purpose', required: false, defaultValue: undefined },
             templates: { name: 'templates', required: false, defaultValue: undefined },

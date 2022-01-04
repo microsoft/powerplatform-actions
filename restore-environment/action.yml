@@ -11,14 +11,6 @@ inputs:
     description: 'Target URL of Power Platform environment; e.g. "https://test-env-target.crm.dynamics.com"'
     required: false
 
-  source-id:
-    description: 'Source Id of Power Platform environment.'
-    required: false
-
-  target-id:
-    description: 'Target Id of Power Platform environment.'
-    required: false
-
   source-env:
     description: 'Source URL or Id of Power Platform environment.'
     required: false

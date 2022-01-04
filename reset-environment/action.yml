@@ -27,10 +27,6 @@ inputs:
     description: 'URL of Power Platform environment to reset; e.g. "https://test-env.crm.dynamics.com"'
     required: false
 
-  environment-id:
-    description: 'Id of Power Platform environment to reset.'
-    required: false
-
   environment:
     description: 'Id or URL of Power Platform environment to reset.'
     required: false

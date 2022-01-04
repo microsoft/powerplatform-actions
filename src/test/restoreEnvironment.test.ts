@@ -39,8 +39,6 @@ describe("restore-environment tests", () => {
             credentials: credentials,
             sourceEnvironmentUrl: { name: 'source-url', required: false, defaultValue: undefined },
             targetEnvironmentUrl: { name: 'target-url', required: false, defaultValue: undefined },
-            sourceEnvironmentId: { name: 'source-id', required: false, defaultValue: undefined },
-            targetEnvironmentId: { name: 'target-id', required: false, defaultValue: undefined },
             sourceEnvironment: { name: 'source-env', required: false, defaultValue: undefined },
             targetEnvironment: { name: 'target-env', required: false, defaultValue: undefined },
             restoreLatestBackup: { name: 'latest-backup', required: false, defaultValue: 'true' },

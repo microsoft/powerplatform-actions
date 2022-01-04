@@ -7,10 +7,6 @@ inputs:
     description: 'URL of Power Platform environment to backup; e.g. "https://test-env.crm.dynamics.com"'
     required: false
 
-  environment-id:
-    description: 'Id of Power Platform environment to backup.'
-    required: false
-
   environment:
     description: 'Id or URL of Power Platform environment to backup.'
     required: false
