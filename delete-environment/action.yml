@@ -1,14 +1,18 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'delete-environment'
-description: 'Power Platform Delete Environment Action'
+name: "delete-environment"
+description: "Power Platform Delete Environment Action"
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to delete; e.g. "https://test-env.crm.dynamics.com". The "environment-url" is mutually exclusive to "environment-id".'
     required: false
 
+  environment-id:
+    description: 'ID of Power Platform environment to delete(deprecated). Please use "environment" action property instead.'
+    required: false
+
   environment:
-    description: 'URL or Id of Power Platform environment to delete.'
+    description: "URL or Id of Power Platform environment to delete."
     required: false
 
   user-name:
@@ -16,7 +20,7 @@ inputs:
     required: false
 
   password-secret:
-    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
     required: false
 
   app-id:
@@ -24,13 +28,13 @@ inputs:
     required: false
 
   client-secret:
-    description: 'The client secret to authenticate with. Required if authenticating with app-id.'
+    description: "The client secret to authenticate with. Required if authenticating with app-id."
     required: false
 
   tenant-id:
-    description: 'Tenant id if using app-id & client secret to authenticate.'
+    description: "Tenant id if using app-id & client secret to authenticate."
     required: false
 
 runs:
-  using: 'node12'
-  main: '../dist/actions/delete-environment/index.js'
+  using: "node12"
+  main: "../dist/actions/delete-environment/index.js"
