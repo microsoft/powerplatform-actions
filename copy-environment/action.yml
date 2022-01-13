@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: "copy-environment"
-description: "Power Platform Copy Environment Action"
+name: 'copy-environment'
+description: 'Power Platform Copy Environment Action'
 inputs:
   source-url:
     description: 'Source URL of Power Platform environment to copy; e.g. "https://test-env-source.crm.dynamics.com"'
@@ -24,7 +24,7 @@ inputs:
     required: false
 
   password-secret:
-    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
+    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: false
 
   app-id:
@@ -32,27 +32,27 @@ inputs:
     required: false
 
   client-secret:
-    description: "The client secret to authenticate with. Required if authenticating with app-id."
+    description: 'The client secret to authenticate with. Required if authenticating with app-id.'
     required: false
 
   tenant-id:
-    description: "Tenant id if using app-id & client secret to authenticate."
+    description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
   copy-type:
-    description: "Type of copy - FullCopy or MinimalCopy"
+    description: 'Type of copy - FullCopy or MinimalCopy'
     required: false
-    default: "FullCopy"
+    default: 'FullCopy'
 
   override-friendly-name:
-    description: "Check to override the friendly name of the target environment."
+    description: 'Check to override the friendly name of the target environment.'
     required: false
-    default: "false"
+    default: 'false'
 
   friendly-name:
-    description: "Set the friendly name of the target environment."
+    description: 'Set the friendly name of the target environment.'
     required: false
 
 runs:
-  using: "node12"
-  main: "../dist/actions/copy-environment/index.js"
+  using: 'node12'
+  main: '../dist/actions/copy-environment/index.js'

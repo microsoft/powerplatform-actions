@@ -86,7 +86,7 @@ jobs:
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
-        environment-id: ${{ steps.create-environment.outputs.environment-id }}
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
