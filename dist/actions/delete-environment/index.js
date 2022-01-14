@@ -5117,7 +5117,8 @@ function main() {
     yield actions_1.deleteEnvironment({
       credentials: getCredentials_1.default(),
       environmentUrl: parameterMap["environment-url"],
-      environment: parameterMap["environment"]
+      environment: parameterMap["environment"],
+      environmentId: parameterMap["environment-id"]
     }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
     core.info("environment deleted");
     core.endGroup();
