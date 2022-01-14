@@ -37,7 +37,8 @@ describe("delete-environment tests", () => {
         deleteEnvironmentStub.should.have.been.calledWithExactly({
             credentials: credentials,
             environmentUrl: { name: 'environment-url', required: false, defaultValue: undefined },
-            environment: { name: 'environment', required: false, defaultValue: undefined }
+            environment: { name: 'environment', required: false, defaultValue: undefined },
+            environmentId: { name: 'environment-id', required: false, defaultValue: undefined }
         }, runnerParameters, new ActionsHost());
     });
 });
