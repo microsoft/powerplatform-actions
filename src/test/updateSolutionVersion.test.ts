@@ -39,7 +39,7 @@ describe("update version solution test", () => {
     updateVersionSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
-      patchVersion: { name: 'patch-version', required: false, defaultValue: undefined },
+      buildVersion: { name: 'build-version', required: false, defaultValue: undefined },
       strategy: { name: 'strategy', required: false, defaultValue: undefined },
       fileName: { name: 'tracker-file', required: false, defaultValue: undefined },
     }, runnerParameters, new ActionsHost());
