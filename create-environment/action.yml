@@ -57,10 +57,10 @@ inputs:
 
 outputs:
   environment-url:
-    description: URL of the freshly created environment
+    description: 'URL of the freshly created environment'
 
   environment-id:
-    description: ID of the freshly created environment
+    description: 'ID of the freshly created environment'
 
 runs:
   using: 'node12'
