@@ -12,7 +12,7 @@ inputs:
     required: false
 
   password-secret:
-    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
+    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: false
 
   app-id:
@@ -54,7 +54,7 @@ inputs:
     default: 'false'
 
   max-async-wait-time:
-    description: 'Maximum wait time in minutes for asynchronous Import; default is 60 min (1 hr).'
+    description: 'Maximum wait time in minutes for asynchronous Import; default is 60 min (1 hr).'
     required: false
     default: '60'
 
