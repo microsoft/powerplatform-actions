@@ -11,6 +11,10 @@ inputs:
     description: 'Revision version for solution'
     required: false
 
+  patch-version:
+    description: 'Patch version for solution'
+    required: false
+
   strategy:
     description: 'Strategy to update patch version for Solution.xml file: "gittags", "filetracking" or "solution"'
     required: false
