@@ -1955,6 +1955,8 @@ var require_updateVersionSolution = __commonJS({
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--buildversion", parameters.buildVersion);
+          validator.pushInput(pacArgs, "--revisionversion", parameters.revisionVersion);
           validator.pushInput(pacArgs, "--patchversion", parameters.patchVersion);
           validator.pushInput(pacArgs, "--strategy", parameters.strategy);
           validator.pushInput(pacArgs, "--filename", parameters.fileName);
@@ -5240,6 +5242,8 @@ function main() {
       yield actions_1.updateVersionSolution({
         credentials: getCredentials_1.default(),
         environmentUrl: getEnvironmentUrl_1.default(),
+        buildVersion: parameterMap["build-version"],
+        revisionVersion: parameterMap["revision-version"],
         patchVersion: parameterMap["patch-version"],
         strategy: parameterMap["strategy"],
         fileName: parameterMap["tracker-file"]
