@@ -667,6 +667,7 @@ var require_whoAmI = __commonJS({
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function whoAmI(parameters, runnerParameters) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = createPacRunner_1.default(runnerParameters);
@@ -675,6 +676,11 @@ var require_whoAmI = __commonJS({
           logger.log("The Authentication Result: " + authenticateResult);
           const pacResult = yield pac("org", "who");
           logger.log("WhoAmI Action Result: " + pacResult);
+          const envIdLabel = "Environment ID:";
+          const envId = (_a = pacResult.filter((l) => l.length > 0).filter((l) => l.includes(envIdLabel))) === null || _a === void 0 ? void 0 : _a[0].split(envIdLabel)[1].trim();
+          return {
+            environmentId: envId
+          };
         } catch (error) {
           logger.error(`failed: ${error.message}`);
           throw error;
@@ -1907,6 +1913,8 @@ var require_updateVersionSolution = __commonJS({
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--buildversion", parameters.buildVersion);
+          validator.pushInput(pacArgs, "--revisionversion", parameters.revisionVersion);
           validator.pushInput(pacArgs, "--patchversion", parameters.patchVersion);
           validator.pushInput(pacArgs, "--strategy", parameters.strategy);
           validator.pushInput(pacArgs, "--filename", parameters.fileName);
@@ -1923,6 +1931,69 @@ var require_updateVersionSolution = __commonJS({
       });
     }
     exports2.updateVersionSolution = updateVersionSolution;
+  }
+});
+
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/onlineVersionSolution.js
+var require_onlineVersionSolution = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/onlineVersionSolution.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.onlineVersionSolution = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function onlineVersionSolution(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["solution", "online-version"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--solution-name", parameters.name);
+          validator.pushInput(pacArgs, "--solution-version", parameters.version);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("OnlineVersionSolution Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error.message}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.onlineVersionSolution = onlineVersionSolution;
   }
 });
 
@@ -1967,6 +2038,7 @@ var require_actions = __commonJS({
     __exportStar(require_downloadPaportal(), exports2);
     __exportStar(require_cloneSolution(), exports2);
     __exportStar(require_updateVersionSolution(), exports2);
+    __exportStar(require_onlineVersionSolution(), exports2);
   }
 });
 
@@ -5128,6 +5200,8 @@ function main() {
       yield actions_1.updateVersionSolution({
         credentials: getCredentials_1.default(),
         environmentUrl: getEnvironmentUrl_1.default(),
+        buildVersion: parameterMap["build-version"],
+        revisionVersion: parameterMap["revision-version"],
         patchVersion: parameterMap["patch-version"],
         strategy: parameterMap["strategy"],
         fileName: parameterMap["tracker-file"]
