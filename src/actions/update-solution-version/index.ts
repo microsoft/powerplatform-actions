@@ -25,6 +25,7 @@ export async function main(): Promise<void> {
             environmentUrl: getEnvironmentUrl(),
             buildVersion: parameterMap['build-version'],
             revisionVersion: parameterMap['revision-version'],
+            patchVersion: parameterMap['patch-version'],
             strategy: parameterMap['strategy'],
             fileName: parameterMap['tracker-file'],
         }, runnerParameters, new ActionsHost());

@@ -40,6 +40,8 @@ describe("update version solution test", () => {
       credentials: credentials,
       environmentUrl: environmentUrl,
       buildVersion: { name: 'build-version', required: false, defaultValue: undefined },
+      revisionVersion: { name: 'revision-version', required: false, defaultValue: undefined },
+      patchVersion: { name: 'patch-version', required: false, defaultValue: undefined },
       strategy: { name: 'strategy', required: false, defaultValue: undefined },
       fileName: { name: 'tracker-file', required: false, defaultValue: undefined },
     }, runnerParameters, new ActionsHost());
