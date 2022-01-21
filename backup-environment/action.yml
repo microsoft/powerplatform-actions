@@ -5,7 +5,11 @@ description: 'Power Platform Backup Environment Action'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to backup; e.g. "https://test-env.crm.dynamics.com"'
-    required: true
+    required: false
+
+  environment:
+    description: 'Id or URL of Power Platform environment to backup.'
+    required: false
 
   backup-label:
     description: 'Label to add to the Power Platform environment backup.'
@@ -20,7 +24,7 @@ inputs:
     required: false
 
   password-secret:
-    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
+    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: false
 
   app-id:

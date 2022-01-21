@@ -25,7 +25,47 @@ inputs:
 
   environment-url:
     description: 'URL of Power Platform environment to reset; e.g. "https://test-env.crm.dynamics.com"'
-    required: true
+    required: false
+
+  environment:
+    description: 'Id or URL of Power Platform environment to reset.'
+    required: false
+
+  language:
+    description: 'Sets the language used for your environment. Defaults to "English".'
+    required: false
+    default: 'English'
+
+  currency:
+    description: 'Sets the currency used for your environment. Defaults to "USD".'
+    required: false
+    default: 'USD'
+
+  purpose:
+    description: 'Sets the description used to associate the environment with a specific intent.'
+    required: false
+
+  templates:
+    description: 'Sets Dynamics365 app that needs to be deployed. [passed as comma separated values] e.g : -tm "D365_Sample, D365_Sales"'
+    required: false
+
+  override-domain-name:
+    description: 'Check to override the domain name while resetting the instance.'
+    required: false
+    default: 'false'
+
+  domain-name:
+    description: 'The domain name is part of the environment URL. If you enter a domain name that is already in use, then the task appends a numeric value to the domain name, starting with 0 and sets the environment URL. For example - If the domain name contoso is already in use, then the environment URL will be updated to https://{contoso}0.crm.dynamics.com.'
+    required: false
+
+  override-friendly-name:
+    description: 'Check to override the friendly name of the environment while resetting the instance.'
+    required: false
+    default: 'false'
+
+  friendly-name:
+    description: 'Sets the name of the environment.'
+    required: false
 
 runs:
   using: 'node12'

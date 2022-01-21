@@ -26,6 +26,8 @@ export async function main(): Promise<void> {
         credentials: getCredentials(),
         sourceEnvironmentUrl: parameterMap['source-url'],
         targetEnvironmentUrl: parameterMap['target-url'],
+        sourceEnvironment: parameterMap['source-env'],
+        targetEnvironment: parameterMap['target-env'],
         copyType: parameterMap['copy-type'],
         overrideFriendlyName: parameterMap['override-friendly-name'],
         friendlyTargetEnvironmentName: parameterMap['friendly-name']

@@ -5228,6 +5228,7 @@ function main() {
     core.startGroup("backup-environment:");
     yield actions_1.backupEnvironment({
       credentials: getCredentials_1.default(),
+      environment: parameterMap["environment"],
       environmentUrl: parameterMap["environment-url"],
       backupLabel: parameterMap["backup-label"],
       notes: parameterMap["notes"]

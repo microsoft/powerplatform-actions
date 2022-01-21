@@ -8,7 +8,11 @@ inputs:
     required: false
 
   environment-id:
-    description: 'ID of Power Platform environment to delete. The "environment-id" is mutually exclusive to "environment-url".'
+    description: 'ID of Power Platform environment to delete(deprecated). Please use "environment" action property instead.'
+    required: false
+
+  environment:
+    description: 'URL or Id of Power Platform environment to delete.'
     required: false
 
   user-name:

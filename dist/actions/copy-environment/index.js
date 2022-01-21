@@ -5230,6 +5230,8 @@ function main() {
       credentials: getCredentials_1.default(),
       sourceEnvironmentUrl: parameterMap["source-url"],
       targetEnvironmentUrl: parameterMap["target-url"],
+      sourceEnvironment: parameterMap["source-env"],
+      targetEnvironment: parameterMap["target-env"],
       copyType: parameterMap["copy-type"],
       overrideFriendlyName: parameterMap["override-friendly-name"],
       friendlyTargetEnvironmentName: parameterMap["friendly-name"]
