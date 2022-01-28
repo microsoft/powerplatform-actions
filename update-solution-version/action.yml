@@ -3,6 +3,14 @@
 name: 'update-solution-version'
 description: 'Power Platform Update Solution Version'
 inputs:
+  build-version:
+    description: 'Build version for solution'
+    required: false
+
+  revision-version:
+    description: 'Revision version for solution'
+    required: false
+
   patch-version:
     description: 'Patch version for solution'
     required: false
