@@ -1955,6 +1955,8 @@ var require_updateVersionSolution = __commonJS({
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--buildversion", parameters.buildVersion);
+          validator.pushInput(pacArgs, "--revisionversion", parameters.revisionVersion);
           validator.pushInput(pacArgs, "--patchversion", parameters.patchVersion);
           validator.pushInput(pacArgs, "--strategy", parameters.strategy);
           validator.pushInput(pacArgs, "--filename", parameters.fileName);
@@ -2258,7 +2260,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.39",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.40",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
