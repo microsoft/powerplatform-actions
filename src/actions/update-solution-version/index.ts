@@ -23,6 +23,8 @@ export async function main(): Promise<void> {
         await updateVersionSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
+            buildVersion: parameterMap['build-version'],
+            revisionVersion: parameterMap['revision-version'],
             patchVersion: parameterMap['patch-version'],
             strategy: parameterMap['strategy'],
             fileName: parameterMap['tracker-file'],
