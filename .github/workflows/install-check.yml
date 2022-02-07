@@ -1,5 +1,4 @@
-# This action installs released versions of powerplatform-actions to test
-# that they are installing correctly.
+# This action installs released versions of powerplatform-actions to test correct installation
 name: install-check
 
 on:
@@ -19,6 +18,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
       fail-fast: false
+
     steps:
       - name: Check pac_linux/tools/pac.dll is not LFS placeholder
         if: matrix.os == 'ubuntu-latest'
@@ -42,9 +42,6 @@ jobs:
             Write-Host "✔️ pac.exe's filesize [$pacFileSize] suggests that it is not a Git LFS placeholder."
           }
 
-      # Note that an action using microsoft/powerplatform-actions must be present
-      # in the same job as the above file size checking step(s) to guarantee that
-      # those files are installed
       - name: who-am-i action
         uses: microsoft/powerplatform-actions/who-am-i@0.5.1
         with:
