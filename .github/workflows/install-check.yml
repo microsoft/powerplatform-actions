@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        tag: ['0.5.1', '${{ github.event.release.tag_name }}' ]
+        #tag: ['0.5.1', '${{ github.event.release.tag_name }}' ]
 
       fail-fast: false
 
@@ -50,13 +50,6 @@ jobs:
       #     } Else {
       #       Write-Host "✔️ pac.exe's filesize [$pacFileSize] suggests that it is not a Git LFS placeholder."
       #     }
-
-      - name: who-am-i v0
-        uses: microsoft/powerplatform-actions/who-am-i@0
-        with:
-          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
-          user-name: ${{ env.WF_USERNAME }}
-          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
       - name: who-am-i latest
         uses: microsoft/powerplatform-actions/who-am-i@latest
