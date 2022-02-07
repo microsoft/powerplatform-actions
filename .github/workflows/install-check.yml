@@ -10,6 +10,7 @@ on:
 env:
   RUNNER_DEBUG: 1
   WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+  WF_ENVIRONMENT_URL: https://ppdevtools.crm.dynamics.com
 
 jobs:
   confirm-pac-files-are-not-lfs-placeholders:
@@ -20,7 +21,6 @@ jobs:
       fail-fast: false
     steps:
       - name: Check pac_linux/tools/pac.dll is not LFS placeholder
-        uses: microsoft/powerplatform-actions/who-am-i
         if: matrix.os == 'ubuntu-latest'
         run: |
           file="../../_actions/microsoft/powerplatform-actions/0.5.1/dist/pac_linux/tools/pac.dll"
@@ -34,7 +34,6 @@ jobs:
 
       - name: Check pac_/tools/pac.exe is not LFS placeholder
         if: matrix.os == 'windows-latest'
-        uses: microsoft/powerplatform-actions/who-am-i
         run: |
           $pacFileSize = (Get-Item ..\..\_actions\microsoft\powerplatform-actions\0.5.1\dist\pac\tools\pac.exe).Length
           If ($pacFileSize -le 1024) {
@@ -42,5 +41,16 @@ jobs:
           } Else {
             Write-Host "✔️ pac.exe's filesize [$pacFileSize] suggests that it is not a Git LFS placeholder."
           }
+
+      # Note that an action using microsoft/powerplatform-actions must be present
+      # in the same job as the above file size checking step(s) to guarantee that
+      # those files are installed
+      - name: who-am-i action
+        uses: microsoft/powerplatform-actions/who-am-i@0.5.1
+        with:
+          environment-url: ${{ WF_ENVIRONMENT_URL }}
+          user-name: ${{ env.WF_USERNAME }}
+          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
 
 
