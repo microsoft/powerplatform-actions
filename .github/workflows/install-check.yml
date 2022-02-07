@@ -46,7 +46,7 @@ jobs:
       - name: who-am-i action
         uses: microsoft/powerplatform-actions/who-am-i@0.5.1
         with:
-          environment-url: ${{ WF_ENVIRONMENT_URL }}
+          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
           user-name: ${{ env.WF_USERNAME }}
           password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
