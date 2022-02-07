@@ -17,7 +17,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ubuntu-latest]
+        #os: [windows-latest, ubuntu-latest]
         #tag: ['0.5.1', '${{ github.event.release.tag_name }}' ]
 
       fail-fast: false
@@ -26,8 +27,14 @@ jobs:
       - name: Checking contents
         if: matrix.os == 'windows-latest'
         run: |
-          Write-Host Github Object: ${{toJSON(github)}}
-          Get-ChildItem ..\..\_actions\microsoft\powerplatform-actions\
+          pwd | write-host
+          Get-ChildItem ..\..\_actions\microsoft\powerplatform-actions\ | write-host
+
+      - name: Checking contents
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          pwd
+          ls -la ../../_actions/microsoft/powerplatform-actions/
 
       # - name: Check pac_linux/tools/pac.dll is not LFS placeholder
       #   if: matrix.os == 'ubuntu-latest'
@@ -50,6 +57,13 @@ jobs:
       #     } Else {
       #       Write-Host "✔️ pac.exe's filesize [$pacFileSize] suggests that it is not a Git LFS placeholder."
       #     }
+
+      - name: who-am-i main
+        uses: microsoft/powerplatform-actions/who-am-i@main
+        with:
+          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
+          user-name: ${{ env.WF_USERNAME }}
+          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
       - name: who-am-i latest
         uses: microsoft/powerplatform-actions/who-am-i@latest
