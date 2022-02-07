@@ -46,7 +46,7 @@ jobs:
           }
 
       - name: who-am-i action
-        uses: ${{ join(["microsoft/powerplatform-actions/who-am-i@", matrix.tag], "") }}
+        uses: ${{ format("microsoft/powerplatform-actions/who-am-i@{0}", matrix.tag) }}
         with:
           environment-url: ${{ env.WF_ENVIRONMENT_URL }}
           user-name: ${{ env.WF_USERNAME }}
