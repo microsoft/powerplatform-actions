@@ -26,7 +26,7 @@ jobs:
       - name: Check pac_linux/tools/pac.dll is not LFS placeholder
         if: matrix.os == 'ubuntu-latest'
         run: |
-          file="../../_actions/microsoft/powerplatform-actions/${{matrix.tag}}/dist/pac_linux/tools/pac.dll"
+          file="../../_actions/microsoft/powerplatform-actions/${{ matrix.tag }}/dist/pac_linux/tools/pac.dll"
           actualsize=$(wc -c <"$file")
           if [ $actualsize -le 1000 ]; then
             >&2 echo "pac.dll has an unexpectadely small filesize of [$actualsize] bytes. It is likely a Git LFS placeholder."
@@ -38,7 +38,7 @@ jobs:
       - name: Check pac_/tools/pac.exe is not LFS placeholder
         if: matrix.os == 'windows-latest'
         run: |
-          $pacFileSize = (Get-Item ..\..\_actions\microsoft\powerplatform-actions\${{matrix.tag}}\dist\pac\tools\pac.exe).Length
+          $pacFileSize = (Get-Item ..\..\_actions\microsoft\powerplatform-actions\${{ matrix.tag }}\dist\pac\tools\pac.exe).Length
           If ($pacFileSize -le 1024) {
             Write-Error "pac.exe has an unexpectadely small file size of [$pacFileSize].  It is likely a Git LFS placeholder."
           } Else {
@@ -46,7 +46,7 @@ jobs:
           }
 
       - name: who-am-i action
-        uses: microsoft/powerplatform-actions/who-am-i@${{matrix.tag}}
+        uses: microsoft/powerplatform-actions/who-am-i@${{ matrix.tag }}
         with:
           environment-url: ${{ env.WF_ENVIRONMENT_URL }}
           user-name: ${{ env.WF_USERNAME }}
