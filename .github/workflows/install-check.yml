@@ -3,7 +3,7 @@ name: action-install-check
 
 on:
   workflow_dispatch:    # allow for manual workflow triggering as needed
-  #push:
+  push:
   release:
     types: [created]
 
