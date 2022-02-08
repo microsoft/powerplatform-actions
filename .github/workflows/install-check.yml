@@ -3,7 +3,6 @@ name: action-install-check
 
 on:
   workflow_dispatch:    # allow for manual workflow triggering as needed
-  push:
   schedule:
     - cron: '0 20 * * *' # every day at 20:00 UTC (noon PST)
   release:
