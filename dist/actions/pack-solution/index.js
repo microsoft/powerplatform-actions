@@ -1025,7 +1025,7 @@ var require_checkSolution = __commonJS({
           validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
           validator.pushInput(pacArgs, "--excludedFiles", parameters.filesExcluded);
           if (parameters.useDefaultPAEndpoint != void 0 && validator.getInput(parameters.useDefaultPAEndpoint) === "true") {
-            validator.pushInput(pacArgs, "--customEndpoint", parameters.useDefaultPAEndpoint);
+            pacArgs.push("--customEndpoint", parameters.environmentUrl);
           } else {
             validator.pushInput(pacArgs, "--customEndpoint", parameters.customPAEndpoint);
           }
@@ -5101,7 +5101,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.40",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.41",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",

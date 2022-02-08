@@ -22,12 +22,11 @@
     <Authors>$authors$</Authors>
     <Company>MyCompany</Company>
     <Description>This is a sample nuget package to contain a Dataverse plugin and its runtimed dependencies like Newtonsoft.Json</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 	
   <ItemGroup>
-    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" />
-    <PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*"/>
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.*" PrivateAssets="All"/>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
