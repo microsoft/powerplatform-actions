@@ -1,0 +1,100 @@
+# This action installs released versions of powerplatform-actions to test correct installation
+name: action-install-check
+
+on:
+  workflow_dispatch:    # allow for manual workflow triggering as needed
+  push:
+  schedule:
+    - cron: '0 20 * * *' # every day at 20:00 UTC (noon PST)
+  release:
+    types: [released, prereleased] # Released - check 'latest'; Prereleased - check 'main', assuming release comes from main as usual
+
+env:
+  RUNNER_DEBUG: 1
+  WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+  WF_ENVIRONMENT_URL: https://ppdevtools.crm.dynamics.com
+
+jobs:
+  confirm-pac-actions-installed-correctly:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+      fail-fast: false  # if either Windows or Ubuntu fail, continue executing the other env
+
+    steps:
+      # Note that the steps checking the filesystem for PAC files are dependent
+      # upon having steps within the same job that use the actions, hence the
+      # "who-am-i" steps below
+      - name: Check pac_linux/tools/pac.dll is not LFS placeholder
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          checkFileSize() {
+            local file="../../_actions/microsoft/powerplatform-actions/$1/dist/pac_linux/tools/pac.dll"
+            local actualsize=$(wc -c <"$file")
+            if [ $actualsize -le 1000 ]; then
+              >&2 echo "pac.dll (version $1) has an unexpectadely small filesize of [$actualsize] bytes. It is likely a Git LFS placeholder."
+              exit 2
+            else
+              echo "pac.dll (version $1) is not a Git LFS Placeholder, as its filessize is [$actualsize]"
+            fi
+          }
+          checkFileSize latest
+          checkFileSize main
+          checkFileSize 0.5.1
+          checkFileSize 0.4.1
+
+      # Note that the steps checking the filesystem for PAC files are dependent
+      # upon having steps within the same job that use the actions, hence the
+      # "who-am-i" steps below
+      - name: Check pac_/tools/pac.exe is not LFS placeholder
+        if: matrix.os == 'windows-latest'
+        run: |
+          function checkFileSize([string]$pathSegment) {
+            $pacFileSize = (Get-Item "..\..\_actions\microsoft\powerplatform-actions\$pathSegment\dist\pac\tools\pac.exe").Length
+            If ($pacFileSize -le 1024) {
+              Write-Error "pac.exe (version $pathSegment) has an unexpectadely small file size of [$pacFileSize].  It is likely a Git LFS placeholder."
+            } Else {
+              Write-Host "✔️ pac.exe (version $pathSegment) is not a Git LFS Placeholder, as its filesize [$pacFileSize]"
+            }
+          }
+          checkFileSize latest
+          checkFileSize main
+          checkFileSize 0.5.1
+          checkFileSize 0.4.1
+
+      # Test known good release 0.4.1 for continued functionality
+      # (ie, not broken by GH action fetch changes)
+      - name: 0.4.1 release - Test who-am-i
+        uses: microsoft/powerplatform-actions/who-am-i@0.4.1
+        with:
+          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
+          user-name: ${{ env.WF_USERNAME }}
+          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+      # Test known good release 0.5.1 for continued functionality
+      # (ie, not broken by GH action fetch changes)
+      - name: 0.5.1 release - Test who-am-i
+        uses: microsoft/powerplatform-actions/who-am-i@0.5.1
+        with:
+          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
+          user-name: ${{ env.WF_USERNAME }}
+          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+      # Test latest release; this will not pick up Pre-Release, but there
+      # is no current invocation for "latest pre-release"
+      - name: Latest release - Test who-am-i action latest
+        uses: microsoft/powerplatform-actions/who-am-i@latest
+        with:
+          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
+          user-name: ${{ env.WF_USERNAME }}
+          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+      # Test main branch (not release), as releases *typically* come from main,
+      # and there is no current way to target a pre-release
+      - name: Test who-am-i action from main branch
+        uses: microsoft/powerplatform-actions/who-am-i@main
+        with:
+          environment-url: ${{ env.WF_ENVIRONMENT_URL }}
+          user-name: ${{ env.WF_USERNAME }}
+          password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
