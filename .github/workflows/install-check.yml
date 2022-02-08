@@ -17,46 +17,44 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        #os: [windows-latest, ubuntu-latest]
-        #tag: ['0.5.1', '${{ github.event.release.tag_name }}' ]
+        os: [windows-latest, ubuntu-latest]
 
       fail-fast: false
 
     steps:
-      - name: Checking contents
-        if: matrix.os == 'windows-latest'
-        run: |
-          pwd | write-host
-          Get-ChildItem ..\..\_actions\microsoft\powerplatform-actions\ | write-host
-
-      - name: Checking contents
+      - name: Check pac_linux/tools/pac.dll is not LFS placeholder
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pwd
-          ls -la ../../_actions/microsoft/powerplatform-actions/
+          checkFileSize() {
+            local file="../../_actions/microsoft/powerplatform-actions/$1/dist/pac_linux/tools/pac.dll"
+            local actualsize=$(wc -c <"$file")
+            if [ $actualsize -le 1000 ]; then
+              >&2 echo "pac.dll (version $1) has an unexpectadely small filesize of [$actualsize] bytes. It is likely a Git LFS placeholder."
+              exit 2
+            else
+              echo "pac.dll (version $1) is not a Git LFS Placeholder, as its filessize is [$actualsize]"
+            fi
+          }
+          checkFileSize latest
+          checkFileSize main
+          checkFileSize 0.5.1
+          checkFileSize 0.4.1
 
-      # - name: Check pac_linux/tools/pac.dll is not LFS placeholder
-      #   if: matrix.os == 'ubuntu-latest'
-      #   run: |
-      #     file="../../_actions/microsoft/powerplatform-actions/${{ matrix.tag }}/dist/pac_linux/tools/pac.dll"
-      #     actualsize=$(wc -c <"$file")
-      #     if [ $actualsize -le 1000 ]; then
-      #       >&2 echo "pac.dll has an unexpectadely small filesize of [$actualsize] bytes. It is likely a Git LFS placeholder."
-      #       exit 2
-      #     else
-      #       echo "pac.dll filessize of [$actualsize] suggests that it is not a Git LFS placeholder."
-      #     fi
-
-      # - name: Check pac_/tools/pac.exe is not LFS placeholder
-      #   if: matrix.os == 'windows-latest'
-      #   run: |
-      #     $pacFileSize = (Get-Item ..\..\_actions\microsoft\powerplatform-actions\${{ matrix.tag }}\dist\pac\tools\pac.exe).Length
-      #     If ($pacFileSize -le 1024) {
-      #       Write-Error "pac.exe has an unexpectadely small file size of [$pacFileSize].  It is likely a Git LFS placeholder."
-      #     } Else {
-      #       Write-Host "✔️ pac.exe's filesize [$pacFileSize] suggests that it is not a Git LFS placeholder."
-      #     }
+      - name: Check pac_/tools/pac.exe is not LFS placeholder
+        if: matrix.os == 'windows-latest'
+        run: |
+          function checkFileSize([string]$pathSegment) {
+            $pacFileSize = (Get-Item "..\..\_actions\microsoft\powerplatform-actions\$pathSegment\dist\pac\tools\pac.exe").Length
+            If ($pacFileSize -le 1024) {
+              Write-Error "pac.exe (version $pathSegment) has an unexpectadely small file size of [$pacFileSize].  It is likely a Git LFS placeholder."
+            } Else {
+              Write-Host "✔️ pac.exe (version $pathSegment) is not a Git LFS Placeholder, as its filesize [$pacFileSize]"
+            }
+          }
+          checkFileSize latest
+          checkFileSize main
+          checkFileSize 0.5.1
+          checkFileSize 0.4.1
 
       - name: who-am-i main
         uses: microsoft/powerplatform-actions/who-am-i@main
