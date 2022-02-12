@@ -44,7 +44,7 @@
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "mocha": "^9.0.2",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "ps-list": "^7.2.0",
     "rewiremock": "^3.14.3",
     "sinon": "^9.2.4",
