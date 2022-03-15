@@ -1229,12 +1229,11 @@ var require_createEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.createEnvironment = void 0;
+    exports2.getEnvironmentDetails = exports2.createEnvironment = void 0;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function createEnvironment(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = createPacRunner_1.default(runnerParameters);
@@ -1253,13 +1252,8 @@ var require_createEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("CreateEnvironment Action Result: " + pacResult);
-          const newEnvDetailColumns = (_a = pacResult.filter((l) => l.length > 0).pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/);
-          const envUrl = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
-          const envId = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
-          return {
-            environmentId: envId,
-            environmentUrl: envUrl
-          };
+          const envResult = getEnvironmentDetails(pacResult);
+          return envResult;
         } catch (error) {
           logger.error(`failed: ${error.message}`);
           throw error;
@@ -1270,6 +1264,17 @@ var require_createEnvironment = __commonJS({
       });
     }
     exports2.createEnvironment = createEnvironment;
+    function getEnvironmentDetails(pacResult) {
+      var _a;
+      const newEnvDetailColumns = (_a = pacResult.filter((l) => l.length > 0).pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/);
+      const envUrl = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
+      const envId = newEnvDetailColumns === null || newEnvDetailColumns === void 0 ? void 0 : newEnvDetailColumns.shift();
+      return {
+        environmentId: envId,
+        environmentUrl: envUrl
+      };
+    }
+    exports2.getEnvironmentDetails = getEnvironmentDetails;
   }
 });
 
@@ -1309,6 +1314,7 @@ var require_restoreEnvironment = __commonJS({
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
+    var createEnvironment_1 = require_createEnvironment();
     function restoreEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1335,6 +1341,8 @@ var require_restoreEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("RestoreEnvironment Action Result: " + pacResult);
+          const envResult = createEnvironment_1.getEnvironmentDetails(pacResult);
+          return envResult;
         } catch (error) {
           logger.error(`failed: ${error.message}`);
           throw error;
@@ -1572,6 +1580,7 @@ var require_resetEnvironment = __commonJS({
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
+    var createEnvironment_1 = require_createEnvironment();
     function resetEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1597,6 +1606,8 @@ var require_resetEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("ResetEnvironment Action Result: " + pacResult);
+          const envResult = createEnvironment_1.getEnvironmentDetails(pacResult);
+          return envResult;
         } catch (error) {
           logger.error(`failed: ${error.message}`);
           throw error;
@@ -1646,6 +1657,7 @@ var require_copyEnvironment = __commonJS({
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
+    var createEnvironment_1 = require_createEnvironment();
     function copyEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1668,6 +1680,8 @@ var require_copyEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("CopyEnvironment Action Result: " + pacResult);
+          const envResult = createEnvironment_1.getEnvironmentDetails(pacResult);
+          return envResult;
         } catch (error) {
           logger.error(`failed: ${error.message}`);
           throw error;
@@ -2039,6 +2053,135 @@ var require_onlineVersionSolution = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/installApplication.js
+var require_installApplication = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/installApplication.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.installApplication = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    var path = require("path");
+    function installApplication(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["application", "install"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--environment-id", parameters.environmentId);
+          validator.pushInput(pacArgs, "--application-name", parameters.applicationName);
+          validator.pushInput(pacArgs, "--application-list", parameters.applicationList, (value) => path.resolve(runnerParameters.workingDir, value));
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("Application Install Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error.message}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.installApplication = installApplication;
+  }
+});
+
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/listApplication.js
+var require_listApplication = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/listApplication.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.listApplication = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    var path = require("path");
+    function listApplication(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = createPacRunner_1.default(runnerParameters);
+        try {
+          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["application", "list"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--environment-id", parameters.environmentId);
+          validator.pushInput(pacArgs, "--output", parameters.output, (value) => path.resolve(runnerParameters.workingDir, value));
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("Application List Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error.message}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.listApplication = listApplication;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -2081,6 +2224,8 @@ var require_actions = __commonJS({
     __exportStar(require_cloneSolution(), exports2);
     __exportStar(require_updateVersionSolution(), exports2);
     __exportStar(require_onlineVersionSolution(), exports2);
+    __exportStar(require_installApplication(), exports2);
+    __exportStar(require_listApplication(), exports2);
   }
 });
 
@@ -2263,7 +2408,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.43",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.44",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
