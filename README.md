@@ -128,3 +128,7 @@ prior to commiting the changes.
 ### Power Platform Environment Admin (BAP)
 
 - [Environments Overview](https://docs.microsoft.com/en-us/power-platform/admin/environments-overview)
+
+### How to make GitHub Actions and Build Tools compatible with latest PAC CLI?
+
+[Please refer steps in Cli-Wrapper](https://github.com/microsoft/powerplatform-cli-wrapper/blob/main/README.md)
