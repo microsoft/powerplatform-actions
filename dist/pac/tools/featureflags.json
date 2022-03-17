@@ -45,6 +45,7 @@
   "moduleConnection": "off",
   "verbConnectionList": "off",
   "verbPAPortalReguid": "off",
-  "moduleApplication": "off",
+  "moduleApplication": "on",
+  "moduleTool": "off",
   "verbPluginInitNupkg": "off"
 }

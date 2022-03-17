@@ -80,7 +80,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.98": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.107": {
         "dependencies": {
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
@@ -91,7 +91,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.98"
+            "fileVersion": "9.1.1.107"
           }
         }
       },
@@ -377,9 +377,11 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.Formulas.Tools/0.3.9-preview": {
+      "Microsoft.PowerPlatform.Formulas.Tools/0.4.0-preview": {
         "dependencies": {
-          "System.Text.Json": "5.0.2"
+          "System.Text.Encodings.Web": "5.0.1",
+          "System.Text.Json": "5.0.2",
+          "YamlDotNet": "11.2.1"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerPlatform.Formulas.Tools.dll": {
@@ -1587,11 +1589,11 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
-      "YamlDotNet/11.0.1": {
+      "YamlDotNet/11.2.1": {
         "runtime": {
           "lib/netstandard2.1/YamlDotNet.dll": {
             "assemblyVersion": "11.0.0.0",
-            "fileVersion": "11.0.1.0"
+            "fileVersion": "11.2.1.0"
           }
         }
       },
@@ -1640,6 +1642,7 @@
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Security.Cryptography.ProtectedData": "4.7.0",
+          "System.Text.Json": "5.0.2",
           "bolt.cli": "0.1.0",
           "bolt.system": "0.1.0"
         },
@@ -1649,7 +1652,7 @@
       },
       "bolt.module.canvas/0.1.0": {
         "dependencies": {
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.3.9-preview",
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.4.0-preview",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
@@ -1663,7 +1666,7 @@
       "bolt.module.cds/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.98",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.107",
           "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
           "Microsoft.Identity.Client": "4.39.0",
@@ -1697,7 +1700,7 @@
       "bolt.module.paportal/0.1.0": {
         "dependencies": {
           "Microsoft.PowerPlatform.Dataverse.Client": "0.5.17",
-          "YamlDotNet": "11.0.1",
+          "YamlDotNet": "11.2.1",
           "bolt.cli": "0.1.0",
           "bolt.system": "0.1.0"
         },
@@ -1729,7 +1732,7 @@
       "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.98",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.107",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
@@ -1807,12 +1810,12 @@
       "path": "microsoft.applicationinsights/2.9.1",
       "hashPath": "microsoft.applicationinsights.2.9.1.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.98": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.107": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-SR8FC4TADreUixz6rRUBMmU7fooig62FPTPm/4fN27IqRAs6IIvfhNVps6PU8Q5QKJ+rhCXTsKiyZehzQjArHA==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.98",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.98.nupkg.sha512"
+      "sha512": "sha512-MmTX7M0MFx0oCY8EUx7PL4bIIXL7pe8krDD2O28LgFlevNWU3D9vsxN/QfVwBUg5qSmz+eN2rGICT+cCDi0Mzg==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.107",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.107.nupkg.sha512"
     },
     "Microsoft.Extensions.Caching.Abstractions/5.0.0": {
       "type": "package",
@@ -1975,12 +1978,12 @@
       "path": "microsoft.powerplatform.dataverse.client/0.5.17",
       "hashPath": "microsoft.powerplatform.dataverse.client.0.5.17.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Formulas.Tools/0.3.9-preview": {
+    "Microsoft.PowerPlatform.Formulas.Tools/0.4.0-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qOIlAHylPyuPIFv7O8sD72MuDwNlGgXUg/wGY++elg3zWcv88/adVE5YoeeVWB5oj69ik3KOma/RH6tHwCE44g==",
-      "path": "microsoft.powerplatform.formulas.tools/0.3.9-preview",
-      "hashPath": "microsoft.powerplatform.formulas.tools.0.3.9-preview.nupkg.sha512"
+      "sha512": "sha512-yR/cuqwo8eBFh1Nw4gh1x2QM87UjsFCWA+7zJu1xElqyuqCEvMUCf92Kq55BCqhNItZpiqAYDMoeGhPlt9nbgA==",
+      "path": "microsoft.powerplatform.formulas.tools/0.4.0-preview",
+      "hashPath": "microsoft.powerplatform.formulas.tools.0.4.0-preview.nupkg.sha512"
     },
     "Microsoft.Rest.ClientRuntime/2.3.20": {
       "type": "package",
@@ -2955,12 +2958,12 @@
       "path": "system.xml.xmlserializer/4.3.0",
       "hashPath": "system.xml.xmlserializer.4.3.0.nupkg.sha512"
     },
-    "YamlDotNet/11.0.1": {
+    "YamlDotNet/11.2.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UvICfSN4gJfAmOsuY/go0hb5SFfr3ZYCXb7jg66yT7kh+wSJEt7tUiwuoCNMpt8ScEXLDwXttpFoWKWeirYU1A==",
-      "path": "yamldotnet/11.0.1",
-      "hashPath": "yamldotnet.11.0.1.nupkg.sha512"
+      "sha512": "sha512-tBt8K+korVfrjH9wyDEhiLKxbs8qoLCLIFwvYgkSUuMC9//w3z0cFQ8LQAI/5MCKq+BMil0cfRTRvPeE7eXhQw==",
+      "path": "yamldotnet/11.2.1",
+      "hashPath": "yamldotnet.11.2.1.nupkg.sha512"
     },
     "bolt.cli/0.1.0": {
       "type": "project",
