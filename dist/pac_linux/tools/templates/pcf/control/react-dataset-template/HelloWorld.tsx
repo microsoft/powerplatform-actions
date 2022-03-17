@@ -6,11 +6,11 @@ export interface IHelloWorldProps {
 }
 
 export class HelloWorld extends React.Component<IHelloWorldProps> {
-  public render(): JSX.Element {
+  public render(): React.ReactNode {
     return (
-        <Label>
-            "Hello, World!"
-        </Label>
+      <Label>
+        {this.props.name}
+      </Label>
     )
   }
 }
