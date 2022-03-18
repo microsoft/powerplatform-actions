@@ -43,6 +43,16 @@ inputs:
     description: 'Working directory; default: root of repository'
     required: false
 
+  run-asynchronously:
+    description: 'Exports solution asynchronously'
+    required: false
+    default: 'false'
+
+  max-async-wait-time:
+    description: 'Maximum wait time in minutes for asynchronous export; default is 60 min (1 hr).'
+    required: false
+    default: '60'
+
 runs:
   using: 'node12'
   main: '../dist/actions/clone-solution/index.js'

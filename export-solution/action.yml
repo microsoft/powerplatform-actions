@@ -54,7 +54,7 @@ inputs:
     default: 'false'
 
   max-async-wait-time:
-    description: 'Maximum wait time in minutes for asynchronous Import; default is 60 min (1 hr).'
+    description: 'Maximum wait time in minutes for asynchronous export; default is 60 min (1 hr).'
     required: false
     default: '60'
 
