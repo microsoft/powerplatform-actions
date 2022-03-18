@@ -23,6 +23,11 @@ inputs:
     description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
+
   environment-url:
     description: 'URL of Power Platform environment to reset; e.g. "https://test-env.crm.dynamics.com"'
     required: false
