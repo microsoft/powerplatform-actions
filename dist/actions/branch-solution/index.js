@@ -459,19 +459,19 @@ var require_package = __commonJS({
         "@types/fs-extra": "^9.0.12",
         "@types/glob": "^7.1.4",
         "@types/js-yaml": "^4.0.3",
-        "@types/mocha": "^8.2.3",
+        "@types/mocha": "^9.1.0",
         "@types/node": "^14.14.35",
         "@types/sinon": "^9.0.11",
         "@types/sinon-chai": "^3.2.5",
         "@types/uuid": "^8.3.0",
         "@types/yargs": "^17.0.2",
-        "@typescript-eslint/eslint-plugin": "^4.28.2",
-        "@typescript-eslint/parser": "^4.28.2",
+        "@typescript-eslint/eslint-plugin": "^5.15.0",
+        "@typescript-eslint/parser": "^5.15.0",
         async: "^3.2.0",
         chai: "^4.3.4",
         dotenv: "^8.2.0",
         esbuild: "^0.14.10",
-        eslint: "^7.30.0",
+        eslint: "^8.11.0",
         "fancy-log": "^1.3.3",
         glob: "^7.2.0",
         "glob-parent": "^6.0.2",
@@ -498,7 +498,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.44",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.47",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -656,314 +656,12 @@ var require_gitRunner = __commonJS({
   }
 });
 
-// out/lib/pacRunner.js
-var require_pacRunner = __commonJS({
-  "out/lib/pacRunner.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.PacRunner = void 0;
-    var exeRunner_1 = require_exeRunner();
-    var os = require("os");
-    var platform = os.platform();
-    var programName = platform === "win32" ? "pac.exe" : "pac";
-    var programPath = platform === "win32" ? ["pac", "tools"] : ["pac_linux", "tools"];
-    var PacRunner = class extends exeRunner_1.ExeRunner {
-      constructor(workingDir2, logger2) {
-        super(workingDir2, logger2, programName, programPath);
-      }
-    };
-    exports2.PacRunner = PacRunner;
-  }
-});
-
-// out/lib/runnerFactory.js
-var require_runnerFactory = __commonJS({
-  "out/lib/runnerFactory.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.DefaultRunnerFactory = void 0;
-    var actionLogger_1 = require_actionLogger();
-    var gitRunner_1 = require_gitRunner();
-    var pacRunner_1 = require_pacRunner();
-    var RealRunnerFactory = class {
-      constructor() {
-        this._logger = new actionLogger_1.ActionLogger();
-      }
-      getRunner(runnerName, workingDir2) {
-        switch (runnerName) {
-          case "pac":
-            return new pacRunner_1.PacRunner(workingDir2, this._logger);
-          case "git":
-            return new gitRunner_1.GitRunner(workingDir2, this._logger);
-          default:
-            throw new Error(`Unknown runner type requested: ${runnerName}`);
-        }
-      }
-    };
-    exports2.DefaultRunnerFactory = new RealRunnerFactory();
-  }
-});
-
-// out/lib/auth/getEnvironmentUrl.js
-var require_getEnvironmentUrl = __commonJS({
-  "out/lib/auth/getEnvironmentUrl.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var core_1 = require_core();
-    function getEnvironmentUrl() {
-      return core_1.getInput("environment-url", { required: false });
-    }
-    exports2.default = getEnvironmentUrl;
-  }
-});
-
-// out/lib/auth/createLegacyRunnerPacAuthenticator.js
-var require_createLegacyRunnerPacAuthenticator = __commonJS({
-  "out/lib/auth/createLegacyRunnerPacAuthenticator.js"(exports2) {
-    "use strict";
-    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-      function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
-        });
-      }
-      return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator["throw"](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var getEnvironmentUrl_1 = require_getEnvironmentUrl();
-    function createLegacyRunnerPacAuthenticator(pac) {
-      return {
-        authenticateCdsWithClientCredentials: (parameters) => __awaiter2(this, void 0, void 0, function* () {
-          yield clearAuth();
-          yield pac.run([
-            "auth",
-            "create",
-            "--url",
-            getEnvironmentUrl_1.default(),
-            "--applicationId",
-            parameters.appId,
-            "--clientSecret",
-            parameters.clientSecret,
-            "--tenant",
-            parameters.tenantId
-          ]);
-        }),
-        authenticateAdminWithClientCredentials: (parameters) => __awaiter2(this, void 0, void 0, function* () {
-          yield clearAuth();
-          yield pac.run([
-            "auth",
-            "create",
-            "--kind",
-            "ADMIN",
-            "--applicationId",
-            parameters.appId,
-            "--clientSecret",
-            parameters.clientSecret,
-            "--tenant",
-            parameters.tenantId
-          ]);
-        }),
-        authenticateCdsWithUsernamePassword: (parameters) => __awaiter2(this, void 0, void 0, function* () {
-          yield clearAuth();
-          yield pac.run([
-            "auth",
-            "create",
-            "--url",
-            getEnvironmentUrl_1.default(),
-            "--username",
-            parameters.username,
-            "--password",
-            parameters.password
-          ]);
-        }),
-        authenticateAdminWithUsernamePassword: (parameters) => __awaiter2(this, void 0, void 0, function* () {
-          yield clearAuth();
-          yield pac.run([
-            "auth",
-            "create",
-            "--kind",
-            "ADMIN",
-            "--username",
-            parameters.username,
-            "--password",
-            parameters.password
-          ]);
-        })
-      };
-      function clearAuth() {
-        return __awaiter2(this, void 0, void 0, function* () {
-          yield pac.run(["auth", "clear"]);
-        });
-      }
-    }
-    exports2.default = createLegacyRunnerPacAuthenticator;
-  }
-});
-
-// out/lib/auth/authHandler.js
-var require_authHandler = __commonJS({
-  "out/lib/auth/authHandler.js"(exports2) {
-    "use strict";
-    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-      function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
-        });
-      }
-      return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator["throw"](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.AuthKind = exports2.AuthHandler = void 0;
-    var core2 = require_core();
-    var createLegacyRunnerPacAuthenticator_1 = require_createLegacyRunnerPacAuthenticator();
-    var AuthHandler = class {
-      constructor(pac) {
-        if ("run" in pac) {
-          this._pacAuthenticator = createLegacyRunnerPacAuthenticator_1.default(pac);
-        } else {
-          this._pacAuthenticator = pac;
-        }
-      }
-      authenticate(authKind) {
-        return __awaiter2(this, void 0, void 0, function* () {
-          core2.startGroup("authentication");
-          this._envUrl = core2.getInput("environment-url", { required: false });
-          const authType = this.determineAuthType();
-          if (authType === AuthTypes.USERNAME_PASSWORD) {
-            yield this.authenticateWithUsernamePassword(authKind);
-          } else if (authType == AuthTypes.APPID_SECRET) {
-            yield this.authenticateWithClientCredentials(authKind);
-          } else {
-            throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
-          }
-          core2.endGroup();
-        });
-      }
-      determineAuthType() {
-        const validUsernameAuth = this.isValidUsernameAuth();
-        const validSPNAuth = this.isValidSPNAuth();
-        try {
-          if (validUsernameAuth && validSPNAuth) {
-            throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
-          }
-          if (validUsernameAuth) {
-            return AuthTypes.USERNAME_PASSWORD;
-          } else if (validSPNAuth) {
-            return AuthTypes.APPID_SECRET;
-          }
-        } catch (error) {
-          core2.setFailed(`failed: ${error.message}`);
-          throw error;
-        }
-        return AuthTypes.INVALID_AUTH_TYPE;
-      }
-      isValidUsernameAuth() {
-        this._username = core2.getInput("user-name", { required: false });
-        this._password = core2.getInput("password-secret", { required: false });
-        return !!this._username && !!this._password;
-      }
-      isValidSPNAuth() {
-        this._appId = core2.getInput("app-id", { required: false });
-        this._clientSecret = core2.getInput("client-secret", {
-          required: false
-        });
-        this._tenantId = core2.getInput("tenant-id", { required: false });
-        return !!this._appId && !!this._clientSecret && !!this._tenantId;
-      }
-      authenticateWithClientCredentials(authKind) {
-        return __awaiter2(this, void 0, void 0, function* () {
-          core2.info(`SPN Authentication : Authenticating with appId: ${this._appId}`);
-          if (authKind === AuthKind.CDS) {
-            yield this._pacAuthenticator.authenticateCdsWithClientCredentials({
-              tenantId: this._tenantId,
-              appId: this._appId,
-              clientSecret: this._clientSecret
-            });
-          } else {
-            yield this._pacAuthenticator.authenticateAdminWithClientCredentials({
-              tenantId: this._tenantId,
-              appId: this._appId,
-              clientSecret: this._clientSecret
-            });
-          }
-        });
-      }
-      authenticateWithUsernamePassword(authKind) {
-        return __awaiter2(this, void 0, void 0, function* () {
-          core2.info(`Username/password Authentication : Authenticating with user: ${this._username}`);
-          if (authKind == AuthKind.CDS) {
-            yield this._pacAuthenticator.authenticateCdsWithUsernamePassword({
-              username: this._username,
-              password: this._password
-            });
-          } else {
-            yield this._pacAuthenticator.authenticateAdminWithUsernamePassword({
-              username: this._username,
-              password: this._password
-            });
-          }
-        });
-      }
-    };
-    exports2.AuthHandler = AuthHandler;
-    var AuthTypes;
-    (function(AuthTypes2) {
-      AuthTypes2[AuthTypes2["USERNAME_PASSWORD"] = 0] = "USERNAME_PASSWORD";
-      AuthTypes2[AuthTypes2["APPID_SECRET"] = 1] = "APPID_SECRET";
-      AuthTypes2[AuthTypes2["INVALID_AUTH_TYPE"] = 2] = "INVALID_AUTH_TYPE";
-    })(AuthTypes || (AuthTypes = {}));
-    var AuthKind;
-    (function(AuthKind2) {
-      AuthKind2[AuthKind2["CDS"] = 0] = "CDS";
-      AuthKind2[AuthKind2["ADMIN"] = 1] = "ADMIN";
-    })(AuthKind = exports2.AuthKind || (exports2.AuthKind = {}));
-  }
-});
-
 // out/lib/index.js
 var require_lib = __commonJS({
   "out/lib/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.AuthKind = exports2.AuthHandler = exports2.PacRunner = exports2.GitRunner = exports2.ActionLogger = exports2.DefaultRunnerFactory = exports2.RunnerError = exports2.getWorkingDirectory = exports2.getInputAsBool = void 0;
+    exports2.GitRunner = exports2.ActionLogger = exports2.RunnerError = exports2.getWorkingDirectory = exports2.getInputAsBool = void 0;
     var actionInput_1 = require_actionInput();
     Object.defineProperty(exports2, "getInputAsBool", { enumerable: true, get: function() {
       return actionInput_1.getInputAsBool;
@@ -975,10 +673,6 @@ var require_lib = __commonJS({
     Object.defineProperty(exports2, "RunnerError", { enumerable: true, get: function() {
       return exeRunner_1.RunnerError;
     } });
-    var runnerFactory_1 = require_runnerFactory();
-    Object.defineProperty(exports2, "DefaultRunnerFactory", { enumerable: true, get: function() {
-      return runnerFactory_1.DefaultRunnerFactory;
-    } });
     var actionLogger_1 = require_actionLogger();
     Object.defineProperty(exports2, "ActionLogger", { enumerable: true, get: function() {
       return actionLogger_1.ActionLogger;
@@ -986,17 +680,6 @@ var require_lib = __commonJS({
     var gitRunner_1 = require_gitRunner();
     Object.defineProperty(exports2, "GitRunner", { enumerable: true, get: function() {
       return gitRunner_1.GitRunner;
-    } });
-    var pacRunner_1 = require_pacRunner();
-    Object.defineProperty(exports2, "PacRunner", { enumerable: true, get: function() {
-      return pacRunner_1.PacRunner;
-    } });
-    var authHandler_1 = require_authHandler();
-    Object.defineProperty(exports2, "AuthHandler", { enumerable: true, get: function() {
-      return authHandler_1.AuthHandler;
-    } });
-    Object.defineProperty(exports2, "AuthKind", { enumerable: true, get: function() {
-      return authHandler_1.AuthKind;
     } });
   }
 });
