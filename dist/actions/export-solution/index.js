@@ -47,11 +47,11 @@ var require_authenticate = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.clearAuthentication = exports2.authenticateEnvironment = exports2.authenticateAdmin = void 0;
     function authenticateAdmin(pac, credentials) {
-      return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials));
+      return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateAdmin = authenticateAdmin;
     function authenticateEnvironment(pac, credentials, environmentUrl) {
-      return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials));
+      return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateEnvironment = authenticateEnvironment;
     function clearAuthentication(pac) {
@@ -72,6 +72,10 @@ var require_authenticate = __commonJS({
     }
     function addUsernamePassword(parameters) {
       return ["--username", parameters.username, "--password", parameters.password];
+    }
+    function addCloudInstance(parameters) {
+      const cloudInstance = parameters.cloudInstance || "Public";
+      return ["--cloud", cloudInstance];
     }
   }
 });
@@ -111,6 +115,7 @@ var require_CommandRunner = __commonJS({
     exports2.RunnerError = exports2.createCommandRunner = void 0;
     var child_process_1 = require("child_process");
     var process_1 = require("process");
+    var readline = require("readline");
     var os_1 = require("os");
     var process2 = require("process");
     function createCommandRunner(workingDir, commandPath, logger, options, agent) {
@@ -119,18 +124,18 @@ var require_CommandRunner = __commonJS({
           return new Promise((resolve, reject) => {
             logInitialization(...args);
             const allOutput = [];
-            const cp = child_process_1.spawn(commandPath, args, Object.assign({ cwd: workingDir, env: Object.assign({
+            const cp = (0, child_process_1.spawn)(commandPath, args, Object.assign({ cwd: workingDir, env: Object.assign({
               PATH: process_1.env.PATH,
               "PP_TOOLS_AUTOMATION_AGENT": agent
             }, process2.env) }, options));
-            cp.stdout.on("data", logData(logger.log));
-            cp.stderr.on("data", logData(logger.error));
-            function logData(logFunction) {
-              return (data) => {
-                `${data}`.split(os_1.EOL).forEach((line) => {
-                  allOutput.push(line);
-                  logFunction(line);
-                });
+            const outputLineReader = readline.createInterface({ input: cp.stdout });
+            outputLineReader.on("line", logOutputFactory(logger.log));
+            const errorLineReader = readline.createInterface({ input: cp.stderr });
+            errorLineReader.on("line", logOutputFactory(logger.error));
+            function logOutputFactory(logFunction) {
+              return (line) => {
+                allOutput.push(line);
+                logFunction(line);
               };
             }
             cp.on("exit", (code) => {
@@ -140,6 +145,8 @@ var require_CommandRunner = __commonJS({
                 logger.error(`error: ${code}`);
                 reject(new RunnerError(code, allOutput.join(os_1.EOL)));
               }
+              outputLineReader.close();
+              errorLineReader.close();
               cp.stdout.destroy();
               cp.stderr.destroy();
             });
@@ -170,7 +177,7 @@ var require_createPacRunner = __commonJS({
     var path_1 = require("path");
     var CommandRunner_1 = require_CommandRunner();
     function createPacRunner({ workingDir, runnersDir, logger, agent }) {
-      return CommandRunner_1.createCommandRunner(workingDir, os_1.platform() === "win32" ? path_1.resolve(runnersDir, "pac", "tools", "pac.exe") : path_1.resolve(runnersDir, "pac_linux", "tools", "pac"), logger, void 0, agent);
+      return (0, CommandRunner_1.createCommandRunner)(workingDir, (0, os_1.platform)() === "win32" ? (0, path_1.resolve)(runnersDir, "pac", "tools", "pac.exe") : (0, path_1.resolve)(runnersDir, "pac_linux", "tools", "pac"), logger, void 0, agent);
     }
     exports2.default = createPacRunner;
   }
@@ -216,9 +223,9 @@ var require_exportSolution = __commonJS({
     function exportSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "export"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -269,10 +276,10 @@ var require_exportSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("ExportSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -320,9 +327,9 @@ var require_whoAmI = __commonJS({
       var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacResult = yield pac("org", "who");
           logger.log("WhoAmI Action Result: " + pacResult);
@@ -332,10 +339,10 @@ var require_whoAmI = __commonJS({
             environmentId: envId
           };
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -384,9 +391,9 @@ var require_importSolution = __commonJS({
     function importSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "import"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -406,10 +413,10 @@ var require_importSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("ImportSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -457,9 +464,9 @@ var require_upgradeSolution = __commonJS({
     function upgradeSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "upgrade"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -470,10 +477,10 @@ var require_upgradeSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("UpgradeSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -521,9 +528,9 @@ var require_deleteEnvironment = __commonJS({
     function deleteEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "delete"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -534,10 +541,10 @@ var require_deleteEnvironment = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("DeleteEnvironment Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -585,9 +592,9 @@ var require_backupEnvironment = __commonJS({
     function backupEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "backup"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -600,10 +607,10 @@ var require_backupEnvironment = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("BackupEnvironment Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -652,7 +659,7 @@ var require_checkSolution = __commonJS({
     function checkSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         const validator = new InputValidator_1.InputValidator(host);
         let level;
         let threshold;
@@ -661,7 +668,7 @@ var require_checkSolution = __commonJS({
           threshold = validator.getInput(parameters.errorThreshold);
         }
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "check"];
           if (parameters.fileLocation != void 0 && validator.getInput(parameters.fileLocation) === "sasUriFile") {
@@ -690,10 +697,10 @@ var require_checkSolution = __commonJS({
             errorCheck(pacResult, level, parseInt(threshold));
           }
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -758,17 +765,17 @@ var require_publishSolution = __commonJS({
     function publishSolution(parameters, runnerParameters) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacResult = yield pac("solution", "publish");
           logger.log("PublishSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -818,13 +825,13 @@ var require_deployPackage = __commonJS({
     function deployPackage(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
           const platform = os.platform();
           if (platform !== "win32") {
             throw new Error(`deploy package is only supported on Windows agents/runners (attempted run on ${platform})`);
           }
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["package", "deploy"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -835,10 +842,10 @@ var require_deployPackage = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("DeployPackage Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -886,9 +893,9 @@ var require_createEnvironment = __commonJS({
     function createEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "create"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -905,10 +912,10 @@ var require_createEnvironment = __commonJS({
           const envResult = getEnvironmentDetails(pacResult);
           return envResult;
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -968,9 +975,9 @@ var require_restoreEnvironment = __commonJS({
     function restoreEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "restore"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -991,13 +998,13 @@ var require_restoreEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("RestoreEnvironment Action Result: " + pacResult);
-          const envResult = createEnvironment_1.getEnvironmentDetails(pacResult);
+          const envResult = (0, createEnvironment_1.getEnvironmentDetails)(pacResult);
           return envResult;
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1045,9 +1052,9 @@ var require_deleteSolution = __commonJS({
     function deleteSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "delete"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1056,10 +1063,10 @@ var require_deleteSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("DeleteSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1107,7 +1114,7 @@ var require_packSolution = __commonJS({
     function packSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
           const pacArgs = ["solution", "pack"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1118,7 +1125,7 @@ var require_packSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("PackSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         }
       });
@@ -1166,7 +1173,7 @@ var require_unpackSolution = __commonJS({
     function unpackSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
           const pacArgs = ["solution", "unpack"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1185,7 +1192,7 @@ var require_unpackSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("UnpackSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         }
       });
@@ -1234,9 +1241,9 @@ var require_resetEnvironment = __commonJS({
     function resetEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "reset"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1256,13 +1263,13 @@ var require_resetEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("ResetEnvironment Action Result: " + pacResult);
-          const envResult = createEnvironment_1.getEnvironmentDetails(pacResult);
+          const envResult = (0, createEnvironment_1.getEnvironmentDetails)(pacResult);
           return envResult;
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1311,9 +1318,9 @@ var require_copyEnvironment = __commonJS({
     function copyEnvironment(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateAdmin(pac, parameters.credentials);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "copy"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1330,13 +1337,13 @@ var require_copyEnvironment = __commonJS({
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("CopyEnvironment Action Result: " + pacResult);
-          const envResult = createEnvironment_1.getEnvironmentDetails(pacResult);
+          const envResult = (0, createEnvironment_1.getEnvironmentDetails)(pacResult);
           return envResult;
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1384,9 +1391,9 @@ var require_uploadPaportal = __commonJS({
     function uploadPaportal(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["paportal", "upload"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1396,10 +1403,10 @@ var require_uploadPaportal = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("UploadPaPortal Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1447,9 +1454,9 @@ var require_downloadPaportal = __commonJS({
     function downloadPaportal(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["paportal", "download"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1459,10 +1466,10 @@ var require_downloadPaportal = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("DownloadPaPortal Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1510,9 +1517,9 @@ var require_cloneSolution = __commonJS({
     function cloneSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "clone"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1521,51 +1528,14 @@ var require_cloneSolution = __commonJS({
           validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
           validator.pushInput(pacArgs, "--async", parameters.async);
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
-          const includeArgs = [];
-          if (validator.getInput(parameters.autoNumberSettings) === "true") {
-            includeArgs.push("autonumbering");
-          }
-          if (validator.getInput(parameters.calenderSettings) === "true") {
-            includeArgs.push("calendar");
-          }
-          if (validator.getInput(parameters.customizationSettings) === "true") {
-            includeArgs.push("customization");
-          }
-          if (validator.getInput(parameters.emailTrackingSettings) === "true") {
-            includeArgs.push("emailtracking");
-          }
-          if (validator.getInput(parameters.externalApplicationSettings) === "true") {
-            includeArgs.push("externalapplications");
-          }
-          if (validator.getInput(parameters.generalSettings) === "true") {
-            includeArgs.push("general");
-          }
-          if (validator.getInput(parameters.isvConfig) === "true") {
-            includeArgs.push("isvconfig");
-          }
-          if (validator.getInput(parameters.marketingSettings) === "true") {
-            includeArgs.push("marketing");
-          }
-          if (validator.getInput(parameters.outlookSynchronizationSettings) === "true") {
-            includeArgs.push("outlooksynchronization");
-          }
-          if (validator.getInput(parameters.relationshipRoles) === "true") {
-            includeArgs.push("relationshiproles");
-          }
-          if (validator.getInput(parameters.sales) === "true") {
-            includeArgs.push("sales");
-          }
-          if (includeArgs.length > 0) {
-            pacArgs.push("--include", includeArgs.join(","));
-          }
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("CloneSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1613,9 +1583,9 @@ var require_updateVersionSolution = __commonJS({
     function updateVersionSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1628,10 +1598,10 @@ var require_updateVersionSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("UpdateVersionSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1679,9 +1649,9 @@ var require_onlineVersionSolution = __commonJS({
     function onlineVersionSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "online-version"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1691,10 +1661,10 @@ var require_onlineVersionSolution = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("OnlineVersionSolution Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1743,9 +1713,9 @@ var require_installApplication = __commonJS({
     function installApplication(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["application", "install"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1756,10 +1726,10 @@ var require_installApplication = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("Application Install Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1808,9 +1778,9 @@ var require_listApplication = __commonJS({
     function listApplication(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
-        const pac = createPacRunner_1.default(runnerParameters);
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield authenticate_1.authenticateEnvironment(pac, parameters.credentials, parameters.environmentUrl);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["application", "list"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -1820,10 +1790,10 @@ var require_listApplication = __commonJS({
           const pacResult = yield pac(...pacArgs);
           logger.log("Application List Action Result: " + pacResult);
         } catch (error) {
-          logger.error(`failed: ${error.message}`);
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
         } finally {
-          const clearAuthResult = yield authenticate_1.clearAuthentication(pac);
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
@@ -1839,9 +1809,13 @@ var require_actions = __commonJS({
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
     } : function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
@@ -5134,13 +5108,15 @@ var require_getCredentials = __commonJS({
     function getCredentials() {
       const usernamePassword = {
         username: getInput("user-name"),
-        password: getInput("password-secret")
+        password: getInput("password-secret"),
+        cloudInstance: getInput("cloud")
       };
       const isUpValid = isUsernamePasswordValid(usernamePassword);
       const clientCredentials = {
         appId: getInput("app-id"),
         clientSecret: getInput("client-secret"),
-        tenantId: getInput("tenant-id")
+        tenantId: getInput("tenant-id"),
+        cloudInstance: getInput("cloud")
       };
       const isCcValid = isClientCredentialsValid(clientCredentials);
       if (isUpValid && isCcValid) {
@@ -5265,19 +5241,19 @@ var require_package = __commonJS({
         "@types/fs-extra": "^9.0.12",
         "@types/glob": "^7.1.4",
         "@types/js-yaml": "^4.0.3",
-        "@types/mocha": "^8.2.3",
+        "@types/mocha": "^9.1.0",
         "@types/node": "^14.14.35",
         "@types/sinon": "^9.0.11",
         "@types/sinon-chai": "^3.2.5",
         "@types/uuid": "^8.3.0",
         "@types/yargs": "^17.0.2",
-        "@typescript-eslint/eslint-plugin": "^4.28.2",
-        "@typescript-eslint/parser": "^4.28.2",
+        "@typescript-eslint/eslint-plugin": "^5.15.0",
+        "@typescript-eslint/parser": "^5.15.0",
         async: "^3.2.0",
         chai: "^4.3.4",
         dotenv: "^8.2.0",
         esbuild: "^0.14.10",
-        eslint: "^7.30.0",
+        eslint: "^8.11.0",
         "fancy-log": "^1.3.3",
         glob: "^7.2.0",
         "glob-parent": "^6.0.2",
@@ -5304,7 +5280,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.44",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.47",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
