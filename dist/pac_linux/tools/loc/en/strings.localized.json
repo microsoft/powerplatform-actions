@@ -538,6 +538,7 @@
   "PortalDownloadLocaleFormat" : "Locale file format [Json or Yaml]",
   "PortalLocaleFolderNotAvailable" : "Folder {0} not exist in {1}",
   "PortalLocaleExtractFailure" : "Failed extracting localized text for language {0} and key {1}",
+  "PortalWebsiteMergeLocaleHelp" : "Merges localized content back to portal yaml files",
   "SolutionLicenseAddHelp" : "Add license and plan info to solution",
   "SolutionLicensePlanDefinitionFileHelp" : "License plan definition file in CSV format; expected columns: Service ID, Display name, More info URL",
   "SolutionLicensePlanMappingFileHelp" : "License plan mapping file in CSV format; expected columns: Service ID, Component name",
