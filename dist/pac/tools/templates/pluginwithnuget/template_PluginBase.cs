@@ -1,4 +1,4 @@
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using System;
 using System.ServiceModel;
 
@@ -8,7 +8,7 @@ namespace $safeprojectname$
     /// Base class for all plug-in classes.
     /// Plugin development guide: https://docs.microsoft.com/powerapps/developer/common-data-service/plug-ins
     /// Best practices and guidance: https://docs.microsoft.com/powerapps/developer/common-data-service/best-practices/business-logic/
-    /// </summary>    
+    /// </summary>
     public abstract class PluginBase : IPlugin
     {
         protected string PluginClassName { get; }
@@ -45,7 +45,7 @@ namespace $safeprojectname$
 
             try
             {
-                // Invoke the custom implementation 
+                // Invoke the custom implementation
                 ExecuteCdsPlugin(localPluginContext);
 
                 // Now exit - if the derived plugin has incorrectly registered overlapping event registrations, guard against multiple executions.
@@ -64,12 +64,12 @@ namespace $safeprojectname$
         }
 
         /// <summary>
-        /// Placeholder for a custom plug-in implementation. 
+        /// Placeholder for a custom plug-in implementation.
         /// </summary>
         /// <param name="localPluginContext">Context for the current plug-in.</param>
         protected virtual void ExecuteCdsPlugin(ILocalPluginContext localPluginContext)
         {
-            // Do nothing. 
+            // Do nothing.
         }
 
     }
@@ -92,7 +92,7 @@ namespace $safeprojectname$
         // It is through this notification service that synchronous plug-ins can send brokered messages to the Microsoft Azure Service Bus
         IServiceEndpointNotificationService NotificationService { get; }
 
-        // Provides logging run time trace information for plug-ins. 
+        // Provides logging run time trace information for plug-ins.
         ITracingService TracingService { get; }
 
         // Writes a trace message to the Dataverse trace log
@@ -100,7 +100,7 @@ namespace $safeprojectname$
     }
 
     /// <summary>
-    /// Plug-in context object. 
+    /// Plug-in context object.
     /// </summary>
     public class LocalPluginContext : ILocalPluginContext
     {
@@ -122,13 +122,13 @@ namespace $safeprojectname$
         public IPluginExecutionContext PluginExecutionContext { get; }
 
         /// <summary>
-        /// Synchronous registered plug-ins can post the execution context to the Microsoft Azure Service Bus. <br/> 
+        /// Synchronous registered plug-ins can post the execution context to the Microsoft Azure Service Bus. <br/>
         /// It is through this notification service that synchronous plug-ins can send brokered messages to the Microsoft Azure Service Bus.
         /// </summary>
         public IServiceEndpointNotificationService NotificationService { get; }
 
         /// <summary>
-        /// Provides logging run-time trace information for plug-ins. 
+        /// Provides logging run-time trace information for plug-ins.
         /// </summary>
         public ITracingService TracingService { get; }
 
