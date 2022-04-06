@@ -7,7 +7,7 @@
   "verbSolutionImport": "on",
   "verbSolutionExport": "on",
   "verbSolutionClone": "on",
-  "pcfReactControls": "off",
+  "pcfReactControls": "on",
   "pcfTheming": "off",
   "pcfObjectType": "off",
   "pcfPropertyDependencies": "off",
@@ -47,5 +47,5 @@
   "verbPAPortalReguid": "off",
   "moduleApplication": "on",
   "moduleTool": "off",
-  "verbPluginInitNupkg": "off"
+  "verbPluginInitNupkg": "on"
 }

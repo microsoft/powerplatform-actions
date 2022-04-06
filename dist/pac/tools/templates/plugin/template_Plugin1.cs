@@ -1,9 +1,9 @@
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using System;
 
 namespace $safeprojectname$
 {
-    /* 
+    /*
      * Plugin development guide: https://docs.microsoft.com/powerapps/developer/common-data-service/plug-ins
      * Best practices and guidance: https://docs.microsoft.com/powerapps/developer/common-data-service/best-practices/business-logic/
      */
