@@ -1,0 +1,21 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'assign-user'
+description: 'Assign user to a target Power Platform environment with a specified security role'
+inputs:
+
+  environment:
+    description: 'Id or URL of Power Platform environment to assign user to.'
+    required: true
+
+  object-id:
+    description: 'Id of the user to assign to Power Platform environment'
+    required: true
+
+  role:
+    description: 'Id of the security role to assign user'
+    required: true
+
+runs:
+  using: 'node12'
+  main: '../dist/actions/assign-user/index.js'
