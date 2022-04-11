@@ -4,11 +4,11 @@ name: 'pack-solution'
 description: 'Power Platform Pack Solution'
 inputs:
   solution-file:
-    description: 'Path/filename of the local solution zip file'
+    description: 'Target Path/filename of the local solution file'
     required: true
 
   solution-folder:
-    description: 'Target folder into which to unpack the solution.zip contents'
+    description: 'Folder into which to pack the solution contents'
     required: true
 
   solution-type:
