@@ -82,6 +82,9 @@ jobs:
         website-id: f46b70cc-580b-4f1a-87c3-41deb48eb90d
         download-path: ./paportal-download
 
+    - name: Delete portal manifest before uploading
+      run: rm ./paportal-download/starter-portal/.portalconfig/org*-manifest.yml
+
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
       with:
@@ -123,6 +126,9 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         website-id: f46b70cc-580b-4f1a-87c3-41deb48eb90d
         download-path: ./paportal-download
+
+    - name: Delete portal manifest before uploading
+      run: rm ./paportal-download/starter-portal/.portalconfig/org*-manifest.yml
 
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
