@@ -60,6 +60,10 @@ inputs:
     description: 'The domain name of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
     required: false
 
+  team-id:
+    description: 'The ID of the Microsoft Teams team to create the Power Apps environment in.'
+    required: false
+
 outputs:
   environment-url:
     description: 'URL of the freshly created environment'
