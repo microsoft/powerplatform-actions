@@ -46,7 +46,8 @@ describe("create-environment tests", () => {
             currency: { name: 'currency', required: false, defaultValue: 'USD' },
             language: { name: 'language', required: false, defaultValue: 'English' },
             templates: { name: 'templates', required: false, defaultValue: undefined },
-            domainName: { name: 'domain', required: false, defaultValue: undefined }
+            domainName: { name: 'domain', required: false, defaultValue: undefined },
+            teamId: {name:'team-id', required: false, defaultValue: undefined},
         }, runnerParameters, new ActionsHost());
     });
 });
