@@ -30,7 +30,8 @@ export async function main(): Promise<void> {
         currency: parameterMap['currency'],
         language: parameterMap['language'],
         templates: parameterMap['templates'],
-        domainName: parameterMap['domain']
+        domainName: parameterMap['domain'],
+        teamId: parameterMap['team-id'],
     }, runnerParameters, new ActionsHost());
 
     if (!result.environmentId || !result.environmentUrl) {
