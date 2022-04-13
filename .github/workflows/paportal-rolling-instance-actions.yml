@@ -85,9 +85,8 @@ jobs:
     - name: Delete portal manifest before uploading
       working-directory: ./paportal-download
       run:  |
-        ls
-        pwd
-        rm ./paportal-download/starter-portal/.portalconfig/org*-manifest.yml
+        ls ./starter-portal
+        rm ./starter-portal/.portalconfig/*-manifest.yml
 
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
@@ -134,9 +133,8 @@ jobs:
     - name: Delete portal manifest before uploading
       working-directory: ./paportal-download
       run:  |
-        ls
-        pwd
-        rm ./paportal-download/starter-portal/.portalconfig/org*-manifest.yml
+        ls ./starter-portal
+        rm ./starter-portal/.portalconfig/*-manifest.yml
 
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
