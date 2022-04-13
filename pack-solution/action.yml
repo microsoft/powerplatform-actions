@@ -4,7 +4,7 @@ name: 'pack-solution'
 description: 'Power Platform Pack Solution'
 inputs:
   solution-file:
-    description: 'Target Path/filename of the local solution file'
+    description: 'Target path/filename of the local solution file'
     required: true
 
   solution-folder:
