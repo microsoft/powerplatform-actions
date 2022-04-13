@@ -37,7 +37,7 @@ describe("assign-user tests", () => {
             credentials: credentials,
             environment: { name: 'environment', required: true, defaultValue: undefined },
             objectId: { name: 'object-id', required: true, defaultValue: undefined },
-            role: { name: 'role', required: true, defaultValue: undefined },
+            role: { name: 'role', required: false, defaultValue: undefined },
         }, runnerParameters, new ActionsHost());
     });
 });
