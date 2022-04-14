@@ -5209,19 +5209,6 @@ var require_getCredentials = __commonJS({
   }
 });
 
-// out/lib/auth/getEnvironmentUrl.js
-var require_getEnvironmentUrl = __commonJS({
-  "out/lib/auth/getEnvironmentUrl.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var core_1 = require_core();
-    function getEnvironmentUrl() {
-      return core_1.getInput("environment-url", { required: false });
-    }
-    exports2.default = getEnvironmentUrl;
-  }
-});
-
 // out/lib/actionLogger.js
 var require_actionLogger = __commonJS({
   "out/lib/actionLogger.js"(exports2) {
@@ -5381,7 +5368,7 @@ var require_runnerParameters = __commonJS({
   }
 });
 
-// out/actions/export-solution/index.js
+// out/actions/assign-user/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve) {
@@ -5410,46 +5397,34 @@ var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P,
   });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.main = void 0;
 var actions_1 = require_actions();
 var core = require_core();
 var YamlParser_1 = require_YamlParser();
 var ActionsHost_1 = require_ActionsHost();
 var getCredentials_1 = require_getCredentials();
-var getEnvironmentUrl_1 = require_getEnvironmentUrl();
 var runnerParameters_1 = require_runnerParameters();
 (() => __awaiter(void 0, void 0, void 0, function* () {
-  const taskParser = new YamlParser_1.YamlParser();
-  const parameterMap = taskParser.getHostParameterEntries("export-solution");
-  const actionsHost = new ActionsHost_1.ActionsHost();
-  const workingDir = actionsHost.getInput({ name: "working-directory", required: false });
-  if (workingDir) {
-    runnerParameters_1.runnerParameters.workingDir = workingDir;
+  if (process.env.GITHUB_ACTIONS) {
+    yield main();
   }
-  core.startGroup("export-solution:");
-  yield actions_1.exportSolution({
-    credentials: getCredentials_1.default(),
-    environmentUrl: getEnvironmentUrl_1.default(),
-    name: parameterMap["solution-name"],
-    path: parameterMap["solution-output-file"],
-    managed: parameterMap["managed"],
-    targetVersion: parameterMap["solution-version"],
-    async: parameterMap["run-asynchronously"],
-    maxAsyncWaitTimeInMin: parameterMap["max-async-wait-time"],
-    autoNumberSettings: parameterMap["export-auto-numbering-settings"],
-    calenderSettings: parameterMap["export-calendar-settings"],
-    customizationSettings: parameterMap["export-customization-settings"],
-    emailTrackingSettings: parameterMap["export-email-tracking-settings"],
-    externalApplicationSettings: parameterMap["export-external-applications-settings"],
-    generalSettings: parameterMap["export-general-settings"],
-    isvConfig: parameterMap["export-isv-config"],
-    marketingSettings: parameterMap["export-marketing-settings"],
-    outlookSynchronizationSettings: parameterMap["export-outlook-synchronization-settings"],
-    relationshipRoles: parameterMap["export-relationship-roles"],
-    sales: parameterMap["export-sales"]
-  }, runnerParameters_1.runnerParameters, actionsHost);
-  core.endGroup();
 }))().catch((error) => {
   const logger = runnerParameters_1.runnerParameters.logger;
   logger.error(`failed: ${error}`);
   core.endGroup();
 });
+function main() {
+  return __awaiter(this, void 0, void 0, function* () {
+    const taskParser = new YamlParser_1.YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries("assign-user");
+    core.startGroup("assign-user:");
+    yield actions_1.assignUser({
+      credentials: getCredentials_1.default(),
+      environment: parameterMap["environment"],
+      objectId: parameterMap["object-id"],
+      role: parameterMap["role"]
+    }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
+    core.endGroup();
+  });
+}
+exports.main = main;

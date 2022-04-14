@@ -1256,6 +1256,7 @@ var require_createEnvironment = __commonJS({
           validator.pushInput(pacArgs, "--currency", parameters.currency);
           validator.pushInput(pacArgs, "--language", parameters.language);
           validator.pushInput(pacArgs, "--domain", parameters.domainName);
+          validator.pushInput(pacArgs, "--team-id", parameters.teamId);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("CreateEnvironment Action Result: " + pacResult);
@@ -2152,6 +2153,70 @@ var require_listApplication = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/assignUser.js
+var require_assignUser = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/assignUser.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.assignUser = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function assignUser(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        const pacArgs = ["admin", "assign-user"];
+        const validator = new InputValidator_1.InputValidator(host);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
+          logger.log("The Authentication Result: " + authenticateResult);
+          validator.pushInput(pacArgs, "--environment", parameters.environment);
+          validator.pushInput(pacArgs, "--object-id", parameters.objectId);
+          validator.pushInput(pacArgs, "--role", parameters.role);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("AssignUser Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.assignUser = assignUser;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -2200,6 +2265,7 @@ var require_actions = __commonJS({
     __exportStar(require_onlineVersionSolution(), exports2);
     __exportStar(require_installApplication(), exports2);
     __exportStar(require_listApplication(), exports2);
+    __exportStar(require_assignUser(), exports2);
   }
 });
 
@@ -5280,7 +5346,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.47",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.48",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
