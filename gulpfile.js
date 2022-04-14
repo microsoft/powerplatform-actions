@@ -197,7 +197,7 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.14.2';
+const cliVersion = '1.14.3-daily-22041318';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
@@ -230,12 +230,12 @@ async function nugetInstallPortalPackages() {
 }
 
 async function nugetInstallLinux() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
+    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
     await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
 }
 
 async function nugetInstallWindows() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
+    await nugetInstall('CAP_ISVExp_Tools_Daily', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
 }
 
 async function restore() {
