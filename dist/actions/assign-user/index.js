@@ -5421,7 +5421,7 @@ function main() {
     yield actions_1.assignUser({
       credentials: getCredentials_1.default(),
       environment: parameterMap["environment"],
-      objectId: parameterMap["object-id"],
+      objectId: parameterMap["user"],
       role: parameterMap["role"]
     }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
     core.endGroup();
