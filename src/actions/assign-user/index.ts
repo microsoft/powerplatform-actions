@@ -26,7 +26,7 @@ export async function main(): Promise<void> {
     await assignUser({
         credentials: getCredentials(),
         environment: parameterMap['environment'],
-        objectId: parameterMap['object-id'],
+        objectId: parameterMap['user'],
         role: parameterMap['role']
     }, runnerParameters, new ActionsHost());
     core.endGroup();

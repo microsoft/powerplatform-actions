@@ -8,8 +8,8 @@ inputs:
     description: 'Id or URL of Power Platform environment to assign user to.'
     required: true
 
-  object-id:
-    description: 'Id of the user to assign to Power Platform environment'
+  user:
+    description: 'Azure AD Object ID or user''s principal name to assign to the target environment'
     required: true
 
   role:

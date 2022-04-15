@@ -159,7 +159,7 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         environment: ${{ steps.create-source-environment.outputs.environment-url }}
-        object-id: ${{ env.WF_USER_AAD_OBJECT_ID}}
+        user: ${{ env.WF_USER_AAD_OBJECT_ID}}
         role: ${{ env.WF_USER_ROLE}}
 
     - name: Test copy-environment action with username/password

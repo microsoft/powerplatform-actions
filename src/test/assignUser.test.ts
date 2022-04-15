@@ -36,7 +36,7 @@ describe("assign-user tests", () => {
         assignUserStub.should.have.been.calledWithExactly({
             credentials: credentials,
             environment: { name: 'environment', required: true, defaultValue: undefined },
-            objectId: { name: 'object-id', required: true, defaultValue: undefined },
+            objectId: { name: 'user', required: true, defaultValue: undefined },
             role: { name: 'role', required: true, defaultValue: undefined },
         }, runnerParameters, new ActionsHost());
     });
