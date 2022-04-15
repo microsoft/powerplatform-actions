@@ -25,6 +25,7 @@ jobs:
       WF_APPID: 8a7729e0-2b71-4919-a89a-c789d0a9720a
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
       WF_USER_AAD_OBJECT_ID: 85fd1857-ddef-46f6-acf4-22a0d1df2cda
+      WF_USER_ROLE: "System Customizer"
 
     steps:
     - uses: actions/checkout@v2
@@ -159,6 +160,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         environment: ${{ steps.create-source-environment.outputs.environment-url }}
         object-id: ${{ env.WF_USER_AAD_OBJECT_ID}}
+        role: ${{ env.WF_USER_ROLE}}
 
     - name: Test copy-environment action with username/password
       if: startsWith(github.event.inputs.runSlowCRUD, 'yes')
