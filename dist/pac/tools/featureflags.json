@@ -43,6 +43,7 @@
   "verbPackageAddExternalPackage": "on",
   "verbPackageAddSolution": "on",
   "moduleConnection": "on",
+  "moduleConnector": "on",
   "verbConnectionList": "on",
   "verbPAPortalReguid": "on",
   "moduleApplication": "on",
