@@ -33,32 +33,29 @@ jobs:
     - name: Test create-source-environment action with appId-clientSecret
       uses: ./create-environment
       id: create-source-environment
+      env:
+        PP_SRC_ENV_NAME: ${{ format('ci-actions-src-{0}', runner.os) }}
       with:
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
-        name: sourceEnvironment
+        name: ${{ env.PP_SRC_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: test-source
+        domain: ${{ env.PP_SRC_ENV_NAME }}
 
     - name: Test create-target-environment action with username/password
       uses: ./create-environment
       id: create-target-environment
+      env:
+        PP_TRG_ENV_NAME: ${{ format('ci-actions-trg-{0}', runner.os) }}
       with:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        name: targetEnvironment
+        name: ${{ env.PP_TRG_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: test-target
-
-    - name: Test who-am-i action with username/password
-      uses: ./who-am-i
-      with:
-        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
-        user-name: ${{ env.WF_USERNAME }}
-        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        domain: ${{ env.PP_TRG_ENV_NAME }}
 
     - name: Test who-am-i action with appId-clientSecret
       uses: ./who-am-i
@@ -68,8 +65,14 @@ jobs:
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
 
+    - name: Test who-am-i action with username/password
+      uses: ./who-am-i
+      with:
+        environment-url: ${{ steps.create-target-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
     - name: Test pack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
@@ -106,7 +109,6 @@ jobs:
         run-asynchronously: true
 
     - name: Test unpack-solution action
-      if: matrix.os == 'windows-latest'   # SoPa.exe is windows only
       uses: ./unpack-solution
       with:
         solution-file: 'out/CI/solution1.zip'
@@ -129,6 +131,14 @@ jobs:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Test delete-solution action with username/password
+      uses: ./delete-solution
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        solution-name: emptySolution
 
     - name: Test deploy-package action with username-password
       if: matrix.os == 'windows-latest'

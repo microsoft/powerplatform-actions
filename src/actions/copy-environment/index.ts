@@ -1,32 +1,36 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+import { copyEnvironment } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
-import { AuthHandler, AuthKind, DefaultRunnerFactory, RunnerFactory } from '../../lib';
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
-        await main(DefaultRunnerFactory);
+        await main();
     }
-})();
+})().catch(error => {
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
+    core.endGroup();
+});
 
-export async function main(factory: RunnerFactory): Promise<void> {
-    let pac;
-    try {
-        core.startGroup('copy-environment:');
+export async function main(): Promise<void> {
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries('copy-environment');
 
-        const sourceUrl = core.getInput('source-url', { required: true});
-        const targetUrl = core.getInput('target-url', { required: true});
-
-        pac = factory.getRunner('pac', process.cwd());
-        await new AuthHandler(pac).authenticate(AuthKind.ADMIN);
-
-        const copyEnvironmentArgs = ['admin', 'copy', '--source-url', sourceUrl, '--target-url', targetUrl];
-        await pac.run(copyEnvironmentArgs);
-        core.endGroup();
-    } catch (error) {
-        core.setFailed(`failed: ${error.message}`);
-        throw error;
-    } finally {
-        await pac?.run(["auth", "clear"]);
-    }
+    core.startGroup('copy-environment:');
+    await copyEnvironment({
+        credentials: getCredentials(),
+        sourceEnvironmentUrl: parameterMap['source-url'],
+        targetEnvironmentUrl: parameterMap['target-url'],
+        sourceEnvironment: parameterMap['source-env'],
+        targetEnvironment: parameterMap['target-env'],
+        copyType: parameterMap['copy-type'],
+        overrideFriendlyName: parameterMap['override-friendly-name'],
+        friendlyTargetEnvironmentName: parameterMap['friendly-name']
+      }, runnerParameters, new ActionsHost());
+    core.endGroup();
 }

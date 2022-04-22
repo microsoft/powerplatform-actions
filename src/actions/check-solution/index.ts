@@ -1,56 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
-import * as artifact from '@actions/artifact';
-import { glob } from 'glob';
-import { ActionLogger, AuthHandler, AuthKind, getWorkingDirectory, PacRunner, Runner } from '../../lib';
-import path = require('path');
-import fs = require('fs-extra');
+import { checkSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { YamlParser } from '../../lib/parser/YamlParser';
+import { ActionsHost } from '../../lib/host/ActionsHost';
+import getCredentials from "../../lib/auth/getCredentials";
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { runnerParameters } from '../../lib/runnerParameters';
 
-core.startGroup('check-solution:');
-const workingDir = getWorkingDirectory('working-directory', false);
-const solutionPathCandidate = core.getInput('path', { required: true });
-const solutionPath = path.isAbsolute(solutionPathCandidate) ? solutionPathCandidate : path.resolve(workingDir, solutionPathCandidate);
-core.info(`solution path: ${solutionPath}`);
-
-const outputDirectory = path.join(process.env['RUNNER_TEMP'] || workingDir, "checker-output");
-fs.ensureDirSync(outputDirectory);
-core.info(`output directory: ${outputDirectory}`);
-
-const geo = core.getInput('geo', { required: false });
-const ruleLevelOverride = core.getInput('rule-level-override', { required: false });
-const artifactName = core.getInput('checker-logs-artifact-name', {required: false}) || 'CheckSolutionLogs';
-
-const logger = new ActionLogger();
-let pac: Runner;
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
-    if (!fs.existsSync(solutionPath)) {
-        throw new Error(`The solution file could not be found at ${solutionPath}`);
-    }
+    core.startGroup('check-solution:');
+    const taskParser = new YamlParser();
+    const parameterMap = taskParser.getHostParameterEntries('check-solution');
 
-    pac = new PacRunner(workingDir, logger);
-    await new AuthHandler(pac).authenticate(AuthKind.CDS);
-
-    const checkArgs = ['solution', 'check', '--path', solutionPath, '--outputDirectory', outputDirectory];
-    if (geo) {
-        checkArgs.push('--geo', geo);
-    }
-    if (ruleLevelOverride) {
-        checkArgs.push('--ruleLevelOverride', ruleLevelOverride);
-    }
-    await pac.run(checkArgs);
-
-    const artifactClient = artifact.create();
-    const files = glob.sync('**/*', { cwd: outputDirectory, absolute: true });
-    const options = { continueOnError: true };
-    await artifactClient.uploadArtifact(artifactName, files, outputDirectory, options);
-    core.info(`checked solution results in folder [${outputDirectory}] and uploaded as artifacts.`);
+    await checkSolution({
+        credentials: getCredentials(),
+        environmentUrl: getEnvironmentUrl(),
+        solutionPath: parameterMap["path"],
+        geoInstance: parameterMap["geo"],
+        ruleLevelOverride: parameterMap["rule-level-override"],
+        outputDirectory: parameterMap["checker-logs-artifact-name"]
+    }, runnerParameters, new ActionsHost());
     core.endGroup();
-
 })().catch(error => {
-    core.setFailed(`failed: ${error}`);
+    const logger = runnerParameters.logger;
+    logger.error(`failed: ${error}`);
     core.endGroup();
-}).finally(async () => {
-    await pac?.run(["auth", "clear"]);
 });

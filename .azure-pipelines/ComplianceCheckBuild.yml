@@ -50,3 +50,15 @@ steps:
   inputs:
     command: custom
     customCommand: run update-dist -- --feedPAT $(AZ_DevOps_Read_PAT)
+
+- task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+  displayName: 'SBOM Generation Task'
+  inputs:
+    BuildDropPath: 'dist'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish dist, incl. SBOM'
+  condition: always()
+  inputs:
+    PathtoPublish: dist
+    ArtifactName: dist

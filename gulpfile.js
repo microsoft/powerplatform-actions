@@ -5,9 +5,9 @@
 "use strict";
 require("dotenv").config();
 const gulp = require('gulp');
+const esbuild = require('esbuild');
 const eslint = require('gulp-eslint');
 const mocha = require('gulp-mocha');
-const ncc = require('@vercel/ncc');
 const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 
@@ -29,8 +29,8 @@ const distdir = path.resolve('./dist');
 
 const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
-// list actions (by their name) that are not ready for release yet (see dist task below):
-const underFeatureFlagActions = [ ];
+// list actions (by their name) that are not to be added to the release (test or pre-release actions):
+const skippedActionYamls = [ 'data' ];
 
 async function clean() {
     (await pslist())
@@ -156,32 +156,28 @@ function binplace(compName, relativePath) {
 
 async function dist() {
     fs.emptyDirSync(distdir);
-    binplace('SoPa', path.join('sopa', 'content', 'bin', 'coretools'));
     binplace('pac CLI', path.join('pac', 'tools'));
     binplace('pac CLI', path.join('pac_linux', 'tools'));
     await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
 
-    const allBundles =
-        glob.sync('**/action.yml', {
-                cwd: __dirname
-            })
-        // ignore the toplevel action.yml that is needed for GH Marketplace
-        .filter(actionYaml => path.dirname(actionYaml) !== '.')
-        .map(actionYaml => path.basename(path.dirname(actionYaml)))
-        .filter(actionName => !underFeatureFlagActions.includes(actionName))
-        .map((actionName, idx) => {
-            const actionDir = path.resolve(distdir, 'actions', actionName)
-            log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDir})...`);
-            // return a promise for each bundled action:
-            return ncc(path.resolve(outdir, 'actions', actionName), {
-                minify: false,
-            })
-                .then(({code, map, assets}) => {
-                    fs.emptyDirSync(actionDir);
-                    fs.writeFileSync(path.resolve(actionDir, 'index.js'), code);
-                })
+    glob.sync('**/action.yml', {
+            cwd: __dirname
+        })
+    // ignore the toplevel action.yml that is needed for GH Marketplace
+    .filter(actionYaml => path.dirname(actionYaml) !== '.')
+    .map(actionYaml => path.basename(path.dirname(actionYaml)))
+    .filter(actionName => !skippedActionYamls.includes(actionName))
+    .map((actionName, idx) => {
+        const actionPath = path.join('actions', actionName);
+        const actionDistDir = path.resolve(distdir, actionPath);
+        log.info(`package action ${idx} "${actionName}" into ./dist folder (${actionDistDir})...`);
+        esbuild.buildSync({
+            bundle: true,
+            entryPoints: [ path.resolve(outdir, actionPath, 'index.js') ],
+            outfile: path.join(actionDistDir, 'index.js'),
+            platform: 'node',
         });
-    await Promise.all(allBundles);
+    });
 }
 
 // Unzipping the pac program from the nuget package does not set the
@@ -201,7 +197,7 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.8.5';
+const cliVersion = '1.14.2';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
@@ -240,7 +236,6 @@ async function nugetInstallLinux() {
 
 async function nugetInstallWindows() {
     await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
-    await nugetInstall('nuget.org', 'Microsoft.CrmSdk.CoreTools', '9.1.0.79', path.resolve(outdir, 'sopa'));
 }
 
 async function restore() {

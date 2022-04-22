@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import process = require('process');
-import { DefaultRunnerFactory } from '../../lib';
 import { main } from './index';
 
 process.env['INPUT_ENVIRONMENT-URL'] = new URL(process.env['PA_BT_ORG_URL'] ?? 'https://davidjenD365-1.crm.dynamics.com').href;
@@ -19,4 +18,4 @@ process.env['INPUT_MAX-ASYNC-WAIT-TIME'] = '60';
 
 process.env['RUNNER_DEBUG'] = '1';
 process.env['GITHUB_ACTIONS'] = '1';
-main(DefaultRunnerFactory);
+main();

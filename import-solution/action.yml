@@ -27,42 +27,67 @@ inputs:
     description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
+
   solution-file:
-    description: 'Path/filename of solution zip file to be imported. Can be absolute or relative to working-directory'
+    description: 'Path/filename of solution zip file to be imported. Can be absolute or relative to working-directory.'
     required: true
 
   activate-plugins:
-    description: 'Activate plug-ins and workflows on the solution'
+    description: 'Activate plug-ins and workflows on the solution.'
     required: false
-    default: true
+    default: 'true'
 
   force-overwrite:
-    description: 'Force an overwrite of unmanaged customizations'
+    description: 'Force an overwrite of unmanaged customizations.'
     required: false
-    default: true
+    default: 'true'
 
   skip-dependency-check:
-    description: 'Skip dependency check against dependencies flagged as product update'
+    description: 'Skip dependency check against dependencies flagged as product update.'
     required: false
-    default: false
+    default: 'false'
 
   import-as-holding:
-    description: 'Import the solution as a holding solution'
+    description: 'Import the solution as a holding solution.'
     required: false
-    default: false
+    default: 'false'
 
   publish-changes:
-    description: 'Publish your changes upon a successful import'
+    description: 'Publish your changes upon a successful import.'
     required: false
-    default: false
+    default: 'false'
 
   working-directory:
-    description: 'Working directory; default: root of repository'
+    description: 'Working directory; default: root of repository.'
     required: false
 
   run-asynchronously:
-    description: 'Imports solution asynchronously'
+    description: 'Imports solution asynchronously.'
     required: false
+    default: 'false'
+
+  use-deployment-settings-file:
+    description: 'Use deployment settings file.'
+    required: false
+    default: 'false'
+
+  deployment-settings-file:
+    description: 'Specify the path and file name of the deployment settings file.'
+    required: false
+
+  max-async-wait-time:
+    description: 'Maximum wait time in minutes for asynchronous Import; default is 60 min (1 hr).'
+    required: false
+    default: '60'
+
+  convert-to-managed:
+    description: 'Specify whether to import as a Managed solution.'
+    required: false
+    default: 'false'
 
 runs:
   using: 'node12'

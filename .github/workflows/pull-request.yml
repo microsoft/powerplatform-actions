@@ -2,6 +2,7 @@
 name: pull-request-validation
 
 on:
+  workflow_dispatch:    # allow for manual workflow triggering as needed
   pull_request:
     branches: [ main ]
 
@@ -47,13 +48,15 @@ jobs:
     - name: Test create-environment action with username/password
       uses: ./create-environment
       id: create-environment
+      env:
+        PP_ENV_NAME: ${{ format('pr-actions-{0}', runner.os) }}
       with:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        name: pullRequestTestEnv
+        name: ${{ env.PP_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: pp-actions-pr
+        domain: ${{ env.PP_ENV_NAME }}
 
     - name: Test who-am-i action
       uses: ./who-am-i
@@ -63,7 +66,6 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
     - name: Test pack-solution action
-      if: matrix.os == 'windows-latest'
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
@@ -84,7 +86,7 @@ jobs:
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
-        environment-id: ${{ steps.create-environment.outputs.environment-id }}
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 

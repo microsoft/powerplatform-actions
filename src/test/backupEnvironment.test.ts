@@ -1,58 +1,43 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { forEachOf } from 'async';
-import { expect } from 'chai';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { main as backupEnvironment } from '../actions/backup-environment';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
+should();
+use(sinonChai);
 
-describe('backup-environment#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
+describe("backup-environment tests", () => {
+    const backupEnvironmentStub: Sinon.SinonStub<any[], any> = stub();
+    const credentials: UsernamePassword = stubInterface<UsernamePassword>();
 
-    const requiredParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
-        { Name: 'backup-label', Value: 'aLabel' }
-    ];
+    async function callActionWithMocks(): Promise<void> {
+        const mockedModule = await rewiremock.around(() => import("../../src/actions/backup-environment/index"),
+            (mock) => {
+                mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ backupEnvironment: backupEnvironmentStub });
+                mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+            });
+        await mockedModule.main();
+    }
 
-    // TODO: read in params and their required state from the action.yml
-    const inputParams = [
-        { Name: 'environment-url', Value: 'aUrl' },
-        { Name: 'backup-label', Value: 'aLabel' },
-        { Name: 'user-name', Value: 'aUserName' },
-        { Name: 'password-secret', Value: 'aSecret' },
-    ];
-    const actionInputs = new ActionInputsEmulator(inputParams);
+    it("fetches parameters from index.ts, calls backupEnvironmentStub properly", async () => {
 
-    forEachOf(requiredParams, (inputParam) => {
-        it(`required parameter - ${inputParam.Name}`, async() => {
-            actionInputs.defineInputsExcept(inputParam.Name);
-            let res, err;
-            try {
-                 res = await backupEnvironment(mockFactory);
-            }
-            catch (error) {
-                err = error;
-            }
-            expect(res).to.be.undefined;
-            expect(err.message).to.match(new RegExp(`required and not supplied: ${inputParam.Name}`));
-        });
+        await callActionWithMocks();
+
+        backupEnvironmentStub.should.have.been.calledWithExactly({
+            credentials: credentials,
+            environment: { name: 'environment', required: false, defaultValue: undefined },
+            environmentUrl: { name: 'environment-url', required: false, defaultValue: undefined },
+            backupLabel: { name: 'backup-label', required: true, defaultValue: undefined },
+            notes: { name: 'notes', required: false, defaultValue: undefined },
+        }, runnerParameters, new ActionsHost());
     });
-
-    it('call action', async() => {
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await backupEnvironment(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'auth', 'create', '--kind', 'ADMIN', '--username', 'aUserName', '--password', 'aSecret'] });
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'admin', 'backup', '--url', 'aUrl', '--label', 'aLabel' ] });
-    }).timeout(5000);
 });

@@ -1,44 +1,49 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import path = require('path');
-import { expect } from 'chai';
 
-import { main as updateSolutionVersion } from '../actions/update-solution-version';
-import { MockedRunners } from './mockedRunners';
-import { ActionInputsEmulator } from './actionInputsEmulator';
+import { should, use } from "chai";
+import { stubInterface } from "ts-sinon";
+import * as sinonChai from "sinon-chai";
+import rewiremock from "./rewiremock";
+import { fake, stub } from "sinon";
+import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
+import { runnerParameters } from "../../src/lib/runnerParameters";
+import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
+should();
+use(sinonChai);
 
-describe('update-solution-version#input validation', () => {
-    const workDir = path.resolve(__dirname, '..', '..', 'out', 'test');
-    const mockFactory: MockedRunners = new MockedRunners(workDir);
-    // TODO: read in params and their required state from the action.yml
+describe("update version solution test", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateVersionSolutionStub: Sinon.SinonStub<any[], any> = stub();
+  const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+  const environmentUrl = "environment url";
 
-    it('required parameter', async() => {
-        const actionInputs = new ActionInputsEmulator([]);
-        actionInputs.defineInputs();
-        let res, err;
-        try {
-            res = await updateSolutionVersion(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
-        expect(res).to.be.undefined;
-        expect(err.message).to.match(new RegExp("Input 'patch-version': not allowed with input 'strategy'"));
-    });
+  async function callActionWithMocks(): Promise<void> {
+    const updateVersionSolution = await rewiremock.around(
+      () => import("../../src/actions/update-solution-version/index"),
+      (mock) => {
+        mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ updateVersionSolution: updateVersionSolutionStub });
+        mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials );
+        mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => environmentUrl );
+        mock(() => import("fs/promises")).with({ chmod: fake() });
+        mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
+      });
+    await updateVersionSolution.main();
+  }
 
-    it('call action with patch-version', async() => {
-        const actionInputs = new ActionInputsEmulator([{ Name: 'patch-version', Value: '10' }]);
-        actionInputs.defineInputs();
-        let err;
-        try {
-            await updateSolutionVersion(mockFactory);
-        }
-        catch (error) {
-            err = error;
-        }
+  it("calls update version solution", async () => {
 
-        expect(err).to.be.undefined;
-        const loggedCommands = mockFactory.loggedCommands;
-        expect(loggedCommands).to.deep.include({ RunnerName: 'pac', Arguments: [ 'solution', 'version', '--patchversion', '10' ] });
-    });
+    await callActionWithMocks();
+
+    updateVersionSolutionStub.should.have.been.calledWithExactly({
+      credentials: credentials,
+      environmentUrl: environmentUrl,
+      buildVersion: { name: 'build-version', required: false, defaultValue: undefined },
+      revisionVersion: { name: 'revision-version', required: false, defaultValue: undefined },
+      patchVersion: { name: 'patch-version', required: false, defaultValue: undefined },
+      strategy: { name: 'strategy', required: false, defaultValue: undefined },
+      fileName: { name: 'tracker-file', required: false, defaultValue: undefined },
+    }, runnerParameters, new ActionsHost());
+  });
 });
