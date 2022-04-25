@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -11,7 +11,7 @@ using Microsoft.Xrm.Tooling.PackageDeployment.CrmPackageExtentionBase;
 namespace $namespace.name$
 {
     /// <summary>
-    /// Import package starter frame. 
+    /// Import package starter frame.
     /// </summary>
     [Export(typeof(IImportExtensions))]
     public class CDSPackageImportExtension : ImportExtension
@@ -62,7 +62,7 @@ namespace $namespace.name$
 
         /// <summary>
         /// Called during a solution upgrade when both solutions, old and new, are present in the system.
-        /// This function can be used to provide a means to do data transformation or upgrade while a solution update is occurring. 
+        /// This function can be used to provide a means to do data transformation or upgrade while a solution update is occurring.
         /// </summary>
         /// <see cref="ImportExtension.RunSolutionUpgradeMigrationStep"/>
         /// <param name="solutionName">Name of the solution</param>
@@ -98,14 +98,14 @@ namespace $namespace.name$
         }
 
         /// <summary>
-        /// Folder Name for the Package data. 
+        /// Folder Name for the Package data.
         /// </summary>
         public override string GetImportPackageDataFolderName
         {
-            get { 
-                // WARNING this value directly correlates to the folder name in the Solution Explorer where the ImportConfig.xml and sub content is located. 
-                // Changing this name requires that you also change the correlating name in the Solution Explorer 
-                return "PkgFolder"; 
+            get {
+                // WARNING this value directly correlates to the folder name in the Solution Explorer where the ImportConfig.xml and sub content is located.
+                // Changing this name requires that you also change the correlating name in the Solution Explorer
+                return "PkgFolder";
             }
         }
 
@@ -118,7 +118,7 @@ namespace $namespace.name$
         }
 
         /// <summary>
-        /// Long name of the Import Package. 
+        /// Long name of the Import Package.
         /// </summary>
         public override string GetLongNameOfImport
         {

@@ -14,6 +14,7 @@ process.env['INPUT_PASSWORD-SECRET'] = password;
 process.env['INPUT_NAME'] = 'test-pizza';
 process.env['INPUT_REGION'] = 'unitedstates';
 process.env['INPUT_TYPE'] = 'Sandbox';
+process.env['INPUT_TEAM-ID'] = '3041a058-0000-0000-0000-b2a5571d9eac';
 
 process.env['RUNNER_DEBUG'] = '1';
 process.env['GITHUB_ACTIONS'] = '1';

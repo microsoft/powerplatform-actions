@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: "export-solution"
-description: "Power Platform Export Solution"
+name: 'export-solution'
+description: 'Power Platform Export Solution'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'
@@ -12,7 +12,7 @@ inputs:
     required: false
 
   password-secret:
-    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
+    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: false
 
   app-id:
@@ -20,100 +20,105 @@ inputs:
     required: false
 
   client-secret:
-    description: "The client secret to authenticate with. Required if authenticating with app-id."
+    description: 'The client secret to authenticate with. Required if authenticating with app-id.'
     required: false
 
   tenant-id:
-    description: "Tenant id if using app-id & client secret to authenticate."
+    description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
   solution-name:
-    description: "Name of solution to export"
+    description: 'Name of solution to export'
     required: true
 
   solution-version:
-    description: "Version of solution to export"
+    description: 'Version of solution to export'
     required: false
 
   solution-output-file:
-    description: "Path/filename where to place the exported solution zip file. Can be absolute or relative to working-directory"
+    description: 'Path/filename where to place the exported solution zip file. Can be absolute or relative to working-directory'
     required: true
 
   managed:
-    description: "Export as managed solution; default is to export as unmanaged solution"
+    description: 'Export as managed solution; default is to export as unmanaged solution'
     required: false
-    default: "false"
+    default: 'false'
 
   working-directory:
-    description: "Working directory; default: root of repository"
+    description: 'Working directory; default: root of repository'
     required: false
 
   run-asynchronously:
-    description: "Exports solution asynchronously"
+    description: 'Exports solution asynchronously'
     required: false
-    default: "false"
+    default: 'false'
+
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
 
   max-async-wait-time:
-    description: "Maximum wait time in minutes for asynchronous Import; default is 60 min (1 hr)."
+    description: 'Maximum wait time in minutes for asynchronous export; default is 60 min (1 hr).'
     required: false
-    default: "60"
+    default: '60'
 
   export-auto-numbering-settings:
-    description: "Specify whether to export auto numbering settings."
+    description: 'Specify whether to export auto numbering settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-calendar-settings:
-    description: "Specify whether to export calendar settings."
+    description: 'Specify whether to export calendar settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-customization-settings:
-    description: "Specify whether to export customization settings."
+    description: 'Specify whether to export customization settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-email-tracking-settings:
-    description: "Specify whether to export email tracking settings."
+    description: 'Specify whether to export email tracking settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-external-applications-settings:
-    description: "Specify whether to export external applications settings."
+    description: 'Specify whether to export external applications settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-general-settings:
-    description: "Specify whether to export general settings."
+    description: 'Specify whether to export general settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-isv-config:
-    description: "Specify whether to export isv config."
+    description: 'Specify whether to export isv config.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-marketing-settings:
-    description: "Specify whether to export marketing settings."
+    description: 'Specify whether to export marketing settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-outlook-synchronization-settings:
-    description: "Specify whether to export outlook synchornization settings."
+    description: 'Specify whether to export outlook synchornization settings.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-relationship-roles:
-    description: "Specify whether to export relationship roles."
+    description: 'Specify whether to export relationship roles.'
     required: false
-    default: "false"
+    default: 'false'
 
   export-sales:
-    description: "Specify whether to export sales."
+    description: 'Specify whether to export sales.'
     required: false
-    default: "false"
+    default: 'false'
 
 runs:
-  using: "node12"
-  main: "../dist/actions/export-solution/index.js"
+  using: 'node12'
+  main: '../dist/actions/export-solution/index.js'
   # main: '../out/actions/export-solution/index.js'

@@ -11,7 +11,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "export-solution");
+    const parameterMap = taskParser.getHostParameterEntries('export-solution');
     const actionsHost = new ActionsHost();
     const workingDir = actionsHost.getInput({ name: "working-directory", required: false });
     if (workingDir) {

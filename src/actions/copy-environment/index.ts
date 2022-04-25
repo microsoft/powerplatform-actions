@@ -5,7 +5,6 @@ import * as core from '@actions/core';
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
 import getCredentials from "../../lib/auth/getCredentials";
-import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from '../../lib/runnerParameters';
 
 (async () => {
@@ -20,13 +19,15 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 export async function main(): Promise<void> {
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "copy-environment");
+    const parameterMap = taskParser.getHostParameterEntries('copy-environment');
 
     core.startGroup('copy-environment:');
     await copyEnvironment({
         credentials: getCredentials(),
-        sourceEnvironmentUrl: getEnvironmentUrl(),
+        sourceEnvironmentUrl: parameterMap['source-url'],
         targetEnvironmentUrl: parameterMap['target-url'],
+        sourceEnvironment: parameterMap['source-env'],
+        targetEnvironment: parameterMap['target-env'],
         copyType: parameterMap['copy-type'],
         overrideFriendlyName: parameterMap['override-friendly-name'],
         friendlyTargetEnvironmentName: parameterMap['friendly-name']

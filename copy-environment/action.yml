@@ -1,22 +1,30 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: "copy-environment"
-description: "Power Platform Copy Environment Action"
+name: 'copy-environment'
+description: 'Power Platform Copy Environment Action'
 inputs:
   source-url:
     description: 'Source URL of Power Platform environment to copy; e.g. "https://test-env-source.crm.dynamics.com"'
-    required: true
+    required: false
 
   target-url:
     description: 'Target URL of Power Platform environment to copy; e.g. "https://test-env-target.crm.dynamics.com"'
-    required: true
+    required: false
+
+  source-env:
+    description: 'Source Id or URL of Power Platform environment to copy.'
+    required: false
+
+  target-env:
+    description: 'Target Id or URL of Power Platform environment to copy.'
+    required: false
 
   user-name:
     description: 'Power Platform user name to authenticate with, e.g. myname@my-org.onmicrosoft.com. Setting this input makes user-name and password required; specifying alternate "app-id" credential set of inputs will result in an error.'
     required: false
 
   password-secret:
-    description: "Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow"
+    description: 'Power Platform password, required if authenticating with username. Do NOT checkin password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
     required: false
 
   app-id:
@@ -24,27 +32,32 @@ inputs:
     required: false
 
   client-secret:
-    description: "The client secret to authenticate with. Required if authenticating with app-id."
+    description: 'The client secret to authenticate with. Required if authenticating with app-id.'
     required: false
 
   tenant-id:
-    description: "Tenant id if using app-id & client secret to authenticate."
+    description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
+
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
 
   copy-type:
-    description: "Type of copy - Full Copy or Minimal Copy"
+    description: 'Type of copy - FullCopy or MinimalCopy'
     required: false
-    default: "Full Copy"
+    default: 'FullCopy'
 
   override-friendly-name:
-    description: "Check to override the friendly name of the target environment."
+    description: 'Check to override the friendly name of the target environment.'
     required: false
-    default: "false"
+    default: 'false'
 
   friendly-name:
-    description: "Set the friendly name of the target environment."
+    description: 'Set the friendly name of the target environment.'
     required: false
 
 runs:
-  using: "node12"
-  main: "../dist/actions/copy-environment/index.js"
+  using: 'node12'
+  main: '../dist/actions/copy-environment/index.js'

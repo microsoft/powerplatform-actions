@@ -11,7 +11,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
 (async () => {
     core.startGroup('check-solution:');
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "check-solution");
+    const parameterMap = taskParser.getHostParameterEntries('check-solution');
 
     await checkSolution({
         credentials: getCredentials(),
