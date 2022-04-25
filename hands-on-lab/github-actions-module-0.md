@@ -28,8 +28,8 @@ You will need to create three environments in your demo or customer tenant.  To 
 
 7. Set the Language to **English** and Currency to **USD** , set the ***Deploy sample apps and data?*** radio button to **Yes**, then **click Save**
 
-![Set currency](media/gh-lab-0.70.png "Set currency")
+    ![Set currency](media/gh-lab-0.70.png "Set currency")
 
-7. Your development environment has been created, follow steps 4 – 7 above to create a second environment called “Your Name – build” , and then finally, create a third environment called “Your Name – prod”
+8. Your development environment has been created, follow steps 4 – 7 above to create a second environment called “Your Name – build” , and then finally, create a third environment called “Your Name – prod”
 
-8. Now you have the environments that we will need for this and ready to begin the next modules of this Hands-on lab
+9. Now you have the environments that we will need for this and ready to begin the next modules of this Hands-on lab
