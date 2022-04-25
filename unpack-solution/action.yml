@@ -21,6 +21,43 @@ inputs:
     required: false
     default: 'true'
 
+  error-level:
+    description: Minimum logging level for log output [Verbose|Info|Warning|Error|Off]
+    required: false
+    default: 'Info'
+
+  single-component:
+    description: Only perform action on a single component type [WebResource|Plugin|Workflow|None]
+    required: false
+    default: 'None'
+
+  map-file:
+    description: The full path to a mapping xml file from which to read component folders to pack
+    required: false
+
+  locale-template:
+    description: Generates a template resource file. Valid only on Extract. Possible Values are auto or an LCID/ISO code of the language you wish to export. When Present, this will extract the string resources from the given locale as a neutral .resx. If auto or just the long or short form of the switch is specified the base locale for the solution will be used
+    required: false
+
+  localize:
+    description: Extract or merge all string resources into .resx files.
+    required: false
+
+  use-lcid:
+    description: "Use LCID's (1033) rather than ISO codes (en-US) for language files"
+    required: false
+    default: 'false'
+
+  use-unmanaged-file-for-missing-managed:
+    description: Use the same XML source file when packaging for Managed and only Unmanaged XML file is found; applies to AppModuleSiteMap, AppModuleMap, FormXml files
+    required: false
+    default: 'false'
+
+  disable-plugin-remap:
+    description: Disabled plugin fully qualified type name remaping
+    required: false
+    default: 'false'
+
 runs:
   using: 'node12'
   main: '../dist/actions/unpack-solution/index.js'

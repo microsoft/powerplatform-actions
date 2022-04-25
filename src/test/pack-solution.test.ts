@@ -33,6 +33,22 @@ describe("pack solution test", () => {
       solutionZipFile: { name: 'solution-file', required: true, defaultValue: undefined },
       sourceFolder: { name: 'solution-folder', required: true, defaultValue: undefined },
       solutionType: { name: 'solution-type', required: false, defaultValue: "Unmanaged" },
+      errorLevel: { name: 'error-level', required: false, defaultValue: 'Info' },
+      singleComponent: { name: 'single-component', required: false, defaultValue: 'None' },
+      mapFile: { name: 'map-file', required: false, defaultValue: undefined },
+      localeTemplate: { name: 'locale-template', required: false, defaultValue: undefined },
+      localize: { name: 'localize', required: false, defaultValue: undefined },
+      useLcid: { name: 'use-lcid', required: false, defaultValue: 'false' },
+      useUnmanagedFileForManaged: {
+          name: 'use-unmanaged-file-for-missing-managed',
+          required: false,
+          defaultValue: 'false'
+      },
+      disablePluginRemap: {
+          name: 'disable-plugin-remap',
+          required: false,
+          defaultValue: 'false'
+      }
     }, runnerParameters, new ActionsHost());
   });
 });
