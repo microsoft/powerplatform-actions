@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'unpack-solution'
+name: 'pack-solution'
 description: 'Power Platform Pack Solution'
 inputs:
   solution-file:
