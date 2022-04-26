@@ -7,7 +7,7 @@
   "verbSolutionImport": "on",
   "verbSolutionExport": "on",
   "verbSolutionClone": "on",
-  "pcfReactControls": "off",
+  "pcfReactControls": "on",
   "pcfTheming": "off",
   "pcfObjectType": "off",
   "pcfPropertyDependencies": "off",
@@ -38,9 +38,14 @@
   "componentSettings": "off",
   "verbCanvas": "on",
   "verbSolutionCreateSettings": "on",
-  "verbPackageInitUseDotnetTemplating": "off",
+  "verbPackageInitUseDotnetTemplating": "on",
   "enableDotetTemplate_PDPackageSdkStyle": "off",
+  "verbPackageAddExternalPackage": "off",
+  "verbPackageAddSolution": "off",
+  "moduleConnection": "off",
   "verbConnectionList": "off",
   "verbPAPortalReguid": "off",
-  "verbPluginInitNupkg": "off"
+  "moduleApplication": "on",
+  "moduleTool": "off",
+  "verbPluginInitNupkg": "on"
 }

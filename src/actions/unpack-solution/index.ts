@@ -9,13 +9,21 @@ import { runnerParameters } from '../../lib/runnerParameters';
 (async () => {
     core.startGroup('unpack-solution:');
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "unpack-solution");
+    const parameterMap = taskParser.getHostParameterEntries('unpack-solution');
 
     await unpackSolution({
       solutionZipFile: parameterMap['solution-file'],
       sourceFolder: parameterMap['solution-folder'],
       solutionType: parameterMap['solution-type'],
       overwriteFiles: parameterMap['overwrite-files'],
+      errorLevel: parameterMap['error-level'],
+      singleComponent: parameterMap['single-component'],
+      mapFile: parameterMap['map-file'],
+      localeTemplate: parameterMap['locale-template'],
+      localize: parameterMap['localize'],
+      useLcid: parameterMap['use-lcid'],
+      useUnmanagedFileForManaged: parameterMap['use-unmanaged-file-for-missing-managed'],
+      disablePluginRemap: parameterMap['disable-plugin-remap'],
     }, runnerParameters, new ActionsHost());
 
     core.endGroup();

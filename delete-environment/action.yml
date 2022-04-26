@@ -8,7 +8,11 @@ inputs:
     required: false
 
   environment-id:
-    description: 'ID of Power Platform environment to delete. The "environment-id" is mutually exclusive to "environment-url".'
+    description: 'ID of Power Platform environment to delete(deprecated). Please use "environment" action property instead.'
+    required: false
+
+  environment:
+    description: 'URL or Id of Power Platform environment to delete.'
     required: false
 
   user-name:
@@ -30,6 +34,11 @@ inputs:
   tenant-id:
     description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
+
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
 
 runs:
   using: 'node12'

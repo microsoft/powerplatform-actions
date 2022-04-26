@@ -18,11 +18,13 @@ export async function main(): Promise<void> {
     try {
         core.startGroup('update-solution-version:');
         const taskParser = new YamlParser();
-        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "update-solution-version");
+        const parameterMap = taskParser.getHostParameterEntries('update-solution-version');
 
         await updateVersionSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
+            buildVersion: parameterMap['build-version'],
+            revisionVersion: parameterMap['revision-version'],
             patchVersion: parameterMap['patch-version'],
             strategy: parameterMap['strategy'],
             fileName: parameterMap['tracker-file'],

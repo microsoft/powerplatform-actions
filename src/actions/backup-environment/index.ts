@@ -19,12 +19,13 @@ import { runnerParameters } from '../../lib/runnerParameters';
 
 export async function main(): Promise<void> {
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "backup-environment");
+    const parameterMap = taskParser.getHostParameterEntries('backup-environment');
 
     core.startGroup('backup-environment:');
 
     await backupEnvironment({
         credentials: getCredentials(),
+        environment: parameterMap['environment'],
         environmentUrl: parameterMap['environment-url'],
         backupLabel: parameterMap['backup-label'],
         notes: parameterMap['notes']

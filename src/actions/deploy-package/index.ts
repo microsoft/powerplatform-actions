@@ -18,7 +18,7 @@ export async function main(): Promise<void> {
     try {
         core.startGroup('deploy-package:');
         const taskParser = new YamlParser();
-        const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "deploy-package");
+        const parameterMap = taskParser.getHostParameterEntries('deploy-package');
 
         await deployPackage({
             credentials: getCredentials(),

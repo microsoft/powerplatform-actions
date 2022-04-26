@@ -9,16 +9,24 @@ import { runnerParameters } from '../../lib/runnerParameters';
 (async () => {
     core.startGroup('pack-solution:');
     const taskParser = new YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries(runnerParameters.workingDir, "pack-solution");
+    const parameterMap = taskParser.getHostParameterEntries('pack-solution');
 
     await packSolution({
-      solutionZipFile: parameterMap['solution-file'],
-      sourceFolder: parameterMap['solution-folder'],
-      solutionType: parameterMap['solution-type'],
+        solutionZipFile: parameterMap['solution-file'],
+        sourceFolder: parameterMap['solution-folder'],
+        solutionType: parameterMap['solution-type'],
+        errorLevel: parameterMap['error-level'],
+        singleComponent: parameterMap['single-component'],
+        mapFile: parameterMap['map-file'],
+        localeTemplate: parameterMap['locale-template'],
+        localize: parameterMap['localize'],
+        useLcid: parameterMap['use-lcid'],
+        useUnmanagedFileForManaged: parameterMap['use-unmanaged-file-for-missing-managed'],
+        disablePluginRemap: parameterMap['disable-plugin-remap'],
     }, runnerParameters, new ActionsHost());
 
     core.endGroup();
-  })().catch(error => {
+})().catch(error => {
     const logger = runnerParameters.logger;
     logger.error(`failed: ${error}`);
     core.endGroup();

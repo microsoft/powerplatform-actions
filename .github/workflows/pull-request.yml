@@ -71,12 +71,25 @@ jobs:
       run: |
         exit 1
 
+    - name: Test unpack-solution action
+      uses: ./unpack-solution
+      with:
+        solution-folder: 'out/CI/emptySolution/src'
+        solution-file: 'src/test/data/emptySolution_0_1_0_0.zip'
+        solution-type: 'Unmanaged'
+        overwrite-files: true
+        error-level: Error
+        locale-template: 'en-US'
+        localize: true
+
     - name: Test pack-solution action
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
+        error-level: Error
+        localize: true
 
     - name: Test import-solution action with username/password
       uses: ./import-solution
@@ -92,7 +105,7 @@ jobs:
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
-        environment-id: ${{ steps.create-environment.outputs.environment-id }}
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 

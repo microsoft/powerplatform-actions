@@ -23,6 +23,11 @@ inputs:
     description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
+
   name:
     description: 'The name of the environment you are creating.'
     required: true
@@ -55,12 +60,16 @@ inputs:
     description: 'The domain name of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
     required: false
 
+  team-id:
+    description: 'The ID of the Microsoft Teams team to create the Power Apps environment in.'
+    required: false
+
 outputs:
   environment-url:
-    description: URL of the freshly created environment
+    description: 'URL of the freshly created environment'
 
   environment-id:
-    description: ID of the freshly created environment
+    description: 'ID of the freshly created environment'
 
 runs:
   using: 'node12'

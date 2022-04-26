@@ -78,9 +78,13 @@ Windows, macOS or Linux:
   ```Powershell
   [Environment]::SetEnvironmentVariable('AZ_DevOps_Read_PAT', '<yourPAT>', [EnvironmentVariableTarget]::User)
   ```
-  - Create a PAT in GitHub to read packages, and enable SSO for the microsoft organization. Then add it to your *~/.npmrc* file or use the `npm login` command as documented [here](https://docs.github.com/en/packages/guides/configuring-npm-for-use-with-github-packages#authenticating-with-a-personal-access-token). This will only be needed until the `@microsoft/powerplatform-cli-wrapper` repo is made public.
+  - Create a PAT in GitHub to read packages, and enable SSO for the microsoft organization.
+  Then add it to your *~/.npmrc* file or use the `npm login --scope=@microsoft --registry=https://npm.pkg.github.com` command,
+  as documented [here](https://docs.github.com/en/packages/guides/configuring-npm-for-use-with-github-packages#authenticating-with-a-personal-access-token).
+  This will only be needed until the `@microsoft/powerplatform-cli-wrapper` repo is made public.
 
-If developing on Linux or macOS, you will also need to install `git-lfs`.  (It is prepackaged with the Git installer for Windows.)  Follow the [instructions here](https://docs.github.com/en/github/managing-large-files/installing-git-large-file-storage) for your environment.
+If developing on Linux or macOS, you will also need to install `git-lfs`.  (It is prepackaged with the Git installer for Windows.)
+Follow the [instructions here](https://docs.github.com/en/github/managing-large-files/installing-git-large-file-storage) for your environment.
 
 ## Getting Started
 
@@ -95,7 +99,7 @@ gulp
 
 ## Refreshing actions in dist folder
 
-Run ```npm run dist``` and commit and push the updates in the ```./dist``` folder.
+In a clean working directory, run ```npm run update-dist``` and commit and push only the updates in the ```./dist``` folder.
 
 If you have updated the Linux PAC package version (especially from a Windows host), double check that the `pac` executable has the execute flag set.  Run
 ```bash
@@ -128,3 +132,7 @@ prior to commiting the changes.
 ### Power Platform Environment Admin (BAP)
 
 - [Environments Overview](https://docs.microsoft.com/en-us/power-platform/admin/environments-overview)
+
+### How to make GitHub Actions and Build Tools compatible with latest PAC CLI?
+
+[Please refer steps in Cli-Wrapper](https://github.com/microsoft/powerplatform-cli-wrapper/blob/main/README.md)

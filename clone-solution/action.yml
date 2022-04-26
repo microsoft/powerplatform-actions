@@ -27,6 +27,11 @@ inputs:
     description: 'Tenant id if using app-id & client secret to authenticate.'
     required: false
 
+  cloud:
+    description: 'Cloud instance to authenticate with. Default: Public. See "pac auth create help" for valid cloud instance names'
+    required: false
+    default: 'Public'
+
   solution-name:
     description: 'Name of solution to clone'
     required: true
@@ -42,6 +47,16 @@ inputs:
   working-directory:
     description: 'Working directory; default: root of repository'
     required: false
+
+  run-asynchronously:
+    description: 'Exports solution asynchronously'
+    required: false
+    default: 'false'
+
+  max-async-wait-time:
+    description: 'Maximum wait time in minutes for asynchronous export; default is 60 min (1 hr).'
+    required: false
+    default: '60'
 
 runs:
   using: 'node12'
