@@ -25,26 +25,28 @@ If you are already familiar with the concept of multiple environments as well as
 ![Initiate](media/gh-lab-2.40.png "Initiate")
 
 ### Create a new secret to be used by the GitHub actions
-5.	Navigate to the repo from the link in the import wizard and select ‘Settings’ and navigate to ‘Secrets’ and click ‘New secret’
+5.	From the newly created repo **click Settings**, then **click Secret**, from the expanded list **click Actions**. Next, **click** **Create new repository secret**
 
-![Create secret](media/gh-lab-2.50.png "Create secret")
+![Create secret](media/gh-lab-2.50.gif "Create secret")
 
-6.	On the secrets page, name the secret ‘password’, type the password for the username you are using to connect to the Power Platform in the ‘Value’ and click ‘Add secret’. The password will be referenced in the yml files used to define the GitHub workflows later in this lab. 
+6. On the Action secrets page, name the secret ‘password’, type the password for the username you are using to connect to the Power Platform in the ‘Value’ and click ‘Add secret’. The password will be referenced in the YAML files used to define the GitHub workflows later in this lab. 
+
+   **Note:** You may alternately setup secrets per environment for additional control. 
+   Reference: [Using environments for deployment in GitHub Docs](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
 
 ![Create secret](media/gh-lab-2.60.png "Create secret")
 
-NOTE: In the preview, only username + password is supported. Support for Service Principals (Application User) will be available later in the fall 2020
 7.	The password is now securely stored as a GitHub Secret
 
 ![Create secret](media/gh-lab-2.70.png "Create secret")
 
 
 ## Create a workflow to export and unpack solution file to a new branch
-8.	Next, click on ‘Actions’ and ‘set up a workflow yourself’
+8.	Next, **click on Actions** and **click ‘set up a workflow yourself’** or **click Configure** in the *Simple workflow* box under the *suggested for this repository* section.
 
-![Setup workflow](media/gh-lab-2.80.png "Setup workflow")
+![Setup workflow](media/gh-lab-2.80.gif"Setup workflow")
 
-9.	This will start a new YML file with a basic workflow to help you get started with GitHub actions. 
+9.	This will start a new YAML file with a basic workflow to help you get started with GitHub actions. 
 
 ![Sample yml ](media/gh-lab-2.90.png "Sample yml")
 
@@ -53,17 +55,17 @@ NOTE: In the preview, only username + password is supported. Support for Service
 
 ![Rename and replace content](media/gh-lab-2.100.png "Rename and replace content")
 
-11.	Update <ENVIRONMENTURL> with the url for the development environment you want to export from (for example https://poweractionsdev.crm.dynamics.com 
-12.	Update <USERNAME> with the username you are using to connect to the environment
+11.	Update `<ENVIRONMENTURL>` with the url for the development environment you want to export from (for example https://poweractionsdev.crm.dynamics.com 
+12.	Update `<USERNAME>` with the username you are using to connect to the environment
 13.	You are now ready to commit your changes. Click ‘Start commit’, type ‘Create export yml’ in the title and add a description (optional). Next, click ‘Commit new file’
 
-![Start commit](media/gh-lab-2.130.png "Start commit")
+![Start commit](media/gh-lab-2.130.gif "Start commit")
 
 14.	Congratulations – you have now created your first GitHub workflow, using the following actions:
 - Who Am I: Ensures that you can successfully connect to the environment you are exporting from
 - Export Solution: Exports the solution file from your development environment
 - Unpack Solution: The solution file that is exported from the server is a zip file with consolidated configuration files.  These initial files are not suitable for source code management as they are not structured to make it feasible for source code management systems to properly do differencing on the files and capture the changes you want to commit to source control.  You need to ‘unpack’ the solution files to make them suitable for source control storage and processing.
-•	Branch Solution: Creates a new branch to store the exported solution
+- Branch Solution: Creates a new branch to store the exported solution
 
 ## Test ‘export and unpack’ workflow
 15.	Next, test that the workflow runs. Navigate to ‘Actions’ – ‘Run workflow’ and click ‘Run workflow’.
@@ -79,7 +81,7 @@ NOTE: In the preview, only username + password is supported. Support for Service
 17.	When the workflow is complete, validate that a new branch has been created with the solution unpacked to the solutions/ALMLab folder. Select ‘Code’ and then ‘Branches’
 
 ![View branches](media/gh-lab-2.170.png "View branches")
- 
+
 18.	Select the branch that was created by the action
 
 ![Select branch](media/gh-lab-2.180.png "Select branch")
@@ -95,7 +97,7 @@ NOTE: In the preview, only username + password is supported. Support for Service
 21.	The next screen showing the pull request, will confirm that branch has no conflict with the main branch and that the changes can be merged into the main branch automatically. Select ‘Squash and merge’  and then ‘Confirm squash and merge’
 
 ![Squash and merge](media/gh-lab-2.210.png "Squash and merge")
- 
+
 22.	Navigate back to the main branch and validate the solution is now available there as well
 
 ## Create a workflow to generate build artifact and import to production
@@ -139,7 +141,7 @@ You are now ready to test the last workflow. This workflow is triggered when a n
 30.	Add a ‘release tag’, a ‘title’ and click ‘Publish release’
 
 ![Create release](media/gh-lab-2.300.png "Create release")
- 
+
 31.	Click on ‘Actions’ to view the running workflow
 
 ![Click to view workflow](media/gh-lab-2.310.png "Click to view workflow")
@@ -160,7 +162,7 @@ We will now test the end-to-end process and then see how we can view and validat
 35.	Navigate to the ALMLab solution in your development environment and click ‘Edit’ 
 
 ![Edit solution](media/gh-lab-2.350.png "Edit solution")
- 
+
 36.	Open the ‘Time off Request’ entity
 
 ![Open Time off entity](media/gh-lab-2.360.png "Open Time off entity")
