@@ -99,7 +99,7 @@ gulp
 
 ## Refreshing actions in dist folder
 
-Run ```npm run update-dist``` and commit and push the updates in the ```./dist``` folder.
+In a clean working directory, run ```npm run update-dist``` and commit and push only the updates in the ```./dist``` folder.
 
 If you have updated the Linux PAC package version (especially from a Windows host), double check that the `pac` executable has the execute flag set.  Run
 ```bash

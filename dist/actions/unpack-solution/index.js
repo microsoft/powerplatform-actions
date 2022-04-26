@@ -5311,7 +5311,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.48",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.49",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -5388,7 +5388,15 @@ var runnerParameters_1 = require_runnerParameters();
     solutionZipFile: parameterMap["solution-file"],
     sourceFolder: parameterMap["solution-folder"],
     solutionType: parameterMap["solution-type"],
-    overwriteFiles: parameterMap["overwrite-files"]
+    overwriteFiles: parameterMap["overwrite-files"],
+    errorLevel: parameterMap["error-level"],
+    singleComponent: parameterMap["single-component"],
+    mapFile: parameterMap["map-file"],
+    localeTemplate: parameterMap["locale-template"],
+    localize: parameterMap["localize"],
+    useLcid: parameterMap["use-lcid"],
+    useUnmanagedFileForManaged: parameterMap["use-unmanaged-file-for-missing-managed"],
+    disablePluginRemap: parameterMap["disable-plugin-remap"]
   }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
   core.endGroup();
 }))().catch((error) => {

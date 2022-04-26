@@ -76,12 +76,25 @@ jobs:
         user: ${{ env.WF_USER_AAD_OBJECT_ID}}
         role: ${{ env.WF_USER_ROLE}}
 
+    - name: Test unpack-solution action
+      uses: ./unpack-solution
+      with:
+        solution-folder: 'out/CI/emptySolution/src'
+        solution-file: 'src/test/data/emptySolution_0_1_0_0.zip'
+        solution-type: 'Unmanaged'
+        overwrite-files: true
+        error-level: Error
+        locale-template: 'en-US'
+        localize: true
+
     - name: Test pack-solution action
       uses: ./pack-solution
       with:
         solution-folder: 'src/test/data/emptySolution'
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
+        error-level: Error
+        localize: true
 
     - name: Test import-solution action with username/password
       uses: ./import-solution
