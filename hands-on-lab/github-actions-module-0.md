@@ -18,18 +18,18 @@ You will need to create three environments in your demo or customer tenant.  To 
 
     ![Select environment](media/gh-lab-0.30-0.40.png "Select environment and click New")
 
-5. The first environment should be named “Your Name – dev”, set the region to “United States (default)”, set the Environment type to **Sandbox** (if available), if not use “Trial”
-
-    ![Create environment](media/gh-lab-0.50.png "Create environment")
+5. The first environment should be named “Your Name – dev”, set the region to “United States (default)”, set the Environment type to **Sandbox** (if available), if not use “Trial”.
 
     - Ensure the ***Create a database for this environment*** radio toggle is set to **Yes**
 
+    ![Create environment](media/gh-lab-0.50.png "Create environment")
+
 6. **Click Next.**
 
-7. Set the Language to **English** and Currency to **USD** , set the ***Deploy sample apps and data?*** radio button to **Yes**, then **click Save**
+7. Set the Language and currency as preferred and set the "***Deploy sample apps and data?*** " radio button to **Yes**, then **click Save**
 
     ![Set currency](media/gh-lab-0.70.png "Set currency")
 
-8. Your development environment has been created, follow steps 4 – 7 above to create a second environment called “Your Name – build” , and then finally, create a third environment called “Your Name – prod”
+8. Your development environment has been created, follow steps 3 – 7 above to create a second environment called “Your Name – build” , and then finally, create a third environment called “Your Name – prod”
 
 9. Now you have the environments that we will need for this and ready to begin the next modules of this Hands-on lab
