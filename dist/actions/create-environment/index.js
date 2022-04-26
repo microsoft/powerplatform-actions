@@ -1076,6 +1076,32 @@ var require_deleteSolution = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/solutionPackagingBase.js
+var require_solutionPackagingBase = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/solutionPackagingBase.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.setSolutionPackagingCommonArgs = void 0;
+    var path = require("path");
+    function setSolutionPackagingCommonArgs(parameters, runnerParameters, validator, pacArgs) {
+      validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
+      validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
+      validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
+      validator.pushInput(pacArgs, "--localize", parameters.localize);
+      validator.pushInput(pacArgs, "--log", parameters.logFile);
+      validator.pushInput(pacArgs, "--errorlevel", parameters.errorLevel);
+      validator.pushInput(pacArgs, "--singleComponent", parameters.singleComponent);
+      validator.pushInput(pacArgs, "--map", parameters.mapFile);
+      validator.pushInput(pacArgs, "--sourceLoc", parameters.localeTemplate);
+      validator.pushInput(pacArgs, "--useLcid", parameters.useLcid);
+      validator.pushInput(pacArgs, "--useUnmanagedFileForMissingManaged", parameters.useUnmanagedFileForManaged);
+      validator.pushInput(pacArgs, "--disablePluginRemap", parameters.disablePluginRemap);
+      validator.pushInput(pacArgs, "--processCanvasApps", parameters.processCanvasApps);
+    }
+    exports2.setSolutionPackagingCommonArgs = setSolutionPackagingCommonArgs;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/packSolution.js
 var require_packSolution = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/packSolution.js"(exports2) {
@@ -1111,7 +1137,7 @@ var require_packSolution = __commonJS({
     exports2.packSolution = void 0;
     var InputValidator_1 = require_InputValidator();
     var createPacRunner_1 = require_createPacRunner();
-    var path = require("path");
+    var solutionPackagingBase_1 = require_solutionPackagingBase();
     function packSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1119,9 +1145,7 @@ var require_packSolution = __commonJS({
         try {
           const pacArgs = ["solution", "pack"];
           const validator = new InputValidator_1.InputValidator(host);
-          validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
-          validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
-          validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
+          (0, solutionPackagingBase_1.setSolutionPackagingCommonArgs)(parameters, runnerParameters, validator, pacArgs);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("PackSolution Action Result: " + pacResult);
@@ -1170,7 +1194,7 @@ var require_unpackSolution = __commonJS({
     exports2.unpackSolution = void 0;
     var InputValidator_1 = require_InputValidator();
     var createPacRunner_1 = require_createPacRunner();
-    var path = require("path");
+    var solutionPackagingBase_1 = require_solutionPackagingBase();
     function unpackSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
@@ -1178,10 +1202,8 @@ var require_unpackSolution = __commonJS({
         try {
           const pacArgs = ["solution", "unpack"];
           const validator = new InputValidator_1.InputValidator(host);
-          validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
-          validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
-          validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
-          if (validator.getInput(parameters.overwriteFiles) === "true") {
+          (0, solutionPackagingBase_1.setSolutionPackagingCommonArgs)(parameters, runnerParameters, validator, pacArgs);
+          if (parameters.overwriteFiles && validator.getInput(parameters.overwriteFiles) === "true") {
             pacArgs.push("--allowDelete");
             pacArgs.push("true");
             pacArgs.push("--allowWrite");
