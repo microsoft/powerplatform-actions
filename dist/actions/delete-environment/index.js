@@ -5418,104 +5418,6 @@ var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P,
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 };
-<<<<<<< HEAD
-exports.runnerParameters = runnerParameters;
-
-//# sourceMappingURL=runnerParameters.js.map
-
-
-/***/ }),
-
-/***/ 306:
-/***/ ((module) => {
-
-module.exports = JSON.parse('{"name":"@microsoft/powerplatform-actions","version":"0.1.0","description":"Github Action for Power Platform","main":"index.js","scripts":{"clean":"scorch","build":"node node_modules/gulp/bin/gulp.js","test":"node node_modules/gulp/bin/gulp.js test","ci":"node node_modules/gulp/bin/gulp.js ci","update-dist":"node node_modules/gulp/bin/gulp.js updateDist"},"author":"PowerApps-ISV-Tools","license":"MIT","repository":{"type":"git","url":"https://github.com/microsoft/powerplatform-actions.git"},"devDependencies":{"@types/async":"^3.2.7","@types/chai":"^4.2.20","@types/fancy-log":"^1.3.1","@types/fs-extra":"^9.0.12","@types/glob":"^7.1.4","@types/js-yaml":"^4.0.3","@types/mocha":"^8.2.3","@types/node":"^14.14.35","@types/sinon":"^9.0.11","@types/sinon-chai":"^3.2.5","@types/uuid":"^8.3.0","@types/yargs":"^17.0.2","@typescript-eslint/eslint-plugin":"^4.28.2","@typescript-eslint/parser":"^4.28.2","@vercel/ncc":"^0.31.1","async":"^3.2.0","chai":"^4.3.4","dotenv":"^8.2.0","eslint":"^7.30.0","fancy-log":"^1.3.3","glob":"^7.1.7","gulp":"^4.0.2","gulp-eslint":"^6.0.0","gulp-mocha":"^8.0.0","gulp-sourcemaps":"^3.0.0","gulp-typescript":"^6.0.0-alpha.1","mocha":"^9.0.2","node-fetch":"^2.6.1","ps-list":"^7.2.0","rewiremock":"^3.14.3","sinon":"^9.2.4","sinon-chai":"^3.5.0","ts-node":"^10.0.0","ts-sinon":"^2.0.1","typescript":"^4.3.5","unzip-stream":"^0.3.0","winston":"^3.3.3","yargs":"^17.0.1"},"dependencies":{"@actions/artifact":"^0.5.2","@actions/core":"^1.4.0","@microsoft/powerplatform-cli-wrapper":"^0.1.37","date-fns":"^2.22.1","fs-extra":"^10.0.0","js-yaml":"^4.1","uuid":"^8.3.2"}}');
-
-/***/ }),
-
-/***/ 129:
-/***/ ((module) => {
-
-module.exports = require("child_process");
-
-/***/ }),
-
-/***/ 747:
-/***/ ((module) => {
-
-module.exports = require("fs");
-
-/***/ }),
-
-/***/ 87:
-/***/ ((module) => {
-
-module.exports = require("os");
-
-/***/ }),
-
-/***/ 622:
-/***/ ((module) => {
-
-module.exports = require("path");
-
-/***/ }),
-
-/***/ 765:
-/***/ ((module) => {
-
-module.exports = require("process");
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __nccwpck_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		var threw = true;
-/******/ 		try {
-/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
-/******/ 			threw = false;
-/******/ 		} finally {
-/******/ 			if(threw) delete __webpack_module_cache__[moduleId];
-/******/ 		}
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/compat */
-/******/ 	
-/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(697);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
-/******/ })()
-;
-=======
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.main = void 0;
 var actions_1 = require_actions();
@@ -5549,4 +5451,3 @@ function main() {
   });
 }
 exports.main = main;
->>>>>>> main
