@@ -5388,7 +5388,7 @@ var runnerParameters_1 = require_runnerParameters();
     solutionZipFile: parameterMap["solution-file"],
     sourceFolder: parameterMap["solution-folder"],
     solutionType: parameterMap["solution-type"],
-    errorLevel: parameterMap["error-level"],
+    errorLevel: { name: "error-level", required: false, defaultValue: core.isDebug() ? "Verbose" : "Info" },
     singleComponent: parameterMap["single-component"],
     mapFile: parameterMap["map-file"],
     localeTemplate: parameterMap["locale-template"],

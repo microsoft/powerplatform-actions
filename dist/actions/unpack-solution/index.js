@@ -5389,7 +5389,7 @@ var runnerParameters_1 = require_runnerParameters();
     sourceFolder: parameterMap["solution-folder"],
     solutionType: parameterMap["solution-type"],
     overwriteFiles: parameterMap["overwrite-files"],
-    errorLevel: parameterMap["error-level"],
+    errorLevel: { name: "error-level", required: false, defaultValue: core.isDebug() ? "Verbose" : "Info" },
     singleComponent: parameterMap["single-component"],
     mapFile: parameterMap["map-file"],
     localeTemplate: parameterMap["locale-template"],
