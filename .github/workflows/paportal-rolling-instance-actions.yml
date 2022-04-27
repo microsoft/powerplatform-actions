@@ -29,6 +29,8 @@ jobs:
       WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
       WF_APPID: 8a7729e0-2b71-4919-a89a-c789d0a9720a
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
+      PORTAL_WORKING_DIRECTORY: ./paportal-download
+      PORTAL_MANIFEST_FILE_PATH: ./starter-portal/.portalconfig/*-manifest.yml
 
     steps:
     - uses: actions/checkout@v2
@@ -82,6 +84,10 @@ jobs:
         website-id: f46b70cc-580b-4f1a-87c3-41deb48eb90d
         download-path: ./paportal-download
 
+    - name: Delete portal manifest before uploading
+      working-directory:  ${{ env.PORTAL_WORKING_DIRECTORY }}
+      run: rm ${{ env.PORTAL_MANIFEST_FILE_PATH }}
+
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
       with:
@@ -109,6 +115,8 @@ jobs:
       WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
       WF_APPID: 8a7729e0-2b71-4919-a89a-c789d0a9720a
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
+      PORTAL_WORKING_DIRECTORY: ./paportal-download
+      PORTAL_MANIFEST_FILE_PATH: ./starter-portal/.portalconfig/*-manifest.yml
 
     steps:
     - uses: actions/checkout@v2
@@ -123,6 +131,10 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         website-id: f46b70cc-580b-4f1a-87c3-41deb48eb90d
         download-path: ./paportal-download
+
+    - name: Delete portal manifest before uploading
+      working-directory:  ${{ env.PORTAL_WORKING_DIRECTORY }}
+      run: rm ${{ env.PORTAL_MANIFEST_FILE_PATH }}
 
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
