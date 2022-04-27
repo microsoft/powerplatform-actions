@@ -397,7 +397,7 @@
   "BackupLabelHelp" : "Sets the backup label as provided.",
   "BackingUpEnvironment" : "Backing up your environment with label : {0}",
   "BackupEnvironmentUrlHelp" : "Url of the environment that requires backup.",
-  "BackupNotesHelp" : "Additional notes for this backup.",
+  "BackupNotesHelp" : "**ignored**: Additional notes for this backup.",
   "BackupEnvironmentIdHelp" : "Id of the environment that requires backup.",
   "BuildVersionUpdateStrategyHelp" : "Updates build version for 'Solution.xml' file using specified strategy. If using gittags, set personal access token in the following environment variable \"PacCli.PAT\"",
   "SolutionNoNameFound" : "Cannot find solution name in file '{0}'",
