@@ -67,7 +67,8 @@ export class ExeRunner {
         if (proc.status === 0) {
             const output = proc.output
                 .filter(line => !!line)     // can have null entries
-                .map(line => line.toString());
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                .map(line => line!.toString());
             this.logger.info(`success: ${output.join(os.EOL)}`);
             return output;
         } else {

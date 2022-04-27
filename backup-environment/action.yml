@@ -16,7 +16,7 @@ inputs:
     required: true
 
   notes:
-    description: 'Additional notes for this backup.'
+    description: 'DEPRECATED: **ignored** Additional notes for this backup.'
     required: false
 
   user-name:
