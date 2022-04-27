@@ -2507,6 +2507,16 @@ var require_runnerParameters = __commonJS({
   }
 });
 
+// out/host/OutputVariables.js
+var require_OutputVariables = __commonJS({
+  "out/host/OutputVariables.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.EnvIdVariableName = void 0;
+    exports2.EnvIdVariableName = "environment-id";
+  }
+});
+
 // out/actions/who-am-i/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -2541,12 +2551,14 @@ var core = require_core();
 var getCredentials_1 = require_getCredentials();
 var getEnvironmentUrl_1 = require_getEnvironmentUrl();
 var runnerParameters_1 = require_runnerParameters();
+var OutputVariables_1 = require_OutputVariables();
 (() => __awaiter(void 0, void 0, void 0, function* () {
   core.startGroup("who-am-i:");
-  yield actions_1.whoAmI({
+  const result = yield actions_1.whoAmI({
     credentials: getCredentials_1.default(),
     environmentUrl: getEnvironmentUrl_1.default()
   }, runnerParameters_1.runnerParameters);
+  core.setOutput(OutputVariables_1.EnvIdVariableName, result.environmentId);
   core.endGroup();
 }))().catch((error) => {
   const logger = runnerParameters_1.runnerParameters.logger;

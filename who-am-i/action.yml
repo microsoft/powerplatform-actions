@@ -32,6 +32,10 @@ inputs:
     required: false
     default: 'Public'
 
+outputs:
+  environment-id:
+    description: ID of the environment connected with
+
 runs:
   using: 'node12'
   main: '../dist/actions/who-am-i/index.js'

@@ -60,10 +60,16 @@ jobs:
 
     - name: Test who-am-i action
       uses: ./who-am-i
+      id: who-am-i
       with:
         environment-url: ${{ steps.create-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+
+    - name: Test who-am-i output
+      if: ${{ steps.create-environment.outputs.environment-id != steps.who-am-i.outputs.environment-id }}
+      run: |
+        exit 1
 
     - name: Test unpack-solution action
       uses: ./unpack-solution
