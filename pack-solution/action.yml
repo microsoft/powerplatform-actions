@@ -16,11 +16,6 @@ inputs:
     required: false
     default: 'Unmanaged'
 
-  error-level:
-    description: Minimum logging level for log output [Verbose|Info|Warning|Error|Off]
-    required: false
-    default: 'Info'
-
   single-component:
     description: Only perform action on a single component type [WebResource|Plugin|Workflow|None]
     required: false
