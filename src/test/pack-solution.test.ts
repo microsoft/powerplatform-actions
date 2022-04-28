@@ -33,7 +33,6 @@ describe("pack solution test", () => {
       solutionZipFile: { name: 'solution-file', required: true, defaultValue: undefined },
       sourceFolder: { name: 'solution-folder', required: true, defaultValue: undefined },
       solutionType: { name: 'solution-type', required: false, defaultValue: "Unmanaged" },
-      errorLevel: { name: 'errorLevel', required: false, defaultValue: 'Info' },
       singleComponent: { name: 'single-component', required: false, defaultValue: 'None' },
       mapFile: { name: 'map-file', required: false, defaultValue: undefined },
       localeTemplate: { name: 'locale-template', required: false, defaultValue: undefined },

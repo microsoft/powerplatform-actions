@@ -5,25 +5,17 @@ import { unpackSolution } from "@microsoft/powerplatform-cli-wrapper/dist/action
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
 import { runnerParameters } from '../../lib/runnerParameters';
-import { HostParameterEntry } from '@microsoft/powerplatform-cli-wrapper/dist/host/IHostAbstractions';
 
 (async () => {
     core.startGroup('unpack-solution:');
     const taskParser = new YamlParser();
     const parameterMap = taskParser.getHostParameterEntries('unpack-solution');
 
-    const errorLevel: HostParameterEntry = {
-        name: 'errorLevel',
-        required: false,
-        defaultValue: core.isDebug() ? 'Verbose' : 'Info',
-    }
-
     await unpackSolution({
       solutionZipFile: parameterMap['solution-file'],
       sourceFolder: parameterMap['solution-folder'],
       solutionType: parameterMap['solution-type'],
       overwriteFiles: parameterMap['overwrite-files'],
-      errorLevel: errorLevel,
       singleComponent: parameterMap['single-component'],
       mapFile: parameterMap['map-file'],
       localeTemplate: parameterMap['locale-template'],
