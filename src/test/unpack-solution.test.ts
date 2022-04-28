@@ -8,12 +8,19 @@ import { fake, stub } from "sinon";
 import { runnerParameters } from "../../src/lib/runnerParameters";
 import Sinon = require("sinon");
 import { ActionsHost } from "../lib/host/ActionsHost";
+import * as core from '@actions/core';
+
 should();
 use(sinonChai);
 
 describe("unpack solution test", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const unpackSolutionStub: Sinon.SinonStub<any[], any> = stub();
+
+    before(() => {
+        Sinon.restore();
+        Sinon.replace(core, "isDebug", () => true);
+    })
 
     async function callActionWithMocks(): Promise<void> {
         await rewiremock.around(
@@ -34,7 +41,7 @@ describe("unpack solution test", () => {
             sourceFolder: { name: 'solution-folder', required: true, defaultValue: undefined },
             solutionType: { name: 'solution-type', required: false, defaultValue: "Unmanaged" },
             overwriteFiles: { name: 'overwrite-files', required: false, defaultValue: "true" },
-            errorLevel: { name: 'error-level', required: false, defaultValue: 'Info' },
+            errorLevel: { name: 'errorLevel', required: false, defaultValue: 'Verbose' },
             singleComponent: { name: 'single-component', required: false, defaultValue: 'None' },
             mapFile: { name: 'map-file', required: false, defaultValue: undefined },
             localeTemplate: { name: 'locale-template', required: false, defaultValue: undefined },
