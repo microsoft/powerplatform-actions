@@ -15,7 +15,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         solutionZipFile: parameterMap['solution-file'],
         sourceFolder: parameterMap['solution-folder'],
         solutionType: parameterMap['solution-type'],
-        errorLevel: { name: 'error-level', required: false, defaultValue: core.isDebug() ? "Verbose" : 'Info' },
+        errorLevel: { name: 'error-level', required: false, defaultValue: core.isDebug() ? 'Verbose' : 'Info' },
         singleComponent: parameterMap['single-component'],
         mapFile: parameterMap['map-file'],
         localeTemplate: parameterMap['locale-template'],
