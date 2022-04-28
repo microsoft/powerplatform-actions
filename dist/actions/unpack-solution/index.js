@@ -6475,11 +6475,17 @@ var runnerParameters_1 = require_runnerParameters();
   core.startGroup("unpack-solution:");
   const taskParser = new YamlParser_1.YamlParser();
   const parameterMap = taskParser.getHostParameterEntries("unpack-solution");
+  const errorLevel = {
+    name: "errorLevel",
+    required: false,
+    defaultValue: core.isDebug() ? "Verbose" : "Info"
+  };
   yield (0, actions_1.unpackSolution)({
     solutionZipFile: parameterMap["solution-file"],
     sourceFolder: parameterMap["solution-folder"],
     solutionType: parameterMap["solution-type"],
     overwriteFiles: parameterMap["overwrite-files"],
+    errorLevel,
     singleComponent: parameterMap["single-component"],
     mapFile: parameterMap["map-file"],
     localeTemplate: parameterMap["locale-template"],

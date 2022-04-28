@@ -6475,10 +6475,16 @@ var runnerParameters_1 = require_runnerParameters();
   core.startGroup("pack-solution:");
   const taskParser = new YamlParser_1.YamlParser();
   const parameterMap = taskParser.getHostParameterEntries("pack-solution");
+  const errorLevel = {
+    name: "errorLevel",
+    required: false,
+    defaultValue: core.isDebug() ? "Verbose" : "Info"
+  };
   yield (0, actions_1.packSolution)({
     solutionZipFile: parameterMap["solution-file"],
     sourceFolder: parameterMap["solution-folder"],
     solutionType: parameterMap["solution-type"],
+    errorLevel,
     singleComponent: parameterMap["single-component"],
     mapFile: parameterMap["map-file"],
     localeTemplate: parameterMap["locale-template"],
