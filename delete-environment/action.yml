@@ -8,8 +8,9 @@ inputs:
     required: false
 
   environment-id:
-    description: 'ID of Power Platform environment to delete(deprecated). Please use "environment" action property instead.'
+    description: 'DEPRECATED: ID of Power Platform environment to delete.'
     required: false
+    deprecationMessage: Please use the `environment` property instead.
 
   environment:
     description: 'URL or Id of Power Platform environment to delete.'
