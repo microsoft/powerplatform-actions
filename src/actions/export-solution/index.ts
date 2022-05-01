@@ -25,7 +25,6 @@ import { runnerParameters } from '../../lib/runnerParameters';
         name: parameterMap['solution-name'],
         path: parameterMap['solution-output-file'],
         managed: parameterMap['managed'],
-        targetVersion: parameterMap['solution-version'],
         async: parameterMap['run-asynchronously'],
         maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
         autoNumberSettings: parameterMap['export-auto-numbering-settings'],

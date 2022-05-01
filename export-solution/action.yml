@@ -32,8 +32,9 @@ inputs:
     required: true
 
   solution-version:
-    description: 'Version of solution to export'
+    description: 'DEPRECATED: Version of solution to export'
     required: false
+    deprecationMessage: This property is deprecated and will be ignored.
 
   solution-output-file:
     description: 'Path/filename where to place the exported solution zip file. Can be absolute or relative to working-directory'

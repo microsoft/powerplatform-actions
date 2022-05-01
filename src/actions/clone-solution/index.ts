@@ -22,7 +22,6 @@ import { runnerParameters } from '../../lib/runnerParameters';
         credentials: getCredentials(),
         environmentUrl: getEnvironmentUrl(),
         name: parameterMap['solution-name'],
-        targetVersion: parameterMap['solution-version'],
         outputDirectory: parameterMap['target-folder'],
         async: parameterMap['async'],
         maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
