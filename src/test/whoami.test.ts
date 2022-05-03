@@ -16,8 +16,7 @@ should();
 use(sinonChai);
 
 describe("WhoAmI tests", () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let coreSetOutputSpy: sinon.SinonSpy<[name: string, value: any], void>;
+    let coreSetOutputSpy: sinon.SinonSpy<[name: string, value: unknown], void>;
 
     beforeEach(() => {
         coreSetOutputSpy = sinon.spy(core, "setOutput");
