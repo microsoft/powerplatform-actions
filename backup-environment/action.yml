@@ -16,8 +16,9 @@ inputs:
     required: true
 
   notes:
-    description: 'DEPRECATED: **ignored** Additional notes for this backup.'
+    description: 'DEPRECATED: Additional notes for this backup.'
     required: false
+    deprecationMessage: This property is deprecated and will be ignored.
 
   user-name:
     description: 'Power Platform user name to authenticate with, e.g. myname@my-org.onmicrosoft.com. Setting this input makes user-name and password required; specifying alternate "app-id" credential set of inputs will result in an error.'

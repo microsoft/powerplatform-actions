@@ -37,8 +37,9 @@ inputs:
     required: true
 
   solution-version:
-    description: 'Version of solution to clone'
+    description: 'DEPRECATED: Version of solution to clone'
     required: false
+    deprecationMessage: This property is deprecated and will be ignored.
 
   target-folder:
     description: 'Target folder to place the extracted solution into'

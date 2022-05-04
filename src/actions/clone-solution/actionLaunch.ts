@@ -13,7 +13,6 @@ process.env['INPUT_TENANT-ID'] = process.env['PA_BT_ORG_SPN_TENANT_ID'] ?? '3041
 const password = process.env['PA_BT_ORG_PASSWORD'] ?? '';
 process.env['INPUT_PASSWORD-SECRET'] = password;
 process.env['INPUT_SOLUTION-NAME'] = 'emptySolution';
-// process.env['INPUT_SOLUTION-VERSION'] = '1.42.0';
 process.env['INPUT_WORKING-DIRECTORY'] = path.resolve(__dirname, '..', '..', '..', 'out', 'cloned');
 // process.env['INPUT_TARGET-FOLDER'] = path.resolve(__dirname, '..', '..', '..', 'out', 'cloned', 'emptySol');
 
