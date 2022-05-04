@@ -78,7 +78,7 @@ Windows, macOS or Linux:
   ```Powershell
   [Environment]::SetEnvironmentVariable('AZ_DevOps_Read_PAT', '<yourPAT>', [EnvironmentVariableTarget]::User)
   ```
-  - Create a PAT in GitHub to read packages, and enable SSO for the microsoft organization.
+  - Create a [PAT in GitHub](https://github.com/settings/tokens) to read packages, and enable SSO for the microsoft organization.
   Then add it to your *~/.npmrc* file or use the `npm login --scope=@microsoft --registry=https://npm.pkg.github.com` command,
   as documented [here](https://docs.github.com/en/packages/guides/configuring-npm-for-use-with-github-packages#authenticating-with-a-personal-access-token).
   This will only be needed until the `@microsoft/powerplatform-cli-wrapper` repo is made public.
