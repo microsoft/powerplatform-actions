@@ -47,16 +47,9 @@ describe("unpack solution test", () => {
             localeTemplate: { name: 'locale-template', required: false, defaultValue: undefined },
             localize: { name: 'localize', required: false, defaultValue: undefined },
             useLcid: { name: 'use-lcid', required: false, defaultValue: 'false' },
-            useUnmanagedFileForManaged: {
-                name: 'use-unmanaged-file-for-missing-managed',
-                required: false,
-                defaultValue: 'false'
-            },
-            disablePluginRemap: {
-                name: 'disable-plugin-remap',
-                required: false,
-                defaultValue: 'false'
-            }
+            useUnmanagedFileForManaged: { name: 'use-unmanaged-file-for-missing-managed', required: false, defaultValue: 'false' },
+            disablePluginRemap: { name: 'disable-plugin-remap', required: false, defaultValue: 'false' },
+            processCanvasApps: { name: 'process-canvas-apps', required: false, defaultValue: undefined}
         }, runnerParameters, new ActionsHost());
     });
 });

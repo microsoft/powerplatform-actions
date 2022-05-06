@@ -53,6 +53,10 @@ inputs:
     required: false
     default: 'false'
 
+  process-canvas-apps:
+    description: (Preview) While processing the solution, unpack any Canvas apps .msapp file into its YAML source format
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/unpack-solution/index.js'
