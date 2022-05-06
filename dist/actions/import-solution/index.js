@@ -234,7 +234,6 @@ var require_exportSolution = __commonJS({
           validator.pushInput(pacArgs, "--managed", parameters.managed);
           validator.pushInput(pacArgs, "--async", parameters.async);
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
-          validator.pushInput(pacArgs, "--targetversion", parameters.targetVersion);
           const includeArgs = [];
           if (validator.getInput(parameters.autoNumberSettings) === "true") {
             includeArgs.push("autonumbering");
@@ -1546,7 +1545,6 @@ var require_cloneSolution = __commonJS({
           const pacArgs = ["solution", "clone"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--name", parameters.name);
-          validator.pushInput(pacArgs, "--targetversion", parameters.targetVersion);
           validator.pushInput(pacArgs, "--outputDirectory", parameters.outputDirectory);
           validator.pushInput(pacArgs, "--async", parameters.async);
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
@@ -6459,7 +6457,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.50",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.51",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
