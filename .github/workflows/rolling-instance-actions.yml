@@ -72,16 +72,17 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Test pack-solution action
+    - name: Test unpack-solution action
       uses: ./unpack-solution
       with:
         solution-folder: 'out/CI/emptySolution/src'
-        solution-file: 'src/test/data/emptySolution_0_1_0_0.zip'
+        solution-file: 'src/test/data/TrivialCanvasSolution.zip'
         solution-type: 'Unmanaged'
         overwrite-files: true
         error-level: Error
         locale-template: 'en-US'
         localize: true
+        process-canvas-apps: true
 
     - name: Test pack-solution action
       uses: ./pack-solution
