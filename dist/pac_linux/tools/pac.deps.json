@@ -9,6 +9,7 @@
     ".NETCoreApp,Version=v5.0/linux-x64": {
       "pac/0.1.0": {
         "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "2.0.18",
           "StyleCop.Analyzers": "1.1.118",
           "System.ComponentModel.Composition": "5.0.0",
@@ -20,6 +21,8 @@
           "bolt.module.cds": "0.1.0",
           "bolt.module.cli": "0.1.0",
           "bolt.module.connection": "0.1.0",
+          "bolt.module.connector": "0.1.0",
+          "bolt.module.package": "0.1.0",
           "bolt.module.paportal": "0.1.0",
           "bolt.module.pcf": "0.1.0",
           "bolt.module.plugin": "0.1.0",
@@ -88,7 +91,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.107": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.110": {
         "dependencies": {
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
@@ -99,7 +102,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.107"
+            "fileVersion": "9.1.1.110"
           }
         }
       },
@@ -347,7 +350,7 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.Dataverse.Client/0.6.1": {
+      "Microsoft.PowerPlatform.Dataverse.Client/0.6.6": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.0",
@@ -385,7 +388,7 @@
           },
           "lib/netcoreapp3.1/Microsoft.PowerPlatform.Dataverse.Client.dll": {
             "assemblyVersion": "0.0.6.0",
-            "fileVersion": "0.0.6.1"
+            "fileVersion": "0.0.6.6"
           },
           "lib/netcoreapp3.1/Microsoft.Xrm.Sdk.dll": {
             "assemblyVersion": "9.0.0.0",
@@ -393,7 +396,7 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.Formulas.Tools/0.4.4-preview": {
+      "Microsoft.PowerPlatform.Formulas.Tools/0.4.5-preview": {
         "dependencies": {
           "System.Text.Encodings.Web": "6.0.0",
           "System.Text.Json": "6.0.2",
@@ -402,7 +405,7 @@
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerPlatform.Formulas.Tools.dll": {
             "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.4.4.0"
+            "fileVersion": "0.4.5.0"
           }
         }
       },
@@ -1733,7 +1736,7 @@
       },
       "bolt.module.canvas/0.1.0": {
         "dependencies": {
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.4.4-preview",
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.4.5-preview",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
@@ -1747,11 +1750,11 @@
       "bolt.module.cds/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.107",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.110",
           "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
           "Microsoft.Identity.Client": "4.39.0",
-          "Microsoft.PowerPlatform.Dataverse.Client": "0.6.1",
+          "Microsoft.PowerPlatform.Dataverse.Client": "0.6.6",
           "bolt.cli": "0.1.0",
           "bolt.system": "0.1.0"
         },
@@ -1778,9 +1781,29 @@
           "bolt.module.connection.dll": {}
         }
       },
+      "bolt.module.connector/0.1.0": {
+        "dependencies": {
+          "System.ComponentModel.Composition": "5.0.0",
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
+        },
+        "runtime": {
+          "bolt.module.connector.dll": {}
+        }
+      },
+      "bolt.module.package/0.1.0": {
+        "dependencies": {
+          "System.IO.Packaging": "4.7.0",
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
+        },
+        "runtime": {
+          "bolt.module.package.dll": {}
+        }
+      },
       "bolt.module.paportal/0.1.0": {
         "dependencies": {
-          "Microsoft.PowerPlatform.Dataverse.Client": "0.6.1",
+          "Microsoft.PowerPlatform.Dataverse.Client": "0.6.6",
           "YamlDotNet": "11.2.1",
           "bolt.cli": "0.1.0",
           "bolt.system": "0.1.0"
@@ -1813,7 +1836,7 @@
       "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.107",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.110",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
@@ -1898,12 +1921,12 @@
       "path": "microsoft.bcl.asyncinterfaces/6.0.0",
       "hashPath": "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.107": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.110": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-MmTX7M0MFx0oCY8EUx7PL4bIIXL7pe8krDD2O28LgFlevNWU3D9vsxN/QfVwBUg5qSmz+eN2rGICT+cCDi0Mzg==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.107",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.107.nupkg.sha512"
+      "sha512": "sha512-lVWh00LmyT7ZNH4qyKjhYEBdMi+IDDdXztCdhm9aYH2sJq61Af2hV235u69o0/dG+0GgBe0W8GdEuPoMKf8Nfg==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.110",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.110.nupkg.sha512"
     },
     "Microsoft.Extensions.Caching.Abstractions/5.0.0": {
       "type": "package",
@@ -2066,19 +2089,19 @@
       "path": "microsoft.powerapps.checker.client/1.0.0.3",
       "hashPath": "microsoft.powerapps.checker.client.1.0.0.3.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Dataverse.Client/0.6.1": {
+    "Microsoft.PowerPlatform.Dataverse.Client/0.6.6": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8f9Yu9qo3gDAsj9qfNbVMO0cSa1U2UaMPJiJ/IJPMrHDF+9kW8FtDqKJrd7b00MHUsfGPoVoLjkLtE9zTwzDew==",
-      "path": "microsoft.powerplatform.dataverse.client/0.6.1",
-      "hashPath": "microsoft.powerplatform.dataverse.client.0.6.1.nupkg.sha512"
+      "sha512": "sha512-DgFH/DNQlQSnz1zelw9FuzznOken+L9QDMr5w6qNI3MmfdPDSa5ye9uq2X08B+lYip8cmafLBUjfxuzW82EMLA==",
+      "path": "microsoft.powerplatform.dataverse.client/0.6.6",
+      "hashPath": "microsoft.powerplatform.dataverse.client.0.6.6.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Formulas.Tools/0.4.4-preview": {
+    "Microsoft.PowerPlatform.Formulas.Tools/0.4.5-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-YuiwD0gc0eeMsseGVDcd9fs4qc6AHzSAsryNdCvmOqOwGqSaqSvlq5+OXyNjcMg5faj1FxCDqXRj+8iVCWoljA==",
-      "path": "microsoft.powerplatform.formulas.tools/0.4.4-preview",
-      "hashPath": "microsoft.powerplatform.formulas.tools.0.4.4-preview.nupkg.sha512"
+      "sha512": "sha512-jGy9XNqXIG+i8TiFRELjI46m4CHIfeiFFlSM8acOKRe/WvuyxtmD0+9XMjI/gKM25cog28cpDinOmJtn+jRIhg==",
+      "path": "microsoft.powerplatform.formulas.tools/0.4.5-preview",
+      "hashPath": "microsoft.powerplatform.formulas.tools.0.4.5-preview.nupkg.sha512"
     },
     "Microsoft.Rest.ClientRuntime/2.3.20": {
       "type": "package",
@@ -3110,6 +3133,16 @@
       "sha512": ""
     },
     "bolt.module.connection/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "bolt.module.connector/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "bolt.module.package/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
