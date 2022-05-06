@@ -30,6 +30,7 @@ import { HostParameterEntry } from '@microsoft/powerplatform-cli-wrapper/dist/ho
         useLcid: parameterMap['use-lcid'],
         useUnmanagedFileForManaged: parameterMap['use-unmanaged-file-for-missing-managed'],
         disablePluginRemap: parameterMap['disable-plugin-remap'],
+        processCanvasApps: parameterMap['process-canvas-apps'],
     }, runnerParameters, new ActionsHost());
 
     core.endGroup();

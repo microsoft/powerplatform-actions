@@ -88,6 +88,7 @@ jobs:
         solution-file: 'out/CI/emptySolution.zip'
         solution-type: 'Unmanaged'
         localize: true
+        process-canvas-apps: true
 
     - name: Test import-solution action with username/password
       uses: ./import-solution
