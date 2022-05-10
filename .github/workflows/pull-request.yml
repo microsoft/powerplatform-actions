@@ -81,6 +81,7 @@ jobs:
         locale-template: 'en-US'
         localize: true
         process-canvas-apps: true
+        map: ''
 
     - name: Test pack-solution action
       uses: ./pack-solution
