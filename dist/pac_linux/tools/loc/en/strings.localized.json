@@ -445,7 +445,7 @@
   "EnvironmentRuntimeStateChanged" : "Changed the runtime state of your environment with status code : {0}",
   "InvalidUriArgumentValue" : "The value passed to {0} is not valid.",
   "InvalidCurrencyCode" : "Invalid currency code '{0}'. Please select a valid currency code from the following : '{1}'.",
-  "InvalidLanguageName" : "Invalid language '{0}'. Please select a valid language from the following : '{1}'.",
+  "InvalidLanguageName" : "'{0}' is an invalid language name or id. Please select a valid language name or id from the following list: {1}.",
   "ListingEnvironmentBackups" : "Listing all backups of your environment with Url : {0}",
   "AdminEnvironmentIdNotFound" : "Environment with url '{0}' is not present in your tenant.",
   "ArgsFileInputArgumentHelp" : "The verb arguments to be passed in a .json input file. Eg: {\"name\" : \"contoso\"}. The arguments passed through command-line will take precedence over arguments from the .json input file.",

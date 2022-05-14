@@ -91,7 +91,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.110": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.111": {
         "dependencies": {
           "Newtonsoft.Json": "11.0.2",
           "System.ComponentModel.Composition": "5.0.0",
@@ -102,7 +102,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.110"
+            "fileVersion": "9.1.1.111"
           }
         }
       },
@@ -1750,7 +1750,7 @@
       "bolt.module.cds/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.110",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.111",
           "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
           "Microsoft.Identity.Client": "4.39.0",
@@ -1836,7 +1836,7 @@
       "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.110",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.111",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
@@ -1921,12 +1921,12 @@
       "path": "microsoft.bcl.asyncinterfaces/6.0.0",
       "hashPath": "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.110": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.111": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-lVWh00LmyT7ZNH4qyKjhYEBdMi+IDDdXztCdhm9aYH2sJq61Af2hV235u69o0/dG+0GgBe0W8GdEuPoMKf8Nfg==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.110",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.110.nupkg.sha512"
+      "sha512": "sha512-Lj+vGOms7SYuku+WfWaeLJjvPEqqLpL3bCbmlHrB/mYM7TSqRL8eqdVJQyojTY0nut6uvXJyq+l44JLTwJJ4RQ==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.111",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.111.nupkg.sha512"
     },
     "Microsoft.Extensions.Caching.Abstractions/5.0.0": {
       "type": "package",
