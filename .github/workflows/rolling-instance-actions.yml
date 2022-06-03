@@ -99,7 +99,7 @@ jobs:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
-        path: 'src/test/data/singlePCF.zip'
+        path: 'src/test/data/empty*.zip'
 
     - name: Test import-solution action with username/password
       uses: ./import-solution

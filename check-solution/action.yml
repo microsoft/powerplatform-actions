@@ -33,7 +33,7 @@ inputs:
     default: 'Public'
 
   path:
-    description: 'Path to a solution zip file to check.'
+    description: 'Specify the path and file name of the zip files to analyze. Wildcards/glob can be used. For example, `**/*.zip` for all zip files in all sub folders.'
     required: true
 
   geo:

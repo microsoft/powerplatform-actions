@@ -41,7 +41,16 @@ describe("check solution test", () => {
       solutionPath: { name: 'path', required: true, defaultValue: undefined },
       geoInstance: { name: 'geo', required: false, defaultValue: undefined },
       ruleLevelOverride: { name: 'rule-level-override', required: false, defaultValue: undefined },
-      outputDirectory: { name: 'checker-logs-artifact-name', required: false, defaultValue: undefined },
+      artifactStoreName: { name: 'checker-logs-artifact-name', required: false, defaultValue: undefined },
+      fileLocation: { name: "fileLocation",  required: false, defaultValue: "localFiles" },
+      solutionUrl: { name: "solutionUrl",  required: false, defaultValue: "" },
+      useDefaultPAEndpoint: { name: "useDefaultPAEndpoint", required: false, defaultValue: true },
+      customPAEndpoint: { name: "customPAEndpoint", required: false, defaultValue: "https://unitedstates.api.advisor.powerapps.com/" },
+      ruleSet: { name: "ruleSet", required: false, defaultValue: "Solution Checker" },
+      errorLevel: { name: "errorLevel", required: false, defaultValue: "HighIssueCount" },
+      errorThreshold: { name: "errorThreshold", required: false, defaultValue: "0" },
+      failOnAnalysisError: { name: "failOnAnalysisError", required: false, defaultValue: true },
+      filesExcluded: { name: "filesExcluded", required: false, defaultValue: ""}
     }, runnerParameters, new ActionsHost());
   });
 });
