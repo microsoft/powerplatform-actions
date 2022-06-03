@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 import * as core from '@actions/core';
 import { checkSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
+import { HostParameterEntry } from "@microsoft/powerplatform-cli-wrapper/dist/host/IHostAbstractions";
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
 import getCredentials from "../../lib/auth/getCredentials";
@@ -19,7 +20,16 @@ import { runnerParameters } from '../../lib/runnerParameters';
         solutionPath: parameterMap["path"],
         geoInstance: parameterMap["geo"],
         ruleLevelOverride: parameterMap["rule-level-override"],
-        outputDirectory: parameterMap["checker-logs-artifact-name"]
+        artifactStoreName: parameterMap["checker-logs-artifact-name"],
+        fileLocation: createEntry("fileLocation", "localFiles"),
+        solutionUrl: createEntry("solutionUrl", ""),
+        useDefaultPAEndpoint: createEntry("useDefaultPAEndpoint", true),
+        customPAEndpoint: createEntry("customPAEndpoint", "https://unitedstates.api.advisor.powerapps.com/"),
+        ruleSet: createEntry("ruleSet", "Solution Checker"),
+        errorLevel: createEntry("errorLevel", "HighIssueCount"),
+        errorThreshold: createEntry("errorThreshold", "0"),
+        failOnAnalysisError: createEntry("failOnAnalysisError", true),
+        filesExcluded: createEntry("filesExcluded", "")
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 })().catch(error => {
@@ -27,3 +37,11 @@ import { runnerParameters } from '../../lib/runnerParameters';
     logger.error(`failed: ${error}`);
     core.endGroup();
 });
+
+function createEntry(name: string, defaultValue?: string | boolean): HostParameterEntry {
+    return {
+        name: name,
+        required: false,
+        defaultValue: defaultValue
+    };
+}

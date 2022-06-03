@@ -12,7 +12,7 @@ function getAutomationAgent(): string {
 
 const runnerParameters: RunnerParameters = {
     runnersDir: getExePath(),
-    workingDir: cwd(),
+    workingDir: process.env['GITHUB_WORKSPACE'] || cwd(),
     logger: new ActionLogger(),
     agent: getAutomationAgent(),
 };
