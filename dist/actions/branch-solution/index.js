@@ -1555,6 +1555,7 @@ var require_package = __commonJS({
         "@types/node": "^14.14.35",
         "@types/sinon": "^9.0.11",
         "@types/sinon-chai": "^3.2.5",
+        "@types/unzip-stream": "^0.3.1",
         "@types/uuid": "^8.3.0",
         "@types/yargs": "^17.0.2",
         "@typescript-eslint/eslint-plugin": "^5.15.0",
@@ -1583,14 +1584,14 @@ var require_package = __commonJS({
         "ts-node": "^10.0.0",
         "ts-sinon": "^2.0.1",
         typescript: "^4.3.5",
-        "unzip-stream": "^0.3.0",
+        "unzip-stream": "^0.3.1",
         winston: "^3.3.3",
         yargs: "^17.0.1"
       },
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.51",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.58",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -1617,7 +1618,7 @@ var require_runnerParameters = __commonJS({
     exports2.getAutomationAgent = getAutomationAgent;
     var runnerParameters = {
       runnersDir: (0, getExePath_1.default)(),
-      workingDir: (0, process_12.cwd)(),
+      workingDir: process.env["GITHUB_WORKSPACE"] || (0, process_12.cwd)(),
       logger: new actionLogger_1.ActionLogger(),
       agent: getAutomationAgent()
     };
