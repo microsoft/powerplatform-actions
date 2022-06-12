@@ -40,6 +40,6 @@ describe("deploy package test", () => {
       credentials: credentials,
       environmentUrl: environmentUrl,
       packagePath: { name: 'package', required: true, defaultValue: undefined },
-    }, runnerParameters, new ActionsHost());
+    }, runnerParameters, new ActionsHost('DeployPackage'));
   });
 });

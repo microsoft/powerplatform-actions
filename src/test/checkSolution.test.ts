@@ -51,6 +51,6 @@ describe("check solution test", () => {
       errorThreshold: { name: "errorThreshold", required: false, defaultValue: "0" },
       failOnAnalysisError: { name: "failOnAnalysisError", required: false, defaultValue: true },
       filesExcluded: { name: "filesExcluded", required: false, defaultValue: ""}
-    }, runnerParameters, new ActionsHost());
+    }, runnerParameters, new ActionsHost('PowerAppsChecker'));
   });
 });
