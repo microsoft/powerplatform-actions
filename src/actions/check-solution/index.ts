@@ -30,7 +30,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         errorThreshold: createEntry("errorThreshold", "0"),
         failOnAnalysisError: createEntry("failOnAnalysisError", true),
         filesExcluded: createEntry("filesExcluded", "")
-    }, runnerParameters, new ActionsHost());
+    }, runnerParameters, new ActionsHost('PowerAppsChecker'));
     core.endGroup();
 })().catch(error => {
     const logger = runnerParameters.logger;

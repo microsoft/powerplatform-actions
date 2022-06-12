@@ -24,7 +24,7 @@ export async function main(): Promise<void> {
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
             packagePath: parameterMap["package"],
-        }, runnerParameters, new ActionsHost())
+        }, runnerParameters, new ActionsHost('DeployPackage'))
         core.info('package deployed.');
         core.endGroup();
     } catch (error) {

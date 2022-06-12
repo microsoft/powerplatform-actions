@@ -10,6 +10,11 @@ import ActionsLogger from "./ActionsLogger";
 
 export class ActionsHost implements IHostAbstractions {
   name = "GitHub-Actions";
+  private _artifactStoreName: string;
+
+  public constructor(artifactStoreName?: string) {
+    this._artifactStoreName = artifactStoreName || 'artifacts';
+  }
 
   public getInput(entry: HostParameterEntry): string | undefined {
     const value = core.getInput(entry.name, { required: entry.required });
@@ -18,7 +23,7 @@ export class ActionsHost implements IHostAbstractions {
   }
 
   public getArtifactStore(): IArtifactStore {
-    return new ActionsArtifactStore('PowerAppsChecker');
+    return new ActionsArtifactStore(this._artifactStoreName);
   }
 }
 
@@ -42,8 +47,13 @@ class ActionsArtifactStore implements IArtifactStore {
     ActionsLogger.debug(`files: ${files.join(';')}`);
     await fs.emptyDir(this._resultsDirectory);
     for (const file of files) {
-      ActionsLogger.debug(`unzipping ${file} into ${this._resultsDirectory} ...`);
-      await extractToFolder(file, this._resultsDirectory);
+      if (path.extname(file).toLowerCase() === '.zip') {
+        ActionsLogger.debug(`unzipping ${file} into ${this._resultsDirectory} ...`);
+        await extractToFolder(file, this._resultsDirectory);
+      } else {
+        ActionsLogger.debug(`copying ${file} into ${this._resultsDirectory} ...`);
+        await fs.copyFile(file, path.join(this._resultsDirectory, path.basename(file)));
+      }
     }
 
     const client = artifact.create();
@@ -65,7 +75,7 @@ class ActionsArtifactStore implements IArtifactStore {
     } else if (process.env.GITHUB_WORKSPACE) {
       baseOutDir = process.env.GITHUB_WORKSPACE;
     } else {
-      baseOutDir = process.cwd();
+      baseOutDir = path.join(process.cwd(), 'out');
     }
     const outputDirectory = path.join(baseOutDir, this._subFolder);
     fs.emptyDirSync(outputDirectory);
