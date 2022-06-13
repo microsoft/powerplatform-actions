@@ -19,7 +19,7 @@ jobs:
   instance-actions:
     runs-on: ${{ matrix.os }}
     outputs:
-      environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+      environment-url: ${{ steps.create-paportal-environment.outputs.environment-url }}
     strategy:
       matrix:
         os: [windows-latest]
@@ -53,23 +53,25 @@ jobs:
     - name: Download CDSStarterPortal package from portal authenticated feed
       run: gulp fetchPortalPackage --feedPAT ${{ secrets.OneCRM_DevOps_Read_PAT }}
 
-    - name: Test create-source-environment action with appId-clientSecret
+    - name: Create a PA Portal test env
       uses: ./create-environment
-      id: create-source-environment
+      id: create-paportal-environment
+      env:
+        PP_SRC_ENV_NAME: ci-actions-paportal
       with:
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
-        name: sourceEnvironment
+        name: ${{ env.PP_SRC_ENV_NAME }}
         type: Sandbox
         region: unitedstates
-        domain: test-source
+        domain: ${{ env.PP_SRC_ENV_NAME }}
 
-    - name: Use deploy-package action with username-password
+    - name: Deploy paportal-package action to create a test Portal
       if: matrix.os == 'windows-latest'
       uses: ./deploy-package
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-url: ${{ steps.create-paportal-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         tenant-id: ${{ env.WF_TENANT_ID }}
@@ -78,7 +80,7 @@ jobs:
     - name: Test paportal-download action with username/password
       uses: ./download-paportal
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-url: ${{ steps.create-paportal-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         website-id: f46b70cc-580b-4f1a-87c3-41deb48eb90d
@@ -91,7 +93,7 @@ jobs:
     - name: Test paportal-upload action with username/password
       uses: ./upload-paportal
       with:
-        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        environment-url: ${{ steps.create-paportal-environment.outputs.environment-url }}
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         upload-path: ./paportal-download/starter-portal
@@ -144,7 +146,7 @@ jobs:
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         upload-path: ./paportal-download/starter-portal
 
-    - name: Test delete-source-environment action with appId-clientSecret
+    - name: Delete PA Portal test environment
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
       with:
