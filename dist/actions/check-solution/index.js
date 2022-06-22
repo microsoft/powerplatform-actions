@@ -7001,7 +7001,7 @@ var require_checkSolution = __commonJS({
           } else {
             validator.pushInput(pacArgs, "--path", parameters.solutionPath, (value) => path.resolve(runnerParameters.workingDir, value));
           }
-          validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet, defaultRulesMapper);
+          validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet);
           ruleLevelOverrideFile = yield createRuleOverrideFile(validator.getInput(parameters.ruleLevelOverride));
           if (ruleLevelOverrideFile) {
             pacArgs.push("--ruleLevelOverride", ruleLevelOverrideFile);
@@ -7104,16 +7104,6 @@ var require_checkSolution = __commonJS({
         }
         return void 0;
       });
-    }
-    function defaultRulesMapper(rule) {
-      switch (rule.toLowerCase()) {
-        case "appsource certification":
-          return "083a2ef5-7e0e-4754-9d88-9455142dc08b";
-        case "solution checker":
-          return "0ad12346-e108-40b8-a956-9a8f95ea18c9";
-        default:
-          return rule;
-      }
     }
   }
 });
@@ -17198,15 +17188,16 @@ var require_ActionsHost = __commonJS({
     var artifact = require_artifact_client2();
     var ActionsLogger_1 = require_ActionsLogger();
     var ActionsHost = class {
-      constructor() {
+      constructor(artifactStoreName) {
         this.name = "GitHub-Actions";
+        this._artifactStoreName = artifactStoreName || "artifacts";
       }
       getInput(entry) {
         const value = core2.getInput(entry.name, { required: entry.required });
         return value && value.trim() !== "" ? value : void 0;
       }
       getArtifactStore() {
-        return new ActionsArtifactStore("PowerAppsChecker");
+        return new ActionsArtifactStore(this._artifactStoreName);
       }
     };
     exports2.ActionsHost = ActionsHost;
@@ -17226,8 +17217,13 @@ var require_ActionsHost = __commonJS({
           ActionsLogger_1.default.debug(`files: ${files.join(";")}`);
           yield fs.emptyDir(this._resultsDirectory);
           for (const file of files) {
-            ActionsLogger_1.default.debug(`unzipping ${file} into ${this._resultsDirectory} ...`);
-            yield extractToFolder(file, this._resultsDirectory);
+            if (path.extname(file).toLowerCase() === ".zip") {
+              ActionsLogger_1.default.debug(`unzipping ${file} into ${this._resultsDirectory} ...`);
+              yield extractToFolder(file, this._resultsDirectory);
+            } else {
+              ActionsLogger_1.default.debug(`copying ${file} into ${this._resultsDirectory} ...`);
+              yield fs.copyFile(file, path.join(this._resultsDirectory, path.basename(file)));
+            }
           }
           const client = artifact.create();
           const resultFiles = (yield fs.readdir(this._resultsDirectory)).map((f) => path.resolve(this._resultsDirectory, f));
@@ -17245,7 +17241,7 @@ var require_ActionsHost = __commonJS({
         } else if (process.env.GITHUB_WORKSPACE) {
           baseOutDir = process.env.GITHUB_WORKSPACE;
         } else {
-          baseOutDir = process.cwd();
+          baseOutDir = path.join(process.cwd(), "out");
         }
         const outputDirectory = path.join(baseOutDir, this._subFolder);
         fs.emptyDirSync(outputDirectory);
@@ -17448,7 +17444,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.58",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.60",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -17539,7 +17535,7 @@ var runnerParameters_1 = require_runnerParameters();
     errorThreshold: createEntry("errorThreshold", "0"),
     failOnAnalysisError: createEntry("failOnAnalysisError", true),
     filesExcluded: createEntry("filesExcluded", "")
-  }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
+  }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost("PowerAppsChecker"));
   core.endGroup();
 }))().catch((error) => {
   const logger = runnerParameters_1.runnerParameters.logger;
