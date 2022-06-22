@@ -7001,7 +7001,7 @@ var require_checkSolution = __commonJS({
           } else {
             validator.pushInput(pacArgs, "--path", parameters.solutionPath, (value) => path.resolve(runnerParameters.workingDir, value));
           }
-          validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet);
+          validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet, defaultRulesMapper);
           ruleLevelOverrideFile = yield createRuleOverrideFile(validator.getInput(parameters.ruleLevelOverride));
           if (ruleLevelOverrideFile) {
             pacArgs.push("--ruleLevelOverride", ruleLevelOverrideFile);
@@ -7104,6 +7104,16 @@ var require_checkSolution = __commonJS({
         }
         return void 0;
       });
+    }
+    function defaultRulesMapper(rule) {
+      switch (rule.toLowerCase()) {
+        case "appsource certification":
+          return "083a2ef5-7e0e-4754-9d88-9455142dc08b";
+        case "solution checker":
+          return "0ad12346-e108-40b8-a956-9a8f95ea18c9";
+        default:
+          return rule;
+      }
     }
   }
 });
