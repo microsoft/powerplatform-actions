@@ -655,6 +655,7 @@
   "PackageAddProjectItemArgumentLayerOrderSolutionUniqueNamesRegexHelp" : "Expected a semicolon delimited list of solution uniquenames.",
   "AdminAssignUserRoleNotFoundError" : "{0} security role not found in {1} environment",
   "AdminAssignUserRoleDuplicateRoleDetected" : "System user with ID {0} already has the \"{1}\" security role assigned.",
+  "SolutionExportOverwriteHelp" : "The exported solution file can overwrite the solution zip file on the local file system.",
   "ConnectorHelp" : "Commands for working with Power Apps Connectors",
   "ConnectorListVerbHelp" : "List the Connectors registered in the Dataverse environment",
   "ConnectorDownloadApiDefinitionVerbHelp" : "Download a Connector's OpenApiDefinition file",

@@ -7001,7 +7001,7 @@ var require_checkSolution = __commonJS({
           } else {
             validator.pushInput(pacArgs, "--path", parameters.solutionPath, (value) => path.resolve(runnerParameters.workingDir, value));
           }
-          validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet, defaultRulesMapper);
+          validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet);
           ruleLevelOverrideFile = yield createRuleOverrideFile(validator.getInput(parameters.ruleLevelOverride));
           if (ruleLevelOverrideFile) {
             pacArgs.push("--ruleLevelOverride", ruleLevelOverrideFile);
@@ -7104,16 +7104,6 @@ var require_checkSolution = __commonJS({
         }
         return void 0;
       });
-    }
-    function defaultRulesMapper(rule) {
-      switch (rule.toLowerCase()) {
-        case "appsource certification":
-          return "083a2ef5-7e0e-4754-9d88-9455142dc08b";
-        case "solution checker":
-          return "0ad12346-e108-40b8-a956-9a8f95ea18c9";
-        default:
-          return rule;
-      }
     }
   }
 });
@@ -8513,7 +8503,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.4.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.58",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.60",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
