@@ -5,6 +5,7 @@ import { publishSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actio
 import getCredentials from "../../lib/auth/getCredentials";
 import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from "../../lib/runnerParameters";
+import { ActionsHost } from '../../lib/host/ActionsHost';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
@@ -18,7 +19,7 @@ export async function main(): Promise<void> {
         await publishSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
-        }, runnerParameters);
+        }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {
         const logger = runnerParameters.logger;
