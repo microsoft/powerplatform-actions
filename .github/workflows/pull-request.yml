@@ -101,6 +101,17 @@ jobs:
         force-overwrite: true
         run-asynchronously: true
 
+    - name: Test add-solution-component action
+      uses: ./add-solution-component
+      with:
+        environment-url: ${{ steps.create-environment.outputs.environment-url }}
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        solution-name: emptySolution
+        component: account
+        component-type: 1
+        add-required-components: true
+
     - name: Test delete-environment action with username/password
       if: always() # Clean up created environments even on failed run
       uses: ./delete-environment
