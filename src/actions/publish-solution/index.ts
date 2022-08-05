@@ -4,6 +4,7 @@ import * as core from '@actions/core';
 import { publishSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import getCredentials from "../../lib/auth/getCredentials";
 import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
+import { ActionsHost } from '../../lib/host/ActionsHost';
 import { runnerParameters } from "../../lib/runnerParameters";
 
 (async () => {
@@ -18,7 +19,7 @@ export async function main(): Promise<void> {
         await publishSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
-        }, runnerParameters);
+        }, runnerParameters, new ActionsHost);
         core.endGroup();
     } catch (error) {
         const logger = runnerParameters.logger;
