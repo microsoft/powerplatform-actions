@@ -9,6 +9,7 @@ import { fake, stub } from "sinon";
 import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
 import { runnerParameters } from "../../src/lib/runnerParameters";
 import Sinon = require("sinon");
+import { ActionsHost } from "../lib/host/ActionsHost";
 should();
 use(sinonChai);
 
@@ -38,6 +39,6 @@ describe("publish solution test", () => {
     publishSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
-    }, runnerParameters);
+    }, runnerParameters, new ActionsHost);
   });
 });
