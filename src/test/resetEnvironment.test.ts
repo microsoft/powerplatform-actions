@@ -42,7 +42,7 @@ describe("reset-environment tests", () => {
             currency: { name: 'currency', required: false, defaultValue: 'USD' },
             purpose: { name: 'purpose', required: false, defaultValue: undefined },
             templates: { name: 'templates', required: false, defaultValue: undefined },
-            language: { name: 'language', required: false, defaultValue: 'English' },
+            language: { name: 'language', required: false, defaultValue: 'English (United States)' },
             overrideDomainName: { name: 'override-domain-name', required: false, defaultValue: 'false' },
             domainName: { name: 'domain-name', required: false, defaultValue: undefined },
             overrideFriendlyName: { name: 'override-friendly-name', required: false, defaultValue: 'false' },
