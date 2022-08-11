@@ -37,9 +37,9 @@ inputs:
     required: false
 
   language:
-    description: 'Sets the language used for your environment. Defaults to "English".'
+    description: 'Sets the language used for your environment. Defaults to "English (United States)".'
     required: false
-    default: 'English'
+    default: 'English (United States)'
 
   currency:
     description: 'Sets the currency used for your environment. Defaults to "USD".'

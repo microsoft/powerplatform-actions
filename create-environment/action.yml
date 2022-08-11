@@ -48,16 +48,16 @@ inputs:
     default: 'USD'
 
   language:
-    description: 'The language to use for the environment.'
+    description: 'Sets the language used for your environment. Defaults to "English (United States)".'
     required: false
-    default: 'English'
+    default: 'English (United States)'
 
   templates:
     description: 'The Dynamics 365 that needs to be deployed to the environment. Passed as comma separated values.'
     required: false
 
   domain:
-    description: 'The domain name of the environment URL. Eg: https://{contoso}0.crm.dynamics.com.'
+    description: 'The domain name of the environment URL. Eg: https://{contoso}.crm.dynamics.com.'
     required: false
 
   team-id:
