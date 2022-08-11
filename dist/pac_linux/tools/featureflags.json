@@ -38,11 +38,11 @@
   "enablePAPortalTranslations": "off",
   "componentSettings": "off",
   "verbCanvas": "on",
-  "verbCanvasCreate": "off",
+  "verbCanvasCreate": "on",
   "verbSolutionCreateSettings": "on",
   "verbPackageInitUseDotnetTemplating": "on",
   "enableDotetTemplate_PDPackageSdkStyle": "on",
-  "verbPackageAddExternalPackage": "off",
+  "verbPackageAddExternalPackage": "on",
   "verbPackageAddSolution": "on",
   "moduleConnection": "off",
   "moduleConnector": "off",
@@ -50,6 +50,10 @@
   "verbPAPortalReguid": "off",
   "moduleApplication": "on",
   "moduleTool": "off",
-  "verbPluginInitNupkg": "off",
-  "verbAdminAssignUser": "off"
+  "verbPluginInitNupkg": "on",
+  "verbAdminAssignUser": "on",
+  "verbSolutionAddComponent": "on",
+  "moduleData": "on",
+  "verbSolutionSync": "on",
+  "verbListTemplates": "on"
 }
