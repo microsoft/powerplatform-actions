@@ -16479,6 +16479,8 @@ var currDir = process.cwd();
     if (branch && branch.length >= 2) {
       return branch[1];
     }
+  }).filter(function(x) {
+    return x !== undefined;
   });
   if (!head || head.length < 1 || head.length > 1 || !head[0]) {
     throw new Error(`Cannot determine HEAD from remote: ${repoUrl}`);
