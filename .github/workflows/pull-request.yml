@@ -49,7 +49,7 @@ jobs:
       uses: ./create-environment
       id: create-environment
       env:
-        PP_ENV_NAME: ${{ format('pr-actions-{0}', runner.os) }}
+        PP_ENV_NAME: ${{ format('pp-actions-{0}-pr-{1}', runner.os, github.event.number) }}
       with:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
