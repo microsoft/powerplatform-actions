@@ -16,6 +16,7 @@ jobs:
     env:
       RUNNER_DEBUG: 1
       WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+      WF_USER_ROLE: "Bot Author"
 
     steps:
     - uses: actions/checkout@v2
@@ -77,6 +78,15 @@ jobs:
       if: ${{ steps.create-environment.outputs.environment-id != steps.who-am-i.outputs.environment-id }}
       run: |
         exit 1
+
+    - name: Test assign-user action without role assignment
+      uses: ./assign-user
+      with:
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        environment: ${{ steps.create-environment.outputs.environment-url }}
+        user: ${{ env.WF_USERNAME}}
+        role: ${{ env.WF_USER_ROLE}}
 
     - name: Test unpack-solution action
       uses: ./unpack-solution
