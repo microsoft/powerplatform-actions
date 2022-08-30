@@ -40,6 +40,14 @@ inputs:
     description: 'Website id of the website to be downloaded.'
     required: true
 
+  exclude-entities:
+    description: 'Comma separated list of entity logical names to exclude downloading'
+    required: true
+  
+  overwrite:
+    description: 'Overwrite if portal context exists at the given path'
+    required: true
+
   working-directory:
     description: 'Working directory; default: root of repository'
     required: false
