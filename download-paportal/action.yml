@@ -40,10 +40,6 @@ inputs:
     description: 'Website id of the website to be downloaded.'
     required: true
 
-  include-entities:
-    description: 'Download only the entities specified for this argument in comma separated entity logical name'
-    required: true
-
   exclude-entities:
     description: 'Comma separated list of entity logical names to exclude downloading'
     required: true

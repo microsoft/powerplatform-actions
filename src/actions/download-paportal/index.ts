@@ -18,7 +18,6 @@ import { runnerParameters } from '../../lib/runnerParameters';
         path: parameterMap['download-path'],
         websiteId: parameterMap['website-id'],
         overwrite: parameterMap['overwrite'],
-        includeEntities: parameterMap['include-entities'],
         excludeEntities: parameterMap['exclude-entities']
     }, runnerParameters, new ActionsHost());
     core.endGroup();
