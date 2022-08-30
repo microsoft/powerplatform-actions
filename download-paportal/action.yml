@@ -41,7 +41,7 @@ inputs:
     required: true
 
   exclude-entities:
-    description: 'Comma separated list of entity logical names to exclude downloading'
+    description: 'Comma separated list of entity logical names to exclude while downloading'
     required: true
   
   overwrite:
