@@ -9,7 +9,7 @@ var require_InputValidator = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/host/InputValidator.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.normalizeLanguage = exports2.normalizeRegion = exports2.InputValidator = void 0;
+    exports2.InputValidator = void 0;
     var InputValidator = class {
       constructor(host) {
         this._host = host;
@@ -30,37 +30,13 @@ var require_InputValidator = __commonJS({
           throw new Error(`Required ${paramEntry.name} not set`);
         } else if (val) {
           if (callback) {
-            val = callback(val || paramEntry.defaultValue);
+            val = callback(val);
           }
-          if (val)
-            pacArgs.push(property, val);
+          pacArgs.push(property, val);
         }
       }
     };
     exports2.InputValidator = InputValidator;
-    var regionMap = {
-      "united states": "unitedstates",
-      "united kingdom": "unitedkingdom",
-      "preview (united states)": "unitedstatesfirstrelease",
-      "south america": "southamerica"
-    };
-    function normalizeRegion(taskRegionName) {
-      if (!taskRegionName || typeof taskRegionName !== "string")
-        return void 0;
-      const cliRegionName = regionMap[taskRegionName.toLowerCase()];
-      return cliRegionName || taskRegionName;
-    }
-    exports2.normalizeRegion = normalizeRegion;
-    var languageMap = {
-      "english": "1033"
-    };
-    function normalizeLanguage(taskLanguageName) {
-      if (!taskLanguageName || typeof taskLanguageName !== "string")
-        return void 0;
-      const cliLanguageName = languageMap[taskLanguageName.toLowerCase()];
-      return cliLanguageName || taskLanguageName;
-    }
-    exports2.normalizeLanguage = normalizeLanguage;
   }
 });
 
@@ -70,18 +46,15 @@ var require_authenticate = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.clearAuthentication = exports2.authenticateEnvironment = exports2.authenticateAdmin = void 0;
-    function authenticateAdmin(pac, credentials, logger) {
-      logger.log(`authN to admin API: authType=${isUsernamePassword(credentials) ? "UserPass" : "SPN"}; cloudInstance: ${credentials.cloudInstance || "<not set>"}`);
+    function authenticateAdmin(pac, credentials) {
       return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateAdmin = authenticateAdmin;
-    function authenticateEnvironment(pac, credentials, environmentUrl, logger) {
-      logger.log(`authN to env: authType=${isUsernamePassword(credentials) ? "UserPass" : "SPN"}; cloudInstance: ${credentials.cloudInstance || "<not set>"}; envUrl: ${environmentUrl}`);
+    function authenticateEnvironment(pac, credentials, environmentUrl) {
       return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateEnvironment = authenticateEnvironment;
     function clearAuthentication(pac) {
-      delete process.env.PAC_CLI_SPN_SECRET;
       return pac("auth", "clear");
     }
     exports2.clearAuthentication = clearAuthentication;
@@ -95,7 +68,6 @@ var require_authenticate = __commonJS({
       return "username" in credentials;
     }
     function addClientCredentials(parameters) {
-      process.env.PAC_CLI_SPN_SECRET = parameters.clientSecret;
       return ["--tenant", parameters.tenantId, "--applicationId", parameters.appId, "--clientSecret", parameters.clientSecret];
     }
     function addUsernamePassword(parameters) {
@@ -166,12 +138,6 @@ var require_CommandRunner = __commonJS({
                 logFunction(line);
               };
             }
-            cp.on("error", (error) => {
-              logger.error(`error: ${error}`);
-              reject(new RunnerError(1, allOutput.join(os_1.EOL)));
-              closeAllReaders(outputLineReader, errorLineReader);
-              destroyOutputStreams(cp);
-            });
             cp.on("exit", (code) => {
               if (code === 0) {
                 resolve(allOutput);
@@ -179,24 +145,14 @@ var require_CommandRunner = __commonJS({
                 logger.error(`error: ${code}`);
                 reject(new RunnerError(code, allOutput.join(os_1.EOL)));
               }
-              closeAllReaders(outputLineReader, errorLineReader);
-              destroyOutputStreams(cp);
+              outputLineReader.close();
+              errorLineReader.close();
+              cp.stdout.destroy();
+              cp.stderr.destroy();
             });
           });
         });
       };
-      function closeAllReaders(outputLineReader, errorLineReader) {
-        outputLineReader === null || outputLineReader === void 0 ? void 0 : outputLineReader.close();
-        errorLineReader === null || errorLineReader === void 0 ? void 0 : errorLineReader.close();
-      }
-      function destroyOutputStreams(cp) {
-        var _a, _b;
-        if (!cp) {
-          return;
-        }
-        (_a = cp.stdout) === null || _a === void 0 ? void 0 : _a.destroy();
-        (_b = cp.stderr) === null || _b === void 0 ? void 0 : _b.destroy();
-      }
       function logInitialization(...args) {
         logger.debug(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
       }
@@ -266,20 +222,15 @@ var require_exportSolution = __commonJS({
     var path = require("path");
     function exportSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
-        function resolveFolder(folder) {
-          if (!folder || typeof folder !== "string")
-            return void 0;
-          return path.resolve(runnerParameters.workingDir, folder);
-        }
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "export"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--name", parameters.name);
-          validator.pushInput(pacArgs, "--path", parameters.path, resolveFolder);
+          validator.pushInput(pacArgs, "--path", parameters.path, (value) => path.resolve(runnerParameters.workingDir, value));
           if (parameters.overwrite && validator.getInput(parameters.overwrite) == "true") {
             pacArgs.push("--overwrite");
           }
@@ -380,7 +331,7 @@ var require_whoAmI = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacResult = yield pac("org", "who");
           logger.log("WhoAmI Action Result: " + pacResult);
@@ -441,19 +392,14 @@ var require_importSolution = __commonJS({
     var path = require("path");
     function importSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
-        function resolveFolder(folder) {
-          if (!folder || typeof folder !== "string")
-            return void 0;
-          return path.resolve(runnerParameters.workingDir, folder);
-        }
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "import"];
           const validator = new InputValidator_1.InputValidator(host);
-          validator.pushInput(pacArgs, "--path", parameters.path, resolveFolder);
+          validator.pushInput(pacArgs, "--path", parameters.path, (value) => path.resolve(runnerParameters.workingDir, value));
           validator.pushInput(pacArgs, "--async", parameters.async);
           validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
           validator.pushInput(pacArgs, "--force-overwrite", parameters.forceOverwrite);
@@ -522,7 +468,7 @@ var require_upgradeSolution = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "upgrade"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -586,7 +532,7 @@ var require_deleteEnvironment = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "delete"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -650,7 +596,7 @@ var require_backupEnvironment = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "backup"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -5599,11 +5545,6 @@ var require_checkSolution = __commonJS({
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         const validator = new InputValidator_1.InputValidator(host);
         const artifactStore = host.getArtifactStore();
-        function resolveFolder(folder) {
-          if (!folder || typeof folder !== "string")
-            return void 0;
-          return path.resolve(runnerParameters.workingDir, folder);
-        }
         let level;
         let threshold;
         if (parameters.errorThreshold != void 0) {
@@ -5613,13 +5554,13 @@ var require_checkSolution = __commonJS({
         const failOnAnalysisError = validator.getInput(parameters.failOnAnalysisError) === "true";
         let ruleLevelOverrideFile;
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "check"];
           if (validator.getInput(parameters.fileLocation) === "sasUriFile") {
             validator.pushInput(pacArgs, "--solutionUrl", parameters.solutionUrl);
           } else {
-            validator.pushInput(pacArgs, "--path", parameters.solutionPath, resolveFolder);
+            validator.pushInput(pacArgs, "--path", parameters.solutionPath, (value) => path.resolve(runnerParameters.workingDir, value));
           }
           validator.pushInput(pacArgs, "--ruleSet", parameters.ruleSet, defaultRulesMapper);
           ruleLevelOverrideFile = yield createRuleOverrideFile(validator.getInput(parameters.ruleLevelOverride));
@@ -5726,8 +5667,6 @@ var require_checkSolution = __commonJS({
       });
     }
     function defaultRulesMapper(rule) {
-      if (!rule || typeof rule !== "string")
-        return void 0;
       switch (rule.toLowerCase()) {
         case "appsource certification":
           return "083a2ef5-7e0e-4754-9d88-9455142dc08b";
@@ -5781,7 +5720,7 @@ var require_publishSolution = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "publish"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -5854,7 +5793,7 @@ var require_deployPackage = __commonJS({
           if (platform !== "win32") {
             throw new Error(`deploy package is only supported on Windows agents/runners (attempted run on ${platform})`);
           }
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["package", "deploy"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -5930,16 +5869,16 @@ var require_createEnvironment = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "create"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--name", parameters.environmentName);
           validator.pushInput(pacArgs, "--type", parameters.environmentType);
           validator.pushInput(pacArgs, "--templates", parameters.templates);
-          validator.pushInput(pacArgs, "--region", parameters.region, InputValidator_1.normalizeRegion);
+          validator.pushInput(pacArgs, "--region", parameters.region, normalizeRegion);
           validator.pushInput(pacArgs, "--currency", parameters.currency);
-          validator.pushInput(pacArgs, "--language", parameters.language, InputValidator_1.normalizeLanguage);
+          validator.pushInput(pacArgs, "--language", parameters.language);
           validator.pushInput(pacArgs, "--domain", parameters.domainName);
           validator.pushInput(pacArgs, "--team-id", parameters.teamId);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
@@ -5968,6 +5907,16 @@ var require_createEnvironment = __commonJS({
       };
     }
     exports2.getEnvironmentDetails = getEnvironmentDetails;
+    var regionMap = {
+      "united states": "unitedstates",
+      "united kingdom": "unitedkingdom",
+      "preview (united states)": "unitedstatesfirstrelease",
+      "south america": "southamerica"
+    };
+    function normalizeRegion(taskRegionName) {
+      const cliRegionName = regionMap[taskRegionName.toLowerCase()];
+      return cliRegionName || taskRegionName;
+    }
   }
 });
 
@@ -6013,7 +5962,7 @@ var require_restoreEnvironment = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "restore"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6090,7 +6039,7 @@ var require_deleteSolution = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "delete"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6119,13 +6068,8 @@ var require_solutionPackagingBase = __commonJS({
     exports2.setSolutionPackagingCommonArgs = void 0;
     var path = require("path");
     function setSolutionPackagingCommonArgs(parameters, runnerParameters, validator, pacArgs) {
-      function resolveFolder(folder) {
-        if (!folder || typeof folder !== "string")
-          return void 0;
-        return path.resolve(runnerParameters.workingDir, folder);
-      }
-      validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, resolveFolder);
-      validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, resolveFolder);
+      validator.pushInput(pacArgs, "--zipFile", parameters.solutionZipFile, (value) => path.resolve(runnerParameters.workingDir, value));
+      validator.pushInput(pacArgs, "--folder", parameters.sourceFolder, (value) => path.resolve(runnerParameters.workingDir, value));
       validator.pushInput(pacArgs, "--packageType", parameters.solutionType);
       validator.pushInput(pacArgs, "--localize", parameters.localize);
       validator.pushInput(pacArgs, "--log", parameters.logFile);
@@ -6306,14 +6250,14 @@ var require_resetEnvironment = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "reset"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--environment", parameters.environment);
           validator.pushInput(pacArgs, "--url", parameters.environmentUrl);
           validator.pushInput(pacArgs, "--environment-id", parameters.environmentId);
-          validator.pushInput(pacArgs, "--language", parameters.language, InputValidator_1.normalizeLanguage);
+          validator.pushInput(pacArgs, "--language", parameters.language);
           validator.pushInput(pacArgs, "--currency", parameters.currency);
           validator.pushInput(pacArgs, "--purpose", parameters.purpose);
           validator.pushInput(pacArgs, "--templates", parameters.templates);
@@ -6383,7 +6327,7 @@ var require_copyEnvironment = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["admin", "copy"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6456,7 +6400,7 @@ var require_uploadPaportal = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["paportal", "upload"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6519,7 +6463,7 @@ var require_downloadPaportal = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["paportal", "download"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6582,7 +6526,7 @@ var require_cloneSolution = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "clone"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6647,7 +6591,7 @@ var require_updateVersionSolution = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6713,7 +6657,7 @@ var require_onlineVersionSolution = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "online-version"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -6774,20 +6718,15 @@ var require_installApplication = __commonJS({
     var path = require("path");
     function installApplication(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
-        function resolveFolder(folder) {
-          if (!folder || typeof folder !== "string")
-            return void 0;
-          return path.resolve(runnerParameters.workingDir, folder);
-        }
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["application", "install"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--environment-id", parameters.environmentId);
-          validator.pushInput(pacArgs, "--application-list", parameters.applicationList, resolveFolder);
+          validator.pushInput(pacArgs, "--application-list", parameters.applicationList, (value) => path.resolve(runnerParameters.workingDir, value));
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("Application Install Action Result: " + pacResult);
@@ -6801,6 +6740,70 @@ var require_installApplication = __commonJS({
       });
     }
     exports2.installApplication = installApplication;
+  }
+});
+
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/listApplication.js
+var require_listApplication = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/listApplication.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.listApplication = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    var path = require("path");
+    function listApplication(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["application", "list"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--environment-id", parameters.environmentId);
+          validator.pushInput(pacArgs, "--output", parameters.output, (value) => path.resolve(runnerParameters.workingDir, value));
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("Application List Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.listApplication = listApplication;
   }
 });
 
@@ -6847,7 +6850,7 @@ var require_assignUser = __commonJS({
         const pacArgs = ["admin", "assign-user"];
         const validator = new InputValidator_1.InputValidator(host);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials);
           logger.log("The Authentication Result: " + authenticateResult);
           validator.pushInput(pacArgs, "--environment", parameters.environment);
           validator.pushInput(pacArgs, "--user", parameters.user);
@@ -6911,7 +6914,7 @@ var require_addSolutionComponent = __commonJS({
         const pacArgs = ["solution", "add-solution-component"];
         const inputValidator = new InputValidator_1.InputValidator(host);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl);
           logger.log("The Authentication Result: " + authenticateResult);
           inputValidator.pushInput(pacArgs, "--solutionUniqueName", parameters.solutionName);
           inputValidator.pushInput(pacArgs, "--component", parameters.component);
@@ -6982,6 +6985,7 @@ var require_actions = __commonJS({
     __exportStar(require_updateVersionSolution(), exports2);
     __exportStar(require_onlineVersionSolution(), exports2);
     __exportStar(require_installApplication(), exports2);
+    __exportStar(require_listApplication(), exports2);
     __exportStar(require_assignUser(), exports2);
     __exportStar(require_addSolutionComponent(), exports2);
   }
