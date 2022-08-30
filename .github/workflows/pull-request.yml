@@ -17,6 +17,7 @@ jobs:
       RUNNER_DEBUG: 1
       WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
       WF_USER_ROLE: "Bot Author"
+      WF_USER_AAD_OBJECT_ID: "85fd1857-ddef-46f6-acf4-22a0d1df2cda"
 
     steps:
     - uses: actions/checkout@v2
@@ -85,7 +86,7 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
         environment: ${{ steps.create-environment.outputs.environment-url }}
-        user: ${{ env.WF_USERNAME}}
+        user: ${{ env.WF_USER_AAD_OBJECT_ID}}
         role: ${{ env.WF_USER_ROLE}}
 
     - name: Test unpack-solution action
