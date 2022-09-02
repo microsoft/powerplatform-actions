@@ -17,7 +17,7 @@ namespace $safeprojectname$
         }
 
         // Entry point for custom business logic execution
-        protected override void ExecuteCdsPlugin(ILocalPluginContext localPluginContext)
+        protected override void ExecuteDataversePlugin(ILocalPluginContext localPluginContext)
         {
             if (localPluginContext == null)
             {
