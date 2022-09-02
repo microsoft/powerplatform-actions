@@ -42,11 +42,11 @@ inputs:
 
   exclude-entities:
     description: 'Comma separated list of entity logical names to exclude while downloading'
-    required: true
-  
+    required: false
+
   overwrite:
     description: 'Overwrite if portal context exists at the given path'
-    required: true
+    required: false
 
   working-directory:
     description: 'Working directory; default: root of repository'
