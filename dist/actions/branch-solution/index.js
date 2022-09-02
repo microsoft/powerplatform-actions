@@ -2288,7 +2288,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.9.1",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.67",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.70",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
