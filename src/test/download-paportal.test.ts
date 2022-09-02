@@ -40,6 +40,8 @@ describe("download paportal test", () => {
       environmentUrl: environmentUrl,
       path: { name: 'download-path', required: true, defaultValue: undefined },
       websiteId: { name: 'website-id', required: true, defaultValue: undefined },
+      overwrite: { name: 'overwrite', required: false, defaultValue: undefined },
+      excludeEntities: { name: 'exclude-entities', required: false, defaultValue: undefined}
     }, runnerParameters, new ActionsHost());
   });
 });
