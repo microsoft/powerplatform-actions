@@ -38,7 +38,7 @@ inputs:
 
   data-file:
     description: 'File name for data zip file. Default data.zip.'
-    required: false
+    required: true
 
   overwrite:
     description: 'Allow overwrite output data file if it already exists.'
