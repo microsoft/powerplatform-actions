@@ -72,14 +72,14 @@ jobs:
         user-name: ${{ env.WF_USERNAME }}
         password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
 
-    - name: Install AppSource application
-      uses: ./install-application
-      with:
-        environment: ${{ steps.create-source-environment.outputs.environment-url }}
-        app-id: ${{ env.WF_APPID }}
-        client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
-        tenant-id: ${{ env.WF_TENANT_ID }}
-        application-list: 'src/test/data/appsToInstall.json'
+    # - name: Install AppSource application
+    #   uses: ./install-application
+    #   with:
+    #     environment: ${{ steps.create-source-environment.outputs.environment-url }}
+    #     app-id: ${{ env.WF_APPID }}
+    #     client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+    #     tenant-id: ${{ env.WF_TENANT_ID }}
+    #     application-list: 'src/test/data/appsToInstall.json'
 
     - name: Test unpack-solution action
       uses: ./unpack-solution
