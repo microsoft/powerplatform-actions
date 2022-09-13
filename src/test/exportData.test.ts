@@ -34,7 +34,7 @@ describe("export-data tests", () => {
 
         exportDataStub.should.have.been.calledWithExactly({
             credentials: credentials,
-            environment: { name: 'environment-url', required: true, defaultValue: undefined },
+            environmentUrl: mockEnvironmentUrl,
             schemaFile: { name: 'schema-file', required: true, defaultValue: undefined },
             dataFile: { name: 'data-file', required: true, defaultValue: undefined },
             overwrite: { name: 'overwrite', required: false, defaultValue: undefined },
