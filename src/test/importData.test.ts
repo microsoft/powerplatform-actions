@@ -34,8 +34,8 @@ describe("import-data tests", () => {
 
         importDataStub.should.have.been.calledWithExactly({
             credentials: credentials,
-            environment: { name: 'environment-url', required: true, defaultValue: undefined },
-            dataDirectory: { name: 'data-directory', required: true, defaultValue: undefined },
+            environmentUrl: mockEnvironmentUrl,
+            dataFile: { name: 'data-file', required: true, defaultValue: undefined },
             verbose: { name: 'verbose', required: false, defaultValue: false }
         }, runnerParameters, new ActionsHost());
     });

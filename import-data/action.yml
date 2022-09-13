@@ -32,8 +32,8 @@ inputs:
     required: false
     default: 'Public'
 
-  data-directory:
-    description: 'Directory name with data for import.'
+  data-file:
+    description: 'File name for data zip file to be imported.'
     required: true
 
 runs:

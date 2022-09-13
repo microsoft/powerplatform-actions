@@ -5,6 +5,7 @@ import { dataExport } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import * as core from '@actions/core';
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
+import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import getCredentials from "../../lib/auth/getCredentials";
 import { runnerParameters } from '../../lib/runnerParameters';
 
@@ -20,7 +21,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
     core.startGroup('export-data:');
     await dataExport({
         credentials: getCredentials(),
-        environment: parameterMap['environment-url'],
+        environmentUrl: getEnvironmentUrl(),
         schemaFile: parameterMap['schema-file'],
         dataFile: parameterMap['data-file'],
         overwrite: parameterMap['overwrite'],
