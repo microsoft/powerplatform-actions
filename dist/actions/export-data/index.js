@@ -6970,23 +6970,27 @@ var require_dataExport = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.dataExport = void 0;
+    var os = require("os");
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function dataExport(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
+        const platform = os.platform();
+        if (platform !== "win32") {
+          throw new Error(`'data export' is only supported on Windows agents/runners (attempted run on ${platform})`);
+        }
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         const pacArgs = ["data", "export"];
         const validator = new InputValidator_1.InputValidator(host);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           validator.pushInput(pacArgs, "--schemaFile", parameters.schemaFile);
           validator.pushInput(pacArgs, "--dataFile", parameters.dataFile);
           validator.pushInput(pacArgs, "--overwrite", parameters.overwrite);
           validator.pushInput(pacArgs, "--verbose", parameters.verbose);
-          validator.pushInput(pacArgs, "--environment", parameters.environment);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("Action Result: " + pacResult);
@@ -7036,21 +7040,25 @@ var require_dataImport = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.dataImport = void 0;
+    var os = require("os");
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function dataImport(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
+        const platform = os.platform();
+        if (platform !== "win32") {
+          throw new Error(`'data export' is only supported on Windows agents/runners (attempted run on ${platform})`);
+        }
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         const pacArgs = ["data", "import"];
         const validator = new InputValidator_1.InputValidator(host);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
-          validator.pushInput(pacArgs, "--dataDirectory", parameters.dataDirectory);
+          validator.pushInput(pacArgs, "--data", parameters.dataFile);
           validator.pushInput(pacArgs, "--verbose", parameters.verbose);
-          validator.pushInput(pacArgs, "--environment", parameters.environment);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("Action Result: " + pacResult);
@@ -18773,6 +18781,19 @@ var require_ActionsHost = __commonJS({
   }
 });
 
+// out/lib/auth/getEnvironmentUrl.js
+var require_getEnvironmentUrl = __commonJS({
+  "out/lib/auth/getEnvironmentUrl.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    var core_1 = require_core();
+    function getEnvironmentUrl() {
+      return (0, core_1.getInput)("environment-url", { required: false });
+    }
+    exports2.default = getEnvironmentUrl;
+  }
+});
+
 // out/lib/auth/getCredentials.js
 var require_getCredentials = __commonJS({
   "out/lib/auth/getCredentials.js"(exports2) {
@@ -18942,7 +18963,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.9.1",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.70",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.73",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -18977,7 +18998,7 @@ var require_runnerParameters = __commonJS({
   }
 });
 
-// out/actions/install-application/index.js
+// out/actions/export-data/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve) {
@@ -19006,42 +19027,40 @@ var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P,
   });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = void 0;
 var actions_1 = require_actions();
 var core = require_core();
 var YamlParser_1 = require_YamlParser();
 var ActionsHost_1 = require_ActionsHost();
+var getEnvironmentUrl_1 = require_getEnvironmentUrl();
 var getCredentials_1 = require_getCredentials();
 var runnerParameters_1 = require_runnerParameters();
 (() => __awaiter(void 0, void 0, void 0, function* () {
-  if (process.env.GITHUB_ACTIONS) {
-    yield main();
+  const taskParser = new YamlParser_1.YamlParser();
+  const parameterMap = taskParser.getHostParameterEntries("export-data");
+  const actionsHost = new ActionsHost_1.ActionsHost();
+  const workingDir = actionsHost.getInput({ name: "working-directory", required: false });
+  if (workingDir) {
+    runnerParameters_1.runnerParameters.workingDir = workingDir;
   }
-}))();
-function main() {
-  return __awaiter(this, void 0, void 0, function* () {
-    try {
-      core.startGroup("install-application:");
-      const taskParser = new YamlParser_1.YamlParser();
-      const parameterMap = taskParser.getHostParameterEntries("install-application");
-      const actionsHost = new ActionsHost_1.ActionsHost();
-      const workingDir = actionsHost.getInput({ name: "working-directory", required: false });
-      if (workingDir) {
-        runnerParameters_1.runnerParameters.workingDir = workingDir;
-      }
-      yield (0, actions_1.installApplication)({
-        credentials: (0, getCredentials_1.default)(),
-        environment: parameterMap["environment"],
-        applicationListFile: parameterMap["application-list"]
-      }, runnerParameters_1.runnerParameters, actionsHost);
-      core.endGroup();
-    } catch (error) {
-      core.setFailed(`failed: ${error}`);
-      throw error;
+  core.startGroup("export-data:");
+  yield (0, actions_1.dataExport)({
+    credentials: (0, getCredentials_1.default)(),
+    environmentUrl: (0, getEnvironmentUrl_1.default)(),
+    schemaFile: parameterMap["schema-file"],
+    dataFile: parameterMap["data-file"],
+    overwrite: parameterMap["overwrite"],
+    verbose: {
+      name: "verbose",
+      required: false,
+      defaultValue: false
     }
-  });
-}
-exports.main = main;
+  }, runnerParameters_1.runnerParameters, actionsHost);
+  core.endGroup();
+}))().catch((error) => {
+  const logger = runnerParameters_1.runnerParameters.logger;
+  logger.error(`failed: ${error}`);
+  core.endGroup();
+});
 /*!
  * Tmp
  *

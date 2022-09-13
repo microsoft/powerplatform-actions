@@ -10,7 +10,7 @@
       "pac/0.1.0": {
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "3.0.1",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "3.0.3",
           "StyleCop.Analyzers": "1.1.118",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Net.Http.WinHttpHandler": "6.0.1",
@@ -152,7 +152,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.117": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.128": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.1",
           "System.ComponentModel.Composition": "5.0.0",
@@ -163,7 +163,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.117"
+            "fileVersion": "9.1.1.128"
           }
         }
       },
@@ -513,7 +513,7 @@
           }
         }
       },
-      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/3.0.1": {
+      "Microsoft.PowerApps.AppInsights.BatchedTelemetry/3.0.3": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.21.0",
           "Newtonsoft.Json": "13.0.1",
@@ -521,12 +521,12 @@
         },
         "runtime": {
           "lib/net6.0/Microsoft.PowerPlatform.Tooling.BatchedTelemetry.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.32"
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.3.0"
           },
           "lib/net6.0/pacTelemetryUpload.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.32"
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.3.0"
           }
         }
       },
@@ -1046,6 +1046,14 @@
           "lib/netstandard2.0/Microsoft.Win32.SystemEvents.dll": {
             "assemblyVersion": "5.0.0.0",
             "fileVersion": "5.0.20.51904"
+          }
+        }
+      },
+      "MimeMapping/1.0.1.37": {
+        "runtime": {
+          "lib/netstandard2.1/MimeMapping.dll": {
+            "assemblyVersion": "1.0.1.37",
+            "fileVersion": "1.0.1.37"
           }
         }
       },
@@ -1967,7 +1975,7 @@
           "Microsoft.Extensions.FileSystemGlobbing": "5.0.0",
           "Microsoft.Extensions.Http": "5.0.0",
           "Microsoft.Extensions.Logging": "5.0.0",
-          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "3.0.1",
+          "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "3.0.3",
           "NLog": "4.6.5",
           "NLog.Extensions.Logging": "1.5.1",
           "Newtonsoft.Json": "13.0.1",
@@ -2032,7 +2040,7 @@
       "bolt.module.cds/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.117",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.128",
           "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
           "Microsoft.Identity.Client": "4.44.0",
@@ -2086,6 +2094,7 @@
       "bolt.module.paportal/0.1.0": {
         "dependencies": {
           "Microsoft.PowerPlatform.Dataverse.Client": "1.0.9",
+          "MimeMapping": "1.0.1.37",
           "YamlDotNet": "11.2.1",
           "bolt.cli": "0.1.0",
           "bolt.system": "0.1.0"
@@ -2128,7 +2137,7 @@
       "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.117",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.128",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
@@ -2253,12 +2262,12 @@
       "path": "microsoft.bcl.asyncinterfaces/6.0.0",
       "hashPath": "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.117": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.128": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-FoheVoEo2eI+KfTeK9vU1MSJ9TTzzlynEfY79IE9cbEl7tUexH9uJkihtL+LAV160CIXttWFCn9EH4Yy554N1g==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.117",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.117.nupkg.sha512"
+      "sha512": "sha512-afbSqZ+WKvycac2LH4+oqf4jXYSKYSrN/XYSz+CiAzYPggGMv4J29KcBM9AU5akMR+K12dImt2CCo/Ei4V2BoA==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.128",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.128.nupkg.sha512"
     },
     "Microsoft.CSharp/4.7.0": {
       "type": "package",
@@ -2491,12 +2500,12 @@
       "path": "microsoft.openapi.readers/1.2.3",
       "hashPath": "microsoft.openapi.readers.1.2.3.nupkg.sha512"
     },
-    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/3.0.1": {
+    "Microsoft.PowerApps.AppInsights.BatchedTelemetry/3.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-EuVS1rKlWhDbC2ov5OlfBLUmYTMvBo6IFAQmHY6Yd7T7ee/Yo4Pe23km5THybK7JD+AmIvGyUFZFkcDgo70utA==",
-      "path": "microsoft.powerapps.appinsights.batchedtelemetry/3.0.1",
-      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.3.0.1.nupkg.sha512"
+      "sha512": "sha512-J0G1UFF9WeAEEHsVseAOrgl6J+cGWGnY09nz0Fvk5YuALEQ8cYjaUysmY6pLDkYP9cg/zZ6jZirVzGTEQGAw4A==",
+      "path": "microsoft.powerapps.appinsights.batchedtelemetry/3.0.3",
+      "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.3.0.3.nupkg.sha512"
     },
     "Microsoft.PowerApps.Checker.Client/1.0.0.3": {
       "type": "package",
@@ -2560,6 +2569,13 @@
       "sha512": "sha512-Bh6blKG8VAKvXiLe2L+sEsn62nc1Ij34MrNxepD2OCrS5cpCwQa9MeLyhVQPQ/R4Wlzwuy6wMK8hLb11QPDRsQ==",
       "path": "microsoft.win32.systemevents/5.0.0",
       "hashPath": "microsoft.win32.systemevents.5.0.0.nupkg.sha512"
+    },
+    "MimeMapping/1.0.1.37": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KyvZaEsIOlrbs3+uyqylnDy3QepY0iyVHEsYpefs7OGCBCfWnW7XuQ55hATazdkcav50GbX26TmhBO4lC05pjQ==",
+      "path": "mimemapping/1.0.1.37",
+      "hashPath": "mimemapping.1.0.1.37.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.1": {
       "type": "package",
