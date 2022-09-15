@@ -33,7 +33,7 @@ inputs:
     default: 'Public'
 
   data-file:
-    description: 'File name for data zip file to be imported.'
+    description: 'File name for data zip file, or folder with data-schema.xml & data.xml, to be imported.'
     required: true
 
 runs:

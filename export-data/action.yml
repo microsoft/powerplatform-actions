@@ -37,7 +37,7 @@ inputs:
     required: true
 
   data-file:
-    description: 'File name for data zip file. Default data.zip.'
+    description: 'File name and path for data zip file. Default: data.zip.'
     required: true
 
   overwrite:
