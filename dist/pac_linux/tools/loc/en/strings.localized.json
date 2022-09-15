@@ -787,6 +787,7 @@
   "VirtualAgentListVerbHelp" : "List of Virtual Agents in current or target Dataverse environment.",
   "VirtualAgentListHeader" : "Name,Component State,Is Managed,Solution ID,Status Code,State Code",
   "VirtualAgentListNoChatbotsFound" : "No Chatbots found in the {0} environment",
+  "DataExportFailed" : "Data export failed",
   "PipelineModuleHelp" : "Work with Pipelines",
   "PipelineListHelp" : "List Pipelines",
   "PipelineListHeader" : "Name,Description,Id",
