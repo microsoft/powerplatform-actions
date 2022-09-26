@@ -119,6 +119,11 @@ inputs:
     required: false
     default: 'false'
 
+  overwrite:
+    description: 'Allow overwrite of local solution file if it already exists.'
+    required: false
+    default: 'false'
+
 runs:
   using: 'node12'
   main: '../dist/actions/export-solution/index.js'

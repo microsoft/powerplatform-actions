@@ -38,6 +38,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         outlookSynchronizationSettings: parameterMap['export-outlook-synchronization-settings'],
         relationshipRoles: parameterMap['export-relationship-roles'],
         sales: parameterMap['export-sales'],
+        overwrite: parameterMap['overwrite'],
     }, runnerParameters, actionsHost);
 
     core.endGroup();
