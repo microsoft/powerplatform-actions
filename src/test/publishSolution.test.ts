@@ -26,7 +26,6 @@ describe("publish solution test", () => {
         mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ publishSolution: publishSolutionStub });
         mock(() => import("../../src/lib/auth/getCredentials")).withDefault(() => credentials );
         mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => environmentUrl );
-        mock(() => import("fs/promises")).with({ chmod: fake() });
         mock(() => import("../../src/lib/runnerParameters")).with({ runnerParameters: runnerParameters });
       });
     await publishSolution.main();
@@ -39,6 +38,8 @@ describe("publish solution test", () => {
     publishSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
+      async: { name: 'run-asynchronously', required: false, defaultValue: 'false' },
+      maxAsyncWaitTimeInMin: { name: 'max-async-wait-time', required: false, defaultValue: '60' },
     }, runnerParameters, new ActionsHost);
   });
 });
