@@ -280,9 +280,7 @@ var require_exportSolution = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--name", parameters.name);
           validator.pushInput(pacArgs, "--path", parameters.path, resolveFolder);
-          if (parameters.overwrite && validator.getInput(parameters.overwrite) == "true") {
-            pacArgs.push("--overwrite");
-          }
+          validator.pushInput(pacArgs, "--overwrite", parameters.overwrite);
           validator.pushInput(pacArgs, "--managed", parameters.managed);
           validator.pushInput(pacArgs, "--async", parameters.async);
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
@@ -5785,9 +5783,7 @@ var require_publishSolution = __commonJS({
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "publish"];
           const validator = new InputValidator_1.InputValidator(host);
-          if (parameters.async && validator.getInput(parameters.async) == "true") {
-            pacArgs.push("--async");
-          }
+          validator.pushInput(pacArgs, "--async", parameters.async);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("PublishSolution Action Result: " + pacResult);
@@ -18950,7 +18946,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.9.1",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.73",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.74",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
