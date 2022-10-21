@@ -36,6 +36,7 @@
   "verbPAPortalDownload": "on",
   "verbPAPortalBundle": "off",
   "enablePAPortalTranslations": "off",
+  "powerPagesCoreEntities": "off",
   "componentSettings": "off",
   "verbCanvas": "on",
   "verbCanvasCreate": "on",
@@ -49,13 +50,18 @@
   "verbConnectionList": "off",
   "verbPAPortalReguid": "off",
   "moduleApplication": "on",
-  "moduleTool": "off",
+  "moduleTool": "on",
   "verbPluginInitNupkg": "on",
   "verbAdminAssignUser": "on",
   "verbSolutionAddComponent": "on",
   "moduleData": "on",
   "verbSolutionSync": "on",
   "verbListTemplates": "on",
+  "verbCreateServicePrincipal": "off",
   "modulePipeline": "off",
-  "moduleVirtualAgent": "off"
+  "moduleVirtualAgent": "off",
+  "warningMessageForPAPortalSiteVisibility": "on",
+  "moduleModelBuilder": "off",
+  "enableForPAPortalTemplateLocalization": "off",
+  "verbPAPortalTranslations": "off"
 }
