@@ -33,11 +33,11 @@ inputs:
     default: 'Public'
 
   download-path:
-    description: 'Path where the website content will be downloaded'
+    description: 'Local path to where the Power Pages website content will be downloaded'
     required: true
 
   website-id:
-    description: 'Website id of the website to be downloaded.'
+    description: 'Website id of the Power Pages website to be downloaded'
     required: true
 
   exclude-entities:
@@ -45,7 +45,7 @@ inputs:
     required: false
 
   overwrite:
-    description: 'Overwrite if portal context exists at the given path'
+    description: 'Overwrite if Power Pages website exists at the given path'
     required: false
 
   working-directory:
