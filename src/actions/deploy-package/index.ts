@@ -24,6 +24,7 @@ export async function main(): Promise<void> {
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
             packagePath: parameterMap["package"],
+            settings: parameterMap["settings"],
         }, runnerParameters, new ActionsHost('DeployPackage'))
         core.info('package deployed.');
         core.endGroup();
