@@ -5866,6 +5866,7 @@ var require_deployPackage = __commonJS({
           fs.ensureDir(path.dirname(logFile));
           pacArgs.push("--logFile", logFile);
           validator.pushInput(pacArgs, "--logConsole", parameters.logConsole);
+          validator.pushInput(pacArgs, "--settings", parameters.settings);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("DeployPackage Action Result: " + pacResult);
@@ -18959,7 +18960,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.9.1",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.74",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.75",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
