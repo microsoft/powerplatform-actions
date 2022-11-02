@@ -38,6 +38,7 @@ inputs:
   application-user:
     description: 'Specifies whether the input user is an application user. If business unit is not specified the application user will be added to the authenticated users business unit.'
     required: false
+    default: 'false'
 
   business-unit:
     description: 'ID of business unit to associate application user with.'
