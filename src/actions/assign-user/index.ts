@@ -27,7 +27,9 @@ export async function main(): Promise<void> {
         credentials: getCredentials(),
         environment: parameterMap['environment'],
         user: parameterMap['user'],
-        role: parameterMap['role']
+        role: parameterMap['role'],
+        applicationUser: parameterMap['application-user'],
+        businessUnit: parameterMap['business-unit'],
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 }
