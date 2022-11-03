@@ -38,6 +38,8 @@ describe("assign-user tests", () => {
             environment: { name: 'environment', required: true, defaultValue: undefined },
             user: { name: 'user', required: true, defaultValue: undefined },
             role: { name: 'role', required: true, defaultValue: undefined },
+            applicationUser: { name: 'application-user', required: false, defaultValue: 'false' },
+            businessUnit: { name: 'business-unit', required: false, defaultValue: undefined },
         }, runnerParameters, new ActionsHost());
     });
 });
