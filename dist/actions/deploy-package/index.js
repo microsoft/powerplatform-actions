@@ -2235,10 +2235,24 @@ var require_authenticate = __commonJS({
     }
     function addClientCredentials(parameters) {
       process.env.PAC_CLI_SPN_SECRET = parameters.clientSecret;
-      return ["--tenant", parameters.tenantId, "--applicationId", parameters.appId, "--clientSecret", parameters.clientSecret];
+      const clientSecret = parameters.encodeSecret ? `data:text/plain;base64,${Buffer.from(parameters.clientSecret, "binary").toString("base64")}` : parameters.clientSecret;
+      return [
+        "--tenant",
+        parameters.tenantId,
+        "--applicationId",
+        parameters.appId,
+        "--clientSecret",
+        clientSecret
+      ];
     }
     function addUsernamePassword(parameters) {
-      return ["--username", parameters.username, "--password", parameters.password];
+      const password = parameters.encodePassword ? `data:text/plain;base64,${Buffer.from(parameters.password, "binary").toString("base64")}` : parameters.password;
+      return [
+        "--username",
+        parameters.username,
+        "--password",
+        password
+      ];
     }
     function addCloudInstance(parameters) {
       const cloudInstance = parameters.cloudInstance || "Public";
@@ -8005,6 +8019,7 @@ var require_deployPackage = __commonJS({
           fs.ensureDir(path.dirname(logFile));
           pacArgs.push("--logFile", logFile);
           validator.pushInput(pacArgs, "--logConsole", parameters.logConsole);
+          validator.pushInput(pacArgs, "--settings", parameters.settings);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("DeployPackage Action Result: " + pacResult);
@@ -8989,6 +9004,8 @@ var require_assignUser = __commonJS({
           validator.pushInput(pacArgs, "--environment", parameters.environment);
           validator.pushInput(pacArgs, "--user", parameters.user);
           validator.pushInput(pacArgs, "--role", parameters.role);
+          validator.pushInput(pacArgs, "--application-user", parameters.applicationUser);
+          validator.pushInput(pacArgs, "--business-unit", parameters.businessUnit);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("AssignUser Action Result: " + pacResult);
@@ -18959,7 +18976,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^0.5.2",
         "@actions/core": "^1.9.1",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.74",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.81",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -19045,7 +19062,8 @@ function main() {
       yield (0, actions_1.deployPackage)({
         credentials: (0, getCredentials_1.default)(),
         environmentUrl: (0, getEnvironmentUrl_1.default)(),
-        packagePath: parameterMap["package"]
+        packagePath: parameterMap["package"],
+        settings: parameterMap["settings"]
       }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost("DeployPackage"));
       core.info("package deployed.");
       core.endGroup();

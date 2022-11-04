@@ -36,6 +36,10 @@ inputs:
     description: 'Path to a package dll or zip file with a package.'
     required: true
 
+  settings:
+    description: 'Runtime Package Settings that are passed to the package that is being deployed. The format of the string must be `key=value|key=value`.'
+    required: false
+
 runs:
   using: 'node12'
   main: '../dist/actions/deploy-package/index.js'

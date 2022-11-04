@@ -18998,7 +18998,7 @@ var require_runnerParameters = __commonJS({
   }
 });
 
-// out/actions/copy-environment/index.js
+// out/actions/assign-user/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve) {
@@ -19046,17 +19046,15 @@ var runnerParameters_1 = require_runnerParameters();
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
     const taskParser = new YamlParser_1.YamlParser();
-    const parameterMap = taskParser.getHostParameterEntries("copy-environment");
-    core.startGroup("copy-environment:");
-    yield (0, actions_1.copyEnvironment)({
+    const parameterMap = taskParser.getHostParameterEntries("assign-user");
+    core.startGroup("assign-user:");
+    yield (0, actions_1.assignUser)({
       credentials: (0, getCredentials_1.default)(),
-      sourceEnvironmentUrl: parameterMap["source-url"],
-      targetEnvironmentUrl: parameterMap["target-url"],
-      sourceEnvironment: parameterMap["source-env"],
-      targetEnvironment: parameterMap["target-env"],
-      copyType: parameterMap["copy-type"],
-      overrideFriendlyName: parameterMap["override-friendly-name"],
-      friendlyTargetEnvironmentName: parameterMap["friendly-name"]
+      environment: parameterMap["environment"],
+      user: parameterMap["user"],
+      role: parameterMap["role"],
+      applicationUser: parameterMap["application-user"],
+      businessUnit: parameterMap["business-unit"]
     }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
     core.endGroup();
   });
