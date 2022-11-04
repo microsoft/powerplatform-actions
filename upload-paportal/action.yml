@@ -33,7 +33,7 @@ inputs:
     default: 'Public'
 
   upload-path:
-    description: 'Path from where the website content will be uploaded'
+    description: 'Path from where the Power Pages website content will be uploaded'
     required: true
 
   deployment-profile:
