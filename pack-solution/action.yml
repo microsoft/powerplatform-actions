@@ -53,6 +53,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/pack-solution/index.js'
   # main: '../out/actions/pack-solution/index.js'

@@ -46,5 +46,5 @@ inputs:
     default: 'Public'
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/backup-environment/index.js'
