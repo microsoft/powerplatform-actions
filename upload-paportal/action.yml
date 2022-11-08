@@ -45,6 +45,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/upload-paportal/index.js'
   #main: '../out/actions/upload-paportal/index.js'

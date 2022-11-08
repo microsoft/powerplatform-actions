@@ -49,6 +49,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/check-solution/index.js'
   # main: '../out/actions/check-solution/index.js'

@@ -45,5 +45,5 @@ inputs:
     required: false
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/assign-user/index.js'

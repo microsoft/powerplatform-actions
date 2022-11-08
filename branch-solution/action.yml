@@ -38,6 +38,6 @@ inputs:
     default: 'false'
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/branch-solution/index.js'
   # main: '../out/actions/branch-solution/index.js'

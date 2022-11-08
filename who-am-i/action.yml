@@ -37,6 +37,6 @@ outputs:
     description: ID of the environment connected with
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/who-am-i/index.js'
   # main: '../out/actions/who-am-i/index.js'

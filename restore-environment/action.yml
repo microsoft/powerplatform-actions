@@ -58,5 +58,5 @@ inputs:
     default: 'Public'
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/restore-environment/index.js'
