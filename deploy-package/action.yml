@@ -41,5 +41,5 @@ inputs:
     required: false
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/deploy-package/index.js'

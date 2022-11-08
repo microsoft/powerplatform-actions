@@ -37,6 +37,6 @@ inputs:
     required: true
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/import-data/index.js'
 

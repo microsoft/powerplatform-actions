@@ -43,6 +43,6 @@ inputs:
     default: 'Public'
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: '../dist/actions/publish-solution/index.js'
   # main: '../out/actions/publish-solution/index.js'
