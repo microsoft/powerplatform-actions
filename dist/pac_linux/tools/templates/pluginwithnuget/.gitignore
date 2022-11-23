@@ -6,3 +6,6 @@
 
 # vs intermediate directory
 /.vs
+
+# MSBuild Binary and Structured Log
+*.binlog

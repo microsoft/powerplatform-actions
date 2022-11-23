@@ -4,7 +4,8 @@
       "es2021": true
     },
     "extends": [
-      "eslint:recommended"
+      "eslint:recommended",
+      "plugin:react/recommended"
     ],
     "globals": {
       "ComponentFramework": true
@@ -18,5 +19,10 @@
       "@typescript-eslint"
     ],
     "rules": {
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
     }
 }

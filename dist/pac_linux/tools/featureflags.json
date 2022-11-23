@@ -61,7 +61,8 @@
   "modulePipeline": "off",
   "moduleVirtualAgent": "off",
   "warningMessageForPAPortalSiteVisibility": "on",
-  "moduleModelBuilder": "off",
+  "moduleModelBuilder": "on",
   "enableForPAPortalTemplateLocalization": "off",
-  "verbPAPortalTranslations": "off"
+  "verbPAPortalTranslations": "off",
+  "verbAdminAssignGroup": "off"
 }
