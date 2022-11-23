@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
     env:
       RUNNER_DEBUG: 1
-      WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+      WF_USERNAME: ppdevautomation@ppdevtools.onmicrosoft.com
       WF_APPID: 8a7729e0-2b71-4919-a89a-c789d0a9720a
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
       PORTAL_WORKING_DIRECTORY: ./paportal-download
@@ -114,7 +114,7 @@ jobs:
       fail-fast: false
     env:
       RUNNER_DEBUG: 1
-      WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+      WF_USERNAME: ppdevautomation@ppdevtools.onmicrosoft.com
       WF_APPID: 8a7729e0-2b71-4919-a89a-c789d0a9720a
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
       PORTAL_WORKING_DIRECTORY: ./paportal-download
