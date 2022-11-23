@@ -33,12 +33,12 @@ jobs:
       PORTAL_MANIFEST_FILE_PATH: ./starter-portal/.portalconfig/*-manifest.yml
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         lfs: true
 
     - name: Setup Node.js environment
-      uses: actions/setup-node@v2-beta
+      uses: actions/setup-node@v3
       with:
         node-version: 16.x
         registry-url: https://npm.pkg.github.com
@@ -100,7 +100,7 @@ jobs:
 
     - name: Upload pac CLI logs
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pac-cli-log ${{ matrix.os }}
         path: ./dist/pac*/tools/logs/pac-log.txt
@@ -121,7 +121,7 @@ jobs:
       PORTAL_MANIFEST_FILE_PATH: ./starter-portal/.portalconfig/*-manifest.yml
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         lfs: true
 
@@ -156,7 +156,7 @@ jobs:
 
     - name: Upload pac CLI logs
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pac-cli-log ${{ matrix.os }}
         path: ./dist/pac*/tools/logs/pac-log.txt

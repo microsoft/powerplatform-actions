@@ -29,7 +29,7 @@ jobs:
       WF_APP_USER_ID: "82e66a08-8bf9-42bf-883a-7e2d17c7cede"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         lfs: true
 
@@ -253,7 +253,7 @@ jobs:
 
     - name: Upload pac CLI logs
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: pac-cli-log ${{ matrix.os }}
         path: ./dist/pac*/tools/logs/pac-log.txt
