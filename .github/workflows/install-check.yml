@@ -10,7 +10,7 @@ on:
 
 env:
   RUNNER_DEBUG: 1
-  WF_USERNAME: davidjen@ppdevtools.onmicrosoft.com
+  WF_USERNAME: ppdevautomation@ppdevtools.onmicrosoft.com
   WF_ENVIRONMENT_URL: https://ppdevtools.crm.dynamics.com
 
 jobs:
