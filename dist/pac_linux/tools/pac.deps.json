@@ -153,7 +153,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.130": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.134": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.1",
           "System.ComponentModel.Composition": "5.0.0",
@@ -164,7 +164,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.130"
+            "fileVersion": "9.1.1.134"
           }
         }
       },
@@ -693,7 +693,7 @@
           "Microsoft.OpenApi.Readers": "1.2.3",
           "Microsoft.PowerApps.Generator.Builder": "1.0.2055.76",
           "Microsoft.PowerApps.Generator.Core": "1.0.2055.76",
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.5.5-preview",
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.5.6-preview",
           "System.Text.Json": "6.0.3"
         },
         "runtime": {
@@ -999,21 +999,13 @@
           "System.Text.Json": "6.0.3"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Crm.Sdk.Proxy.dll": {
-            "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.2.47.9409"
-          },
           "lib/netcoreapp3.1/Microsoft.PowerPlatform.Dataverse.Client.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.9"
-          },
-          "lib/netcoreapp3.1/Microsoft.Xrm.Sdk.dll": {
-            "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.2.47.9489"
           }
         }
       },
-      "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.4": {
+      "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.9": {
         "dependencies": {
           "System.CodeDom": "6.0.0",
           "System.Configuration.ConfigurationManager": "6.0.0",
@@ -1021,13 +1013,21 @@
           "System.Xml.XmlDocument": "4.3.0"
         },
         "runtime": {
+          "lib/net6.0/Microsoft.Crm.Sdk.Proxy.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.2.47.11043"
+          },
           "lib/net6.0/Microsoft.PowerPlatform.Dataverse.ModelBuilderLib.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
+          },
+          "lib/net6.0/Microsoft.Xrm.Sdk.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.2.47.11043"
           }
         }
       },
-      "Microsoft.PowerPlatform.Formulas.Tools/0.5.5-preview": {
+      "Microsoft.PowerPlatform.Formulas.Tools/0.5.6-preview": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.1",
           "System.Text.Encodings.Web": "6.0.0",
@@ -1036,8 +1036,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerPlatform.Formulas.Tools.dll": {
-            "assemblyVersion": "0.5.5.0",
-            "fileVersion": "0.5.5.0"
+            "assemblyVersion": "0.5.6.0",
+            "fileVersion": "0.5.6.0"
           }
         }
       },
@@ -1097,34 +1097,34 @@
           }
         }
       },
-      "NuGet.Common/6.2.0": {
+      "NuGet.Common/6.3.1": {
         "dependencies": {
-          "NuGet.Frameworks": "6.2.0"
+          "NuGet.Frameworks": "6.3.1"
         },
         "runtime": {
           "lib/netstandard2.0/NuGet.Common.dll": {
-            "assemblyVersion": "6.2.0.146",
-            "fileVersion": "6.2.0.146"
+            "assemblyVersion": "6.3.1.1",
+            "fileVersion": "6.3.1.1"
           }
         }
       },
-      "NuGet.Configuration/6.2.0": {
+      "NuGet.Configuration/6.3.1": {
         "dependencies": {
-          "NuGet.Common": "6.2.0",
+          "NuGet.Common": "6.3.1",
           "System.Security.Cryptography.ProtectedData": "6.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/NuGet.Configuration.dll": {
-            "assemblyVersion": "6.2.0.146",
-            "fileVersion": "6.2.0.146"
+            "assemblyVersion": "6.3.1.1",
+            "fileVersion": "6.3.1.1"
           }
         }
       },
-      "NuGet.Frameworks/6.2.0": {
+      "NuGet.Frameworks/6.3.1": {
         "runtime": {
           "lib/netstandard2.0/NuGet.Frameworks.dll": {
-            "assemblyVersion": "6.2.0.146",
-            "fileVersion": "6.2.0.146"
+            "assemblyVersion": "6.3.1.1",
+            "fileVersion": "6.3.1.1"
           }
         }
       },
@@ -1995,6 +1995,7 @@
           "NLog.Extensions.Logging": "1.5.1",
           "Newtonsoft.Json": "13.0.1",
           "System.ComponentModel.Composition": "5.0.0",
+          "System.Drawing.Common": "6.0.0",
           "System.Text.Encodings.Web": "6.0.0",
           "System.Text.Json": "6.0.3",
           "bolt.system": "0.1.0"
@@ -2041,7 +2042,7 @@
       "bolt.module.canvas/0.1.0": {
         "dependencies": {
           "Microsoft.PowerApps.Generator.Connector": "1.0.2055.76",
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.5.5-preview",
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.5.6-preview",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
@@ -2099,7 +2100,7 @@
       "bolt.module.modelbuilder/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib": "1.0.4",
+          "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib": "1.0.9",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
           "bolt.cli": "0.1.0",
@@ -2167,7 +2168,7 @@
       "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.130",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.134",
           "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
@@ -2194,7 +2195,7 @@
           "Microsoft.Extensions.Logging": "5.0.0",
           "Microsoft.Extensions.Logging.Debug": "5.0.0",
           "Newtonsoft.Json": "13.0.1",
-          "NuGet.Configuration": "6.2.0",
+          "NuGet.Configuration": "6.3.1",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Runtime.InteropServices.RuntimeInformation": "4.3.0"
         },
@@ -2292,12 +2293,12 @@
       "path": "microsoft.bcl.asyncinterfaces/6.0.0",
       "hashPath": "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.130": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.134": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-WZTl8CNAbUOlgKk41RyPrniSIS68RCxNN/azpWo4VwJYugZb1FsItFsCx2G2NldFA0zcHW9JjPbcl16sNv6PvQ==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.130",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.130.nupkg.sha512"
+      "sha512": "sha512-uZroCXzHvVaB+5s6ZpMPDzXzeh3RqSSbs6NpDvbPLn01/R5me7A1F+tdTIBC2DhHTkiaycKdWO24+qipDDVBDQ==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.134",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.134.nupkg.sha512"
     },
     "Microsoft.CSharp/4.7.0": {
       "type": "package",
@@ -2572,19 +2573,19 @@
       "path": "microsoft.powerplatform.dataverse.client/1.0.9",
       "hashPath": "microsoft.powerplatform.dataverse.client.1.0.9.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.4": {
+    "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-hrUkap01yAhPgjQ1P/vZEcAegYN0y32ifuifkGoFbNMbYCz8eqHbBsKtjY5A/6PzO7cGR5P49ieh+kFmm1B8cA==",
-      "path": "microsoft.powerplatform.dataverse.modelbuilderlib/1.0.4",
-      "hashPath": "microsoft.powerplatform.dataverse.modelbuilderlib.1.0.4.nupkg.sha512"
+      "sha512": "sha512-ts9qznL8TshVLHMThtwxJaD7NG1jty/PSrKNr+eAo5frAwwS1Q/usRNW+oumsnmk0YFu0El9legOR8az100ryA==",
+      "path": "microsoft.powerplatform.dataverse.modelbuilderlib/1.0.9",
+      "hashPath": "microsoft.powerplatform.dataverse.modelbuilderlib.1.0.9.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Formulas.Tools/0.5.5-preview": {
+    "Microsoft.PowerPlatform.Formulas.Tools/0.5.6-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-wgkInDbXNmaOtX8i+sUkl/j3DyfkAdlE05XI/VgApHSylZspfE4ZBmxIKDZ2xXYuCl601DJsgKZ+EIfD5zNnHw==",
-      "path": "microsoft.powerplatform.formulas.tools/0.5.5-preview",
-      "hashPath": "microsoft.powerplatform.formulas.tools.0.5.5-preview.nupkg.sha512"
+      "sha512": "sha512-7bfRRd26AUNpjVNn5LJrUQ6tQuuY8Vbwolk43rJAxyl8WdJsVzOANe0irYRTnytF6ZXfuTFGYHTw0Hjl2Iixkw==",
+      "path": "microsoft.powerplatform.formulas.tools/0.5.6-preview",
+      "hashPath": "microsoft.powerplatform.formulas.tools.0.5.6-preview.nupkg.sha512"
     },
     "Microsoft.Rest.ClientRuntime/2.3.20": {
       "type": "package",
@@ -2635,26 +2636,26 @@
       "path": "nlog.extensions.logging/1.5.1",
       "hashPath": "nlog.extensions.logging.1.5.1.nupkg.sha512"
     },
-    "NuGet.Common/6.2.0": {
+    "NuGet.Common/6.3.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-zr+d71sxvPFBlswbSKUmnixlAY3muvBmbtTzZ6b6xiyxHtIkvSskTG3LzL/sOquTZjcsQh6XhS3iiZQPj222PA==",
-      "path": "nuget.common/6.2.0",
-      "hashPath": "nuget.common.6.2.0.nupkg.sha512"
+      "sha512": "sha512-/WgxNyc9dXl+ZrQJDf5BXaqtMbl0CcDC5GEQITecbHZBQHApTMuxeTMMEqa0Y+PD1CIxTtbRY4jmotKS5dsLuA==",
+      "path": "nuget.common/6.3.1",
+      "hashPath": "nuget.common.6.3.1.nupkg.sha512"
     },
-    "NuGet.Configuration/6.2.0": {
+    "NuGet.Configuration/6.3.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8T64rHLh/Lld2Lr5qAFmVGdbOpdMtgdDNbm0rEuT5zNJqp+So8p3Dw3sdNE1ThK/DjGuc8c+C2lMTb7JiCcD1Q==",
-      "path": "nuget.configuration/6.2.0",
-      "hashPath": "nuget.configuration.6.2.0.nupkg.sha512"
+      "sha512": "sha512-ja227AmXuDVgPXi3p2VTZFTYI/4xwwLSPYtd9Y9WIfCrRqSNDa96J5hm70wXhBCOQYvoRVDjp3ufgDnnqZ0bYA==",
+      "path": "nuget.configuration/6.3.1",
+      "hashPath": "nuget.configuration.6.3.1.nupkg.sha512"
     },
-    "NuGet.Frameworks/6.2.0": {
+    "NuGet.Frameworks/6.3.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vf2Iq2/z3QTZo90uHyjGpiBbI4BwJamO4dawC7UvRws9qpBjJcWDADiCEmo0pZSvwUgkb4SQUOuqccCa3JmjxQ==",
-      "path": "nuget.frameworks/6.2.0",
-      "hashPath": "nuget.frameworks.6.2.0.nupkg.sha512"
+      "sha512": "sha512-Ae1vRjHDbNU7EQwQnDlxFRl+O9iQLp2H9Z/sRB/EAmO8+neUOeOfbkLClO7ZNcTcW5p1FDABrPakXICtQ0JCRw==",
+      "path": "nuget.frameworks/6.3.1",
+      "hashPath": "nuget.frameworks.6.3.1.nupkg.sha512"
     },
     "runtime.any.System.Collections/4.3.0": {
       "type": "package",
