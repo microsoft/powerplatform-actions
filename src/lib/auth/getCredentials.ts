@@ -8,6 +8,7 @@ export default function getCredentials(): UsernamePassword | ClientCredentials {
     const usernamePassword: UsernamePassword = {
         username: getInput("user-name"),
         password: getInput("password-secret"),
+        encodePassword: true,
         cloudInstance: getInput("cloud"),
     };
     const isUpValid = isUsernamePasswordValid(usernamePassword);
@@ -15,6 +16,7 @@ export default function getCredentials(): UsernamePassword | ClientCredentials {
     const clientCredentials: ClientCredentials = {
         appId: getInput("app-id"),
         clientSecret: getInput("client-secret"),
+        encodeSecret: true,
         tenantId: getInput("tenant-id"),
         cloudInstance: getInput("cloud"),
     };
