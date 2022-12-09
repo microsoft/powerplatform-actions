@@ -76,7 +76,7 @@ var require_authenticate = __commonJS({
     }
     exports2.authenticateAdmin = authenticateAdmin;
     function authenticateEnvironment(pac, credentials, environmentUrl, logger) {
-      logger.log(`authN to env: authType=${isUsernamePassword(credentials) ? "UserPass" : "SPN"}; cloudInstance: ${credentials.cloudInstance || "<not set>"}; envUrl: ${environmentUrl}`);
+      logger.log(`authN to env. authType:${isUsernamePassword(credentials) ? "UserPass" : "SPN"} authScheme:${isUsernamePassword(credentials) ? "" : `${credentials.scheme}`}; cloudInstance: ${credentials.cloudInstance || "<not set>"}; envUrl: ${environmentUrl}`);
       return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateEnvironment = authenticateEnvironment;
@@ -95,6 +95,9 @@ var require_authenticate = __commonJS({
       return "username" in credentials;
     }
     function addClientCredentials(parameters) {
+      if (parameters.scheme == "ManagedServiceIdentity") {
+        return ["--managedIdentity"];
+      }
       process.env.PAC_CLI_SPN_SECRET = parameters.clientSecret;
       const clientSecret = parameters.encodeSecret ? `data:text/plain;base64,${Buffer.from(parameters.clientSecret, "binary").toString("base64")}` : parameters.clientSecret;
       return [
@@ -18809,7 +18812,8 @@ var require_getCredentials = __commonJS({
         clientSecret: getInput("client-secret"),
         encodeSecret: true,
         tenantId: getInput("tenant-id"),
-        cloudInstance: getInput("cloud")
+        cloudInstance: getInput("cloud"),
+        scheme: ""
       };
       const isCcValid = isClientCredentialsValid(clientCredentials);
       if (isUpValid && isCcValid) {
@@ -18961,7 +18965,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.0",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.82",
+        "@microsoft/powerplatform-cli-wrapper": "0.1.83",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
