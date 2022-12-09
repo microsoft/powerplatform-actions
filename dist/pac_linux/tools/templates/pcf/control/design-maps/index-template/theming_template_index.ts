@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { IDesign, DesignContext, DesignComponent } from "./generated/ManifestDesignTypes";
 import DataSetInterfaces = ComponentFramework.PropertyHelper.DataSetApi;
