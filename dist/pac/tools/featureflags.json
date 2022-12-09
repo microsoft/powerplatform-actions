@@ -58,11 +58,11 @@
   "verbSolutionSync": "on",
   "verbListTemplates": "on",
   "verbCreateServicePrincipal": "off",
-  "modulePipeline": "off",
-  "moduleVirtualAgent": "off",
+  "modulePipeline": "on",
+  "moduleVirtualAgent": "on",
   "warningMessageForPAPortalSiteVisibility": "on",
   "moduleModelBuilder": "on",
   "enableForPAPortalTemplateLocalization": "off",
   "verbPAPortalTranslations": "off",
-  "verbAdminAssignGroup": "off"
+  "verbAdminAssignGroup": "on"
 }
