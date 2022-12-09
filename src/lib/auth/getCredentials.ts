@@ -19,6 +19,7 @@ export default function getCredentials(): UsernamePassword | ClientCredentials {
         encodeSecret: true,
         tenantId: getInput("tenant-id"),
         cloudInstance: getInput("cloud"),
+        scheme: '', // no MgtIdentity support for Actions yet
     };
     const isCcValid = isClientCredentialsValid(clientCredentials);
 

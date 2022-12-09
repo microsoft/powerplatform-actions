@@ -5,7 +5,7 @@ import { should, use } from "chai";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import rewiremock from "./rewiremock";
-import { fake, stub } from "sinon";
+import { stub } from "sinon";
 import { UsernamePassword } from "@microsoft/powerplatform-cli-wrapper";
 import { runnerParameters } from "../../src/lib/runnerParameters";
 import Sinon = require("sinon");
