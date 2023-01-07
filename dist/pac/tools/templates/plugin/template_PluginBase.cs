@@ -196,7 +196,7 @@ namespace $safeprojectname$
 
             NotificationService = serviceProvider.Get<IServiceEndpointNotificationService>();
 
-            IOrganizationServiceFactory factory = serviceProvider.Get<IOrganizationServiceFactory>();
+            OrgSvcFactory = (IOrganizationServiceFactory)serviceprovider.GetService(typeof(IOrganizationServiceFactory));
 
             PluginUserService = serviceProvider.GetOrganizationService(PluginExecutionContext.UserId); // User that the plugin is registered to run as, Could be same as current user.
 
