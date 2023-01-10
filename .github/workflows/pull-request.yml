@@ -103,6 +103,19 @@ jobs:
         role: ${{ env.WF_USER_ROLE}}
         application-user: true
 
+
+    - name: Test assign-group action
+      uses: ./assign-group
+      with:
+        user-name: ${{ env.WF_USERNAME }}
+        password-secret: ${{ secrets.PASSWORD_PPDEVTOOLS }}
+        environment: ${{ steps.create-environment.outputs.environment-url }}
+        group: 'fef01b9b-da30-4cb5-b6b9-ff34c5d2ca2e'
+        group-name: 'Test Group'
+        role: 'System Customizer'
+        team-type: 'AadSecurityGroup'
+        membership-type: 'Members'
+
     - name: Test unpack-solution action
       uses: ./unpack-solution
       with:
