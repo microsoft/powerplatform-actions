@@ -61,7 +61,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Gulp task",
+            "name": "Gulp task - dist",
             "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
             "cwd": "${workspaceFolder}",
             "args": [

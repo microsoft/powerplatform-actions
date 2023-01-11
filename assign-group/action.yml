@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'assign-user'
-description: 'Assign user to a target Power Platform environment with specified security role'
+name: 'assign-group'
+description: 'Assign group to a target Power Platform environment with specified security role'
 inputs:
   user-name:
       description: 'Power Platform user name to authenticate with, e.g. myname@my-org.onmicrosoft.com. Setting this input makes user-name and password required; specifying alternate "app-id" credential set of inputs will result in an error.'
@@ -27,23 +27,30 @@ inputs:
     description: 'Id or URL of Power Platform environment to assign user to.'
     required: true
 
-  user:
-    description: 'Azure AD Object ID or user''s principal name to assign to the target environment'
+  group:
+    description: 'AAD object id of group to assign to target environment.'
+    required: true
+
+  group-name:
+    description: 'Name of group/team that will created in Dataverse.'
     required: true
 
   role:
-    description: 'Id of the security role to assign user'
+    description: 'Security role name or id to assign to the group.'
     required: true
 
-  application-user:
-    description: 'Specifies whether the input user is an application user. If business unit is not specified the application user will be added to the authenticated users business unit.'
-    required: false
-    default: 'false'
+  team-type:
+    description: 'Type of team. [Owner|Access|AadSecurityGroup|AadOfficeGroup]'
+    required: true
+
+  membership-type:
+    description: 'Team membership type. [MembersAndGuests|Members|Owners|Guests]'
+    required: true
 
   business-unit:
-    description: 'ID of business unit to associate application user with.'
+    description: 'ID of business unit to associate application group with.'
     required: false
 
 runs:
   using: 'node16'
-  main: '../dist/actions/assign-user/index.js'
+  main: '../dist/actions/assign-group/index.js'
