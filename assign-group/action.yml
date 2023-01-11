@@ -53,4 +53,4 @@ inputs:
 
 runs:
   using: 'node16'
-  main: '../dist/actions/assign-user/index.js'
+  main: '../dist/actions/assign-group/index.js'
