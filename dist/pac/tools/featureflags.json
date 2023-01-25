@@ -6,6 +6,7 @@
   "verbOrgList": "on",
   "verbSolutionImport": "on",
   "verbSolutionImportActivateFlows": "off",
+  "verbSolutionImportUpdateCanvasAppOwnership": "off",
   "verbSolutionExport": "on",
   "verbSolutionClone": "on",
   "pcfReactControls": "on",
@@ -15,6 +16,7 @@
   "pcfAllowLibraryResources": "off",
   "pcfAllowCustomWebpack": "off",
   "pcfAllowDefaultSelectedItemsForDataSet": "off",
+  "pcfAllowActions": "off",
   "pcfAllowEvents": "off",
   "pcfAllowProjectReferences": "off",
   "pcfCanvasDataConnector": "off",
@@ -64,5 +66,7 @@
   "moduleModelBuilder": "on",
   "enableForPAPortalTemplateLocalization": "off",
   "verbPAPortalTranslations": "off",
-  "verbAdminAssignGroup": "on"
+  "verbAdminAssignGroup": "on",
+  "verbVirtualAgentStatusPolling": "on",
+  "moduleCatalog": "off"
 }
