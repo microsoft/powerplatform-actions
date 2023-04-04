@@ -61,7 +61,7 @@
     "yargs": "^17.7.1"
   },
   "dependencies": {
-    "@actions/artifact": "^1.1.0",
+    "@actions/artifact": "^1.1.1",
     "@actions/core": "^1.10.0",
     "@microsoft/powerplatform-cli-wrapper": "^0.1.84",
     "date-fns": "^2.22.1",
