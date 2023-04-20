@@ -8630,6 +8630,7 @@ var require_uploadPaportal = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--path", parameters.path);
           validator.pushInput(pacArgs, "--deploymentProfile", parameters.deploymentProfile);
+          validator.pushInput(pacArgs, "--modelVersion", parameters.modelVersion);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("UploadPaPortal Action Result: " + pacResult);
@@ -19034,7 +19035,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.84",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.85",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
