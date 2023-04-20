@@ -7954,6 +7954,7 @@ var require_publishSolution = __commonJS({
           const pacArgs = ["solution", "publish"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--async", parameters.async);
+          validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("PublishSolution Action Result: " + pacResult);
@@ -9312,6 +9313,68 @@ var require_assignGroup = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/virtualAgentsStatus.js
+var require_virtualAgentsStatus = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/virtualAgentsStatus.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.virtualAgentsStatus = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function virtualAgentsStatus(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        const pacArgs = ["virtual-agent", "status"];
+        const inputValidator = new InputValidator_1.InputValidator(host);
+        inputValidator.pushInput(pacArgs, "--bot-id", parameters.botId);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("VirtualAgentsStatus Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.virtualAgentsStatus = virtualAgentsStatus;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -9364,6 +9427,7 @@ var require_actions = __commonJS({
     __exportStar(require_dataExport(), exports2);
     __exportStar(require_dataImport(), exports2);
     __exportStar(require_assignGroup(), exports2);
+    __exportStar(require_virtualAgentsStatus(), exports2);
   }
 });
 
@@ -18356,6 +18420,12 @@ var require_download_http_client = __commonJS({
           };
           const resetDestinationStream = (fileDownloadPath) => __awaiter2(this, void 0, void 0, function* () {
             destinationStream.close();
+            yield new Promise((resolve) => {
+              destinationStream.on("close", resolve);
+              if (destinationStream.writableFinished) {
+                resolve();
+              }
+            });
             yield utils_1.rmFile(fileDownloadPath);
             destinationStream = fs.createWriteStream(fileDownloadPath);
           });
@@ -18920,26 +18990,26 @@ var require_package = __commonJS({
       },
       devDependencies: {
         "@types/async": "^3.2.7",
-        "@types/chai": "^4.2.20",
-        "@types/fancy-log": "^1.3.1",
+        "@types/chai": "^4.3.4",
+        "@types/fancy-log": "^2.0.0",
         "@types/fs-extra": "^9.0.12",
         "@types/glob": "^7.1.4",
         "@types/js-yaml": "^4.0.3",
         "@types/mocha": "^9.1.0",
         "@types/node": "^14.14.35",
         "@types/sinon": "^9.0.11",
-        "@types/sinon-chai": "^3.2.5",
+        "@types/sinon-chai": "^3.2.9",
         "@types/unzip-stream": "^0.3.1",
         "@types/uuid": "^8.3.0",
-        "@types/yargs": "^17.0.2",
-        "@typescript-eslint/eslint-plugin": "^5.15.0",
+        "@types/yargs": "^17.0.24",
+        "@typescript-eslint/eslint-plugin": "^5.57.1",
         "@typescript-eslint/parser": "^5.15.0",
         async: "^3.2.0",
-        chai: "^4.3.4",
+        chai: "^4.3.7",
         dotenv: "^8.2.0",
         esbuild: "^0.14.10",
         eslint: "^8.11.0",
-        "fancy-log": "^1.3.3",
+        "fancy-log": "^2.0.0",
         glob: "^7.2.0",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
@@ -18948,7 +19018,6 @@ var require_package = __commonJS({
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^9.2.0",
-        nanoid: "^3.2.0",
         "node-fetch": "^2.6.7",
         postcss: "^8.4.6",
         "ps-list": "^7.2.0",
@@ -18960,12 +19029,12 @@ var require_package = __commonJS({
         typescript: "^4.3.5",
         "unzip-stream": "^0.3.1",
         winston: "^3.3.3",
-        yargs: "^17.0.1"
+        yargs: "^17.7.1"
       },
       dependencies: {
-        "@actions/artifact": "^1.1.0",
+        "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.83",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.84",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
