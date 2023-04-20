@@ -40,6 +40,7 @@ describe("upload paportal test", () => {
       environmentUrl: environmentUrl,
       path: { name: 'upload-path', required: true, defaultValue: undefined },
       deploymentProfile: { name: 'deployment-profile', required: false, defaultValue: undefined },
+      modelVersion:  { name: 'model-version', required: false, defaultValue: undefined },
     }, runnerParameters, new ActionsHost());
   });
 });
