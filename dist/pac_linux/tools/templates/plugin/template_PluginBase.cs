@@ -18,7 +18,7 @@ namespace $safeprojectname$
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginBase"/> class.
         /// </summary>
-        /// <param name="pluginClassName">The <see cref=" cred="Type"/> of the plugin class.</param>
+        /// <param name="pluginClassName">The <see cref="Type"/> of the plugin class.</param>
         internal PluginBase(Type pluginClassName)
         {
             PluginClassName = pluginClassName.ToString();
@@ -196,7 +196,7 @@ namespace $safeprojectname$
 
             NotificationService = serviceProvider.Get<IServiceEndpointNotificationService>();
 
-            IOrganizationServiceFactory factory = serviceProvider.Get<IOrganizationServiceFactory>();
+            OrgSvcFactory = serviceProvider.Get<IOrganizationServiceFactory>();
 
             PluginUserService = serviceProvider.GetOrganizationService(PluginExecutionContext.UserId); // User that the plugin is registered to run as, Could be same as current user.
 

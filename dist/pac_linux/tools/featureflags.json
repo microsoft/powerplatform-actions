@@ -68,5 +68,5 @@
   "verbPAPortalTranslations": "off",
   "verbAdminAssignGroup": "on",
   "verbVirtualAgentStatusPolling": "on",
-  "moduleCatalog": "off"
+  "moduleCatalog": "on"
 }
