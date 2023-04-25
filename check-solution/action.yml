@@ -48,6 +48,11 @@ inputs:
     description: The name of the artifact folder of which the PowerApps Checker logs will be uploaded.  Default value is \'CheckSolutionLogs\'
     required: false
 
+  fail-on-analysis-error:
+    description: Fail task if the Power Apps Checker analysis is returned as Failed or FinishedWithErrors. Default value is true
+    required: false
+    default: 'true'
+
 runs:
   using: 'node16'
   main: '../dist/actions/check-solution/index.js'
