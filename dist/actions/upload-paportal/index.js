@@ -8630,6 +8630,7 @@ var require_uploadPaportal = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--path", parameters.path);
           validator.pushInput(pacArgs, "--deploymentProfile", parameters.deploymentProfile);
+          validator.pushInput(pacArgs, "--modelVersion", parameters.modelVersion);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("UploadPaPortal Action Result: " + pacResult);
@@ -8695,6 +8696,7 @@ var require_downloadPaportal = __commonJS({
           validator.pushInput(pacArgs, "--websiteId", parameters.websiteId);
           validator.pushInput(pacArgs, "--overwrite", parameters.overwrite);
           validator.pushInput(pacArgs, "--excludeEntities", parameters.excludeEntities);
+          validator.pushInput(pacArgs, "--modelVersion", parameters.modelVersion);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("DownloadPaPortal Action Result: " + pacResult);
@@ -19034,7 +19036,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.84",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.86",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -19112,7 +19114,8 @@ var runnerParameters_1 = require_runnerParameters();
     credentials: (0, getCredentials_1.default)(),
     environmentUrl: (0, getEnvironmentUrl_1.default)(),
     path: parameterMap["upload-path"],
-    deploymentProfile: parameterMap["deployment-profile"]
+    deploymentProfile: parameterMap["deployment-profile"],
+    modelVersion: parameterMap["model-version"]
   }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());
   core.endGroup();
 }))().catch((error) => {
