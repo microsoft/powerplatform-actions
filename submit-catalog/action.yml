@@ -28,11 +28,11 @@ inputs:
     required: true
 
   solution-zip:
-    description: 'Path to solution zip file.]'
+    description: 'Path to solution zip file.'
     required: false
 
   package-zip:
-    description: 'Path to package zip file.]'
+    description: 'Path to package zip file.'
     required: false
 
   poll-status:
