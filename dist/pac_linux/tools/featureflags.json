@@ -38,7 +38,7 @@
   "verbPAPortalDownload": "on",
   "verbPAPortalBundle": "off",
   "enablePAPortalTranslations": "off",
-  "powerPagesCoreEntities": "off",
+  "powerPagesCoreEntities": "on",
   "componentSettings": "off",
   "verbCanvas": "on",
   "verbCanvasCreate": "on",
