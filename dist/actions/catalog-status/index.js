@@ -7266,7 +7266,7 @@ var require_installCatalog = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["catalog", "install"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -7332,7 +7332,7 @@ var require_catalogStatus = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["catalog", "status"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -7395,7 +7395,7 @@ var require_submitCatalog = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["catalog", "submit"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -19097,6 +19097,19 @@ var require_getCredentials = __commonJS({
   }
 });
 
+// out/lib/auth/getEnvironmentUrl.js
+var require_getEnvironmentUrl = __commonJS({
+  "out/lib/auth/getEnvironmentUrl.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    var core_1 = require_core();
+    function getEnvironmentUrl() {
+      return (0, core_1.getInput)("environment-url", { required: false });
+    }
+    exports2.default = getEnvironmentUrl;
+  }
+});
+
 // out/lib/actionLogger.js
 var require_actionLogger = __commonJS({
   "out/lib/actionLogger.js"(exports2) {
@@ -19221,7 +19234,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.89",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.90",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -19291,6 +19304,7 @@ var core = require_core();
 var YamlParser_1 = require_YamlParser();
 var ActionsHost_1 = require_ActionsHost();
 var getCredentials_1 = require_getCredentials();
+var getEnvironmentUrl_1 = require_getEnvironmentUrl();
 var runnerParameters_1 = require_runnerParameters();
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS)
@@ -19307,6 +19321,7 @@ function main() {
     core.startGroup("catalog-status:");
     yield (0, actions_1.catalogStatus)({
       credentials: (0, getCredentials_1.default)(),
+      environmentUrl: (0, getEnvironmentUrl_1.default)(),
       trackingId: parameterMap["tracking-id"],
       requestType: parameterMap["type"]
     }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost());

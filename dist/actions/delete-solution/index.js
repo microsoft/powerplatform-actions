@@ -9419,7 +9419,7 @@ var require_installCatalog = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["catalog", "install"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -9485,7 +9485,7 @@ var require_catalogStatus = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["catalog", "status"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -9548,7 +9548,7 @@ var require_submitCatalog = __commonJS({
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["catalog", "submit"];
           const validator = new InputValidator_1.InputValidator(host);
@@ -19234,7 +19234,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.89",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.90",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
