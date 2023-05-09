@@ -18,12 +18,14 @@ use(sinonChai);
 describe("catalog-status tests", () => {
     const catalogStatusStub: Sinon.SinonStub<any[], any> = stub();
     const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
     async function callActionWithMocks(): Promise<void> {
         const mockedModule = await rewiremock.around(() => import("../actions/catalog-status/index"),
             (mock) => {
                 mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ catalogStatus: catalogStatusStub });
                 mock(() => import("../lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
                 mock(() => import("../lib/runnerParameters")).with({ runnerParameters: runnerParameters });
             });
         await mockedModule.main();
@@ -35,6 +37,7 @@ describe("catalog-status tests", () => {
 
         catalogStatusStub.should.have.been.calledWithExactly({
             credentials: credentials,
+            environmentUrl: mockEnvironmentUrl,
             trackingId: { name: 'tracking-id', required: true, defaultValue: undefined },
             requestType: { name: 'type', required: true, defaultValue: undefined }
         }, runnerParameters, new ActionsHost());

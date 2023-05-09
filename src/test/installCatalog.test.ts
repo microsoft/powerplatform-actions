@@ -18,12 +18,14 @@ use(sinonChai);
 describe("install-catalog tests", () => {
     const installCatalogStub: Sinon.SinonStub<any[], any> = stub();
     const credentials: UsernamePassword = stubInterface<UsernamePassword>();
+    const mockEnvironmentUrl = "https://contoso.crm.dynamics.com/";
 
     async function callActionWithMocks(): Promise<void> {
         const mockedModule = await rewiremock.around(() => import("../actions/install-catalog/index"),
             (mock) => {
                 mock(() => import("@microsoft/powerplatform-cli-wrapper/dist/actions")).with({ installCatalog: installCatalogStub });
                 mock(() => import("../lib/auth/getCredentials")).withDefault(() => credentials);
+                mock(() => import("../../src/lib/auth/getEnvironmentUrl")).withDefault(() => mockEnvironmentUrl);
                 mock(() => import("../lib/runnerParameters")).with({ runnerParameters: runnerParameters });
             });
         await mockedModule.main();
@@ -35,6 +37,7 @@ describe("install-catalog tests", () => {
 
         installCatalogStub.should.have.been.calledWithExactly({
             credentials: credentials,
+            environmentUrl: mockEnvironmentUrl,
             catalogItemId: { name: 'catalog-item-id', required: true, defaultValue: undefined },
             targetEnvironmentUrl: { name: 'target-url', required: true, defaultValue: undefined },
             settings: { name: 'settings', required: false, defaultValue: undefined },
