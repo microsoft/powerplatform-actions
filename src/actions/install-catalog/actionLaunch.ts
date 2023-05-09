@@ -3,7 +3,7 @@
 import process = require('process');
 import { main } from './index';
 
-process.env['INPUT_ENVIRONMENT-URL'] = new URL(process.env['PA_BT_ORG_URL'] ?? 'https://davidjenD365-1.crm.dynamics.com').href;
+process.env['INPUT_ENVIRONMENT-URL'] = new URL(process.env['PA_BT_ORG_URL'] ?? 'https://contoso.crm.dynamics.com').href;
 process.env['INPUT_USER-NAME'] = process.env['PA_BT_ORG_USER'] ?? 'ppdevautomation@ppdevtools.onmicrosoft.com';
 // process.env['INPUT_APP-ID'] = process.env['PA_BT_ORG_SPN_ID'] ?? '8a7729e0-2b71-4919-a89a-c789d0a9720a';
 // process.env['INPUT_CLIENT-SECRET'] = process.env['PA_BT_ORG_SPNKEY'] ?? "expectSpnKeyFromEnvVariable";
@@ -13,7 +13,7 @@ const password = process.env['PA_BT_ORG_PASSWORD'] ?? '';
 process.env['INPUT_PASSWORD-SECRET'] = password;
 
 process.env['INPUT_CATALOG-ITEM-ID'] = '00000000-0000-0000-0000-000000000004';
-process.env['INPUT_TARGET-URL'] = 'https://davidjenD365-1.crm.dynamics.com';
+process.env['INPUT_TARGET-URL'] = 'https://test-env.crm.dynamics.com';
 
 process.env['RUNNER_DEBUG'] = '1';
 process.env['GITHUB_ACTIONS'] = '1';
