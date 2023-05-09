@@ -29,7 +29,8 @@ import { runnerParameters } from '../../lib/runnerParameters';
         ruleSet: createEntry("ruleSet", "Solution Checker"),
         errorLevel: createEntry("errorLevel", "HighIssueCount"),
         errorThreshold: createEntry("errorThreshold", "0"),
-        filesExcluded: createEntry("filesExcluded", "")
+        filesExcluded: createEntry("filesExcluded", ""),
+        saveResults: createEntry("saveResults", false)
     }, runnerParameters, new ActionsHost('PowerAppsChecker'));
     core.endGroup();
 })().catch(error => {
