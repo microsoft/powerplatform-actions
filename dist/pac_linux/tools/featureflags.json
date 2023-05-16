@@ -34,6 +34,7 @@
   "verbSolutionCheck": "on",
   "verbPAPortal": "on",
   "verbPAPortalList": "on",
+  "verbPAPortalBootstrapMigrate": "off",
   "verbPAPortalUpload": "on",
   "verbPAPortalDownload": "on",
   "verbPAPortalBundle": "off",
@@ -43,10 +44,6 @@
   "verbCanvas": "on",
   "verbCanvasCreate": "on",
   "verbSolutionCreateSettings": "on",
-  "verbPackageInitUseDotnetTemplating": "on",
-  "enableDotetTemplate_PDPackageSdkStyle": "on",
-  "verbPackageAddExternalPackage": "on",
-  "verbPackageAddSolution": "on",
   "moduleConnection": "off",
   "moduleConnector": "on",
   "verbConnectionList": "off",
@@ -68,5 +65,7 @@
   "verbPAPortalTranslations": "off",
   "verbAdminAssignGroup": "on",
   "verbVirtualAgentStatusPolling": "on",
-  "moduleCatalog": "on"
+  "moduleCatalog": "on",
+  "moduleTests": "off",
+  "windowsSingleSignon": "on"
 }
