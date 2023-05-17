@@ -3,27 +3,36 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-undef */
 "use strict";
-require("dotenv").config();
-const gulp = require('gulp');
-const esbuild = require('esbuild');
-const eslint = require('gulp-eslint');
-const mocha = require('gulp-mocha');
-const sourcemaps = require('gulp-sourcemaps');
-const ts = require('gulp-typescript');
+import dotenv from 'dotenv';
+dotenv.config();
 
-const fetch = require('node-fetch');
-const fs = require('fs-extra');
-const log = require('fancy-log');
-const path = require('path');
-const pslist = require('ps-list');
-const unzip = require('unzip-stream');
-const { glob } = require('glob');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
-const argv = require('yargs').argv;
+import gulp from 'gulp';
+import esbuild from 'esbuild';
+import eslint from 'gulp-eslint';
+import mocha from 'gulp-mocha';
+import sourcemaps from 'gulp-sourcemaps';
+import ts from 'gulp-typescript';
 
+import fetch from 'node-fetch';
+import fs from 'fs-extra';
+import log from 'fancy-log';
+import path from'path';
+import pslist from 'ps-list';
+import unzip from 'unzip-stream';
+import glob from 'glob';
+import util from 'util';
+
+import childProcess from 'child_process';
+const exec = util.promisify(childProcess.exec);
+
+import yargs from 'yargs';
+const argv = yargs(process.argv.slice(2)).argv; // skip 'node' and 'gulp.js' args
+
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
 const tsConfigFile = './tsconfig.json';
 const tsconfig = require(tsConfigFile);
+
 const outdir = path.resolve(tsconfig.compilerOptions.outDir);
 const distdir = path.resolve('./dist');
 
@@ -248,30 +257,35 @@ async function fetchPortalPackage() {
     await nugetInstallPortalPackages()
 }
 
-
-exports.clean = clean;
-exports.compile = compile;
-exports.recompile = gulp.series(
+const recompile = gulp.series(
     restore,
     compile,
 );
 
-exports.lint = lint;
-exports.test = test;
-exports.ci = gulp.series(
+const ci = gulp.series(
     restore,
     compile,
     lint,
     test
 );
-exports.dist = dist;
-exports.updateDist = gulp.series(
+
+const updateDist = gulp.series(
     restore,
     compile,
     dist,
     addDistToIndex,
 );
-exports.addDistToIndex = addDistToIndex;
-exports.fetchPortalPackage = fetchPortalPackage
 
-exports.default = exports.recompile;
+export {
+    clean,
+    compile,
+    recompile,
+    lint,
+    test,
+    ci,
+    dist,
+    updateDist,
+    addDistToIndex,
+    fetchPortalPackage,
+    recompile as default,
+};
