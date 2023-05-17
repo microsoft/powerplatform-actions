@@ -21,6 +21,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         geoInstance: parameterMap["geo"],
         ruleLevelOverride: parameterMap["rule-level-override"],
         artifactStoreName: parameterMap["checker-logs-artifact-name"],
+        failOnAnalysisError: parameterMap["fail-on-analysis-error"],
         fileLocation: createEntry("fileLocation", "localFiles"),
         solutionUrl: createEntry("solutionUrl", ""),
         useDefaultPAEndpoint: createEntry("useDefaultPAEndpoint", true),
@@ -28,8 +29,8 @@ import { runnerParameters } from '../../lib/runnerParameters';
         ruleSet: createEntry("ruleSet", "Solution Checker"),
         errorLevel: createEntry("errorLevel", "HighIssueCount"),
         errorThreshold: createEntry("errorThreshold", "0"),
-        failOnAnalysisError: createEntry("failOnAnalysisError", true),
-        filesExcluded: createEntry("filesExcluded", "")
+        filesExcluded: createEntry("filesExcluded", ""),
+        saveResults: createEntry("saveResults", false)
     }, runnerParameters, new ActionsHost('PowerAppsChecker'));
     core.endGroup();
 })().catch(error => {

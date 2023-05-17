@@ -42,6 +42,7 @@ describe("check solution test", () => {
       geoInstance: { name: 'geo', required: false, defaultValue: undefined },
       ruleLevelOverride: { name: 'rule-level-override', required: false, defaultValue: undefined },
       artifactStoreName: { name: 'checker-logs-artifact-name', required: false, defaultValue: undefined },
+      failOnAnalysisError: { name: "fail-on-analysis-error", required: false, defaultValue: 'true' },
       fileLocation: { name: "fileLocation",  required: false, defaultValue: "localFiles" },
       solutionUrl: { name: "solutionUrl",  required: false, defaultValue: "" },
       useDefaultPAEndpoint: { name: "useDefaultPAEndpoint", required: false, defaultValue: true },
@@ -49,8 +50,8 @@ describe("check solution test", () => {
       ruleSet: { name: "ruleSet", required: false, defaultValue: "Solution Checker" },
       errorLevel: { name: "errorLevel", required: false, defaultValue: "HighIssueCount" },
       errorThreshold: { name: "errorThreshold", required: false, defaultValue: "0" },
-      failOnAnalysisError: { name: "failOnAnalysisError", required: false, defaultValue: true },
-      filesExcluded: { name: "filesExcluded", required: false, defaultValue: ""}
+      filesExcluded: { name: "filesExcluded", required: false, defaultValue: ""},
+      saveResults: { name: "saveResults", required: false, defaultValue: false}
     }, runnerParameters, new ActionsHost('PowerAppsChecker'));
   });
 });

@@ -1,0 +1,1175 @@
+[
+  {
+    "name": "help",
+    "help": "Show help for the Microsoft Power Platform CLI"
+  },
+  {
+    "name": "package",
+    "help": "Commands for working with Dataverse package projects",
+    "verbs": [
+      {
+        "name": "init",
+        "help": "Initializes a directory with a new Dataverse package project",
+        "arguments": [
+          {
+            "name": "--outputDirectory",
+            "alias": "-o",
+            "help": "Output directory",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--package-name",
+            "alias": null,
+            "help": "Sets the default name of the package. Applies to the generation of ImportExtension.GetNameOfImport.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "add-external-package",
+        "help": "Adds a package that is external to the Dataverse solution system to a PD Package project",
+        "arguments": [
+          {
+            "name": "--path",
+            "alias": "-p",
+            "help": "Path to the external package",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--package-type",
+            "alias": "-t",
+            "help": "The type of the package being added. e.g. 'xpp' for FnO packages.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--import-order",
+            "alias": null,
+            "help": "A whole number that indicates the order to insert this item into the final ImportConfig.xml file at build time. Negative numbers are inserted before existing elements. Positive numbers are added after existing elements.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--skip-validation",
+            "alias": "-sv",
+            "help": "Adds the item to the project file even if the file does not exist or appears to be invalid. Note, this will not affect any validation that is performed by MSBuild.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "add-solution",
+        "help": "Adds a prebuilt Dataverse solution file to a PD Package project",
+        "arguments": [
+          {
+            "name": "--path",
+            "alias": "-p",
+            "help": "Path to the Dataverse solution file (must be *.zip)",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--import-order",
+            "alias": null,
+            "help": "A whole number that indicates the order to insert this item into the final ImportConfig.xml file at build time. Negative numbers are inserted before existing elements. Positive numbers are added after existing elements.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--skip-validation",
+            "alias": "-sv",
+            "help": "Adds the item to the project file even if the file does not exist or appears to be invalid. Note, this will not affect any validation that is performed by MSBuild.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--publish-workflows-activate-plugins",
+            "alias": null,
+            "help": "Explicitly indicates whether to publish the workflows and activate plug-ins when this solution is imported.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "true, false",
+            "listOfDisplayValues": "true, false",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--overwrite-unmanaged-customizations",
+            "alias": null,
+            "help": "Explicitly indicates whether to overwrite unmanaged customizations when this solution is imported.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "true, false",
+            "listOfDisplayValues": "true, false",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--import-mode",
+            "alias": null,
+            "help": "Explicitly specifies the required mode when importing this solution.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "sync, async",
+            "listOfDisplayValues": "sync, async",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--missing-dependency-behavior",
+            "alias": null,
+            "help": "Specifies the behavior on import when a dependency of this solution is missing from the target environment.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "skip, fault",
+            "listOfDisplayValues": "skip, fault",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--dependency-overrides",
+            "alias": null,
+            "help": "A semicolon delimited list of overrides. This value overrides any dependency information encoded in the solution's metadata. Each override should be in the format: `<uniquename>:<minVersion>:<maxVersion>`. Where the minVersion and maxVersion is optional but should be in .Net version format syntax.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "Use a semicolon delimited list of dependency overrides of the format <uniquename>:<minVersion>:<maxVersion>."
+          }
+        ]
+      },
+      {
+        "name": "add-reference",
+        "help": "Adds reference to Dataverse solution project",
+        "arguments": [
+          {
+            "name": "--path",
+            "alias": "-p",
+            "help": "The path to the referenced Dataverse solution project",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--import-order",
+            "alias": null,
+            "help": "A whole number that indicates the order to insert this item into the final ImportConfig.xml file at build time. Negative numbers are inserted before existing elements. Positive numbers are added after existing elements.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--publish-workflows-activate-plugins",
+            "alias": null,
+            "help": "Explicitly indicates whether to publish the workflows and activate plug-ins when this solution is imported.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "true, false",
+            "listOfDisplayValues": "true, false",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--overwrite-unmanaged-customizations",
+            "alias": null,
+            "help": "Explicitly indicates whether to overwrite unmanaged customizations when this solution is imported.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "true, false",
+            "listOfDisplayValues": "true, false",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--import-mode",
+            "alias": null,
+            "help": "Explicitly specifies the required mode when importing this solution.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "sync, async",
+            "listOfDisplayValues": "sync, async",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--missing-dependency-behavior",
+            "alias": null,
+            "help": "Specifies the behavior on import when a dependency of this solution is missing from the target environment.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "skip, fault",
+            "listOfDisplayValues": "skip, fault",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--dependency-overrides",
+            "alias": null,
+            "help": "A semicolon delimited list of overrides. This value overrides any dependency information encoded in the solution's metadata. Each override should be in the format: `<uniquename>:<minVersion>:<maxVersion>`. Where the minVersion and maxVersion is optional but should be in .Net version format syntax.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "Use a semicolon delimited list of dependency overrides of the format <uniquename>:<minVersion>:<maxVersion>."
+          }
+        ]
+      },
+      {
+        "name": "deploy",
+        "help": "Deploys package to Dataverse",
+        "arguments": [
+          {
+            "name": "--logFile",
+            "alias": "-lf",
+            "help": "Log file path",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--logConsole",
+            "alias": "-c",
+            "help": "Output log to console",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--package",
+            "alias": "-p",
+            "help": "path to a package dll or zip file with a package",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--settings",
+            "alias": "-s",
+            "help": "Runtime Package Settings that are passed to the package that is being deployed.  The format of the string must be `key=value|key=value`.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "The format of the string must be `key=value|key=value`."
+          },
+          {
+            "name": "--verbose",
+            "alias": "-vdbg",
+            "help": "Emit Verbose logs to the log outputs",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "show",
+        "help": "Shows details of Dataverse package",
+        "arguments": [
+          {
+            "name": "--package",
+            "alias": "-p",
+            "help": "path to a package dll or zip file with a package",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--logFile",
+            "alias": "-lf",
+            "help": "Log file path",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--verbose",
+            "alias": "-vdbg",
+            "help": "Emit Verbose logs to the log outputs",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pcf",
+    "help": "Commands for working with Power Apps component framework projects",
+    "verbs": [
+      {
+        "name": "init",
+        "help": "Initializes a directory with a new Power Apps component framework project",
+        "arguments": [
+          {
+            "name": "--namespace",
+            "alias": "-ns",
+            "help": "The namespace for the component",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "minLength": 1,
+            "maxLength": 75,
+            "allowMultipleValues": false,
+            "RegexHelp": "Only characters within the ranges [A - Z], [a - z], [0 - 9], or '.' are allowed. The first and last character may not be the '.' character. Consecutive '.' characters are not allowed. Numbers are not allowed as the first character or immediately after a period."
+          },
+          {
+            "name": "--name",
+            "alias": "-n",
+            "help": "The name for the component",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "minLength": 1,
+            "maxLength": 75,
+            "allowMultipleValues": false,
+            "RegexHelp": "Only characters within the ranges [A - Z], [a - z] or [0 - 9] are allowed. The first character may not be a number."
+          },
+          {
+            "name": "--template",
+            "alias": "-t",
+            "help": "Choose a template for the component",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "field, dataset",
+            "listOfDisplayValues": "field, dataset",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--framework",
+            "alias": "-fw",
+            "help": "The rendering framework for control. Default value is 'none' [none: HTML, react: React]",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "none, react",
+            "listOfDisplayValues": "none, react",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--outputDirectory",
+            "alias": "-o",
+            "help": "Output directory",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--run-npm-install",
+            "alias": "-npm",
+            "help": "Auto run 'npm install' after the control is created. Default value is 'false'",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "version",
+        "help": "Patch version for controls",
+        "argumentRelations": [
+          {
+            "RelationType": "MutuallyExclusive",
+            "argument1": "--patchversion",
+            "argument2": "--strategy",
+            "argument3": null,
+            "areSwitchArguments": false
+          }
+        ],
+        "arguments": [
+          {
+            "name": "--strategy",
+            "alias": "-s",
+            "help": "Updates patch version for 'ControlManifest.xml' files using specified strategy. If using gittags, set personal access token in the following environment variable \"PacCli.PAT\"",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "None, GitTags, FileTracking, Manifest",
+            "listOfDisplayValues": "None, GitTags, FileTracking, Manifest",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--patchversion",
+            "alias": "-pv",
+            "help": "Patch version for controls",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "The value must be a positive integer"
+          },
+          {
+            "name": "--path",
+            "alias": "-p",
+            "help": "Absolute/Relative path of the 'ControlManifest.xml' for updating.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--allmanifests",
+            "alias": "-a",
+            "help": "Updates patch version for all 'ControlManifest.xml' files",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--updatetarget",
+            "alias": "-ut",
+            "help": "Specify which target manifest needs to be updated",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "build, project",
+            "listOfDisplayValues": "build, project",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--filename",
+            "alias": "-fn",
+            "help": "Tracker CSV file name to be used when using filetracking as a strategy. Default value is ControlsStateVersionInfo.csv",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "solution",
+    "help": "Commands for working with Dataverse solution projects",
+    "verbs": [
+      {
+        "name": "init",
+        "help": "Initializes a directory with a new Dataverse solution project",
+        "arguments": [
+          {
+            "name": "--publisher-name",
+            "alias": "-pn",
+            "help": "Name of the Dataverse solution publisher",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "Only characters within the ranges [A - Z], [a - z], [0 - 9], or _ are allowed. The first character may only be in the ranges [A - Z], [a - z], or _."
+          },
+          {
+            "name": "--publisher-prefix",
+            "alias": "-pp",
+            "help": "Customization prefix value for the Dataverse solution publisher",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "minLength": 2,
+            "maxLength": 8,
+            "allowMultipleValues": false,
+            "RegexHelp": "The prefix must be 2 to 8 characters long, can only consist of alpha-numerics, must start with a letter, and cannot start with 'mscrm'."
+          },
+          {
+            "name": "--outputDirectory",
+            "alias": "-o",
+            "help": "Output directory",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "add-reference",
+        "help": "Adds a reference from the project in the current directory to the project at 'path'",
+        "arguments": [
+          {
+            "name": "--path",
+            "alias": "-p",
+            "help": "The path to the referenced project",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "list",
+        "help": "List all Solutions from the current Dataverse Organization",
+        "argumentRelations": [
+          {
+            "RelationType": "MutuallyExclusiveOrNeither",
+            "argument1": "--environment-id",
+            "argument2": "--environment",
+            "argument3": null,
+            "areSwitchArguments": false
+          }
+        ],
+        "arguments": [
+          {
+            "name": "--environment-id",
+            "alias": null,
+            "help": "The target Environment ID.  Default value is the environment of your currently active Dataverse Auth Profile.",
+            "deprecated": "Replaced",
+            "deprecatedArgumentReplacement": "--environment",
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--environment",
+            "alias": "-env",
+            "help": "The target Environment ID or URL.  Default value is the environment of your currently active Dataverse Auth Profile.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "delete",
+        "help": "Delete solution from Dataverse in the current Environment.",
+        "arguments": [
+          {
+            "name": "--solution-name",
+            "alias": "-sn",
+            "help": "Name of the solution",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "online-version",
+        "help": "Sets version for solution loaded in Dataverse.",
+        "arguments": [
+          {
+            "name": "--solution-name",
+            "alias": "-sn",
+            "help": "Name of the solution",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--solution-version",
+            "alias": "-sv",
+            "help": "Specify the solution version number.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "version",
+        "help": "Update build or revision version for solution",
+        "argumentRelations": [
+          {
+            "RelationType": "MutuallyExclusive",
+            "argument1": "--buildversion",
+            "argument2": "--revisionversion",
+            "argument3": "--strategy",
+            "areSwitchArguments": false
+          }
+        ],
+        "arguments": [
+          {
+            "name": "--strategy",
+            "alias": "-s",
+            "help": "Updates build version for 'Solution.xml' file using specified strategy. If using gittags, set personal access token in the following environment variable \"PacCli.PAT\"",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "listOfValues": "None, GitTags, FileTracking, Solution",
+            "listOfDisplayValues": "None, GitTags, FileTracking, Solution",
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--patchversion",
+            "alias": "-pv",
+            "help": "Patch version for solution",
+            "deprecated": "Ignored",
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--buildversion",
+            "alias": "-bv",
+            "help": "Build version for solution",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "The value must be a positive integer"
+          },
+          {
+            "name": "--revisionversion",
+            "alias": "-rv",
+            "help": "Revision version for solution",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false,
+            "RegexHelp": "The value must be a positive integer"
+          },
+          {
+            "name": "--filename",
+            "alias": "-fn",
+            "help": "Tracker CSV file name to be used when using filetracking as a strategy. Default value is ControlsStateVersionInfo.csv",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--solutionPath",
+            "alias": "-sp",
+            "help": "Path to Dataverse solution directory or Solution.xml file.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "pack",
+        "help": "Package solution components on local filesystem into solution.zip (SolutionPackager)",
+        "arguments": [
+          {
+            "name": "--zipfile",
+            "alias": "-z",
+            "help": "The full path to the solution ZIP file",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--folder",
+            "alias": "-f",
+            "help": "The path to the root folder on the local filesystem. When unpacking/extractins, this will be written to, when packing this will be read from.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--packagetype",
+            "alias": "-p",
+            "help": "When unpacking/extracting, use to specify dual Managed and Unmanaged operation. When packing, use to specify Managed or Unmanaged from a previous unpack 'Both'. Can be: 'Unmanaged', 'Managed' or 'Both'; default: 'Unmanaged'",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--log",
+            "alias": "-l",
+            "help": "The path to the log file.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--errorlevel",
+            "alias": "-e",
+            "help": "Minimum logging level for log output [Verbose|Info|Warning|Error|Off]; default: Info",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--singleComponent",
+            "alias": "-sc",
+            "help": "Only perform action on a single component type [WebResource|Plugin|Workflow|None]; default: None.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--allowDelete",
+            "alias": "-ad",
+            "help": "Dictates if delete operations may occur; default: false.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--allowWrite",
+            "alias": "-aw",
+            "help": "Dictates if write operations may occur; default: false.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--clobber",
+            "alias": "-c",
+            "help": "Enables that files marked read-only can be deleted or overwritten; default: false.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--map",
+            "alias": "-m",
+            "help": "The full path to a mapping xml file from which to read component folders to pack.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--sourceLoc",
+            "alias": "-src",
+            "help": "Generates a template resource file. Valid only on Extract. Possible Values are auto or an LCID/ISO code of the language you wish to export. When Present, this will extract the string resources from the given locale as a neutral .resx. If auto or just the long or short form of the switch is specified the base locale for the solution will be used.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--localize",
+            "alias": "-loc",
+            "help": "Extract or merge all string resources into .resx files.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--useLcid",
+            "alias": "-lcid",
+            "help": "Use LCID's (1033) rather than ISO codes (en-US) for language files.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--useUnmanagedFileForMissingManaged",
+            "alias": "-same",
+            "help": "Use the same XML source file when packaging for Managed and only Unmanaged XML file is found; applies to AppModuleSiteMap, AppModuleMap, FormXml files",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--disablePluginRemap",
+            "alias": "-dpm",
+            "help": "Disabled plug-in fully qualified type name remapping. default: false",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--processCanvasApps",
+            "alias": "-pca",
+            "help": "(Preview) Pack/unpack any Canvas apps (.msapp) while processing the solution. default: false",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      },
+      {
+        "name": "unpack",
+        "help": "Extract solution components from solution.zip onto local filesystem (SolutionPackager)",
+        "arguments": [
+          {
+            "name": "--zipfile",
+            "alias": "-z",
+            "help": "The full path to the solution ZIP file",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": true,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--folder",
+            "alias": "-f",
+            "help": "The path to the root folder on the local filesystem. When unpacking/extractins, this will be written to, when packing this will be read from.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--packagetype",
+            "alias": "-p",
+            "help": "When unpacking/extracting, use to specify dual Managed and Unmanaged operation. When packing, use to specify Managed or Unmanaged from a previous unpack 'Both'. Can be: 'Unmanaged', 'Managed' or 'Both'; default: 'Unmanaged'",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--log",
+            "alias": "-l",
+            "help": "The path to the log file.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--errorlevel",
+            "alias": "-e",
+            "help": "Minimum logging level for log output [Verbose|Info|Warning|Error|Off]; default: Info",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--singleComponent",
+            "alias": "-sc",
+            "help": "Only perform action on a single component type [WebResource|Plugin|Workflow|None]; default: None.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--allowDelete",
+            "alias": "-ad",
+            "help": "Dictates if delete operations may occur; default: false.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--allowWrite",
+            "alias": "-aw",
+            "help": "Dictates if write operations may occur; default: false.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--clobber",
+            "alias": "-c",
+            "help": "Enables that files marked read-only can be deleted or overwritten; default: false.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--map",
+            "alias": "-m",
+            "help": "The full path to a mapping xml file from which to read component folders to pack.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--sourceLoc",
+            "alias": "-src",
+            "help": "Generates a template resource file. Valid only on Extract. Possible Values are auto or an LCID/ISO code of the language you wish to export. When Present, this will extract the string resources from the given locale as a neutral .resx. If auto or just the long or short form of the switch is specified the base locale for the solution will be used.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": false,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--localize",
+            "alias": "-loc",
+            "help": "Extract or merge all string resources into .resx files.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--useLcid",
+            "alias": "-lcid",
+            "help": "Use LCID's (1033) rather than ISO codes (en-US) for language files.",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--useUnmanagedFileForMissingManaged",
+            "alias": "-same",
+            "help": "Use the same XML source file when packaging for Managed and only Unmanaged XML file is found; applies to AppModuleSiteMap, AppModuleMap, FormXml files",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--disablePluginRemap",
+            "alias": "-dpm",
+            "help": "Disabled plug-in fully qualified type name remapping. default: false",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          },
+          {
+            "name": "--processCanvasApps",
+            "alias": "-pca",
+            "help": "(Preview) Pack/unpack any Canvas apps (.msapp) while processing the solution. default: false",
+            "deprecated": null,
+            "deprecatedArgumentReplacement": null,
+            "isRequired": false,
+            "isSwitch": true,
+            "isUri": false,
+            "allowMultipleValues": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "telemetry",
+    "help": "Manage telemetry settings",
+    "verbs": [
+      {
+        "name": "enable",
+        "help": "Choose to send usage information to help Microsoft improve this product"
+      },
+      {
+        "name": "disable",
+        "help": "Choose to not send usage information to help Microsoft improve this product"
+      },
+      {
+        "name": "status",
+        "help": "Show the current status of telemetry"
+      }
+    ]
+  }
+]

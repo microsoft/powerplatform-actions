@@ -11,10 +11,14 @@
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "3.0.8",
+          "NLog": "5.1.1",
+          "NLog.Extensions.Logging": "5.2.1",
           "StyleCop.Analyzers": "1.2.0-beta.435",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Net.Http.WinHttpHandler": "6.0.1",
+          "bolt.authentication": "0.1.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.module.admin": "0.1.0",
           "bolt.module.application": "0.1.0",
           "bolt.module.auth": "0.1.0",
@@ -31,6 +35,7 @@
           "bolt.module.pipeline": "0.1.0",
           "bolt.module.plugin": "0.1.0",
           "bolt.module.solution": "0.1.0",
+          "bolt.module.tests": "0.1.0",
           "bolt.module.virtualAgent": "0.1.0",
           "bolt.system": "0.1.0",
           "bolt.version": "0.1.0"
@@ -46,7 +51,7 @@
           "System.Memory.Data": "1.0.2",
           "System.Numerics.Vectors": "4.5.0",
           "System.Text.Encodings.Web": "6.0.0",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -59,11 +64,11 @@
       "Azure.Identity/1.8.0": {
         "dependencies": {
           "Azure.Core": "1.25.0",
-          "Microsoft.Identity.Client": "4.46.0",
+          "Microsoft.Identity.Client": "4.53.0",
           "Microsoft.Identity.Client.Extensions.Msal": "2.23.0",
           "System.Memory": "4.5.4",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -77,7 +82,7 @@
         "dependencies": {
           "Azure.Core": "1.25.0",
           "System.Memory": "4.5.4",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -91,7 +96,7 @@
         "dependencies": {
           "Azure.Core": "1.25.0",
           "System.Memory": "4.5.4",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -117,20 +122,20 @@
           }
         }
       },
-      "LibGit2Sharp/0.26.2": {
+      "LibGit2Sharp/0.27.2": {
         "dependencies": {
-          "LibGit2Sharp.NativeBinaries": "2.0.306"
+          "LibGit2Sharp.NativeBinaries": "2.0.320"
         },
         "runtime": {
-          "lib/netstandard2.0/LibGit2Sharp.dll": {
-            "assemblyVersion": "0.26.0.0",
-            "fileVersion": "0.26.2.97"
+          "lib/net6.0/LibGit2Sharp.dll": {
+            "assemblyVersion": "0.27.0.0",
+            "fileVersion": "0.27.2.0"
           }
         }
       },
-      "LibGit2Sharp.NativeBinaries/2.0.306": {
+      "LibGit2Sharp.NativeBinaries/2.0.320": {
         "native": {
-          "runtimes/linux-x64/native/libgit2-106a5f2.so": {
+          "runtimes/linux-x64/native/libgit2-e632535.so": {
             "fileVersion": "0.0.0.0"
           }
         }
@@ -154,7 +159,7 @@
           }
         }
       },
-      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.135": {
+      "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.151": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.2",
           "System.ComponentModel.Composition": "5.0.0",
@@ -165,7 +170,7 @@
         "runtime": {
           "lib/netstandard2.0/SolutionPackagerLib.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.1.1.135"
+            "fileVersion": "9.1.1.151"
           }
         }
       },
@@ -196,54 +201,12 @@
           }
         }
       },
-      "Microsoft.Extensions.Configuration/6.0.0": {
-        "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Primitives": "6.0.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Extensions.Configuration.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        }
-      },
       "Microsoft.Extensions.Configuration.Abstractions/6.0.0": {
         "dependencies": {
           "Microsoft.Extensions.Primitives": "6.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        }
-      },
-      "Microsoft.Extensions.Configuration.FileExtensions/6.0.0": {
-        "dependencies": {
-          "Microsoft.Extensions.Configuration": "6.0.0",
-          "Microsoft.Extensions.Configuration.Abstractions": "6.0.0",
-          "Microsoft.Extensions.FileProviders.Abstractions": "6.0.0",
-          "Microsoft.Extensions.FileProviders.Physical": "6.0.0",
-          "Microsoft.Extensions.Primitives": "6.0.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Extensions.Configuration.FileExtensions.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        }
-      },
-      "Microsoft.Extensions.Configuration.Json/6.0.0": {
-        "dependencies": {
-          "Microsoft.Extensions.Configuration": "6.0.0",
-          "Microsoft.Extensions.Configuration.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Configuration.FileExtensions": "6.0.0",
-          "Microsoft.Extensions.FileProviders.Abstractions": "6.0.0",
-          "System.Text.Json": "6.0.5"
-        },
-        "runtime": {
-          "lib/netstandard2.1/Microsoft.Extensions.Configuration.Json.dll": {
             "assemblyVersion": "6.0.0.0",
             "fileVersion": "6.0.21.52210"
           }
@@ -264,30 +227,6 @@
       "Microsoft.Extensions.DependencyInjection.Abstractions/6.0.0": {
         "runtime": {
           "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        }
-      },
-      "Microsoft.Extensions.FileProviders.Abstractions/6.0.0": {
-        "dependencies": {
-          "Microsoft.Extensions.Primitives": "6.0.0"
-        },
-        "runtime": {
-          "lib/net6.0/Microsoft.Extensions.FileProviders.Abstractions.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
-          }
-        }
-      },
-      "Microsoft.Extensions.FileProviders.Physical/6.0.0": {
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "6.0.0",
-          "Microsoft.Extensions.FileSystemGlobbing": "6.0.0",
-          "Microsoft.Extensions.Primitives": "6.0.0"
-        },
-        "runtime": {
-          "lib/net6.0/Microsoft.Extensions.FileProviders.Physical.dll": {
             "assemblyVersion": "6.0.0.0",
             "fileVersion": "6.0.21.52210"
           }
@@ -396,11 +335,11 @@
       "Microsoft.Graph.Core/2.0.8": {
         "dependencies": {
           "Azure.Core": "1.25.0",
-          "Microsoft.Identity.Client": "4.46.0",
+          "Microsoft.Identity.Client": "4.53.0",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.15.1",
           "System.Diagnostics.DiagnosticSource": "6.0.0",
           "System.Security.Claims": "4.3.0",
-          "System.Text.Json": "6.0.5"
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Graph.Core.dll": {
@@ -409,20 +348,32 @@
           }
         }
       },
-      "Microsoft.Identity.Client/4.46.0": {
+      "Microsoft.Identity.Client/4.53.0": {
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.18.0"
+          "Microsoft.IdentityModel.Abstractions": "6.22.0"
         },
         "runtime": {
-          "lib/netcoreapp2.1/Microsoft.Identity.Client.dll": {
-            "assemblyVersion": "4.46.0.0",
-            "fileVersion": "4.46.0.0"
+          "lib/net6.0/Microsoft.Identity.Client.dll": {
+            "assemblyVersion": "4.53.0.0",
+            "fileVersion": "4.53.0.0"
+          }
+        }
+      },
+      "Microsoft.Identity.Client.Broker/4.53.0": {
+        "dependencies": {
+          "Microsoft.Identity.Client": "4.53.0",
+          "Microsoft.Identity.Client.NativeInterop": "0.13.7"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Identity.Client.Broker.dll": {
+            "assemblyVersion": "4.53.0.0",
+            "fileVersion": "4.53.0.0"
           }
         }
       },
       "Microsoft.Identity.Client.Extensions.Msal/2.23.0": {
         "dependencies": {
-          "Microsoft.Identity.Client": "4.46.0",
+          "Microsoft.Identity.Client": "4.53.0",
           "System.IO.FileSystem.AccessControl": "5.0.0",
           "System.Security.Cryptography.ProtectedData": "6.0.0"
         },
@@ -430,6 +381,14 @@
           "lib/netcoreapp3.1/Microsoft.Identity.Client.Extensions.Msal.dll": {
             "assemblyVersion": "2.23.0.0",
             "fileVersion": "2.23.0.0"
+          }
+        }
+      },
+      "Microsoft.Identity.Client.NativeInterop/0.13.7": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Identity.Client.NativeInterop.dll": {
+            "assemblyVersion": "0.13.7.0",
+            "fileVersion": "0.13.7.0"
           }
         }
       },
@@ -447,11 +406,11 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Abstractions/6.18.0": {
+      "Microsoft.IdentityModel.Abstractions/6.22.0": {
         "runtime": {
-          "lib/netstandard2.0/Microsoft.IdentityModel.Abstractions.dll": {
-            "assemblyVersion": "6.18.0.0",
-            "fileVersion": "6.18.0.30518"
+          "lib/net6.0/Microsoft.IdentityModel.Abstractions.dll": {
+            "assemblyVersion": "6.22.0.0",
+            "fileVersion": "6.22.0.30727"
           }
         }
       },
@@ -533,6 +492,19 @@
           }
         }
       },
+      "Microsoft.Playwright/1.22.0": {
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "System.ComponentModel.Annotations": "5.0.0",
+          "System.Text.Json": "6.0.7"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Playwright.dll": {
+            "assemblyVersion": "1.22.0.0",
+            "fileVersion": "1.22.0.0"
+          }
+        }
+      },
       "Microsoft.PowerApps.AppInsights.BatchedTelemetry/3.0.8": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.21.0",
@@ -550,7 +522,7 @@
           }
         }
       },
-      "Microsoft.PowerApps.Checker.Client/1.0.0.3": {
+      "Microsoft.PowerApps.Checker.Client/1.0.0.11": {
         "dependencies": {
           "Microsoft.Rest.ClientRuntime": "2.3.20",
           "Newtonsoft.Json": "13.0.2"
@@ -558,7 +530,7 @@
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerApps.Checker.Client.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.35.0"
+            "fileVersion": "1.0.43.0"
           }
         }
       },
@@ -567,7 +539,7 @@
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.OpenApi": "1.3.1",
           "Microsoft.PowerApps.Generator.Core": "1.0.2055.76",
-          "System.Text.Json": "6.0.5"
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerApps.Generator.Builder.dll": {
@@ -712,8 +684,8 @@
           "Microsoft.OpenApi.Readers": "1.2.3",
           "Microsoft.PowerApps.Generator.Builder": "1.0.2055.76",
           "Microsoft.PowerApps.Generator.Core": "1.0.2055.76",
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.5.8-preview",
-          "System.Text.Json": "6.0.5"
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.6.0-preview",
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerApps.Generator.Connector.dll": {
@@ -986,21 +958,333 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.CatalogExtensions/1.0.2197.48": {
+      "Microsoft.PowerApps.TestEngine/1.0.1-preview": {
         "dependencies": {
-          "Microsoft.PowerPlatform.CatalogPayloadModels": "1.0.2197.48",
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.0.26"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "Microsoft.Playwright": "1.22.0",
+          "Microsoft.PowerFx.Interpreter": "0.2.3-preview",
+          "Newtonsoft.Json": "13.0.2",
+          "YamlDotNet": "11.2.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.PowerApps.TestEngine.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.1.0"
+          }
+        }
+      },
+      "Microsoft.PowerFx.Core/0.2.3-preview": {
+        "dependencies": {
+          "Microsoft.PowerFx.Transport.Attributes": "0.2.3-preview",
+          "System.Collections.Immutable": "5.0.0",
+          "System.Memory": "4.5.4",
+          "System.Text.Json": "6.0.7"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.PowerFx.Core.dll": {
+            "assemblyVersion": "0.2.3.0",
+            "fileVersion": "0.2.3.0"
+          }
+        },
+        "resources": {
+          "lib/netstandard2.0/bg-BG/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "bg-BG"
+          },
+          "lib/netstandard2.0/ca-ES/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "ca-ES"
+          },
+          "lib/netstandard2.0/cs-CZ/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "cs-CZ"
+          },
+          "lib/netstandard2.0/da-DK/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "da-DK"
+          },
+          "lib/netstandard2.0/de-DE/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "de-DE"
+          },
+          "lib/netstandard2.0/el-GR/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "el-GR"
+          },
+          "lib/netstandard2.0/en-US/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "en-US"
+          },
+          "lib/netstandard2.0/es-ES/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "es-ES"
+          },
+          "lib/netstandard2.0/et-EE/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "et-EE"
+          },
+          "lib/netstandard2.0/eu-ES/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "eu-ES"
+          },
+          "lib/netstandard2.0/fi-FI/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "fi-FI"
+          },
+          "lib/netstandard2.0/fr-FR/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "fr-FR"
+          },
+          "lib/netstandard2.0/gl-ES/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "gl-ES"
+          },
+          "lib/netstandard2.0/hi-IN/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "hi-IN"
+          },
+          "lib/netstandard2.0/hr-HR/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "hr-HR"
+          },
+          "lib/netstandard2.0/hu-HU/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "hu-HU"
+          },
+          "lib/netstandard2.0/id-ID/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "id-ID"
+          },
+          "lib/netstandard2.0/it-IT/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "it-IT"
+          },
+          "lib/netstandard2.0/ja-JP/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "ja-JP"
+          },
+          "lib/netstandard2.0/kk-KZ/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "kk-KZ"
+          },
+          "lib/netstandard2.0/lt-LT/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "lt-LT"
+          },
+          "lib/netstandard2.0/lv-LV/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "lv-LV"
+          },
+          "lib/netstandard2.0/ms-MY/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "ms-MY"
+          },
+          "lib/netstandard2.0/nb-NO/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/netstandard2.0/nl-NL/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "nl-NL"
+          },
+          "lib/netstandard2.0/pl-PL/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "pl-PL"
+          },
+          "lib/netstandard2.0/pt-BR/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/netstandard2.0/pt-PT/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "pt-PT"
+          },
+          "lib/netstandard2.0/ro-RO/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "ro-RO"
+          },
+          "lib/netstandard2.0/ru-RU/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "ru-RU"
+          },
+          "lib/netstandard2.0/sk-SK/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "sk-SK"
+          },
+          "lib/netstandard2.0/sl-SI/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "sl-SI"
+          },
+          "lib/netstandard2.0/sr-Cyrl-RS/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "sr-Cyrl-RS"
+          },
+          "lib/netstandard2.0/sr-Latn-RS/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "sr-Latn-RS"
+          },
+          "lib/netstandard2.0/sv-SE/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "sv-SE"
+          },
+          "lib/netstandard2.0/th-TH/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "th-TH"
+          },
+          "lib/netstandard2.0/tr-TR/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "tr-TR"
+          },
+          "lib/netstandard2.0/uk-UA/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "uk-UA"
+          },
+          "lib/netstandard2.0/vi-VN/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "vi-VN"
+          },
+          "lib/netstandard2.0/ko-KR/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "ko-KR"
+          },
+          "lib/netstandard2.0/zh-CN/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "zh-CN"
+          },
+          "lib/netstandard2.0/zh-TW/Microsoft.PowerFx.Core.resources.dll": {
+            "locale": "zh-TW"
+          }
+        }
+      },
+      "Microsoft.PowerFx.Interpreter/0.2.3-preview": {
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "Microsoft.PowerFx.Core": "0.2.3-preview",
+          "System.Collections.Immutable": "5.0.0",
+          "System.Memory": "4.5.4",
+          "System.Text.Json": "6.0.7"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.PowerFx.Interpreter.dll": {
+            "assemblyVersion": "0.2.3.0",
+            "fileVersion": "0.2.3.0"
+          }
+        }
+      },
+      "Microsoft.PowerFx.Transport.Attributes/0.2.3-preview": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.PowerFx.Transport.Attributes.dll": {
+            "assemblyVersion": "0.2.3.0",
+            "fileVersion": "0.2.3.0"
+          }
+        }
+      },
+      "Microsoft.PowerPlatform.CatalogExtensions/1.0.2323.85": {
+        "dependencies": {
+          "Microsoft.PowerPlatform.CatalogPayloadModels": "1.0.2323.85",
+          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.6"
         },
         "runtime": {
           "lib/net6.0/Microsoft.PowerPlatform.CatalogExtensions.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
+        },
+        "resources": {
+          "lib/net6.0/ar-SA/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ar-SA"
+          },
+          "lib/net6.0/bg-BG/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "bg-BG"
+          },
+          "lib/net6.0/ca-ES/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ca-ES"
+          },
+          "lib/net6.0/cs-CZ/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "cs-CZ"
+          },
+          "lib/net6.0/da-DK/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "da-DK"
+          },
+          "lib/net6.0/de-DE/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "de-DE"
+          },
+          "lib/net6.0/el-GR/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "el-GR"
+          },
+          "lib/net6.0/en-US/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "en-US"
+          },
+          "lib/net6.0/es-ES/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "es-ES"
+          },
+          "lib/net6.0/et-EE/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "et-EE"
+          },
+          "lib/net6.0/eu-ES/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "eu-ES"
+          },
+          "lib/net6.0/fi-FI/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "fi-FI"
+          },
+          "lib/net6.0/fr-FR/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "fr-FR"
+          },
+          "lib/net6.0/gl-ES/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "gl-ES"
+          },
+          "lib/net6.0/he-IL/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "he-IL"
+          },
+          "lib/net6.0/hi-IN/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "hi-IN"
+          },
+          "lib/net6.0/hr-HR/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "hr-HR"
+          },
+          "lib/net6.0/hu-HU/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "hu-HU"
+          },
+          "lib/net6.0/id-ID/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "id-ID"
+          },
+          "lib/net6.0/it-IT/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "it-IT"
+          },
+          "lib/net6.0/ja-JP/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ja-JP"
+          },
+          "lib/net6.0/kk-KZ/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "kk-KZ"
+          },
+          "lib/net6.0/ko-KR/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ko-KR"
+          },
+          "lib/net6.0/lt-LT/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "lt-LT"
+          },
+          "lib/net6.0/lv-LV/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "lv-LV"
+          },
+          "lib/net6.0/ms-MY/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ms-MY"
+          },
+          "lib/net6.0/nb-NO/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/net6.0/nl-NL/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "nl-NL"
+          },
+          "lib/net6.0/pl-PL/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "pl-PL"
+          },
+          "lib/net6.0/pt-BR/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/net6.0/pt-PT/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "pt-PT"
+          },
+          "lib/net6.0/ro-RO/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ro-RO"
+          },
+          "lib/net6.0/ru-RU/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "ru-RU"
+          },
+          "lib/net6.0/sk-SK/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "sk-SK"
+          },
+          "lib/net6.0/sl-SI/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "sl-SI"
+          },
+          "lib/net6.0/sv-SE/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "sv-SE"
+          },
+          "lib/net6.0/th-TH/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "th-TH"
+          },
+          "lib/net6.0/tr-TR/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "tr-TR"
+          },
+          "lib/net6.0/uk-UA/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "uk-UA"
+          },
+          "lib/net6.0/vi-VN/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "vi-VN"
+          },
+          "lib/net6.0/zh-CN/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "zh-CN"
+          },
+          "lib/net6.0/zh-HK/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "zh-HK"
+          },
+          "lib/net6.0/zh-TW/Microsoft.PowerPlatform.CatalogExtensions.resources.dll": {
+            "locale": "zh-TW"
+          }
         }
       },
-      "Microsoft.PowerPlatform.CatalogPayloadModels/1.0.2197.48": {
+      "Microsoft.PowerPlatform.CatalogPayloadModels/1.0.2323.85": {
         "dependencies": {
-          "System.Text.Json": "6.0.5"
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
           "lib/net6.0/Microsoft.PowerPlatform.CatalogPayloadModels.dll": {
@@ -1009,19 +1293,20 @@
           }
         }
       },
-      "Microsoft.PowerPlatform.Dataverse.Client/1.0.26": {
+      "Microsoft.PowerPlatform.Dataverse.Client/1.1.6": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Http": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
-          "Microsoft.Identity.Client": "4.46.0",
+          "Microsoft.Identity.Client": "4.53.0",
           "Microsoft.Identity.Client.Extensions.Msal": "2.23.0",
           "Microsoft.Rest.ClientRuntime": "2.3.20",
           "Microsoft.VisualBasic": "10.3.0",
           "Newtonsoft.Json": "13.0.2",
           "System.Collections": "4.3.0",
           "System.Configuration.ConfigurationManager": "6.0.0",
+          "System.Drawing.Common": "6.0.0",
           "System.Globalization": "4.3.0",
           "System.Linq": "4.3.0",
           "System.Linq.Expressions": "4.3.0",
@@ -1034,52 +1319,51 @@
           "System.Runtime.Serialization.Xml": "4.3.0",
           "System.Security.Cryptography.Algorithms": "4.3.1",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
+          "System.Security.Cryptography.Xml": "6.0.1",
           "System.Security.Permissions": "6.0.0",
-          "System.ServiceModel.Duplex": "4.9.0",
-          "System.ServiceModel.Http": "4.9.0",
-          "System.ServiceModel.Primitives": "4.10.0",
-          "System.Text.Json": "6.0.5"
+          "System.ServiceModel.Http": "4.10.0",
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
-          "lib/netcoreapp3.1/Microsoft.Crm.Sdk.Proxy.dll": {
+          "lib/net6.0/Microsoft.Crm.Sdk.Proxy.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.2.47.11043"
+            "fileVersion": "9.2.49.3165"
           },
-          "lib/netcoreapp3.1/Microsoft.PowerPlatform.Dataverse.Client.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.26"
+          "lib/net6.0/Microsoft.PowerPlatform.Dataverse.Client.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.5"
           },
-          "lib/netcoreapp3.1/Microsoft.Xrm.Sdk.dll": {
+          "lib/net6.0/Microsoft.Xrm.Sdk.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.2.47.11043"
+            "fileVersion": "9.2.49.3165"
           }
         }
       },
-      "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.16": {
+      "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.23": {
         "dependencies": {
           "System.CodeDom": "6.0.0",
           "System.Configuration.ConfigurationManager": "6.0.0",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "System.Xml.XmlDocument": "4.3.0"
         },
         "runtime": {
           "lib/net6.0/Microsoft.PowerPlatform.Dataverse.ModelBuilderLib.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.17"
+            "fileVersion": "1.0.0.24"
           }
         }
       },
-      "Microsoft.PowerPlatform.Formulas.Tools/0.5.8-preview": {
+      "Microsoft.PowerPlatform.Formulas.Tools/0.6.0-preview": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.2",
           "System.Text.Encodings.Web": "6.0.0",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "YamlDotNet": "11.2.1"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.PowerPlatform.Formulas.Tools.dll": {
-            "assemblyVersion": "0.5.8.0",
-            "fileVersion": "0.5.8.0"
+            "assemblyVersion": "0.6.0.0",
+            "fileVersion": "0.6.0.0"
           }
         }
       },
@@ -1167,6 +1451,12 @@
       "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {},
       "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {},
       "runtime.native.System/4.3.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Targets": "1.1.0"
+        }
+      },
+      "runtime.native.System.IO.Compression/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
           "Microsoft.NETCore.Targets": "1.1.0"
@@ -1291,6 +1581,7 @@
           "System.Threading.Tasks": "4.3.0"
         }
       },
+      "System.Collections.Immutable/5.0.0": {},
       "System.ComponentModel.Annotations/5.0.0": {},
       "System.ComponentModel.Composition/5.0.0": {
         "runtime": {
@@ -1383,6 +1674,25 @@
           "runtime.any.System.IO": "4.3.0"
         }
       },
+      "System.IO.Compression/4.3.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.0",
+          "System.Buffers": "4.3.0",
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.IO": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime.Handles": "4.3.0",
+          "System.Runtime.InteropServices": "4.3.0",
+          "System.Text.Encoding": "4.3.0",
+          "System.Threading": "4.3.0",
+          "System.Threading.Tasks": "4.3.0",
+          "runtime.native.System": "4.3.0",
+          "runtime.native.System.IO.Compression": "4.3.0"
+        }
+      },
       "System.IO.FileSystem/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -1449,7 +1759,7 @@
       "System.Memory.Data/1.0.2": {
         "dependencies": {
           "System.Text.Encodings.Web": "6.0.0",
-          "System.Text.Json": "6.0.5"
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
           "lib/netstandard2.0/System.Memory.Data.dll": {
@@ -1505,7 +1815,7 @@
           "System.Xml.XmlSerializer": "4.3.0"
         }
       },
-      "System.Private.ServiceModel/4.10.0": {
+      "System.Private.ServiceModel/4.10.2": {
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "Microsoft.Extensions.ObjectPool": "5.0.10",
@@ -1516,8 +1826,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/System.Private.ServiceModel.dll": {
-            "assemblyVersion": "4.10.0.0",
-            "fileVersion": "4.1000.22.41602"
+            "assemblyVersion": "4.10.2.0",
+            "fileVersion": "4.1000.223.17202"
           }
         },
         "resources": {
@@ -1809,42 +2119,30 @@
         }
       },
       "System.Security.Principal.Windows/5.0.0": {},
-      "System.ServiceModel.Duplex/4.9.0": {
+      "System.ServiceModel.Http/4.10.0": {
         "dependencies": {
-          "System.Private.ServiceModel": "4.10.0",
-          "System.ServiceModel.Primitives": "4.10.0"
-        },
-        "runtime": {
-          "lib/net6.0/System.ServiceModel.Duplex.dll": {
-            "assemblyVersion": "4.9.0.0",
-            "fileVersion": "4.900.21.52002"
-          }
-        }
-      },
-      "System.ServiceModel.Http/4.9.0": {
-        "dependencies": {
-          "System.Private.ServiceModel": "4.10.0",
-          "System.ServiceModel.Primitives": "4.10.0"
+          "System.Private.ServiceModel": "4.10.2",
+          "System.ServiceModel.Primitives": "4.10.2"
         },
         "runtime": {
           "lib/net6.0/System.ServiceModel.Http.dll": {
-            "assemblyVersion": "4.9.0.0",
-            "fileVersion": "4.900.21.52002"
+            "assemblyVersion": "4.10.0.0",
+            "fileVersion": "4.1000.22.41602"
           }
         }
       },
-      "System.ServiceModel.Primitives/4.10.0": {
+      "System.ServiceModel.Primitives/4.10.2": {
         "dependencies": {
-          "System.Private.ServiceModel": "4.10.0"
+          "System.Private.ServiceModel": "4.10.2"
         },
         "runtime": {
           "lib/net6.0/System.ServiceModel.Primitives.dll": {
-            "assemblyVersion": "4.10.0.0",
-            "fileVersion": "4.1000.22.41602"
+            "assemblyVersion": "4.10.2.0",
+            "fileVersion": "4.1000.223.17202"
           },
           "lib/net6.0/System.ServiceModel.dll": {
             "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.1000.22.41602"
+            "fileVersion": "4.1000.223.17202"
           }
         }
       },
@@ -1870,7 +2168,7 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
       },
-      "System.Text.Json/6.0.5": {
+      "System.Text.Json/6.0.7": {
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0",
           "System.Text.Encodings.Web": "6.0.0"
@@ -1878,7 +2176,7 @@
         "runtime": {
           "lib/net6.0/System.Text.Json.dll": {
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.622.26707"
+            "fileVersion": "6.0.1122.52304"
           }
         }
       },
@@ -1992,34 +2290,64 @@
           }
         }
       },
+      "bolt.authentication/0.1.0": {
+        "dependencies": {
+          "Azure.Identity": "1.8.0",
+          "Microsoft.Extensions.Http": "6.0.0",
+          "Microsoft.Graph": "4.29.0",
+          "Microsoft.Identity.Client": "4.53.0",
+          "Microsoft.Identity.Client.Broker": "4.53.0",
+          "Microsoft.Identity.Web.Certificate": "1.25.1",
+          "System.Security.Cryptography.ProtectedData": "6.0.0",
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
+        },
+        "runtime": {
+          "bolt.authentication.dll": {}
+        }
+      },
       "bolt.cli/0.1.0": {
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.21.0",
-          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
-          "Microsoft.Extensions.Configuration.Json": "6.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.FileSystemGlobbing": "6.0.0",
           "Microsoft.Extensions.Http": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Logging.Debug": "6.0.0",
           "Microsoft.PowerApps.AppInsights.BatchedTelemetry": "3.0.8",
-          "NLog": "5.1.1",
-          "NLog.Extensions.Logging": "5.2.1",
           "Newtonsoft.Json": "13.0.2",
           "System.ComponentModel.Composition": "5.0.0",
-          "System.Drawing.Common": "6.0.0",
-          "System.Text.Encodings.Web": "6.0.0",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
           "bolt.system": "0.1.0"
         },
         "runtime": {
           "bolt.cli.dll": {}
         }
       },
+      "bolt.dataverse/0.1.0": {
+        "dependencies": {
+          "Irony": "1.1.0",
+          "Microsoft.Extensions.Caching.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Caching.Memory": "6.0.0",
+          "Microsoft.Identity.Client": "4.53.0",
+          "Microsoft.PowerPlatform.CatalogExtensions": "1.0.2323.85",
+          "Microsoft.PowerPlatform.CatalogPayloadModels": "1.0.2323.85",
+          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.6",
+          "System.Security.Cryptography.Xml": "6.0.1",
+          "System.ServiceModel.Primitives": "4.10.2",
+          "bolt.authentication": "0.1.0",
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
+        },
+        "runtime": {
+          "bolt.dataverse.dll": {}
+        }
+      },
       "bolt.module.admin/0.1.0": {
         "dependencies": {
           "Irony": "1.1.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2028,7 +2356,9 @@
       },
       "bolt.module.application/0.1.0": {
         "dependencies": {
+          "bolt.authentication": "0.1.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2039,13 +2369,15 @@
         "dependencies": {
           "Azure.Identity": "1.8.0",
           "Microsoft.Graph": "4.29.0",
-          "Microsoft.Identity.Client": "4.46.0",
+          "Microsoft.Identity.Client": "4.53.0",
           "Microsoft.Identity.Web.Certificate": "1.25.1",
           "Newtonsoft.Json": "13.0.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
-          "System.Text.Json": "6.0.5",
+          "System.Text.Json": "6.0.7",
+          "bolt.authentication": "0.1.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2055,7 +2387,7 @@
       "bolt.module.canvas/0.1.0": {
         "dependencies": {
           "Microsoft.PowerApps.Generator.Connector": "1.0.2055.76",
-          "Microsoft.PowerPlatform.Formulas.Tools": "0.5.8-preview",
+          "Microsoft.PowerPlatform.Formulas.Tools": "0.6.0-preview",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
@@ -2068,8 +2400,14 @@
       },
       "bolt.module.catalog/0.1.0": {
         "dependencies": {
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.151",
+          "Microsoft.PowerPlatform.CatalogExtensions": "1.0.2323.85",
+          "Microsoft.PowerPlatform.CatalogPayloadModels": "1.0.2323.85",
           "System.ComponentModel.Composition": "5.0.0",
+          "System.IO.Compression": "4.3.0",
+          "System.IO.Packaging": "4.7.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2078,16 +2416,8 @@
       },
       "bolt.module.cds/0.1.0": {
         "dependencies": {
-          "Irony": "1.1.0",
-          "Microsoft.Extensions.Caching.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Caching.Memory": "6.0.0",
-          "Microsoft.Identity.Client": "4.46.0",
-          "Microsoft.PowerPlatform.CatalogExtensions": "1.0.2197.48",
-          "Microsoft.PowerPlatform.CatalogPayloadModels": "1.0.2197.48",
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.0.26",
-          "System.Security.Cryptography.Xml": "6.0.1",
-          "System.ServiceModel.Primitives": "4.10.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2106,6 +2436,7 @@
       },
       "bolt.module.connection/0.1.0": {
         "dependencies": {
+          "bolt.authentication": "0.1.0",
           "bolt.cli": "0.1.0",
           "bolt.system": "0.1.0"
         },
@@ -2117,6 +2448,7 @@
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2126,10 +2458,11 @@
       "bolt.module.modelbuilder/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib": "1.0.16",
+          "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib": "1.0.23",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0",
           "bolt.version": "0.1.0"
         },
@@ -2140,7 +2473,9 @@
       "bolt.module.package/0.1.0": {
         "dependencies": {
           "System.IO.Packaging": "4.7.0",
+          "bolt.authentication": "0.1.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2149,12 +2484,13 @@
       },
       "bolt.module.paportal/0.1.0": {
         "dependencies": {
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.0.26",
+          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.6",
           "MimeMapping": "1.0.1.37",
           "System.Security.Cryptography.Xml": "6.0.1",
-          "System.ServiceModel.Primitives": "4.10.0",
+          "System.ServiceModel.Primitives": "4.10.2",
           "YamlDotNet": "11.2.1",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2165,6 +2501,7 @@
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0",
           "bolt.version": "0.1.0"
         },
@@ -2175,7 +2512,9 @@
       "bolt.module.pipeline/0.1.0": {
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
+          "bolt.authentication": "0.1.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2186,6 +2525,7 @@
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2195,11 +2535,12 @@
       "bolt.module.solution/0.1.0": {
         "dependencies": {
           "CsvHelper": "26.0.0",
-          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.135",
-          "Microsoft.PowerApps.Checker.Client": "1.0.0.3",
+          "Microsoft.CrmSdk.SolutionPackagerLib": "9.1.1.151",
+          "Microsoft.PowerApps.Checker.Client": "1.0.0.11",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0",
           "bolt.version": "0.1.0"
         },
@@ -2207,10 +2548,22 @@
           "bolt.module.solution.dll": {}
         }
       },
+      "bolt.module.tests/0.1.0": {
+        "dependencies": {
+          "Microsoft.PowerApps.TestEngine": "1.0.1-preview",
+          "System.ComponentModel.Composition": "5.0.0",
+          "bolt.cli": "0.1.0",
+          "bolt.system": "0.1.0"
+        },
+        "runtime": {
+          "bolt.module.tests.dll": {}
+        }
+      },
       "bolt.module.virtualAgent/0.1.0": {
         "dependencies": {
           "System.ComponentModel.Composition": "5.0.0",
           "bolt.cli": "0.1.0",
+          "bolt.dataverse": "0.1.0",
           "bolt.system": "0.1.0"
         },
         "runtime": {
@@ -2220,7 +2573,8 @@
       "bolt.system/0.1.0": {
         "dependencies": {
           "Microsoft.Extensions.Logging": "6.0.0",
-          "Newtonsoft.Json": "13.0.2"
+          "Newtonsoft.Json": "13.0.2",
+          "System.Text.Json": "6.0.7"
         },
         "runtime": {
           "bolt.system.dll": {}
@@ -2228,7 +2582,7 @@
       },
       "bolt.version/0.1.0": {
         "dependencies": {
-          "LibGit2Sharp": "0.26.2",
+          "LibGit2Sharp": "0.27.2",
           "System.ComponentModel.Composition": "5.0.0",
           "System.ValueTuple": "4.5.0",
           "bolt.system": "0.1.0"
@@ -2287,19 +2641,19 @@
       "path": "irony/1.1.0",
       "hashPath": "irony.1.1.0.nupkg.sha512"
     },
-    "LibGit2Sharp/0.26.2": {
+    "LibGit2Sharp/0.27.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qHLhuI8VEtMf7jiurT/Ypquh37S6ngllCx+aq9uqOY2evok7Fb2AzhJgvNctsXOzHaJwveBs+30sPQJFn/pISg==",
-      "path": "libgit2sharp/0.26.2",
-      "hashPath": "libgit2sharp.0.26.2.nupkg.sha512"
+      "sha512": "sha512-TYIfwuumwmZFjxwRFz5y2MyTA8jc19MejSyRRTCS/TflhrdQPH7H84ueyCpY0+xkNWThEd+dCnkuf7XuH3tt+A==",
+      "path": "libgit2sharp/0.27.2",
+      "hashPath": "libgit2sharp.0.27.2.nupkg.sha512"
     },
-    "LibGit2Sharp.NativeBinaries/2.0.306": {
+    "LibGit2Sharp.NativeBinaries/2.0.320": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-LY9nyPE2X/eLl69ttuDPFFlKR8b5KXlqYej1YR1YmqmhF8Izo+vPX90q5ouOO5YGCf5d4lDUOC0x2yMWw00P7Q==",
-      "path": "libgit2sharp.nativebinaries/2.0.306",
-      "hashPath": "libgit2sharp.nativebinaries.2.0.306.nupkg.sha512"
+      "sha512": "sha512-7vIqOhB+5LOi9arXi8IdlkWURpQEiMtnwVP//djA7cQvIVfpC4bZSnQIDe4kwwvsU/w1oH0YkBTgMmpkVndNbg==",
+      "path": "libgit2sharp.nativebinaries/2.0.320",
+      "hashPath": "libgit2sharp.nativebinaries.2.0.320.nupkg.sha512"
     },
     "Microsoft.ApplicationInsights/2.21.0": {
       "type": "package",
@@ -2315,12 +2669,12 @@
       "path": "microsoft.bcl.asyncinterfaces/6.0.0",
       "hashPath": "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512"
     },
-    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.135": {
+    "Microsoft.CrmSdk.SolutionPackagerLib/9.1.1.151": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-t/6QL0FSPxrSD/L5W8PdDGezwxezdiUYPYXIZQSLdwnfIx5cUgr8Gxg0YrI1x4QutIPpZKNl0KuD4ylOt4/LOQ==",
-      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.135",
-      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.135.nupkg.sha512"
+      "sha512": "sha512-kQ0qbm7HuvoWU3ULniLJvpX5NUIo1txiOx+OELGqJmbdEpV9YU0/fCXu00QSdcRFweDv9fCAv6PfySbCEH27EA==",
+      "path": "microsoft.crmsdk.solutionpackagerlib/9.1.1.151",
+      "hashPath": "microsoft.crmsdk.solutionpackagerlib.9.1.1.151.nupkg.sha512"
     },
     "Microsoft.CSharp/4.7.0": {
       "type": "package",
@@ -2343,33 +2697,12 @@
       "path": "microsoft.extensions.caching.memory/6.0.0",
       "hashPath": "microsoft.extensions.caching.memory.6.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-tq2wXyh3fL17EMF2bXgRhU7JrbO3on93MRKYxzz4JzzvuGSA1l0W3GI9/tl8EO89TH+KWEymP7bcFway6z9fXg==",
-      "path": "microsoft.extensions.configuration/6.0.0",
-      "hashPath": "microsoft.extensions.configuration.6.0.0.nupkg.sha512"
-    },
     "Microsoft.Extensions.Configuration.Abstractions/6.0.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-qWzV9o+ZRWq+pGm+1dF+R7qTgTYoXvbyowRoBxQJGfqTpqDun2eteerjRQhq5PQ/14S+lqto3Ft4gYaRyl4rdQ==",
       "path": "microsoft.extensions.configuration.abstractions/6.0.0",
       "hashPath": "microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512"
-    },
-    "Microsoft.Extensions.Configuration.FileExtensions/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-V4Dth2cYMZpw3HhGw9XUDIijpI6gN+22LDt0AhufIgOppCUfpWX4483OmN+dFXRJkJLc8Tv0Q8QK+1ingT2+KQ==",
-      "path": "microsoft.extensions.configuration.fileextensions/6.0.0",
-      "hashPath": "microsoft.extensions.configuration.fileextensions.6.0.0.nupkg.sha512"
-    },
-    "Microsoft.Extensions.Configuration.Json/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-GJGery6QytCzS/BxJ96klgG9in3uH26KcUBbiVG/coNDXCRq6LGVVlUT4vXq34KPuM+R2av+LeYdX9h4IZOCUg==",
-      "path": "microsoft.extensions.configuration.json/6.0.0",
-      "hashPath": "microsoft.extensions.configuration.json.6.0.0.nupkg.sha512"
     },
     "Microsoft.Extensions.DependencyInjection/6.0.0": {
       "type": "package",
@@ -2384,20 +2717,6 @@
       "sha512": "sha512-xlzi2IYREJH3/m6+lUrQlujzX8wDitm4QGnUu6kUXTQAWPuZY8i+ticFJbzfqaetLA6KR/rO6Ew/HuYD+bxifg==",
       "path": "microsoft.extensions.dependencyinjection.abstractions/6.0.0",
       "hashPath": "microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
-    },
-    "Microsoft.Extensions.FileProviders.Abstractions/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-0pd4/fho0gC12rQswaGQxbU34jOS1TPS8lZPpkFCH68ppQjHNHYle9iRuHeev1LhrJ94YPvzcRd8UmIuFk23Qw==",
-      "path": "microsoft.extensions.fileproviders.abstractions/6.0.0",
-      "hashPath": "microsoft.extensions.fileproviders.abstractions.6.0.0.nupkg.sha512"
-    },
-    "Microsoft.Extensions.FileProviders.Physical/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-QvkL7l0nM8udt3gfyu0Vw8bbCXblxaKOl7c2oBfgGy4LCURRaL9XWZX1FWJrQc43oMokVneVxH38iz+bY1sbhg==",
-      "path": "microsoft.extensions.fileproviders.physical/6.0.0",
-      "hashPath": "microsoft.extensions.fileproviders.physical.6.0.0.nupkg.sha512"
     },
     "Microsoft.Extensions.FileSystemGlobbing/6.0.0": {
       "type": "package",
@@ -2469,12 +2788,19 @@
       "path": "microsoft.graph.core/2.0.8",
       "hashPath": "microsoft.graph.core.2.0.8.nupkg.sha512"
     },
-    "Microsoft.Identity.Client/4.46.0": {
+    "Microsoft.Identity.Client/4.53.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-cqNAIELaUypwWvTwnC3MdsccaSpEpVR10WBQ7+e33iSkceeC1kum6aTEwe2m8z4ZdnzlvEMH+dBbXBHMLCy+fQ==",
-      "path": "microsoft.identity.client/4.46.0",
-      "hashPath": "microsoft.identity.client.4.46.0.nupkg.sha512"
+      "sha512": "sha512-N0qNbtiuziG0UBFbbju7az96t4lEOQtuonhV+yk1mx76q4o5hBzekOURxQM0EJNWBIi68w72LivMQJuFig6kQw==",
+      "path": "microsoft.identity.client/4.53.0",
+      "hashPath": "microsoft.identity.client.4.53.0.nupkg.sha512"
+    },
+    "Microsoft.Identity.Client.Broker/4.53.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zZTqLfk7EYzrC4dFWIXaUZBb1WgqfbCO2e5HSYExsXLPFBOcSYhSoxV0/u+e00OUrkj0FrdSFdmoxmeSQSPMmA==",
+      "path": "microsoft.identity.client.broker/4.53.0",
+      "hashPath": "microsoft.identity.client.broker.4.53.0.nupkg.sha512"
     },
     "Microsoft.Identity.Client.Extensions.Msal/2.23.0": {
       "type": "package",
@@ -2483,6 +2809,13 @@
       "path": "microsoft.identity.client.extensions.msal/2.23.0",
       "hashPath": "microsoft.identity.client.extensions.msal.2.23.0.nupkg.sha512"
     },
+    "Microsoft.Identity.Client.NativeInterop/0.13.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ch7Nqsl3nUd+/BD5HNPw2GMfBtERfZmUsxueIz8vUvEvbOjqd5gwykJRZnvitWQ/s91XNP5mkRg3vPJjDW6MeQ==",
+      "path": "microsoft.identity.client.nativeinterop/0.13.7",
+      "hashPath": "microsoft.identity.client.nativeinterop.0.13.7.nupkg.sha512"
+    },
     "Microsoft.Identity.Web.Certificate/1.25.1": {
       "type": "package",
       "serviceable": true,
@@ -2490,12 +2823,12 @@
       "path": "microsoft.identity.web.certificate/1.25.1",
       "hashPath": "microsoft.identity.web.certificate.1.25.1.nupkg.sha512"
     },
-    "Microsoft.IdentityModel.Abstractions/6.18.0": {
+    "Microsoft.IdentityModel.Abstractions/6.22.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ItCO09JoIQr9sY0AumHRLJKToMKM4/jFcBsg3uhKBZZLX1KPxjed/mKrQzo9PXiarfC87rguvFWWg9C996sEqA==",
-      "path": "microsoft.identitymodel.abstractions/6.18.0",
-      "hashPath": "microsoft.identitymodel.abstractions.6.18.0.nupkg.sha512"
+      "sha512": "sha512-iI+9V+2ciCrbheeLjpmjcqCnhy+r6yCoEcid3nkoFWerHgjVuT6CPM4HODUTtUPe1uwks4wcnAujJ8u+IKogHQ==",
+      "path": "microsoft.identitymodel.abstractions/6.22.0",
+      "hashPath": "microsoft.identitymodel.abstractions.6.22.0.nupkg.sha512"
     },
     "Microsoft.IdentityModel.JsonWebTokens/6.15.1": {
       "type": "package",
@@ -2560,6 +2893,13 @@
       "path": "microsoft.openapi.readers/1.2.3",
       "hashPath": "microsoft.openapi.readers.1.2.3.nupkg.sha512"
     },
+    "Microsoft.Playwright/1.22.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vITmRQmg5vbB3twC+wiUTvVkgTQQnhyo1Xf8oJ0KTEyJQumRRFxnyH+BlqU3USRqPEwwmP/mm8NdJLNWnzChQg==",
+      "path": "microsoft.playwright/1.22.0",
+      "hashPath": "microsoft.playwright.1.22.0.nupkg.sha512"
+    },
     "Microsoft.PowerApps.AppInsights.BatchedTelemetry/3.0.8": {
       "type": "package",
       "serviceable": true,
@@ -2567,12 +2907,12 @@
       "path": "microsoft.powerapps.appinsights.batchedtelemetry/3.0.8",
       "hashPath": "microsoft.powerapps.appinsights.batchedtelemetry.3.0.8.nupkg.sha512"
     },
-    "Microsoft.PowerApps.Checker.Client/1.0.0.3": {
+    "Microsoft.PowerApps.Checker.Client/1.0.0.11": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-JoM+VvjlHEYmLRSkqDEerJvDbc0Ea4qkKTGC6qwO2LC2MvG44TeXF0GFg4QNdk+uHv4dpb0jMxNQXpVncxRqWg==",
-      "path": "microsoft.powerapps.checker.client/1.0.0.3",
-      "hashPath": "microsoft.powerapps.checker.client.1.0.0.3.nupkg.sha512"
+      "sha512": "sha512-QIuPHhTX1TmcpXrsR8BaxnwU3JgbpwFpZLjPupGPseeQOg6jkU/QrGtrXBqJNlYvMZdIp+T5jcR1SBiuf/YUZg==",
+      "path": "microsoft.powerapps.checker.client/1.0.0.11",
+      "hashPath": "microsoft.powerapps.checker.client.1.0.0.11.nupkg.sha512"
     },
     "Microsoft.PowerApps.Generator.Builder/1.0.2055.76": {
       "type": "package",
@@ -2595,40 +2935,68 @@
       "path": "microsoft.powerapps.generator.core/1.0.2055.76",
       "hashPath": "microsoft.powerapps.generator.core.1.0.2055.76.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.CatalogExtensions/1.0.2197.48": {
+    "Microsoft.PowerApps.TestEngine/1.0.1-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-9+DAhKUO5jqz0U1e3X2kP16CasDFxfJlnDgUP9GVejXCEmeDqIvxEh0CYUypZEwgRefCtM+6WKsN5vVh19GNnA==",
-      "path": "microsoft.powerplatform.catalogextensions/1.0.2197.48",
-      "hashPath": "microsoft.powerplatform.catalogextensions.1.0.2197.48.nupkg.sha512"
+      "sha512": "sha512-LZPKVEO4eXLvqVtD/B1PS+S96mMC8qOt2+hLwEgkHv2yq1A1JOnygNgyd/HZsOD2WpQ09pnpe3AMAPDyuaMuOA==",
+      "path": "microsoft.powerapps.testengine/1.0.1-preview",
+      "hashPath": "microsoft.powerapps.testengine.1.0.1-preview.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.CatalogPayloadModels/1.0.2197.48": {
+    "Microsoft.PowerFx.Core/0.2.3-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bAP0shr1N023N8M84gGZKCVfuXGrwkCaV79u/UOaT3scrk2qk+/eVA4ioge8XeibItkVSmAH8hUKNMFh0RDx7Q==",
-      "path": "microsoft.powerplatform.catalogpayloadmodels/1.0.2197.48",
-      "hashPath": "microsoft.powerplatform.catalogpayloadmodels.1.0.2197.48.nupkg.sha512"
+      "sha512": "sha512-NLgRZoAveu816XRhvUfN3XpZtYJbchA9jOE+riWYGpze5rCkXlfNmciGti1k2trR5qmhS6pDHqNpnD9qJ9zW5Q==",
+      "path": "microsoft.powerfx.core/0.2.3-preview",
+      "hashPath": "microsoft.powerfx.core.0.2.3-preview.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Dataverse.Client/1.0.26": {
+    "Microsoft.PowerFx.Interpreter/0.2.3-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bCTPIM1XI1n+D1OVwjDiWPPQip2TurYlBcJ3onV5nCFXID8cAsRlGf6GVq740kszGwxoO6rML3ooQwHAah8AtA==",
-      "path": "microsoft.powerplatform.dataverse.client/1.0.26",
-      "hashPath": "microsoft.powerplatform.dataverse.client.1.0.26.nupkg.sha512"
+      "sha512": "sha512-D7i8LvxS1dHXGz4J2t1lh8XFXZnMUuku1gKFPoAynXgmi/TRwtAgd3r2U1enRCY+xu37pxeQsREtBw+NwGxcQA==",
+      "path": "microsoft.powerfx.interpreter/0.2.3-preview",
+      "hashPath": "microsoft.powerfx.interpreter.0.2.3-preview.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.16": {
+    "Microsoft.PowerFx.Transport.Attributes/0.2.3-preview": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-TCwgI40AR8VWeRL11AxJJGNe3qAc8wi4JjCYiZtAcVR1p7ZzqmFJqLqr/upuE/ev8auK5WPHrPNBNr1yCNHq7Q==",
-      "path": "microsoft.powerplatform.dataverse.modelbuilderlib/1.0.16",
-      "hashPath": "microsoft.powerplatform.dataverse.modelbuilderlib.1.0.16.nupkg.sha512"
+      "sha512": "sha512-y0r20slMGBoqS5AbuF5G+TkTTtxfLhqn3t1ngX+P77FQ4YX1bT+fnYKvfYA41Qo/sOnFeQbSRzfCMEIzpoVejA==",
+      "path": "microsoft.powerfx.transport.attributes/0.2.3-preview",
+      "hashPath": "microsoft.powerfx.transport.attributes.0.2.3-preview.nupkg.sha512"
     },
-    "Microsoft.PowerPlatform.Formulas.Tools/0.5.8-preview": {
+    "Microsoft.PowerPlatform.CatalogExtensions/1.0.2323.85": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pfW01aQzD50uBDjhYbBbIwATwCOE6fHQGhSul/zwD37krW8PAaBmQWcmliMMRPuhZGBZF/3WuOxDtspHPQ1GXg==",
-      "path": "microsoft.powerplatform.formulas.tools/0.5.8-preview",
-      "hashPath": "microsoft.powerplatform.formulas.tools.0.5.8-preview.nupkg.sha512"
+      "sha512": "sha512-W6e4w+YKufm8slBqzN/k59xi39Bd2i72Ab3Fw1BD4KDVOTP2OnOyf9nnDLcW4JrdasdJ0wTYvolj5UxtzjlavA==",
+      "path": "microsoft.powerplatform.catalogextensions/1.0.2323.85",
+      "hashPath": "microsoft.powerplatform.catalogextensions.1.0.2323.85.nupkg.sha512"
+    },
+    "Microsoft.PowerPlatform.CatalogPayloadModels/1.0.2323.85": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-20vTCDoNKj6D4wHvMi1nvnJ54MskREOpkSDTz7KfI9As0FfezgcggDf8nGtIP2mU4uBjbbt6wCy35kl7+7r1Cw==",
+      "path": "microsoft.powerplatform.catalogpayloadmodels/1.0.2323.85",
+      "hashPath": "microsoft.powerplatform.catalogpayloadmodels.1.0.2323.85.nupkg.sha512"
+    },
+    "Microsoft.PowerPlatform.Dataverse.Client/1.1.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-1cpn0OP4JgCpvNMCfGGznIyq7uVfzkFIDivPO3n0YZPKKVY/q4aHeq+CP/lnchT3vNTsqpdEyGVoGgn0AC6FAQ==",
+      "path": "microsoft.powerplatform.dataverse.client/1.1.6",
+      "hashPath": "microsoft.powerplatform.dataverse.client.1.1.6.nupkg.sha512"
+    },
+    "Microsoft.PowerPlatform.Dataverse.ModelBuilderLib/1.0.23": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dmYaf4+6UpMJ3T7BSCf5rQaxlwRcG8uYdDhnO8+GlaIYXB7z+CK8PDUJRicFBI2xzAuh9qiFvpn2dKID421kSw==",
+      "path": "microsoft.powerplatform.dataverse.modelbuilderlib/1.0.23",
+      "hashPath": "microsoft.powerplatform.dataverse.modelbuilderlib.1.0.23.nupkg.sha512"
+    },
+    "Microsoft.PowerPlatform.Formulas.Tools/0.6.0-preview": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GGSoHzHFHxsqUeIxeYBftNYS0LtipjqKdzXIdAac7yTYTsyQYV2vwMTPSASxxnFD5YyC/3VbQpAGpvPLcwOQgQ==",
+      "path": "microsoft.powerplatform.formulas.tools/0.6.0-preview",
+      "hashPath": "microsoft.powerplatform.formulas.tools.0.6.0-preview.nupkg.sha512"
     },
     "Microsoft.Rest.ClientRuntime/2.3.20": {
       "type": "package",
@@ -2812,6 +3180,13 @@
       "path": "runtime.native.system/4.3.0",
       "hashPath": "runtime.native.system.4.3.0.nupkg.sha512"
     },
+    "runtime.native.System.IO.Compression/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-INBPonS5QPEgn7naufQFXJEp3zX6L4bwHgJ/ZH78aBTpeNfQMtf7C6VrAFhlq2xxWBveIOWyFzQjJ8XzHMhdOQ==",
+      "path": "runtime.native.system.io.compression/4.3.0",
+      "hashPath": "runtime.native.system.io.compression.4.3.0.nupkg.sha512"
+    },
     "runtime.native.System.Security.Cryptography.Apple/4.3.1": {
       "type": "package",
       "serviceable": true,
@@ -2959,6 +3334,13 @@
       "path": "system.collections.concurrent/4.3.0",
       "hashPath": "system.collections.concurrent.4.3.0.nupkg.sha512"
     },
+    "System.Collections.Immutable/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-FXkLXiK0sVVewcso0imKQoOxjoPAj42R8HtjjbSjVPAzwDfzoyoznWxgA3c38LDbN9SJux1xXoXYAhz98j7r2g==",
+      "path": "system.collections.immutable/5.0.0",
+      "hashPath": "system.collections.immutable.5.0.0.nupkg.sha512"
+    },
     "System.ComponentModel.Annotations/5.0.0": {
       "type": "package",
       "serviceable": true,
@@ -3042,6 +3424,13 @@
       "sha512": "sha512-3qjaHvxQPDpSOYICjUoTsmoq5u6QJAFRUITgeT/4gqkF1bajbSmb1kwSxEA8AHlofqgcKJcM8udgieRNhaJ5Cg==",
       "path": "system.io/4.3.0",
       "hashPath": "system.io.4.3.0.nupkg.sha512"
+    },
+    "System.IO.Compression/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YHndyoiV90iu4iKG115ibkhrG+S3jBm8Ap9OwoUAzO5oPDAWcr0SFwQFm0HjM8WkEZWo0zvLTyLmbvTkW1bXgg==",
+      "path": "system.io.compression/4.3.0",
+      "hashPath": "system.io.compression.4.3.0.nupkg.sha512"
     },
     "System.IO.FileSystem/4.3.0": {
       "type": "package",
@@ -3127,12 +3516,12 @@
       "path": "system.private.datacontractserialization/4.3.0",
       "hashPath": "system.private.datacontractserialization.4.3.0.nupkg.sha512"
     },
-    "System.Private.ServiceModel/4.10.0": {
+    "System.Private.ServiceModel/4.10.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-dB4hD50X7FaCCPoMJ+TShvSVXEHWBD/GKEd494N4a3V+avJmNFmKK7bM40J1zsj+QWt66DG2YkwWlRf/OHx8zw==",
-      "path": "system.private.servicemodel/4.10.0",
-      "hashPath": "system.private.servicemodel.4.10.0.nupkg.sha512"
+      "sha512": "sha512-bi2/w2EDXqxno8zfbt6vHcrpGw0Pav8tEMzmJraHwJvWYJd45wcqr7gNa2IUs91j4z+BNGMooStaWS6pm2Lq0A==",
+      "path": "system.private.servicemodel/4.10.2",
+      "hashPath": "system.private.servicemodel.4.10.2.nupkg.sha512"
     },
     "System.Private.Uri/4.3.0": {
       "type": "package",
@@ -3351,26 +3740,19 @@
       "path": "system.security.principal.windows/5.0.0",
       "hashPath": "system.security.principal.windows.5.0.0.nupkg.sha512"
     },
-    "System.ServiceModel.Duplex/4.9.0": {
+    "System.ServiceModel.Http/4.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Yb8MFiJxBBtm2JnfS/5SxYzm2HqkEmHu5xeaVIHXy83sNpty9wc30JifH2xgda821D6nr1UctbwbdZqN4LBUKQ==",
-      "path": "system.servicemodel.duplex/4.9.0",
-      "hashPath": "system.servicemodel.duplex.4.9.0.nupkg.sha512"
+      "sha512": "sha512-/PbmNSEwTQ7Vizor3F/Zp8bzR6L9YZNGIwGr1Tyc//ZZuAYDhiwiMbNpX3EnPZM63qD2bJmR/FWH9S5Ffp8K6g==",
+      "path": "system.servicemodel.http/4.10.0",
+      "hashPath": "system.servicemodel.http.4.10.0.nupkg.sha512"
     },
-    "System.ServiceModel.Http/4.9.0": {
+    "System.ServiceModel.Primitives/4.10.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Z+s3RkLNzJ31fDXAjqXdXp67FqsNG4V3Md3r7FOrzMkHmg61gY8faEfTFPBLxU9tax1HPWt6IHVAquXBKySJaw==",
-      "path": "system.servicemodel.http/4.9.0",
-      "hashPath": "system.servicemodel.http.4.9.0.nupkg.sha512"
-    },
-    "System.ServiceModel.Primitives/4.10.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-BtrvvpgU2HolcC0tUf1g+n4Fk5kLhfbIBgRibcGe7TDHXcy6zTfkyXxR88rl2tO4KEPLkJXxWf/HW/LJmsI0Ew==",
-      "path": "system.servicemodel.primitives/4.10.0",
-      "hashPath": "system.servicemodel.primitives.4.10.0.nupkg.sha512"
+      "sha512": "sha512-8QOguIqHtWYywBt7SubPhdICE2LClHzqOMDy0LQIui4T3QJOae7g6UR+alCW61nEufYNtO8Uss41EbXqD8hdww==",
+      "path": "system.servicemodel.primitives/4.10.2",
+      "hashPath": "system.servicemodel.primitives.4.10.2.nupkg.sha512"
     },
     "System.Text.Encoding/4.3.0": {
       "type": "package",
@@ -3393,12 +3775,12 @@
       "path": "system.text.encodings.web/6.0.0",
       "hashPath": "system.text.encodings.web.6.0.0.nupkg.sha512"
     },
-    "System.Text.Json/6.0.5": {
+    "System.Text.Json/6.0.7": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-SSH+YYrMpvLcy7Orzb5K1tSyffnFacWahyxCCjYH1PbSHdAF4dekmIetBurFKgtTHDmwEe/J2Csi/7niRH6d/g==",
-      "path": "system.text.json/6.0.5",
-      "hashPath": "system.text.json.6.0.5.nupkg.sha512"
+      "sha512": "sha512-/Tf/9XjprpHolbcDOrxsKVYy/mUG/FS7aGd9YUgBVEiHeQH4kAE0T1sMbde7q6B5xcrNUsJ5iW7D1RvHudQNqA==",
+      "path": "system.text.json/6.0.7",
+      "hashPath": "system.text.json.6.0.7.nupkg.sha512"
     },
     "System.Text.RegularExpressions/4.3.0": {
       "type": "package",
@@ -3477,7 +3859,17 @@
       "path": "yamldotnet/11.2.1",
       "hashPath": "yamldotnet.11.2.1.nupkg.sha512"
     },
+    "bolt.authentication/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
     "bolt.cli/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "bolt.dataverse/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -3558,6 +3950,11 @@
       "sha512": ""
     },
     "bolt.module.solution/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "bolt.module.tests/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

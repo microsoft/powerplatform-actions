@@ -17,6 +17,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         environmentUrl: getEnvironmentUrl(),
         path: parameterMap['upload-path'],
         deploymentProfile: parameterMap['deployment-profile'],
+        modelVersion: parameterMap['model-version'],
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 })().catch(error => {
