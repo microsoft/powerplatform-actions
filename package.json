@@ -48,7 +48,7 @@
     "mocha": "^9.2.0",
     "node-fetch": "^2.6.7",
     "postcss": "^8.4.23",
-    "ps-list": "^7.2.0",
+    "ps-list": "^8.1.1",
     "rewiremock": "^3.14.3",
     "sinon": "^15.0.4",
     "sinon-chai": "^3.5.0",
