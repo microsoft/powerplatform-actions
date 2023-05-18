@@ -7812,6 +7812,7 @@ var require_checkSolution = __commonJS({
           const outputDirectory = path.join(artifactStore.getTempFolder(), "checker-output");
           logger.debug(`checker-output folder: ${outputDirectory}`);
           pacArgs.push("--outputDirectory", outputDirectory);
+          validator.pushInput(pacArgs, "--saveResults", parameters.saveResults);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("CheckSolution Action Result: " + pacResult);
@@ -7954,6 +7955,7 @@ var require_publishSolution = __commonJS({
           const pacArgs = ["solution", "publish"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--async", parameters.async);
+          validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("PublishSolution Action Result: " + pacResult);
@@ -8629,6 +8631,7 @@ var require_uploadPaportal = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--path", parameters.path);
           validator.pushInput(pacArgs, "--deploymentProfile", parameters.deploymentProfile);
+          validator.pushInput(pacArgs, "--modelVersion", parameters.modelVersion);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("UploadPaPortal Action Result: " + pacResult);
@@ -8694,6 +8697,7 @@ var require_downloadPaportal = __commonJS({
           validator.pushInput(pacArgs, "--websiteId", parameters.websiteId);
           validator.pushInput(pacArgs, "--overwrite", parameters.overwrite);
           validator.pushInput(pacArgs, "--excludeEntities", parameters.excludeEntities);
+          validator.pushInput(pacArgs, "--modelVersion", parameters.modelVersion);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("DownloadPaPortal Action Result: " + pacResult);
@@ -9312,6 +9316,262 @@ var require_assignGroup = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/virtualAgentsStatus.js
+var require_virtualAgentsStatus = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/virtualAgentsStatus.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.virtualAgentsStatus = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function virtualAgentsStatus(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        const pacArgs = ["virtual-agent", "status"];
+        const inputValidator = new InputValidator_1.InputValidator(host);
+        inputValidator.pushInput(pacArgs, "--bot-id", parameters.botId);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("VirtualAgentsStatus Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.virtualAgentsStatus = virtualAgentsStatus;
+  }
+});
+
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/installCatalog.js
+var require_installCatalog = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/installCatalog.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.installCatalog = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function installCatalog(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["catalog", "install"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--catalog-item-id", parameters.catalogItemId);
+          validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
+          validator.pushInput(pacArgs, "--settings", parameters.settings);
+          validator.pushInput(pacArgs, "--target-version", parameters.targetVersion);
+          validator.pushInput(pacArgs, "--poll-status", parameters.pollStatus);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("InstallCatalog Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.installCatalog = installCatalog;
+  }
+});
+
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/catalogStatus.js
+var require_catalogStatus = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/catalogStatus.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.catalogStatus = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function catalogStatus(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["catalog", "status"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--tracking-id", parameters.trackingId);
+          validator.pushInput(pacArgs, "--type", parameters.requestType);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("CatalogStatus Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.catalogStatus = catalogStatus;
+  }
+});
+
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/submitCatalog.js
+var require_submitCatalog = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/submitCatalog.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.submitCatalog = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function submitCatalog(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          const pacArgs = ["catalog", "submit"];
+          const validator = new InputValidator_1.InputValidator(host);
+          validator.pushInput(pacArgs, "--path", parameters.path);
+          validator.pushInput(pacArgs, "--solution-zip", parameters.solutionZip);
+          validator.pushInput(pacArgs, "--package-zip", parameters.packageZip);
+          validator.pushInput(pacArgs, "--poll-status", parameters.pollStatus);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("SubmitCatalog Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.submitCatalog = submitCatalog;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -9364,6 +9624,10 @@ var require_actions = __commonJS({
     __exportStar(require_dataExport(), exports2);
     __exportStar(require_dataImport(), exports2);
     __exportStar(require_assignGroup(), exports2);
+    __exportStar(require_virtualAgentsStatus(), exports2);
+    __exportStar(require_installCatalog(), exports2);
+    __exportStar(require_catalogStatus(), exports2);
+    __exportStar(require_submitCatalog(), exports2);
   }
 });
 
@@ -18296,6 +18560,12 @@ var require_download_http_client = __commonJS({
           };
           const resetDestinationStream = (fileDownloadPath) => __awaiter2(this, void 0, void 0, function* () {
             destinationStream.close();
+            yield new Promise((resolve) => {
+              destinationStream.on("close", resolve);
+              if (destinationStream.writableFinished) {
+                resolve();
+              }
+            });
             yield utils_1.rmFile(fileDownloadPath);
             destinationStream = fs.createWriteStream(fileDownloadPath);
           });
@@ -18920,26 +19190,26 @@ var require_package = __commonJS({
       },
       devDependencies: {
         "@types/async": "^3.2.7",
-        "@types/chai": "^4.2.20",
-        "@types/fancy-log": "^1.3.1",
+        "@types/chai": "^4.3.4",
+        "@types/fancy-log": "^2.0.0",
         "@types/fs-extra": "^9.0.12",
         "@types/glob": "^7.1.4",
         "@types/js-yaml": "^4.0.3",
         "@types/mocha": "^9.1.0",
         "@types/node": "^14.14.35",
         "@types/sinon": "^9.0.11",
-        "@types/sinon-chai": "^3.2.5",
+        "@types/sinon-chai": "^3.2.9",
         "@types/unzip-stream": "^0.3.1",
         "@types/uuid": "^8.3.0",
-        "@types/yargs": "^17.0.2",
-        "@typescript-eslint/eslint-plugin": "^5.15.0",
+        "@types/yargs": "^17.0.24",
+        "@typescript-eslint/eslint-plugin": "^5.57.1",
         "@typescript-eslint/parser": "^5.15.0",
         async: "^3.2.0",
-        chai: "^4.3.4",
+        chai: "^4.3.7",
         dotenv: "^8.2.0",
         esbuild: "^0.14.10",
         eslint: "^8.11.0",
-        "fancy-log": "^1.3.3",
+        "fancy-log": "^2.0.0",
         glob: "^7.2.0",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
@@ -18948,7 +19218,6 @@ var require_package = __commonJS({
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^9.2.0",
-        nanoid: "^3.2.0",
         "node-fetch": "^2.6.7",
         postcss: "^8.4.6",
         "ps-list": "^7.2.0",
@@ -18960,12 +19229,12 @@ var require_package = __commonJS({
         typescript: "^4.3.5",
         "unzip-stream": "^0.3.1",
         winston: "^3.3.3",
-        yargs: "^17.0.1"
+        yargs: "^17.7.1"
       },
       dependencies: {
-        "@actions/artifact": "^1.1.0",
+        "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "0.1.83",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.92",
         "date-fns": "^2.22.1",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
@@ -19047,6 +19316,7 @@ var runnerParameters_1 = require_runnerParameters();
     geoInstance: parameterMap["geo"],
     ruleLevelOverride: parameterMap["rule-level-override"],
     artifactStoreName: parameterMap["checker-logs-artifact-name"],
+    failOnAnalysisError: parameterMap["fail-on-analysis-error"],
     fileLocation: createEntry("fileLocation", "localFiles"),
     solutionUrl: createEntry("solutionUrl", ""),
     useDefaultPAEndpoint: createEntry("useDefaultPAEndpoint", true),
@@ -19054,8 +19324,8 @@ var runnerParameters_1 = require_runnerParameters();
     ruleSet: createEntry("ruleSet", "Solution Checker"),
     errorLevel: createEntry("errorLevel", "HighIssueCount"),
     errorThreshold: createEntry("errorThreshold", "0"),
-    failOnAnalysisError: createEntry("failOnAnalysisError", true),
-    filesExcluded: createEntry("filesExcluded", "")
+    filesExcluded: createEntry("filesExcluded", ""),
+    saveResults: createEntry("saveResults", false)
   }, runnerParameters_1.runnerParameters, new ActionsHost_1.ActionsHost("PowerAppsChecker"));
   core.endGroup();
 }))().catch((error) => {

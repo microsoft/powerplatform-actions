@@ -40,6 +40,10 @@ inputs:
     description: 'Deployment profile name to be used. Defaults to "default"'
     required: false
 
+  model-version:
+    description: 'Model version of Pages schema. Defaults to "default"'
+    required: false
+
   working-directory:
     description: 'Working directory; default: root of repository'
     required: false

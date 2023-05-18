@@ -1,0 +1,35 @@
+{
+  "modelVersion": "1.0.0.0",
+  "sourcePortal": 526430000,
+  "operation": "CreateOrUpdate",
+  "businessJustification": "Business Justification",
+  "publisherDetails": {
+    "publisherId": "e4fdf91a-6ac5-409c-9640-a2ce51fabaf4",
+    "publisherDisplayName": "Publisher Display Name"
+  },
+  "catalogItemDefinition": {
+    "id": "908d263a-57a6-47b2-8b39-ddf575cabcf3",
+    "displayName": "Catalog Item Display Name",
+    "description": "Catalog Item Description",
+    "offer": {
+      "type": "Component_Collection",
+      "deploymentType": "Normal",
+      "engineeringName": {
+        "firstName": "Eng",
+        "lastName": "User",
+        "email": "user@test.com",
+        "phoneNumber": "999-111-1234"
+      },
+      "supportName": {
+        "firstName": "Support",
+        "lastName": "User",
+        "email": "user@test.com",
+        "phoneNumber": "999-111-1234"
+      }
+    },
+    "packageFile": {
+      "name": "FileName.zip",
+      "fileSasLink": "File SAS Link HERE"
+    }
+  }
+}
