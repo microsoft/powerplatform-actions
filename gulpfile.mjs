@@ -19,7 +19,7 @@ import log from 'fancy-log';
 import path from'path';
 import pslist from 'ps-list';
 import unzip from 'unzip-stream';
-import glob from 'glob';
+import { glob } from 'glob';
 import util from 'util';
 
 import childProcess from 'child_process';
