@@ -50,7 +50,7 @@
     "postcss": "^8.4.23",
     "ps-list": "^8.1.1",
     "rewiremock": "^3.14.5",
-    "sinon": "^15.0.4",
+    "sinon": "^15.1.0",
     "sinon-chai": "^3.5.0",
     "ts-node": "^10.9.1",
     "ts-sinon": "^2.0.1",
