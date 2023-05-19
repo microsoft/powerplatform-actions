@@ -39,6 +39,7 @@ describe("submit-catalog tests", () => {
             credentials: credentials,
             environmentUrl: mockEnvironmentUrl,
             path: { name: 'path', required: true, defaultValue: undefined },
+            packageSolutionZipFile: { name: 'package-or-solution-zip-file', required: false, defaultValue: 'UploadedPackageFile' },
             solutionZip: { name: 'solution-zip', required: false, defaultValue: undefined },
             packageZip: { name: 'package-zip', required: false, defaultValue: undefined },
             pollStatus: { name: 'poll-status', required: false, defaultValue: 'false' }
