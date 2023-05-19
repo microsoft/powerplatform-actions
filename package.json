@@ -49,7 +49,7 @@
     "node-fetch": "^3.3.1",
     "postcss": "^8.4.23",
     "ps-list": "^8.1.1",
-    "rewiremock": "^3.14.3",
+    "rewiremock": "^3.14.5",
     "sinon": "^15.0.4",
     "sinon-chai": "^3.5.0",
     "ts-node": "^10.0.0",
