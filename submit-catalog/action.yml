@@ -31,10 +31,10 @@ inputs:
     description: 'Path to catalog submission document.'
     required: true
 
-  package-or-solution-zip-file:
-    description: 'Specify package or solution zip file for catalog submit request. (PackageZipFile, SolutionZipFile, UploadedPackageFile)'
+  package-solution-zip-file:
+    description: 'Specify package or solution zip file for catalog submit request. (PackageZipFile, SolutionZipFile, ExistingPackage)'
     required: false
-    default: 'UploadedPackageFile'
+    default: 'ExistingPackage'
 
   solution-zip:
     description: 'Path to solution zip file.'
