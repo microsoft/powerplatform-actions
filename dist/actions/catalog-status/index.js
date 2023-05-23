@@ -1,7 +1,63 @@
 "use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+var __accessCheck = (obj, member, msg) => {
+  if (!member.has(obj))
+    throw TypeError("Cannot " + msg);
+};
+var __privateGet = (obj, member, getter) => {
+  __accessCheck(obj, member, "read from private field");
+  return getter ? getter.call(obj) : member.get(obj);
+};
+var __privateAdd = (obj, member, value) => {
+  if (member.has(obj))
+    throw TypeError("Cannot add the same private member more than once");
+  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+};
+var __privateSet = (obj, member, value, setter) => {
+  __accessCheck(obj, member, "write to private field");
+  setter ? setter.call(obj, value) : member.set(obj, value);
+  return value;
+};
+var __privateMethod = (obj, member, method) => {
+  __accessCheck(obj, member, "access private method");
+  return method;
 };
 
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/host/InputValidator.js
@@ -39,6 +95,8 @@ var require_InputValidator = __commonJS({
     };
     exports2.InputValidator = InputValidator;
     var regionMap = {
+      // pac CLI accepts case-insensitive region names, only transpose different names:
+      // region key entries must be lower case
       "united states": "unitedstates",
       "united kingdom": "unitedkingdom",
       "preview (united states)": "unitedstatesfirstrelease",
@@ -52,6 +110,9 @@ var require_InputValidator = __commonJS({
     }
     exports2.normalizeRegion = normalizeRegion;
     var languageMap = {
+      // pac CLI accepts case-insensitive region names, only transpose different names:
+      // pac CLI accepts languages by either the BAP names, e.g. 'English (United States)' or by langCode, here: 1033
+      // language key entries must be lower case
       "english": "1033"
     };
     function normalizeLanguage(taskLanguageName) {
@@ -689,285 +750,6 @@ var require_backupEnvironment = __commonJS({
   }
 });
 
-// node_modules/fs.realpath/old.js
-var require_old = __commonJS({
-  "node_modules/fs.realpath/old.js"(exports2) {
-    var pathModule = require("path");
-    var isWindows = process.platform === "win32";
-    var fs = require("fs");
-    var DEBUG = process.env.NODE_DEBUG && /fs/.test(process.env.NODE_DEBUG);
-    function rethrow() {
-      var callback;
-      if (DEBUG) {
-        var backtrace = new Error();
-        callback = debugCallback;
-      } else
-        callback = missingCallback;
-      return callback;
-      function debugCallback(err) {
-        if (err) {
-          backtrace.message = err.message;
-          err = backtrace;
-          missingCallback(err);
-        }
-      }
-      function missingCallback(err) {
-        if (err) {
-          if (process.throwDeprecation)
-            throw err;
-          else if (!process.noDeprecation) {
-            var msg = "fs: missing callback " + (err.stack || err.message);
-            if (process.traceDeprecation)
-              console.trace(msg);
-            else
-              console.error(msg);
-          }
-        }
-      }
-    }
-    function maybeCallback(cb) {
-      return typeof cb === "function" ? cb : rethrow();
-    }
-    var normalize = pathModule.normalize;
-    if (isWindows) {
-      nextPartRe = /(.*?)(?:[\/\\]+|$)/g;
-    } else {
-      nextPartRe = /(.*?)(?:[\/]+|$)/g;
-    }
-    var nextPartRe;
-    if (isWindows) {
-      splitRootRe = /^(?:[a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/][^\\\/]+)?[\\\/]*/;
-    } else {
-      splitRootRe = /^[\/]*/;
-    }
-    var splitRootRe;
-    exports2.realpathSync = function realpathSync(p, cache) {
-      p = pathModule.resolve(p);
-      if (cache && Object.prototype.hasOwnProperty.call(cache, p)) {
-        return cache[p];
-      }
-      var original = p, seenLinks = {}, knownHard = {};
-      var pos;
-      var current;
-      var base;
-      var previous;
-      start();
-      function start() {
-        var m = splitRootRe.exec(p);
-        pos = m[0].length;
-        current = m[0];
-        base = m[0];
-        previous = "";
-        if (isWindows && !knownHard[base]) {
-          fs.lstatSync(base);
-          knownHard[base] = true;
-        }
-      }
-      while (pos < p.length) {
-        nextPartRe.lastIndex = pos;
-        var result = nextPartRe.exec(p);
-        previous = current;
-        current += result[0];
-        base = previous + result[1];
-        pos = nextPartRe.lastIndex;
-        if (knownHard[base] || cache && cache[base] === base) {
-          continue;
-        }
-        var resolvedLink;
-        if (cache && Object.prototype.hasOwnProperty.call(cache, base)) {
-          resolvedLink = cache[base];
-        } else {
-          var stat = fs.lstatSync(base);
-          if (!stat.isSymbolicLink()) {
-            knownHard[base] = true;
-            if (cache)
-              cache[base] = base;
-            continue;
-          }
-          var linkTarget = null;
-          if (!isWindows) {
-            var id = stat.dev.toString(32) + ":" + stat.ino.toString(32);
-            if (seenLinks.hasOwnProperty(id)) {
-              linkTarget = seenLinks[id];
-            }
-          }
-          if (linkTarget === null) {
-            fs.statSync(base);
-            linkTarget = fs.readlinkSync(base);
-          }
-          resolvedLink = pathModule.resolve(previous, linkTarget);
-          if (cache)
-            cache[base] = resolvedLink;
-          if (!isWindows)
-            seenLinks[id] = linkTarget;
-        }
-        p = pathModule.resolve(resolvedLink, p.slice(pos));
-        start();
-      }
-      if (cache)
-        cache[original] = p;
-      return p;
-    };
-    exports2.realpath = function realpath(p, cache, cb) {
-      if (typeof cb !== "function") {
-        cb = maybeCallback(cache);
-        cache = null;
-      }
-      p = pathModule.resolve(p);
-      if (cache && Object.prototype.hasOwnProperty.call(cache, p)) {
-        return process.nextTick(cb.bind(null, null, cache[p]));
-      }
-      var original = p, seenLinks = {}, knownHard = {};
-      var pos;
-      var current;
-      var base;
-      var previous;
-      start();
-      function start() {
-        var m = splitRootRe.exec(p);
-        pos = m[0].length;
-        current = m[0];
-        base = m[0];
-        previous = "";
-        if (isWindows && !knownHard[base]) {
-          fs.lstat(base, function(err) {
-            if (err)
-              return cb(err);
-            knownHard[base] = true;
-            LOOP();
-          });
-        } else {
-          process.nextTick(LOOP);
-        }
-      }
-      function LOOP() {
-        if (pos >= p.length) {
-          if (cache)
-            cache[original] = p;
-          return cb(null, p);
-        }
-        nextPartRe.lastIndex = pos;
-        var result = nextPartRe.exec(p);
-        previous = current;
-        current += result[0];
-        base = previous + result[1];
-        pos = nextPartRe.lastIndex;
-        if (knownHard[base] || cache && cache[base] === base) {
-          return process.nextTick(LOOP);
-        }
-        if (cache && Object.prototype.hasOwnProperty.call(cache, base)) {
-          return gotResolvedLink(cache[base]);
-        }
-        return fs.lstat(base, gotStat);
-      }
-      function gotStat(err, stat) {
-        if (err)
-          return cb(err);
-        if (!stat.isSymbolicLink()) {
-          knownHard[base] = true;
-          if (cache)
-            cache[base] = base;
-          return process.nextTick(LOOP);
-        }
-        if (!isWindows) {
-          var id = stat.dev.toString(32) + ":" + stat.ino.toString(32);
-          if (seenLinks.hasOwnProperty(id)) {
-            return gotTarget(null, seenLinks[id], base);
-          }
-        }
-        fs.stat(base, function(err2) {
-          if (err2)
-            return cb(err2);
-          fs.readlink(base, function(err3, target) {
-            if (!isWindows)
-              seenLinks[id] = target;
-            gotTarget(err3, target);
-          });
-        });
-      }
-      function gotTarget(err, target, base2) {
-        if (err)
-          return cb(err);
-        var resolvedLink = pathModule.resolve(previous, target);
-        if (cache)
-          cache[base2] = resolvedLink;
-        gotResolvedLink(resolvedLink);
-      }
-      function gotResolvedLink(resolvedLink) {
-        p = pathModule.resolve(resolvedLink, p.slice(pos));
-        start();
-      }
-    };
-  }
-});
-
-// node_modules/fs.realpath/index.js
-var require_fs = __commonJS({
-  "node_modules/fs.realpath/index.js"(exports2, module2) {
-    module2.exports = realpath;
-    realpath.realpath = realpath;
-    realpath.sync = realpathSync;
-    realpath.realpathSync = realpathSync;
-    realpath.monkeypatch = monkeypatch;
-    realpath.unmonkeypatch = unmonkeypatch;
-    var fs = require("fs");
-    var origRealpath = fs.realpath;
-    var origRealpathSync = fs.realpathSync;
-    var version = process.version;
-    var ok = /^v[0-5]\./.test(version);
-    var old = require_old();
-    function newError(er) {
-      return er && er.syscall === "realpath" && (er.code === "ELOOP" || er.code === "ENOMEM" || er.code === "ENAMETOOLONG");
-    }
-    function realpath(p, cache, cb) {
-      if (ok) {
-        return origRealpath(p, cache, cb);
-      }
-      if (typeof cache === "function") {
-        cb = cache;
-        cache = null;
-      }
-      origRealpath(p, cache, function(er, result) {
-        if (newError(er)) {
-          old.realpath(p, cache, cb);
-        } else {
-          cb(er, result);
-        }
-      });
-    }
-    function realpathSync(p, cache) {
-      if (ok) {
-        return origRealpathSync(p, cache);
-      }
-      try {
-        return origRealpathSync(p, cache);
-      } catch (er) {
-        if (newError(er)) {
-          return old.realpathSync(p, cache);
-        } else {
-          throw er;
-        }
-      }
-    }
-    function monkeypatch() {
-      fs.realpath = realpath;
-      fs.realpathSync = realpathSync;
-    }
-    function unmonkeypatch() {
-      fs.realpath = origRealpath;
-      fs.realpathSync = origRealpathSync;
-    }
-  }
-});
-
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/minimatch/lib/path.js
-var require_path = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/minimatch/lib/path.js"(exports2, module2) {
-    var isWindows = typeof process === "object" && process && process.platform === "win32";
-    module2.exports = isWindows ? { sep: "\\" } : { sep: "/" };
-  }
-});
-
 // node_modules/balanced-match/index.js
 var require_balanced_match = __commonJS({
   "node_modules/balanced-match/index.js"(exports2, module2) {
@@ -1028,9 +810,9 @@ var require_balanced_match = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/brace-expansion/index.js
+// node_modules/glob/node_modules/brace-expansion/index.js
 var require_brace_expansion = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/brace-expansion/index.js"(exports2, module2) {
+  "node_modules/glob/node_modules/brace-expansion/index.js"(exports2, module2) {
     var balanced = require_balanced_match();
     module2.exports = expandTop;
     var escSlash = "\0SLASH" + Math.random() + "\0";
@@ -1179,74 +961,12 @@ var require_brace_expansion = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/minimatch/minimatch.js
-var require_minimatch = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/minimatch/minimatch.js"(exports2, module2) {
-    var minimatch = module2.exports = (p, pattern, options = {}) => {
-      assertValidPattern(pattern);
-      if (!options.nocomment && pattern.charAt(0) === "#") {
-        return false;
-      }
-      return new Minimatch(pattern, options).match(p);
-    };
-    module2.exports = minimatch;
-    var path = require_path();
-    minimatch.sep = path.sep;
-    var GLOBSTAR = Symbol("globstar **");
-    minimatch.GLOBSTAR = GLOBSTAR;
-    var expand = require_brace_expansion();
-    var plTypes = {
-      "!": { open: "(?:(?!(?:", close: "))[^/]*?)" },
-      "?": { open: "(?:", close: ")?" },
-      "+": { open: "(?:", close: ")+" },
-      "*": { open: "(?:", close: ")*" },
-      "@": { open: "(?:", close: ")" }
-    };
-    var qmark = "[^/]";
-    var star = qmark + "*?";
-    var twoStarDot = "(?:(?!(?:\\/|^)(?:\\.{1,2})($|\\/)).)*?";
-    var twoStarNoDot = "(?:(?!(?:\\/|^)\\.).)*?";
-    var charSet = (s) => s.split("").reduce((set, c) => {
-      set[c] = true;
-      return set;
-    }, {});
-    var reSpecials = charSet("().*{}+?[]^$\\!");
-    var addPatternStartSet = charSet("[.(");
-    var slashSplit = /\/+/;
-    minimatch.filter = (pattern, options = {}) => (p, i, list) => minimatch(p, pattern, options);
-    var ext = (a, b = {}) => {
-      const t = {};
-      Object.keys(a).forEach((k) => t[k] = a[k]);
-      Object.keys(b).forEach((k) => t[k] = b[k]);
-      return t;
-    };
-    minimatch.defaults = (def) => {
-      if (!def || typeof def !== "object" || !Object.keys(def).length) {
-        return minimatch;
-      }
-      const orig = minimatch;
-      const m = (p, pattern, options) => orig(p, pattern, ext(def, options));
-      m.Minimatch = class Minimatch extends orig.Minimatch {
-        constructor(pattern, options) {
-          super(pattern, ext(def, options));
-        }
-      };
-      m.Minimatch.defaults = (options) => orig.defaults(ext(def, options)).Minimatch;
-      m.filter = (pattern, options) => orig.filter(pattern, ext(def, options));
-      m.defaults = (options) => orig.defaults(ext(def, options));
-      m.makeRe = (pattern, options) => orig.makeRe(pattern, ext(def, options));
-      m.braceExpand = (pattern, options) => orig.braceExpand(pattern, ext(def, options));
-      m.match = (list, pattern, options) => orig.match(list, pattern, ext(def, options));
-      return m;
-    };
-    minimatch.braceExpand = (pattern, options) => braceExpand(pattern, options);
-    var braceExpand = (pattern, options = {}) => {
-      assertValidPattern(pattern);
-      if (options.nobrace || !/\{(?:(?!\{).)*\}/.test(pattern)) {
-        return [pattern];
-      }
-      return expand(pattern);
-    };
+// node_modules/glob/node_modules/minimatch/dist/cjs/assert-valid-pattern.js
+var require_assert_valid_pattern = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/cjs/assert-valid-pattern.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.assertValidPattern = void 0;
     var MAX_PATTERN_LENGTH = 1024 * 64;
     var assertValidPattern = (pattern) => {
       if (typeof pattern !== "string") {
@@ -1256,9 +976,790 @@ var require_minimatch = __commonJS({
         throw new TypeError("pattern is too long");
       }
     };
-    var SUBPARSE = Symbol("subparse");
-    minimatch.makeRe = (pattern, options) => new Minimatch(pattern, options || {}).makeRe();
-    minimatch.match = (list, pattern, options = {}) => {
+    exports2.assertValidPattern = assertValidPattern;
+  }
+});
+
+// node_modules/glob/node_modules/minimatch/dist/cjs/brace-expressions.js
+var require_brace_expressions = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/cjs/brace-expressions.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.parseClass = void 0;
+    var posixClasses = {
+      "[:alnum:]": ["\\p{L}\\p{Nl}\\p{Nd}", true],
+      "[:alpha:]": ["\\p{L}\\p{Nl}", true],
+      "[:ascii:]": ["\\x00-\\x7f", false],
+      "[:blank:]": ["\\p{Zs}\\t", true],
+      "[:cntrl:]": ["\\p{Cc}", true],
+      "[:digit:]": ["\\p{Nd}", true],
+      "[:graph:]": ["\\p{Z}\\p{C}", true, true],
+      "[:lower:]": ["\\p{Ll}", true],
+      "[:print:]": ["\\p{C}", true],
+      "[:punct:]": ["\\p{P}", true],
+      "[:space:]": ["\\p{Z}\\t\\r\\n\\v\\f", true],
+      "[:upper:]": ["\\p{Lu}", true],
+      "[:word:]": ["\\p{L}\\p{Nl}\\p{Nd}\\p{Pc}", true],
+      "[:xdigit:]": ["A-Fa-f0-9", false]
+    };
+    var braceEscape = (s) => s.replace(/[[\]\\-]/g, "\\$&");
+    var regexpEscape = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    var rangesToString = (ranges) => ranges.join("");
+    var parseClass = (glob, position) => {
+      const pos = position;
+      if (glob.charAt(pos) !== "[") {
+        throw new Error("not in a brace expression");
+      }
+      const ranges = [];
+      const negs = [];
+      let i = pos + 1;
+      let sawStart = false;
+      let uflag = false;
+      let escaping = false;
+      let negate = false;
+      let endPos = pos;
+      let rangeStart = "";
+      WHILE:
+        while (i < glob.length) {
+          const c = glob.charAt(i);
+          if ((c === "!" || c === "^") && i === pos + 1) {
+            negate = true;
+            i++;
+            continue;
+          }
+          if (c === "]" && sawStart && !escaping) {
+            endPos = i + 1;
+            break;
+          }
+          sawStart = true;
+          if (c === "\\") {
+            if (!escaping) {
+              escaping = true;
+              i++;
+              continue;
+            }
+          }
+          if (c === "[" && !escaping) {
+            for (const [cls, [unip, u, neg]] of Object.entries(posixClasses)) {
+              if (glob.startsWith(cls, i)) {
+                if (rangeStart) {
+                  return ["$.", false, glob.length - pos, true];
+                }
+                i += cls.length;
+                if (neg)
+                  negs.push(unip);
+                else
+                  ranges.push(unip);
+                uflag = uflag || u;
+                continue WHILE;
+              }
+            }
+          }
+          escaping = false;
+          if (rangeStart) {
+            if (c > rangeStart) {
+              ranges.push(braceEscape(rangeStart) + "-" + braceEscape(c));
+            } else if (c === rangeStart) {
+              ranges.push(braceEscape(c));
+            }
+            rangeStart = "";
+            i++;
+            continue;
+          }
+          if (glob.startsWith("-]", i + 1)) {
+            ranges.push(braceEscape(c + "-"));
+            i += 2;
+            continue;
+          }
+          if (glob.startsWith("-", i + 1)) {
+            rangeStart = c;
+            i += 2;
+            continue;
+          }
+          ranges.push(braceEscape(c));
+          i++;
+        }
+      if (endPos < i) {
+        return ["", false, 0, false];
+      }
+      if (!ranges.length && !negs.length) {
+        return ["$.", false, glob.length - pos, true];
+      }
+      if (negs.length === 0 && ranges.length === 1 && /^\\?.$/.test(ranges[0]) && !negate) {
+        const r = ranges[0].length === 2 ? ranges[0].slice(-1) : ranges[0];
+        return [regexpEscape(r), false, endPos - pos, false];
+      }
+      const sranges = "[" + (negate ? "^" : "") + rangesToString(ranges) + "]";
+      const snegs = "[" + (negate ? "" : "^") + rangesToString(negs) + "]";
+      const comb = ranges.length && negs.length ? "(" + sranges + "|" + snegs + ")" : ranges.length ? sranges : snegs;
+      return [comb, uflag, endPos - pos, true];
+    };
+    exports2.parseClass = parseClass;
+  }
+});
+
+// node_modules/glob/node_modules/minimatch/dist/cjs/unescape.js
+var require_unescape = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/cjs/unescape.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.unescape = void 0;
+    var unescape2 = (s, { windowsPathsNoEscape = false } = {}) => {
+      return windowsPathsNoEscape ? s.replace(/\[([^\/\\])\]/g, "$1") : s.replace(/((?!\\).|^)\[([^\/\\])\]/g, "$1$2").replace(/\\([^\/])/g, "$1");
+    };
+    exports2.unescape = unescape2;
+  }
+});
+
+// node_modules/glob/node_modules/minimatch/dist/cjs/ast.js
+var require_ast = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/cjs/ast.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.AST = void 0;
+    var brace_expressions_js_1 = require_brace_expressions();
+    var unescape_js_1 = require_unescape();
+    var types = /* @__PURE__ */ new Set(["!", "?", "+", "*", "@"]);
+    var isExtglobType = (c) => types.has(c);
+    var startNoTraversal = "(?!\\.\\.?(?:$|/))";
+    var startNoDot = "(?!\\.)";
+    var addPatternStart = /* @__PURE__ */ new Set(["[", "."]);
+    var justDots = /* @__PURE__ */ new Set(["..", "."]);
+    var reSpecials = new Set("().*{}+?[]^$\\!");
+    var regExpEscape = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    var qmark = "[^/]";
+    var star = qmark + "*?";
+    var starNoEmpty = qmark + "+?";
+    var _root, _hasMagic, _uflag, _parts, _parent, _parentIndex, _negs, _filledNegs, _options, _toString, _emptyExt, _fillNegs, fillNegs_fn, _parseAST, parseAST_fn, _parseGlob, parseGlob_fn;
+    var _AST = class {
+      constructor(type, parent, options = {}) {
+        __privateAdd(this, _fillNegs);
+        __publicField(this, "type");
+        __privateAdd(this, _root, void 0);
+        __privateAdd(this, _hasMagic, void 0);
+        __privateAdd(this, _uflag, false);
+        __privateAdd(this, _parts, []);
+        __privateAdd(this, _parent, void 0);
+        __privateAdd(this, _parentIndex, void 0);
+        __privateAdd(this, _negs, void 0);
+        __privateAdd(this, _filledNegs, false);
+        __privateAdd(this, _options, void 0);
+        __privateAdd(this, _toString, void 0);
+        // set to true if it's an extglob with no children
+        // (which really means one child of '')
+        __privateAdd(this, _emptyExt, false);
+        this.type = type;
+        if (type)
+          __privateSet(this, _hasMagic, true);
+        __privateSet(this, _parent, parent);
+        __privateSet(this, _root, __privateGet(this, _parent) ? __privateGet(__privateGet(this, _parent), _root) : this);
+        __privateSet(this, _options, __privateGet(this, _root) === this ? options : __privateGet(__privateGet(this, _root), _options));
+        __privateSet(this, _negs, __privateGet(this, _root) === this ? [] : __privateGet(__privateGet(this, _root), _negs));
+        if (type === "!" && !__privateGet(__privateGet(this, _root), _filledNegs))
+          __privateGet(this, _negs).push(this);
+        __privateSet(this, _parentIndex, __privateGet(this, _parent) ? __privateGet(__privateGet(this, _parent), _parts).length : 0);
+      }
+      get hasMagic() {
+        if (__privateGet(this, _hasMagic) !== void 0)
+          return __privateGet(this, _hasMagic);
+        for (const p of __privateGet(this, _parts)) {
+          if (typeof p === "string")
+            continue;
+          if (p.type || p.hasMagic)
+            return __privateSet(this, _hasMagic, true);
+        }
+        return __privateGet(this, _hasMagic);
+      }
+      // reconstructs the pattern
+      toString() {
+        if (__privateGet(this, _toString) !== void 0)
+          return __privateGet(this, _toString);
+        if (!this.type) {
+          return __privateSet(this, _toString, __privateGet(this, _parts).map((p) => String(p)).join(""));
+        } else {
+          return __privateSet(this, _toString, this.type + "(" + __privateGet(this, _parts).map((p) => String(p)).join("|") + ")");
+        }
+      }
+      push(...parts) {
+        for (const p of parts) {
+          if (p === "")
+            continue;
+          if (typeof p !== "string" && !(p instanceof _AST && __privateGet(p, _parent) === this)) {
+            throw new Error("invalid part: " + p);
+          }
+          __privateGet(this, _parts).push(p);
+        }
+      }
+      toJSON() {
+        const ret = this.type === null ? __privateGet(this, _parts).slice().map((p) => typeof p === "string" ? p : p.toJSON()) : [this.type, ...__privateGet(this, _parts).map((p) => p.toJSON())];
+        if (this.isStart() && !this.type)
+          ret.unshift([]);
+        if (this.isEnd() && (this === __privateGet(this, _root) || __privateGet(__privateGet(this, _root), _filledNegs) && __privateGet(this, _parent)?.type === "!")) {
+          ret.push({});
+        }
+        return ret;
+      }
+      isStart() {
+        if (__privateGet(this, _root) === this)
+          return true;
+        if (!__privateGet(this, _parent)?.isStart())
+          return false;
+        if (__privateGet(this, _parentIndex) === 0)
+          return true;
+        const p = __privateGet(this, _parent);
+        for (let i = 0; i < __privateGet(this, _parentIndex); i++) {
+          const pp = __privateGet(p, _parts)[i];
+          if (!(pp instanceof _AST && pp.type === "!")) {
+            return false;
+          }
+        }
+        return true;
+      }
+      isEnd() {
+        if (__privateGet(this, _root) === this)
+          return true;
+        if (__privateGet(this, _parent)?.type === "!")
+          return true;
+        if (!__privateGet(this, _parent)?.isEnd())
+          return false;
+        if (!this.type)
+          return __privateGet(this, _parent)?.isEnd();
+        const pl = __privateGet(this, _parent) ? __privateGet(__privateGet(this, _parent), _parts).length : 0;
+        return __privateGet(this, _parentIndex) === pl - 1;
+      }
+      copyIn(part) {
+        if (typeof part === "string")
+          this.push(part);
+        else
+          this.push(part.clone(this));
+      }
+      clone(parent) {
+        const c = new _AST(this.type, parent);
+        for (const p of __privateGet(this, _parts)) {
+          c.copyIn(p);
+        }
+        return c;
+      }
+      static fromGlob(pattern, options = {}) {
+        var _a;
+        const ast = new _AST(null, void 0, options);
+        __privateMethod(_a = _AST, _parseAST, parseAST_fn).call(_a, pattern, ast, 0, options);
+        return ast;
+      }
+      // returns the regular expression if there's magic, or the unescaped
+      // string if not.
+      toMMPattern() {
+        if (this !== __privateGet(this, _root))
+          return __privateGet(this, _root).toMMPattern();
+        const glob = this.toString();
+        const [re, body, hasMagic, uflag] = this.toRegExpSource();
+        const anyMagic = hasMagic || __privateGet(this, _hasMagic) || __privateGet(this, _options).nocase && !__privateGet(this, _options).nocaseMagicOnly && glob.toUpperCase() !== glob.toLowerCase();
+        if (!anyMagic) {
+          return body;
+        }
+        const flags = (__privateGet(this, _options).nocase ? "i" : "") + (uflag ? "u" : "");
+        return Object.assign(new RegExp(`^${re}$`, flags), {
+          _src: re,
+          _glob: glob
+        });
+      }
+      // returns the string match, the regexp source, whether there's magic
+      // in the regexp (so a regular expression is required) and whether or
+      // not the uflag is needed for the regular expression (for posix classes)
+      // TODO: instead of injecting the start/end at this point, just return
+      // the BODY of the regexp, along with the start/end portions suitable
+      // for binding the start/end in either a joined full-path makeRe context
+      // (where we bind to (^|/), or a standalone matchPart context (where
+      // we bind to ^, and not /).  Otherwise slashes get duped!
+      //
+      // In part-matching mode, the start is:
+      // - if not isStart: nothing
+      // - if traversal possible, but not allowed: ^(?!\.\.?$)
+      // - if dots allowed or not possible: ^
+      // - if dots possible and not allowed: ^(?!\.)
+      // end is:
+      // - if not isEnd(): nothing
+      // - else: $
+      //
+      // In full-path matching mode, we put the slash at the START of the
+      // pattern, so start is:
+      // - if first pattern: same as part-matching mode
+      // - if not isStart(): nothing
+      // - if traversal possible, but not allowed: /(?!\.\.?(?:$|/))
+      // - if dots allowed or not possible: /
+      // - if dots possible and not allowed: /(?!\.)
+      // end is:
+      // - if last pattern, same as part-matching mode
+      // - else nothing
+      //
+      // Always put the (?:$|/) on negated tails, though, because that has to be
+      // there to bind the end of the negated pattern portion, and it's easier to
+      // just stick it in now rather than try to inject it later in the middle of
+      // the pattern.
+      //
+      // We can just always return the same end, and leave it up to the caller
+      // to know whether it's going to be used joined or in parts.
+      // And, if the start is adjusted slightly, can do the same there:
+      // - if not isStart: nothing
+      // - if traversal possible, but not allowed: (?:/|^)(?!\.\.?$)
+      // - if dots allowed or not possible: (?:/|^)
+      // - if dots possible and not allowed: (?:/|^)(?!\.)
+      //
+      // But it's better to have a simpler binding without a conditional, for
+      // performance, so probably better to return both start options.
+      //
+      // Then the caller just ignores the end if it's not the first pattern,
+      // and the start always gets applied.
+      //
+      // But that's always going to be $ if it's the ending pattern, or nothing,
+      // so the caller can just attach $ at the end of the pattern when building.
+      //
+      // So the todo is:
+      // - better detect what kind of start is needed
+      // - return both flavors of starting pattern
+      // - attach $ at the end of the pattern when creating the actual RegExp
+      //
+      // Ah, but wait, no, that all only applies to the root when the first pattern
+      // is not an extglob. If the first pattern IS an extglob, then we need all
+      // that dot prevention biz to live in the extglob portions, because eg
+      // +(*|.x*) can match .xy but not .yx.
+      //
+      // So, return the two flavors if it's #root and the first child is not an
+      // AST, otherwise leave it to the child AST to handle it, and there,
+      // use the (?:^|/) style of start binding.
+      //
+      // Even simplified further:
+      // - Since the start for a join is eg /(?!\.) and the start for a part
+      // is ^(?!\.), we can just prepend (?!\.) to the pattern (either root
+      // or start or whatever) and prepend ^ or / at the Regexp construction.
+      toRegExpSource() {
+        if (__privateGet(this, _root) === this)
+          __privateMethod(this, _fillNegs, fillNegs_fn).call(this);
+        if (!this.type) {
+          const noEmpty = this.isStart() && this.isEnd();
+          const src = __privateGet(this, _parts).map((p) => {
+            var _a;
+            const [re, _, hasMagic, uflag] = typeof p === "string" ? __privateMethod(_a = _AST, _parseGlob, parseGlob_fn).call(_a, p, __privateGet(this, _hasMagic), noEmpty) : p.toRegExpSource();
+            __privateSet(this, _hasMagic, __privateGet(this, _hasMagic) || hasMagic);
+            __privateSet(this, _uflag, __privateGet(this, _uflag) || uflag);
+            return re;
+          }).join("");
+          let start2 = "";
+          if (this.isStart()) {
+            if (typeof __privateGet(this, _parts)[0] === "string") {
+              const dotTravAllowed = __privateGet(this, _parts).length === 1 && justDots.has(__privateGet(this, _parts)[0]);
+              if (!dotTravAllowed) {
+                const aps = addPatternStart;
+                const needNoTrav = (
+                  // dots are allowed, and the pattern starts with [ or .
+                  __privateGet(this, _options).dot && aps.has(src.charAt(0)) || // the pattern starts with \., and then [ or .
+                  src.startsWith("\\.") && aps.has(src.charAt(2)) || // the pattern starts with \.\., and then [ or .
+                  src.startsWith("\\.\\.") && aps.has(src.charAt(4))
+                );
+                const needNoDot = !__privateGet(this, _options).dot && aps.has(src.charAt(0));
+                start2 = needNoTrav ? startNoTraversal : needNoDot ? startNoDot : "";
+              }
+            }
+          }
+          let end = "";
+          if (this.isEnd() && __privateGet(__privateGet(this, _root), _filledNegs) && __privateGet(this, _parent)?.type === "!") {
+            end = "(?:$|\\/)";
+          }
+          const final2 = start2 + src + end;
+          return [
+            final2,
+            (0, unescape_js_1.unescape)(src),
+            __privateSet(this, _hasMagic, !!__privateGet(this, _hasMagic)),
+            __privateGet(this, _uflag)
+          ];
+        }
+        const start = this.type === "!" ? "(?:(?!(?:" : "(?:";
+        const body = __privateGet(this, _parts).map((p) => {
+          if (typeof p === "string") {
+            throw new Error("string type in extglob ast??");
+          }
+          const [re, _, _hasMagic2, uflag] = p.toRegExpSource();
+          __privateSet(this, _uflag, __privateGet(this, _uflag) || uflag);
+          return re;
+        }).filter((p) => !(this.isStart() && this.isEnd()) || !!p).join("|");
+        if (this.isStart() && this.isEnd() && !body && this.type !== "!") {
+          const s = this.toString();
+          __privateSet(this, _parts, [s]);
+          this.type = null;
+          __privateSet(this, _hasMagic, void 0);
+          return [s, (0, unescape_js_1.unescape)(this.toString()), false, false];
+        }
+        let final = "";
+        if (this.type === "!" && __privateGet(this, _emptyExt)) {
+          final = (this.isStart() && !__privateGet(this, _options).dot ? startNoDot : "") + starNoEmpty;
+        } else {
+          const close = this.type === "!" ? (
+            // !() must match something,but !(x) can match ''
+            "))" + (this.isStart() && !__privateGet(this, _options).dot ? startNoDot : "") + star + ")"
+          ) : this.type === "@" ? ")" : `)${this.type}`;
+          final = start + body + close;
+        }
+        return [
+          final,
+          (0, unescape_js_1.unescape)(body),
+          __privateSet(this, _hasMagic, !!__privateGet(this, _hasMagic)),
+          __privateGet(this, _uflag)
+        ];
+      }
+    };
+    var AST = _AST;
+    _root = new WeakMap();
+    _hasMagic = new WeakMap();
+    _uflag = new WeakMap();
+    _parts = new WeakMap();
+    _parent = new WeakMap();
+    _parentIndex = new WeakMap();
+    _negs = new WeakMap();
+    _filledNegs = new WeakMap();
+    _options = new WeakMap();
+    _toString = new WeakMap();
+    _emptyExt = new WeakMap();
+    _fillNegs = new WeakSet();
+    fillNegs_fn = function() {
+      if (this !== __privateGet(this, _root))
+        throw new Error("should only call on root");
+      if (__privateGet(this, _filledNegs))
+        return this;
+      this.toString();
+      __privateSet(this, _filledNegs, true);
+      let n;
+      while (n = __privateGet(this, _negs).pop()) {
+        if (n.type !== "!")
+          continue;
+        let p = n;
+        let pp = __privateGet(p, _parent);
+        while (pp) {
+          for (let i = __privateGet(p, _parentIndex) + 1; !pp.type && i < __privateGet(pp, _parts).length; i++) {
+            for (const part of __privateGet(n, _parts)) {
+              if (typeof part === "string") {
+                throw new Error("string part in extglob AST??");
+              }
+              part.copyIn(__privateGet(pp, _parts)[i]);
+            }
+          }
+          p = pp;
+          pp = __privateGet(p, _parent);
+        }
+      }
+      return this;
+    };
+    _parseAST = new WeakSet();
+    parseAST_fn = function(str, ast, pos, opt) {
+      var _a, _b;
+      let escaping = false;
+      let inBrace = false;
+      let braceStart = -1;
+      let braceNeg = false;
+      if (ast.type === null) {
+        let i2 = pos;
+        let acc2 = "";
+        while (i2 < str.length) {
+          const c = str.charAt(i2++);
+          if (escaping || c === "\\") {
+            escaping = !escaping;
+            acc2 += c;
+            continue;
+          }
+          if (inBrace) {
+            if (i2 === braceStart + 1) {
+              if (c === "^" || c === "!") {
+                braceNeg = true;
+              }
+            } else if (c === "]" && !(i2 === braceStart + 2 && braceNeg)) {
+              inBrace = false;
+            }
+            acc2 += c;
+            continue;
+          } else if (c === "[") {
+            inBrace = true;
+            braceStart = i2;
+            braceNeg = false;
+            acc2 += c;
+            continue;
+          }
+          if (!opt.noext && isExtglobType(c) && str.charAt(i2) === "(") {
+            ast.push(acc2);
+            acc2 = "";
+            const ext = new _AST(c, ast);
+            i2 = __privateMethod(_a = _AST, _parseAST, parseAST_fn).call(_a, str, ext, i2, opt);
+            ast.push(ext);
+            continue;
+          }
+          acc2 += c;
+        }
+        ast.push(acc2);
+        return i2;
+      }
+      let i = pos + 1;
+      let part = new _AST(null, ast);
+      const parts = [];
+      let acc = "";
+      while (i < str.length) {
+        const c = str.charAt(i++);
+        if (escaping || c === "\\") {
+          escaping = !escaping;
+          acc += c;
+          continue;
+        }
+        if (inBrace) {
+          if (i === braceStart + 1) {
+            if (c === "^" || c === "!") {
+              braceNeg = true;
+            }
+          } else if (c === "]" && !(i === braceStart + 2 && braceNeg)) {
+            inBrace = false;
+          }
+          acc += c;
+          continue;
+        } else if (c === "[") {
+          inBrace = true;
+          braceStart = i;
+          braceNeg = false;
+          acc += c;
+          continue;
+        }
+        if (isExtglobType(c) && str.charAt(i) === "(") {
+          part.push(acc);
+          acc = "";
+          const ext = new _AST(c, part);
+          part.push(ext);
+          i = __privateMethod(_b = _AST, _parseAST, parseAST_fn).call(_b, str, ext, i, opt);
+          continue;
+        }
+        if (c === "|") {
+          part.push(acc);
+          acc = "";
+          parts.push(part);
+          part = new _AST(null, ast);
+          continue;
+        }
+        if (c === ")") {
+          if (acc === "" && __privateGet(ast, _parts).length === 0) {
+            __privateSet(ast, _emptyExt, true);
+          }
+          part.push(acc);
+          acc = "";
+          ast.push(...parts, part);
+          return i;
+        }
+        acc += c;
+      }
+      ast.type = null;
+      __privateSet(ast, _hasMagic, void 0);
+      __privateSet(ast, _parts, [str.substring(pos - 1)]);
+      return i;
+    };
+    _parseGlob = new WeakSet();
+    parseGlob_fn = function(glob, hasMagic, noEmpty = false) {
+      let escaping = false;
+      let re = "";
+      let uflag = false;
+      for (let i = 0; i < glob.length; i++) {
+        const c = glob.charAt(i);
+        if (escaping) {
+          escaping = false;
+          re += (reSpecials.has(c) ? "\\" : "") + c;
+          continue;
+        }
+        if (c === "\\") {
+          if (i === glob.length - 1) {
+            re += "\\\\";
+          } else {
+            escaping = true;
+          }
+          continue;
+        }
+        if (c === "[") {
+          const [src, needUflag, consumed, magic] = (0, brace_expressions_js_1.parseClass)(glob, i);
+          if (consumed) {
+            re += src;
+            uflag = uflag || needUflag;
+            i += consumed - 1;
+            hasMagic = hasMagic || magic;
+            continue;
+          }
+        }
+        if (c === "*") {
+          if (noEmpty && glob === "*")
+            re += starNoEmpty;
+          else
+            re += star;
+          hasMagic = true;
+          continue;
+        }
+        if (c === "?") {
+          re += qmark;
+          hasMagic = true;
+          continue;
+        }
+        re += regExpEscape(c);
+      }
+      return [re, (0, unescape_js_1.unescape)(glob), !!hasMagic, uflag];
+    };
+    __privateAdd(AST, _parseAST);
+    __privateAdd(AST, _parseGlob);
+    exports2.AST = AST;
+  }
+});
+
+// node_modules/glob/node_modules/minimatch/dist/cjs/escape.js
+var require_escape = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/cjs/escape.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.escape = void 0;
+    var escape = (s, { windowsPathsNoEscape = false } = {}) => {
+      return windowsPathsNoEscape ? s.replace(/[?*()[\]]/g, "[$&]") : s.replace(/[?*()[\]\\]/g, "\\$&");
+    };
+    exports2.escape = escape;
+  }
+});
+
+// node_modules/glob/node_modules/minimatch/dist/cjs/index.js
+var require_cjs = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/cjs/index.js"(exports2) {
+    "use strict";
+    var __importDefault = exports2 && exports2.__importDefault || function(mod) {
+      return mod && mod.__esModule ? mod : { "default": mod };
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.unescape = exports2.escape = exports2.AST = exports2.Minimatch = exports2.match = exports2.makeRe = exports2.braceExpand = exports2.defaults = exports2.filter = exports2.GLOBSTAR = exports2.sep = exports2.minimatch = void 0;
+    var brace_expansion_1 = __importDefault(require_brace_expansion());
+    var assert_valid_pattern_js_1 = require_assert_valid_pattern();
+    var ast_js_1 = require_ast();
+    var escape_js_1 = require_escape();
+    var unescape_js_1 = require_unescape();
+    var minimatch = (p, pattern, options = {}) => {
+      (0, assert_valid_pattern_js_1.assertValidPattern)(pattern);
+      if (!options.nocomment && pattern.charAt(0) === "#") {
+        return false;
+      }
+      return new Minimatch(pattern, options).match(p);
+    };
+    exports2.minimatch = minimatch;
+    var starDotExtRE = /^\*+([^+@!?\*\[\(]*)$/;
+    var starDotExtTest = (ext2) => (f) => !f.startsWith(".") && f.endsWith(ext2);
+    var starDotExtTestDot = (ext2) => (f) => f.endsWith(ext2);
+    var starDotExtTestNocase = (ext2) => {
+      ext2 = ext2.toLowerCase();
+      return (f) => !f.startsWith(".") && f.toLowerCase().endsWith(ext2);
+    };
+    var starDotExtTestNocaseDot = (ext2) => {
+      ext2 = ext2.toLowerCase();
+      return (f) => f.toLowerCase().endsWith(ext2);
+    };
+    var starDotStarRE = /^\*+\.\*+$/;
+    var starDotStarTest = (f) => !f.startsWith(".") && f.includes(".");
+    var starDotStarTestDot = (f) => f !== "." && f !== ".." && f.includes(".");
+    var dotStarRE = /^\.\*+$/;
+    var dotStarTest = (f) => f !== "." && f !== ".." && f.startsWith(".");
+    var starRE = /^\*+$/;
+    var starTest = (f) => f.length !== 0 && !f.startsWith(".");
+    var starTestDot = (f) => f.length !== 0 && f !== "." && f !== "..";
+    var qmarksRE = /^\?+([^+@!?\*\[\(]*)?$/;
+    var qmarksTestNocase = ([$0, ext2 = ""]) => {
+      const noext = qmarksTestNoExt([$0]);
+      if (!ext2)
+        return noext;
+      ext2 = ext2.toLowerCase();
+      return (f) => noext(f) && f.toLowerCase().endsWith(ext2);
+    };
+    var qmarksTestNocaseDot = ([$0, ext2 = ""]) => {
+      const noext = qmarksTestNoExtDot([$0]);
+      if (!ext2)
+        return noext;
+      ext2 = ext2.toLowerCase();
+      return (f) => noext(f) && f.toLowerCase().endsWith(ext2);
+    };
+    var qmarksTestDot = ([$0, ext2 = ""]) => {
+      const noext = qmarksTestNoExtDot([$0]);
+      return !ext2 ? noext : (f) => noext(f) && f.endsWith(ext2);
+    };
+    var qmarksTest = ([$0, ext2 = ""]) => {
+      const noext = qmarksTestNoExt([$0]);
+      return !ext2 ? noext : (f) => noext(f) && f.endsWith(ext2);
+    };
+    var qmarksTestNoExt = ([$0]) => {
+      const len = $0.length;
+      return (f) => f.length === len && !f.startsWith(".");
+    };
+    var qmarksTestNoExtDot = ([$0]) => {
+      const len = $0.length;
+      return (f) => f.length === len && f !== "." && f !== "..";
+    };
+    var defaultPlatform = typeof process === "object" && process ? typeof process.env === "object" && process.env && process.env.__MINIMATCH_TESTING_PLATFORM__ || process.platform : "posix";
+    var path = {
+      win32: { sep: "\\" },
+      posix: { sep: "/" }
+    };
+    exports2.sep = defaultPlatform === "win32" ? path.win32.sep : path.posix.sep;
+    exports2.minimatch.sep = exports2.sep;
+    exports2.GLOBSTAR = Symbol("globstar **");
+    exports2.minimatch.GLOBSTAR = exports2.GLOBSTAR;
+    var qmark = "[^/]";
+    var star = qmark + "*?";
+    var twoStarDot = "(?:(?!(?:\\/|^)(?:\\.{1,2})($|\\/)).)*?";
+    var twoStarNoDot = "(?:(?!(?:\\/|^)\\.).)*?";
+    var filter = (pattern, options = {}) => (p) => (0, exports2.minimatch)(p, pattern, options);
+    exports2.filter = filter;
+    exports2.minimatch.filter = exports2.filter;
+    var ext = (a, b = {}) => Object.assign({}, a, b);
+    var defaults = (def) => {
+      if (!def || typeof def !== "object" || !Object.keys(def).length) {
+        return exports2.minimatch;
+      }
+      const orig = exports2.minimatch;
+      const m = (p, pattern, options = {}) => orig(p, pattern, ext(def, options));
+      return Object.assign(m, {
+        Minimatch: class Minimatch extends orig.Minimatch {
+          constructor(pattern, options = {}) {
+            super(pattern, ext(def, options));
+          }
+          static defaults(options) {
+            return orig.defaults(ext(def, options)).Minimatch;
+          }
+        },
+        AST: class AST extends orig.AST {
+          /* c8 ignore start */
+          constructor(type, parent, options = {}) {
+            super(type, parent, ext(def, options));
+          }
+          /* c8 ignore stop */
+          static fromGlob(pattern, options = {}) {
+            return orig.AST.fromGlob(pattern, ext(def, options));
+          }
+        },
+        unescape: (s, options = {}) => orig.unescape(s, ext(def, options)),
+        escape: (s, options = {}) => orig.escape(s, ext(def, options)),
+        filter: (pattern, options = {}) => orig.filter(pattern, ext(def, options)),
+        defaults: (options) => orig.defaults(ext(def, options)),
+        makeRe: (pattern, options = {}) => orig.makeRe(pattern, ext(def, options)),
+        braceExpand: (pattern, options = {}) => orig.braceExpand(pattern, ext(def, options)),
+        match: (list, pattern, options = {}) => orig.match(list, pattern, ext(def, options)),
+        sep: orig.sep,
+        GLOBSTAR: exports2.GLOBSTAR
+      });
+    };
+    exports2.defaults = defaults;
+    exports2.minimatch.defaults = exports2.defaults;
+    var braceExpand = (pattern, options = {}) => {
+      (0, assert_valid_pattern_js_1.assertValidPattern)(pattern);
+      if (options.nobrace || !/\{(?:(?!\{).)*\}/.test(pattern)) {
+        return [pattern];
+      }
+      return (0, brace_expansion_1.default)(pattern);
+    };
+    exports2.braceExpand = braceExpand;
+    exports2.minimatch.braceExpand = exports2.braceExpand;
+    var makeRe = (pattern, options = {}) => new Minimatch(pattern, options).makeRe();
+    exports2.makeRe = makeRe;
+    exports2.minimatch.makeRe = exports2.makeRe;
+    var match = (list, pattern, options = {}) => {
       const mm = new Minimatch(pattern, options);
       list = list.filter((f) => mm.match(f));
       if (mm.options.nonull && !list.length) {
@@ -1266,28 +1767,66 @@ var require_minimatch = __commonJS({
       }
       return list;
     };
-    var globUnescape = (s) => s.replace(/\\(.)/g, "$1");
+    exports2.match = match;
+    exports2.minimatch.match = exports2.match;
+    var globMagic = /[?*]|[+@!]\(.*?\)|\[|\]/;
     var regExpEscape = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     var Minimatch = class {
-      constructor(pattern, options) {
-        assertValidPattern(pattern);
-        if (!options)
-          options = {};
+      options;
+      set;
+      pattern;
+      windowsPathsNoEscape;
+      nonegate;
+      negate;
+      comment;
+      empty;
+      preserveMultipleSlashes;
+      partial;
+      globSet;
+      globParts;
+      nocase;
+      isWindows;
+      platform;
+      windowsNoMagicRoot;
+      regexp;
+      constructor(pattern, options = {}) {
+        (0, assert_valid_pattern_js_1.assertValidPattern)(pattern);
+        options = options || {};
         this.options = options;
-        this.set = [];
         this.pattern = pattern;
+        this.platform = options.platform || defaultPlatform;
+        this.isWindows = this.platform === "win32";
         this.windowsPathsNoEscape = !!options.windowsPathsNoEscape || options.allowWindowsEscape === false;
         if (this.windowsPathsNoEscape) {
           this.pattern = this.pattern.replace(/\\/g, "/");
         }
+        this.preserveMultipleSlashes = !!options.preserveMultipleSlashes;
         this.regexp = null;
         this.negate = false;
+        this.nonegate = !!options.nonegate;
         this.comment = false;
         this.empty = false;
         this.partial = !!options.partial;
+        this.nocase = !!this.options.nocase;
+        this.windowsNoMagicRoot = options.windowsNoMagicRoot !== void 0 ? options.windowsNoMagicRoot : !!(this.isWindows && this.nocase);
+        this.globSet = [];
+        this.globParts = [];
+        this.set = [];
         this.make();
       }
-      debug() {
+      hasMagic() {
+        if (this.options.magicalBraces && this.set.length > 1) {
+          return true;
+        }
+        for (const pattern of this.set) {
+          for (const part of pattern) {
+            if (typeof part !== "string")
+              return true;
+          }
+        }
+        return false;
+      }
+      debug(..._) {
       }
       make() {
         const pattern = this.pattern;
@@ -1301,20 +1840,272 @@ var require_minimatch = __commonJS({
           return;
         }
         this.parseNegate();
-        let set = this.globSet = this.braceExpand();
-        if (options.debug)
+        this.globSet = [...new Set(this.braceExpand())];
+        if (options.debug) {
           this.debug = (...args) => console.error(...args);
+        }
+        this.debug(this.pattern, this.globSet);
+        const rawGlobParts = this.globSet.map((s) => this.slashSplit(s));
+        this.globParts = this.preprocess(rawGlobParts);
+        this.debug(this.pattern, this.globParts);
+        let set = this.globParts.map((s, _, __) => {
+          if (this.isWindows && this.windowsNoMagicRoot) {
+            const isUNC = s[0] === "" && s[1] === "" && (s[2] === "?" || !globMagic.test(s[2])) && !globMagic.test(s[3]);
+            const isDrive = /^[a-z]:/i.test(s[0]);
+            if (isUNC) {
+              return [...s.slice(0, 4), ...s.slice(4).map((ss) => this.parse(ss))];
+            } else if (isDrive) {
+              return [s[0], ...s.slice(1).map((ss) => this.parse(ss))];
+            }
+          }
+          return s.map((ss) => this.parse(ss));
+        });
         this.debug(this.pattern, set);
-        set = this.globParts = set.map((s) => s.split(slashSplit));
-        this.debug(this.pattern, set);
-        set = set.map((s, si, set2) => s.map(this.parse, this));
-        this.debug(this.pattern, set);
-        set = set.filter((s) => s.indexOf(false) === -1);
-        this.debug(this.pattern, set);
-        this.set = set;
+        this.set = set.filter((s) => s.indexOf(false) === -1);
+        if (this.isWindows) {
+          for (let i = 0; i < this.set.length; i++) {
+            const p = this.set[i];
+            if (p[0] === "" && p[1] === "" && this.globParts[i][2] === "?" && typeof p[3] === "string" && /^[a-z]:$/i.test(p[3])) {
+              p[2] = "?";
+            }
+          }
+        }
+        this.debug(this.pattern, this.set);
+      }
+      // various transforms to equivalent pattern sets that are
+      // faster to process in a filesystem walk.  The goal is to
+      // eliminate what we can, and push all ** patterns as far
+      // to the right as possible, even if it increases the number
+      // of patterns that we have to process.
+      preprocess(globParts) {
+        if (this.options.noglobstar) {
+          for (let i = 0; i < globParts.length; i++) {
+            for (let j = 0; j < globParts[i].length; j++) {
+              if (globParts[i][j] === "**") {
+                globParts[i][j] = "*";
+              }
+            }
+          }
+        }
+        const { optimizationLevel = 1 } = this.options;
+        if (optimizationLevel >= 2) {
+          globParts = this.firstPhasePreProcess(globParts);
+          globParts = this.secondPhasePreProcess(globParts);
+        } else if (optimizationLevel >= 1) {
+          globParts = this.levelOneOptimize(globParts);
+        } else {
+          globParts = this.adjascentGlobstarOptimize(globParts);
+        }
+        return globParts;
+      }
+      // just get rid of adjascent ** portions
+      adjascentGlobstarOptimize(globParts) {
+        return globParts.map((parts) => {
+          let gs = -1;
+          while (-1 !== (gs = parts.indexOf("**", gs + 1))) {
+            let i = gs;
+            while (parts[i + 1] === "**") {
+              i++;
+            }
+            if (i !== gs) {
+              parts.splice(gs, i - gs);
+            }
+          }
+          return parts;
+        });
+      }
+      // get rid of adjascent ** and resolve .. portions
+      levelOneOptimize(globParts) {
+        return globParts.map((parts) => {
+          parts = parts.reduce((set, part) => {
+            const prev = set[set.length - 1];
+            if (part === "**" && prev === "**") {
+              return set;
+            }
+            if (part === "..") {
+              if (prev && prev !== ".." && prev !== "." && prev !== "**") {
+                set.pop();
+                return set;
+              }
+            }
+            set.push(part);
+            return set;
+          }, []);
+          return parts.length === 0 ? [""] : parts;
+        });
+      }
+      levelTwoFileOptimize(parts) {
+        if (!Array.isArray(parts)) {
+          parts = this.slashSplit(parts);
+        }
+        let didSomething = false;
+        do {
+          didSomething = false;
+          if (!this.preserveMultipleSlashes) {
+            for (let i = 1; i < parts.length - 1; i++) {
+              const p = parts[i];
+              if (i === 1 && p === "" && parts[0] === "")
+                continue;
+              if (p === "." || p === "") {
+                didSomething = true;
+                parts.splice(i, 1);
+                i--;
+              }
+            }
+            if (parts[0] === "." && parts.length === 2 && (parts[1] === "." || parts[1] === "")) {
+              didSomething = true;
+              parts.pop();
+            }
+          }
+          let dd = 0;
+          while (-1 !== (dd = parts.indexOf("..", dd + 1))) {
+            const p = parts[dd - 1];
+            if (p && p !== "." && p !== ".." && p !== "**") {
+              didSomething = true;
+              parts.splice(dd - 1, 2);
+              dd -= 2;
+            }
+          }
+        } while (didSomething);
+        return parts.length === 0 ? [""] : parts;
+      }
+      // First phase: single-pattern processing
+      // <pre> is 1 or more portions
+      // <rest> is 1 or more portions
+      // <p> is any portion other than ., .., '', or **
+      // <e> is . or ''
+      //
+      // **/.. is *brutal* for filesystem walking performance, because
+      // it effectively resets the recursive walk each time it occurs,
+      // and ** cannot be reduced out by a .. pattern part like a regexp
+      // or most strings (other than .., ., and '') can be.
+      //
+      // <pre>/**/../<p>/<p>/<rest> -> {<pre>/../<p>/<p>/<rest>,<pre>/**/<p>/<p>/<rest>}
+      // <pre>/<e>/<rest> -> <pre>/<rest>
+      // <pre>/<p>/../<rest> -> <pre>/<rest>
+      // **/**/<rest> -> **/<rest>
+      //
+      // **/*/<rest> -> */**/<rest> <== not valid because ** doesn't follow
+      // this WOULD be allowed if ** did follow symlinks, or * didn't
+      firstPhasePreProcess(globParts) {
+        let didSomething = false;
+        do {
+          didSomething = false;
+          for (let parts of globParts) {
+            let gs = -1;
+            while (-1 !== (gs = parts.indexOf("**", gs + 1))) {
+              let gss = gs;
+              while (parts[gss + 1] === "**") {
+                gss++;
+              }
+              if (gss > gs) {
+                parts.splice(gs + 1, gss - gs);
+              }
+              let next = parts[gs + 1];
+              const p = parts[gs + 2];
+              const p2 = parts[gs + 3];
+              if (next !== "..")
+                continue;
+              if (!p || p === "." || p === ".." || !p2 || p2 === "." || p2 === "..") {
+                continue;
+              }
+              didSomething = true;
+              parts.splice(gs, 1);
+              const other = parts.slice(0);
+              other[gs] = "**";
+              globParts.push(other);
+              gs--;
+            }
+            if (!this.preserveMultipleSlashes) {
+              for (let i = 1; i < parts.length - 1; i++) {
+                const p = parts[i];
+                if (i === 1 && p === "" && parts[0] === "")
+                  continue;
+                if (p === "." || p === "") {
+                  didSomething = true;
+                  parts.splice(i, 1);
+                  i--;
+                }
+              }
+              if (parts[0] === "." && parts.length === 2 && (parts[1] === "." || parts[1] === "")) {
+                didSomething = true;
+                parts.pop();
+              }
+            }
+            let dd = 0;
+            while (-1 !== (dd = parts.indexOf("..", dd + 1))) {
+              const p = parts[dd - 1];
+              if (p && p !== "." && p !== ".." && p !== "**") {
+                didSomething = true;
+                const needDot = dd === 1 && parts[dd + 1] === "**";
+                const splin = needDot ? ["."] : [];
+                parts.splice(dd - 1, 2, ...splin);
+                if (parts.length === 0)
+                  parts.push("");
+                dd -= 2;
+              }
+            }
+          }
+        } while (didSomething);
+        return globParts;
+      }
+      // second phase: multi-pattern dedupes
+      // {<pre>/*/<rest>,<pre>/<p>/<rest>} -> <pre>/*/<rest>
+      // {<pre>/<rest>,<pre>/<rest>} -> <pre>/<rest>
+      // {<pre>/**/<rest>,<pre>/<rest>} -> <pre>/**/<rest>
+      //
+      // {<pre>/**/<rest>,<pre>/**/<p>/<rest>} -> <pre>/**/<rest>
+      // ^-- not valid because ** doens't follow symlinks
+      secondPhasePreProcess(globParts) {
+        for (let i = 0; i < globParts.length - 1; i++) {
+          for (let j = i + 1; j < globParts.length; j++) {
+            const matched = this.partsMatch(globParts[i], globParts[j], !this.preserveMultipleSlashes);
+            if (!matched)
+              continue;
+            globParts[i] = matched;
+            globParts[j] = [];
+          }
+        }
+        return globParts.filter((gs) => gs.length);
+      }
+      partsMatch(a, b, emptyGSMatch = false) {
+        let ai = 0;
+        let bi = 0;
+        let result = [];
+        let which = "";
+        while (ai < a.length && bi < b.length) {
+          if (a[ai] === b[bi]) {
+            result.push(which === "b" ? b[bi] : a[ai]);
+            ai++;
+            bi++;
+          } else if (emptyGSMatch && a[ai] === "**" && b[bi] === a[ai + 1]) {
+            result.push(a[ai]);
+            ai++;
+          } else if (emptyGSMatch && b[bi] === "**" && a[ai] === b[bi + 1]) {
+            result.push(b[bi]);
+            bi++;
+          } else if (a[ai] === "*" && b[bi] && (this.options.dot || !b[bi].startsWith(".")) && b[bi] !== "**") {
+            if (which === "b")
+              return false;
+            which = "a";
+            result.push(a[ai]);
+            ai++;
+            bi++;
+          } else if (b[bi] === "*" && a[ai] && (this.options.dot || !a[ai].startsWith(".")) && a[ai] !== "**") {
+            if (which === "a")
+              return false;
+            which = "b";
+            result.push(b[bi]);
+            ai++;
+            bi++;
+          } else {
+            return false;
+          }
+        }
+        return a.length === b.length && result;
       }
       parseNegate() {
-        if (this.options.nonegate)
+        if (this.nonegate)
           return;
         const pattern = this.pattern;
         let negate = false;
@@ -1324,21 +2115,55 @@ var require_minimatch = __commonJS({
           negateOffset++;
         }
         if (negateOffset)
-          this.pattern = pattern.substr(negateOffset);
+          this.pattern = pattern.slice(negateOffset);
         this.negate = negate;
       }
-      matchOne(file, pattern, partial) {
-        var options = this.options;
-        this.debug("matchOne", { "this": this, file, pattern });
+      // set partial to true to test if, for example,
+      // "/a/b" matches the start of "/*/b/*/d"
+      // Partial means, if you run out of file before you run
+      // out of pattern, then that's fine, as long as all
+      // the parts match.
+      matchOne(file, pattern, partial = false) {
+        const options = this.options;
+        if (this.isWindows) {
+          const fileUNC = file[0] === "" && file[1] === "" && file[2] === "?" && typeof file[3] === "string" && /^[a-z]:$/i.test(file[3]);
+          const patternUNC = pattern[0] === "" && pattern[1] === "" && pattern[2] === "?" && typeof pattern[3] === "string" && /^[a-z]:$/i.test(pattern[3]);
+          if (fileUNC && patternUNC) {
+            const fd = file[3];
+            const pd = pattern[3];
+            if (fd.toLowerCase() === pd.toLowerCase()) {
+              file[3] = pd;
+            }
+          } else if (patternUNC && typeof file[0] === "string") {
+            const pd = pattern[3];
+            const fd = file[0];
+            if (pd.toLowerCase() === fd.toLowerCase()) {
+              pattern[3] = fd;
+              pattern = pattern.slice(3);
+            }
+          } else if (fileUNC && typeof pattern[0] === "string") {
+            const fd = file[3];
+            if (fd.toLowerCase() === pattern[0].toLowerCase()) {
+              pattern[0] = fd;
+              file = file.slice(3);
+            }
+          }
+        }
+        const { optimizationLevel = 1 } = this.options;
+        if (optimizationLevel >= 2) {
+          file = this.levelTwoFileOptimize(file);
+        }
+        this.debug("matchOne", this, { file, pattern });
         this.debug("matchOne", file.length, pattern.length);
         for (var fi = 0, pi = 0, fl = file.length, pl = pattern.length; fi < fl && pi < pl; fi++, pi++) {
           this.debug("matchOne loop");
           var p = pattern[pi];
           var f = file[fi];
           this.debug(pattern, p, f);
-          if (p === false)
+          if (p === false) {
             return false;
-          if (p === GLOBSTAR) {
+          }
+          if (p === exports2.GLOBSTAR) {
             this.debug("GLOBSTAR", [pattern, p, f]);
             var fr = fi;
             var pr = pi + 1;
@@ -1367,17 +2192,18 @@ var require_minimatch = __commonJS({
             }
             if (partial) {
               this.debug("\n>>> no match, partial?", file, fr, pattern, pr);
-              if (fr === fl)
+              if (fr === fl) {
                 return true;
+              }
             }
             return false;
           }
-          var hit;
+          let hit;
           if (typeof p === "string") {
             hit = f === p;
             this.debug("string match", p, f, hit);
           } else {
-            hit = f.match(p);
+            hit = p.test(f);
             this.debug("pattern match", p, f, hit);
           }
           if (!hit)
@@ -1389,238 +2215,35 @@ var require_minimatch = __commonJS({
           return partial;
         } else if (pi === pl) {
           return fi === fl - 1 && file[fi] === "";
+        } else {
+          throw new Error("wtf?");
         }
-        throw new Error("wtf?");
       }
       braceExpand() {
-        return braceExpand(this.pattern, this.options);
+        return (0, exports2.braceExpand)(this.pattern, this.options);
       }
-      parse(pattern, isSub) {
-        assertValidPattern(pattern);
+      parse(pattern) {
+        (0, assert_valid_pattern_js_1.assertValidPattern)(pattern);
         const options = this.options;
-        if (pattern === "**") {
-          if (!options.noglobstar)
-            return GLOBSTAR;
-          else
-            pattern = "*";
-        }
+        if (pattern === "**")
+          return exports2.GLOBSTAR;
         if (pattern === "")
           return "";
-        let re = "";
-        let hasMagic = !!options.nocase;
-        let escaping = false;
-        const patternListStack = [];
-        const negativeLists = [];
-        let stateChar;
-        let inClass = false;
-        let reClassStart = -1;
-        let classStart = -1;
-        let cs;
-        let pl;
-        let sp;
-        const patternStart = pattern.charAt(0) === "." ? "" : options.dot ? "(?!(?:^|\\/)\\.{1,2}(?:$|\\/))" : "(?!\\.)";
-        const clearStateChar = () => {
-          if (stateChar) {
-            switch (stateChar) {
-              case "*":
-                re += star;
-                hasMagic = true;
-                break;
-              case "?":
-                re += qmark;
-                hasMagic = true;
-                break;
-              default:
-                re += "\\" + stateChar;
-                break;
-            }
-            this.debug("clearStateChar %j %j", stateChar, re);
-            stateChar = false;
-          }
-        };
-        for (let i = 0, c; i < pattern.length && (c = pattern.charAt(i)); i++) {
-          this.debug("%s	%s %s %j", pattern, i, re, c);
-          if (escaping) {
-            if (c === "/") {
-              return false;
-            }
-            if (reSpecials[c]) {
-              re += "\\";
-            }
-            re += c;
-            escaping = false;
-            continue;
-          }
-          switch (c) {
-            case "/": {
-              return false;
-            }
-            case "\\":
-              clearStateChar();
-              escaping = true;
-              continue;
-            case "?":
-            case "*":
-            case "+":
-            case "@":
-            case "!":
-              this.debug("%s	%s %s %j <-- stateChar", pattern, i, re, c);
-              if (inClass) {
-                this.debug("  in class");
-                if (c === "!" && i === classStart + 1)
-                  c = "^";
-                re += c;
-                continue;
-              }
-              this.debug("call clearStateChar %j", stateChar);
-              clearStateChar();
-              stateChar = c;
-              if (options.noext)
-                clearStateChar();
-              continue;
-            case "(":
-              if (inClass) {
-                re += "(";
-                continue;
-              }
-              if (!stateChar) {
-                re += "\\(";
-                continue;
-              }
-              patternListStack.push({
-                type: stateChar,
-                start: i - 1,
-                reStart: re.length,
-                open: plTypes[stateChar].open,
-                close: plTypes[stateChar].close
-              });
-              re += stateChar === "!" ? "(?:(?!(?:" : "(?:";
-              this.debug("plType %j %j", stateChar, re);
-              stateChar = false;
-              continue;
-            case ")":
-              if (inClass || !patternListStack.length) {
-                re += "\\)";
-                continue;
-              }
-              clearStateChar();
-              hasMagic = true;
-              pl = patternListStack.pop();
-              re += pl.close;
-              if (pl.type === "!") {
-                negativeLists.push(pl);
-              }
-              pl.reEnd = re.length;
-              continue;
-            case "|":
-              if (inClass || !patternListStack.length) {
-                re += "\\|";
-                continue;
-              }
-              clearStateChar();
-              re += "|";
-              continue;
-            case "[":
-              clearStateChar();
-              if (inClass) {
-                re += "\\" + c;
-                continue;
-              }
-              inClass = true;
-              classStart = i;
-              reClassStart = re.length;
-              re += c;
-              continue;
-            case "]":
-              if (i === classStart + 1 || !inClass) {
-                re += "\\" + c;
-                continue;
-              }
-              cs = pattern.substring(classStart + 1, i);
-              try {
-                RegExp("[" + cs + "]");
-              } catch (er) {
-                sp = this.parse(cs, SUBPARSE);
-                re = re.substr(0, reClassStart) + "\\[" + sp[0] + "\\]";
-                hasMagic = hasMagic || sp[1];
-                inClass = false;
-                continue;
-              }
-              hasMagic = true;
-              inClass = false;
-              re += c;
-              continue;
-            default:
-              clearStateChar();
-              if (reSpecials[c] && !(c === "^" && inClass)) {
-                re += "\\";
-              }
-              re += c;
-              break;
-          }
+        let m;
+        let fastTest = null;
+        if (m = pattern.match(starRE)) {
+          fastTest = options.dot ? starTestDot : starTest;
+        } else if (m = pattern.match(starDotExtRE)) {
+          fastTest = (options.nocase ? options.dot ? starDotExtTestNocaseDot : starDotExtTestNocase : options.dot ? starDotExtTestDot : starDotExtTest)(m[1]);
+        } else if (m = pattern.match(qmarksRE)) {
+          fastTest = (options.nocase ? options.dot ? qmarksTestNocaseDot : qmarksTestNocase : options.dot ? qmarksTestDot : qmarksTest)(m);
+        } else if (m = pattern.match(starDotStarRE)) {
+          fastTest = options.dot ? starDotStarTestDot : starDotStarTest;
+        } else if (m = pattern.match(dotStarRE)) {
+          fastTest = dotStarTest;
         }
-        if (inClass) {
-          cs = pattern.substr(classStart + 1);
-          sp = this.parse(cs, SUBPARSE);
-          re = re.substr(0, reClassStart) + "\\[" + sp[0];
-          hasMagic = hasMagic || sp[1];
-        }
-        for (pl = patternListStack.pop(); pl; pl = patternListStack.pop()) {
-          let tail;
-          tail = re.slice(pl.reStart + pl.open.length);
-          this.debug("setting tail", re, pl);
-          tail = tail.replace(/((?:\\{2}){0,64})(\\?)\|/g, (_, $1, $2) => {
-            if (!$2) {
-              $2 = "\\";
-            }
-            return $1 + $1 + $2 + "|";
-          });
-          this.debug("tail=%j\n   %s", tail, tail, pl, re);
-          const t = pl.type === "*" ? star : pl.type === "?" ? qmark : "\\" + pl.type;
-          hasMagic = true;
-          re = re.slice(0, pl.reStart) + t + "\\(" + tail;
-        }
-        clearStateChar();
-        if (escaping) {
-          re += "\\\\";
-        }
-        const addPatternStart = addPatternStartSet[re.charAt(0)];
-        for (let n = negativeLists.length - 1; n > -1; n--) {
-          const nl = negativeLists[n];
-          const nlBefore = re.slice(0, nl.reStart);
-          const nlFirst = re.slice(nl.reStart, nl.reEnd - 8);
-          let nlAfter = re.slice(nl.reEnd);
-          const nlLast = re.slice(nl.reEnd - 8, nl.reEnd) + nlAfter;
-          const openParensBefore = nlBefore.split("(").length - 1;
-          let cleanAfter = nlAfter;
-          for (let i = 0; i < openParensBefore; i++) {
-            cleanAfter = cleanAfter.replace(/\)[+*?]?/, "");
-          }
-          nlAfter = cleanAfter;
-          const dollar = nlAfter === "" && isSub !== SUBPARSE ? "$" : "";
-          re = nlBefore + nlFirst + nlAfter + dollar + nlLast;
-        }
-        if (re !== "" && hasMagic) {
-          re = "(?=.)" + re;
-        }
-        if (addPatternStart) {
-          re = patternStart + re;
-        }
-        if (isSub === SUBPARSE) {
-          return [re, hasMagic];
-        }
-        if (!hasMagic) {
-          return globUnescape(pattern);
-        }
-        const flags = options.nocase ? "i" : "";
-        try {
-          return Object.assign(new RegExp("^" + re + "$", flags), {
-            _glob: pattern,
-            _src: re
-          });
-        } catch (er) {
-          return new RegExp("$.");
-        }
+        const re = ast_js_1.AST.fromGlob(pattern, this.options).toMMPattern();
+        return fastTest ? Object.assign(re, { test: fastTest }) : re;
       }
       makeRe() {
         if (this.regexp || this.regexp === false)
@@ -1632,1359 +2255,4832 @@ var require_minimatch = __commonJS({
         }
         const options = this.options;
         const twoStar = options.noglobstar ? star : options.dot ? twoStarDot : twoStarNoDot;
-        const flags = options.nocase ? "i" : "";
+        const flags = new Set(options.nocase ? ["i"] : []);
         let re = set.map((pattern) => {
-          pattern = pattern.map((p) => typeof p === "string" ? regExpEscape(p) : p === GLOBSTAR ? GLOBSTAR : p._src).reduce((set2, p) => {
-            if (!(set2[set2.length - 1] === GLOBSTAR && p === GLOBSTAR)) {
-              set2.push(p);
+          const pp = pattern.map((p) => {
+            if (p instanceof RegExp) {
+              for (const f of p.flags.split(""))
+                flags.add(f);
             }
-            return set2;
-          }, []);
-          pattern.forEach((p, i) => {
-            if (p !== GLOBSTAR || pattern[i - 1] === GLOBSTAR) {
+            return typeof p === "string" ? regExpEscape(p) : p === exports2.GLOBSTAR ? exports2.GLOBSTAR : p._src;
+          });
+          pp.forEach((p, i) => {
+            const next = pp[i + 1];
+            const prev = pp[i - 1];
+            if (p !== exports2.GLOBSTAR || prev === exports2.GLOBSTAR) {
               return;
             }
-            if (i === 0) {
-              if (pattern.length > 1) {
-                pattern[i + 1] = "(?:\\/|" + twoStar + "\\/)?" + pattern[i + 1];
+            if (prev === void 0) {
+              if (next !== void 0 && next !== exports2.GLOBSTAR) {
+                pp[i + 1] = "(?:\\/|" + twoStar + "\\/)?" + next;
               } else {
-                pattern[i] = twoStar;
+                pp[i] = twoStar;
               }
-            } else if (i === pattern.length - 1) {
-              pattern[i - 1] += "(?:\\/|" + twoStar + ")?";
-            } else {
-              pattern[i - 1] += "(?:\\/|\\/" + twoStar + "\\/)" + pattern[i + 1];
-              pattern[i + 1] = GLOBSTAR;
+            } else if (next === void 0) {
+              pp[i - 1] = prev + "(?:\\/|" + twoStar + ")?";
+            } else if (next !== exports2.GLOBSTAR) {
+              pp[i - 1] = prev + "(?:\\/|\\/" + twoStar + "\\/)" + next;
+              pp[i + 1] = exports2.GLOBSTAR;
             }
           });
-          return pattern.filter((p) => p !== GLOBSTAR).join("/");
+          return pp.filter((p) => p !== exports2.GLOBSTAR).join("/");
         }).join("|");
-        re = "^(?:" + re + ")$";
+        const [open, close] = set.length > 1 ? ["(?:", ")"] : ["", ""];
+        re = "^" + open + re + close + "$";
         if (this.negate)
-          re = "^(?!" + re + ").*$";
+          re = "^(?!" + re + ").+$";
         try {
-          this.regexp = new RegExp(re, flags);
+          this.regexp = new RegExp(re, [...flags].join(""));
         } catch (ex) {
           this.regexp = false;
         }
         return this.regexp;
       }
+      slashSplit(p) {
+        if (this.preserveMultipleSlashes) {
+          return p.split("/");
+        } else if (this.isWindows && /^\/\/[^\/]+/.test(p)) {
+          return ["", ...p.split(/\/+/)];
+        } else {
+          return p.split(/\/+/);
+        }
+      }
       match(f, partial = this.partial) {
         this.debug("match", f, this.pattern);
-        if (this.comment)
+        if (this.comment) {
           return false;
-        if (this.empty)
-          return f === "";
-        if (f === "/" && partial)
-          return true;
-        const options = this.options;
-        if (path.sep !== "/") {
-          f = f.split(path.sep).join("/");
         }
-        f = f.split(slashSplit);
-        this.debug(this.pattern, "split", f);
+        if (this.empty) {
+          return f === "";
+        }
+        if (f === "/" && partial) {
+          return true;
+        }
+        const options = this.options;
+        if (this.isWindows) {
+          f = f.split("\\").join("/");
+        }
+        const ff = this.slashSplit(f);
+        this.debug(this.pattern, "split", ff);
         const set = this.set;
         this.debug(this.pattern, "set", set);
-        let filename;
-        for (let i = f.length - 1; i >= 0; i--) {
-          filename = f[i];
-          if (filename)
-            break;
+        let filename = ff[ff.length - 1];
+        if (!filename) {
+          for (let i = ff.length - 2; !filename && i >= 0; i--) {
+            filename = ff[i];
+          }
         }
         for (let i = 0; i < set.length; i++) {
           const pattern = set[i];
-          let file = f;
+          let file = ff;
           if (options.matchBase && pattern.length === 1) {
             file = [filename];
           }
           const hit = this.matchOne(file, pattern, partial);
           if (hit) {
-            if (options.flipNegate)
+            if (options.flipNegate) {
               return true;
+            }
             return !this.negate;
           }
         }
-        if (options.flipNegate)
+        if (options.flipNegate) {
           return false;
+        }
         return this.negate;
       }
       static defaults(def) {
-        return minimatch.defaults(def).Minimatch;
+        return exports2.minimatch.defaults(def).Minimatch;
       }
     };
-    minimatch.Minimatch = Minimatch;
+    exports2.Minimatch = Minimatch;
+    var ast_js_2 = require_ast();
+    Object.defineProperty(exports2, "AST", { enumerable: true, get: function() {
+      return ast_js_2.AST;
+    } });
+    var escape_js_2 = require_escape();
+    Object.defineProperty(exports2, "escape", { enumerable: true, get: function() {
+      return escape_js_2.escape;
+    } });
+    var unescape_js_2 = require_unescape();
+    Object.defineProperty(exports2, "unescape", { enumerable: true, get: function() {
+      return unescape_js_2.unescape;
+    } });
+    exports2.minimatch.AST = ast_js_1.AST;
+    exports2.minimatch.Minimatch = Minimatch;
+    exports2.minimatch.escape = escape_js_1.escape;
+    exports2.minimatch.unescape = unescape_js_1.unescape;
   }
 });
 
-// node_modules/inherits/inherits_browser.js
-var require_inherits_browser = __commonJS({
-  "node_modules/inherits/inherits_browser.js"(exports2, module2) {
-    if (typeof Object.create === "function") {
-      module2.exports = function inherits(ctor, superCtor) {
-        if (superCtor) {
-          ctor.super_ = superCtor;
-          ctor.prototype = Object.create(superCtor.prototype, {
-            constructor: {
-              value: ctor,
-              enumerable: false,
-              writable: true,
-              configurable: true
-            }
-          });
+// node_modules/path-scurry/node_modules/lru-cache/dist/cjs/index.js
+var require_cjs2 = __commonJS({
+  "node_modules/path-scurry/node_modules/lru-cache/dist/cjs/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.LRUCache = void 0;
+    var perf = typeof performance === "object" && performance && typeof performance.now === "function" ? performance : Date;
+    var warned = /* @__PURE__ */ new Set();
+    var PROCESS = typeof process === "object" && !!process ? process : {};
+    var emitWarning = (msg, type, code, fn) => {
+      typeof PROCESS.emitWarning === "function" ? PROCESS.emitWarning(msg, type, code, fn) : console.error(`[${code}] ${type}: ${msg}`);
+    };
+    var AC = globalThis.AbortController;
+    var AS = globalThis.AbortSignal;
+    if (typeof AC === "undefined") {
+      AS = class AbortSignal {
+        onabort;
+        _onabort = [];
+        reason;
+        aborted = false;
+        addEventListener(_, fn) {
+          this._onabort.push(fn);
         }
       };
-    } else {
-      module2.exports = function inherits(ctor, superCtor) {
-        if (superCtor) {
-          ctor.super_ = superCtor;
-          var TempCtor = function() {
-          };
-          TempCtor.prototype = superCtor.prototype;
-          ctor.prototype = new TempCtor();
-          ctor.prototype.constructor = ctor;
+      AC = class AbortController {
+        constructor() {
+          warnACPolyfill();
         }
-      };
-    }
-  }
-});
-
-// node_modules/inherits/inherits.js
-var require_inherits = __commonJS({
-  "node_modules/inherits/inherits.js"(exports2, module2) {
-    try {
-      util = require("util");
-      if (typeof util.inherits !== "function")
-        throw "";
-      module2.exports = util.inherits;
-    } catch (e) {
-      module2.exports = require_inherits_browser();
-    }
-    var util;
-  }
-});
-
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/glob/common.js
-var require_common = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/glob/common.js"(exports2) {
-    exports2.setopts = setopts;
-    exports2.ownProp = ownProp;
-    exports2.makeAbs = makeAbs;
-    exports2.finish = finish;
-    exports2.mark = mark;
-    exports2.isIgnored = isIgnored;
-    exports2.childrenIgnored = childrenIgnored;
-    function ownProp(obj, field) {
-      return Object.prototype.hasOwnProperty.call(obj, field);
-    }
-    var fs = require("fs");
-    var path = require("path");
-    var minimatch = require_minimatch();
-    var isAbsolute = require("path").isAbsolute;
-    var Minimatch = minimatch.Minimatch;
-    function alphasort(a, b) {
-      return a.localeCompare(b, "en");
-    }
-    function setupIgnores(self, options) {
-      self.ignore = options.ignore || [];
-      if (!Array.isArray(self.ignore))
-        self.ignore = [self.ignore];
-      if (self.ignore.length) {
-        self.ignore = self.ignore.map(ignoreMap);
-      }
-    }
-    function ignoreMap(pattern) {
-      var gmatcher = null;
-      if (pattern.slice(-3) === "/**") {
-        var gpattern = pattern.replace(/(\/\*\*)+$/, "");
-        gmatcher = new Minimatch(gpattern, { dot: true });
-      }
-      return {
-        matcher: new Minimatch(pattern, { dot: true }),
-        gmatcher
-      };
-    }
-    function setopts(self, pattern, options) {
-      if (!options)
-        options = {};
-      if (options.matchBase && pattern.indexOf("/") === -1) {
-        if (options.noglobstar) {
-          throw new Error("base matching requires globstar");
-        }
-        pattern = "**/" + pattern;
-      }
-      self.silent = !!options.silent;
-      self.pattern = pattern;
-      self.strict = options.strict !== false;
-      self.realpath = !!options.realpath;
-      self.realpathCache = options.realpathCache || /* @__PURE__ */ Object.create(null);
-      self.follow = !!options.follow;
-      self.dot = !!options.dot;
-      self.mark = !!options.mark;
-      self.nodir = !!options.nodir;
-      if (self.nodir)
-        self.mark = true;
-      self.sync = !!options.sync;
-      self.nounique = !!options.nounique;
-      self.nonull = !!options.nonull;
-      self.nosort = !!options.nosort;
-      self.nocase = !!options.nocase;
-      self.stat = !!options.stat;
-      self.noprocess = !!options.noprocess;
-      self.absolute = !!options.absolute;
-      self.fs = options.fs || fs;
-      self.maxLength = options.maxLength || Infinity;
-      self.cache = options.cache || /* @__PURE__ */ Object.create(null);
-      self.statCache = options.statCache || /* @__PURE__ */ Object.create(null);
-      self.symlinks = options.symlinks || /* @__PURE__ */ Object.create(null);
-      setupIgnores(self, options);
-      self.changedCwd = false;
-      var cwd = process.cwd();
-      if (!ownProp(options, "cwd"))
-        self.cwd = path.resolve(cwd);
-      else {
-        self.cwd = path.resolve(options.cwd);
-        self.changedCwd = self.cwd !== cwd;
-      }
-      self.root = options.root || path.resolve(self.cwd, "/");
-      self.root = path.resolve(self.root);
-      self.cwdAbs = isAbsolute(self.cwd) ? self.cwd : makeAbs(self, self.cwd);
-      self.nomount = !!options.nomount;
-      if (process.platform === "win32") {
-        self.root = self.root.replace(/\\/g, "/");
-        self.cwd = self.cwd.replace(/\\/g, "/");
-        self.cwdAbs = self.cwdAbs.replace(/\\/g, "/");
-      }
-      options.nonegate = true;
-      options.nocomment = true;
-      options.allowWindowsEscape = true;
-      self.minimatch = new Minimatch(pattern, options);
-      self.options = self.minimatch.options;
-    }
-    function finish(self) {
-      var nou = self.nounique;
-      var all = nou ? [] : /* @__PURE__ */ Object.create(null);
-      for (var i = 0, l = self.matches.length; i < l; i++) {
-        var matches = self.matches[i];
-        if (!matches || Object.keys(matches).length === 0) {
-          if (self.nonull) {
-            var literal = self.minimatch.globSet[i];
-            if (nou)
-              all.push(literal);
-            else
-              all[literal] = true;
+        signal = new AS();
+        abort(reason) {
+          if (this.signal.aborted)
+            return;
+          this.signal.reason = reason;
+          this.signal.aborted = true;
+          for (const fn of this.signal._onabort) {
+            fn(reason);
           }
+          this.signal.onabort?.(reason);
+        }
+      };
+      let printACPolyfillWarning = PROCESS.env?.LRU_CACHE_IGNORE_AC_WARNING !== "1";
+      const warnACPolyfill = () => {
+        if (!printACPolyfillWarning)
+          return;
+        printACPolyfillWarning = false;
+        emitWarning("AbortController is not defined. If using lru-cache in node 14, load an AbortController polyfill from the `node-abort-controller` package. A minimal polyfill is provided for use by LRUCache.fetch(), but it should not be relied upon in other contexts (eg, passing it to other APIs that use AbortController/AbortSignal might have undesirable effects). You may disable this with LRU_CACHE_IGNORE_AC_WARNING=1 in the env.", "NO_ABORT_CONTROLLER", "ENOTSUP", warnACPolyfill);
+      };
+    }
+    var shouldWarn = (code) => !warned.has(code);
+    var TYPE = Symbol("type");
+    var isPosInt = (n) => n && n === Math.floor(n) && n > 0 && isFinite(n);
+    var getUintArray = (max) => !isPosInt(max) ? null : max <= Math.pow(2, 8) ? Uint8Array : max <= Math.pow(2, 16) ? Uint16Array : max <= Math.pow(2, 32) ? Uint32Array : max <= Number.MAX_SAFE_INTEGER ? ZeroArray : null;
+    var ZeroArray = class extends Array {
+      constructor(size) {
+        super(size);
+        this.fill(0);
+      }
+    };
+    var _constructing;
+    var _Stack = class {
+      heap;
+      length;
+      static create(max) {
+        const HeapCls = getUintArray(max);
+        if (!HeapCls)
+          return [];
+        __privateSet(_Stack, _constructing, true);
+        const s = new _Stack(max, HeapCls);
+        __privateSet(_Stack, _constructing, false);
+        return s;
+      }
+      constructor(max, HeapCls) {
+        if (!__privateGet(_Stack, _constructing)) {
+          throw new TypeError("instantiate Stack using Stack.create(n)");
+        }
+        this.heap = new HeapCls(max);
+        this.length = 0;
+      }
+      push(n) {
+        this.heap[this.length++] = n;
+      }
+      pop() {
+        return this.heap[--this.length];
+      }
+    };
+    var Stack = _Stack;
+    _constructing = new WeakMap();
+    // private constructor
+    __privateAdd(Stack, _constructing, false);
+    var LRUCache = class {
+      // properties coming in from the options of these, only max and maxSize
+      // really *need* to be protected. The rest can be modified, as they just
+      // set defaults for various methods.
+      #max;
+      #maxSize;
+      #dispose;
+      #disposeAfter;
+      #fetchMethod;
+      /**
+       * {@link LRUCache.OptionsBase.ttl}
+       */
+      ttl;
+      /**
+       * {@link LRUCache.OptionsBase.ttlResolution}
+       */
+      ttlResolution;
+      /**
+       * {@link LRUCache.OptionsBase.ttlAutopurge}
+       */
+      ttlAutopurge;
+      /**
+       * {@link LRUCache.OptionsBase.updateAgeOnGet}
+       */
+      updateAgeOnGet;
+      /**
+       * {@link LRUCache.OptionsBase.updateAgeOnHas}
+       */
+      updateAgeOnHas;
+      /**
+       * {@link LRUCache.OptionsBase.allowStale}
+       */
+      allowStale;
+      /**
+       * {@link LRUCache.OptionsBase.noDisposeOnSet}
+       */
+      noDisposeOnSet;
+      /**
+       * {@link LRUCache.OptionsBase.noUpdateTTL}
+       */
+      noUpdateTTL;
+      /**
+       * {@link LRUCache.OptionsBase.maxEntrySize}
+       */
+      maxEntrySize;
+      /**
+       * {@link LRUCache.OptionsBase.sizeCalculation}
+       */
+      sizeCalculation;
+      /**
+       * {@link LRUCache.OptionsBase.noDeleteOnFetchRejection}
+       */
+      noDeleteOnFetchRejection;
+      /**
+       * {@link LRUCache.OptionsBase.noDeleteOnStaleGet}
+       */
+      noDeleteOnStaleGet;
+      /**
+       * {@link LRUCache.OptionsBase.allowStaleOnFetchAbort}
+       */
+      allowStaleOnFetchAbort;
+      /**
+       * {@link LRUCache.OptionsBase.allowStaleOnFetchRejection}
+       */
+      allowStaleOnFetchRejection;
+      /**
+       * {@link LRUCache.OptionsBase.ignoreFetchAbort}
+       */
+      ignoreFetchAbort;
+      // computed properties
+      #size;
+      #calculatedSize;
+      #keyMap;
+      #keyList;
+      #valList;
+      #next;
+      #prev;
+      #head;
+      #tail;
+      #free;
+      #disposed;
+      #sizes;
+      #starts;
+      #ttls;
+      #hasDispose;
+      #hasFetchMethod;
+      #hasDisposeAfter;
+      /**
+       * Do not call this method unless you need to inspect the
+       * inner workings of the cache.  If anything returned by this
+       * object is modified in any way, strange breakage may occur.
+       *
+       * These fields are private for a reason!
+       *
+       * @internal
+       */
+      static unsafeExposeInternals(c) {
+        return {
+          // properties
+          starts: c.#starts,
+          ttls: c.#ttls,
+          sizes: c.#sizes,
+          keyMap: c.#keyMap,
+          keyList: c.#keyList,
+          valList: c.#valList,
+          next: c.#next,
+          prev: c.#prev,
+          get head() {
+            return c.#head;
+          },
+          get tail() {
+            return c.#tail;
+          },
+          free: c.#free,
+          // methods
+          isBackgroundFetch: (p) => c.#isBackgroundFetch(p),
+          backgroundFetch: (k, index, options, context) => c.#backgroundFetch(k, index, options, context),
+          moveToTail: (index) => c.#moveToTail(index),
+          indexes: (options) => c.#indexes(options),
+          rindexes: (options) => c.#rindexes(options),
+          isStale: (index) => c.#isStale(index)
+        };
+      }
+      // Protected read-only members
+      /**
+       * {@link LRUCache.OptionsBase.max} (read-only)
+       */
+      get max() {
+        return this.#max;
+      }
+      /**
+       * {@link LRUCache.OptionsBase.maxSize} (read-only)
+       */
+      get maxSize() {
+        return this.#maxSize;
+      }
+      /**
+       * The total computed size of items in the cache (read-only)
+       */
+      get calculatedSize() {
+        return this.#calculatedSize;
+      }
+      /**
+       * The number of items stored in the cache (read-only)
+       */
+      get size() {
+        return this.#size;
+      }
+      /**
+       * {@link LRUCache.OptionsBase.fetchMethod} (read-only)
+       */
+      get fetchMethod() {
+        return this.#fetchMethod;
+      }
+      /**
+       * {@link LRUCache.OptionsBase.dispose} (read-only)
+       */
+      get dispose() {
+        return this.#dispose;
+      }
+      /**
+       * {@link LRUCache.OptionsBase.disposeAfter} (read-only)
+       */
+      get disposeAfter() {
+        return this.#disposeAfter;
+      }
+      constructor(options) {
+        const { max = 0, ttl, ttlResolution = 1, ttlAutopurge, updateAgeOnGet, updateAgeOnHas, allowStale, dispose, disposeAfter, noDisposeOnSet, noUpdateTTL, maxSize = 0, maxEntrySize = 0, sizeCalculation, fetchMethod, noDeleteOnFetchRejection, noDeleteOnStaleGet, allowStaleOnFetchRejection, allowStaleOnFetchAbort, ignoreFetchAbort } = options;
+        if (max !== 0 && !isPosInt(max)) {
+          throw new TypeError("max option must be a nonnegative integer");
+        }
+        const UintArray = max ? getUintArray(max) : Array;
+        if (!UintArray) {
+          throw new Error("invalid max value: " + max);
+        }
+        this.#max = max;
+        this.#maxSize = maxSize;
+        this.maxEntrySize = maxEntrySize || this.#maxSize;
+        this.sizeCalculation = sizeCalculation;
+        if (this.sizeCalculation) {
+          if (!this.#maxSize && !this.maxEntrySize) {
+            throw new TypeError("cannot set sizeCalculation without setting maxSize or maxEntrySize");
+          }
+          if (typeof this.sizeCalculation !== "function") {
+            throw new TypeError("sizeCalculation set to non-function");
+          }
+        }
+        if (fetchMethod !== void 0 && typeof fetchMethod !== "function") {
+          throw new TypeError("fetchMethod must be a function if specified");
+        }
+        this.#fetchMethod = fetchMethod;
+        this.#hasFetchMethod = !!fetchMethod;
+        this.#keyMap = /* @__PURE__ */ new Map();
+        this.#keyList = new Array(max).fill(void 0);
+        this.#valList = new Array(max).fill(void 0);
+        this.#next = new UintArray(max);
+        this.#prev = new UintArray(max);
+        this.#head = 0;
+        this.#tail = 0;
+        this.#free = Stack.create(max);
+        this.#size = 0;
+        this.#calculatedSize = 0;
+        if (typeof dispose === "function") {
+          this.#dispose = dispose;
+        }
+        if (typeof disposeAfter === "function") {
+          this.#disposeAfter = disposeAfter;
+          this.#disposed = [];
         } else {
-          var m = Object.keys(matches);
-          if (nou)
-            all.push.apply(all, m);
-          else
-            m.forEach(function(m2) {
-              all[m2] = true;
-            });
+          this.#disposeAfter = void 0;
+          this.#disposed = void 0;
+        }
+        this.#hasDispose = !!this.#dispose;
+        this.#hasDisposeAfter = !!this.#disposeAfter;
+        this.noDisposeOnSet = !!noDisposeOnSet;
+        this.noUpdateTTL = !!noUpdateTTL;
+        this.noDeleteOnFetchRejection = !!noDeleteOnFetchRejection;
+        this.allowStaleOnFetchRejection = !!allowStaleOnFetchRejection;
+        this.allowStaleOnFetchAbort = !!allowStaleOnFetchAbort;
+        this.ignoreFetchAbort = !!ignoreFetchAbort;
+        if (this.maxEntrySize !== 0) {
+          if (this.#maxSize !== 0) {
+            if (!isPosInt(this.#maxSize)) {
+              throw new TypeError("maxSize must be a positive integer if specified");
+            }
+          }
+          if (!isPosInt(this.maxEntrySize)) {
+            throw new TypeError("maxEntrySize must be a positive integer if specified");
+          }
+          this.#initializeSizeTracking();
+        }
+        this.allowStale = !!allowStale;
+        this.noDeleteOnStaleGet = !!noDeleteOnStaleGet;
+        this.updateAgeOnGet = !!updateAgeOnGet;
+        this.updateAgeOnHas = !!updateAgeOnHas;
+        this.ttlResolution = isPosInt(ttlResolution) || ttlResolution === 0 ? ttlResolution : 1;
+        this.ttlAutopurge = !!ttlAutopurge;
+        this.ttl = ttl || 0;
+        if (this.ttl) {
+          if (!isPosInt(this.ttl)) {
+            throw new TypeError("ttl must be a positive integer if specified");
+          }
+          this.#initializeTTLTracking();
+        }
+        if (this.#max === 0 && this.ttl === 0 && this.#maxSize === 0) {
+          throw new TypeError("At least one of max, maxSize, or ttl is required");
+        }
+        if (!this.ttlAutopurge && !this.#max && !this.#maxSize) {
+          const code = "LRU_CACHE_UNBOUNDED";
+          if (shouldWarn(code)) {
+            warned.add(code);
+            const msg = "TTL caching without ttlAutopurge, max, or maxSize can result in unbounded memory consumption.";
+            emitWarning(msg, "UnboundedCacheWarning", code, LRUCache);
+          }
         }
       }
-      if (!nou)
-        all = Object.keys(all);
-      if (!self.nosort)
-        all = all.sort(alphasort);
-      if (self.mark) {
-        for (var i = 0; i < all.length; i++) {
-          all[i] = self._mark(all[i]);
+      /**
+       * Return the remaining TTL time for a given entry key
+       */
+      getRemainingTTL(key) {
+        return this.#keyMap.has(key) ? Infinity : 0;
+      }
+      #initializeTTLTracking() {
+        const ttls = new ZeroArray(this.#max);
+        const starts = new ZeroArray(this.#max);
+        this.#ttls = ttls;
+        this.#starts = starts;
+        this.#setItemTTL = (index, ttl, start = perf.now()) => {
+          starts[index] = ttl !== 0 ? start : 0;
+          ttls[index] = ttl;
+          if (ttl !== 0 && this.ttlAutopurge) {
+            const t = setTimeout(() => {
+              if (this.#isStale(index)) {
+                this.delete(this.#keyList[index]);
+              }
+            }, ttl + 1);
+            if (t.unref) {
+              t.unref();
+            }
+          }
+        };
+        this.#updateItemAge = (index) => {
+          starts[index] = ttls[index] !== 0 ? perf.now() : 0;
+        };
+        this.#statusTTL = (status, index) => {
+          if (ttls[index]) {
+            const ttl = ttls[index];
+            const start = starts[index];
+            status.ttl = ttl;
+            status.start = start;
+            status.now = cachedNow || getNow();
+            const age = status.now - start;
+            status.remainingTTL = ttl - age;
+          }
+        };
+        let cachedNow = 0;
+        const getNow = () => {
+          const n = perf.now();
+          if (this.ttlResolution > 0) {
+            cachedNow = n;
+            const t = setTimeout(() => cachedNow = 0, this.ttlResolution);
+            if (t.unref) {
+              t.unref();
+            }
+          }
+          return n;
+        };
+        this.getRemainingTTL = (key) => {
+          const index = this.#keyMap.get(key);
+          if (index === void 0) {
+            return 0;
+          }
+          const ttl = ttls[index];
+          const start = starts[index];
+          if (ttl === 0 || start === 0) {
+            return Infinity;
+          }
+          const age = (cachedNow || getNow()) - start;
+          return ttl - age;
+        };
+        this.#isStale = (index) => {
+          return ttls[index] !== 0 && starts[index] !== 0 && (cachedNow || getNow()) - starts[index] > ttls[index];
+        };
+      }
+      // conditionally set private methods related to TTL
+      #updateItemAge = () => {
+      };
+      #statusTTL = () => {
+      };
+      #setItemTTL = () => {
+      };
+      /* c8 ignore stop */
+      #isStale = () => false;
+      #initializeSizeTracking() {
+        const sizes = new ZeroArray(this.#max);
+        this.#calculatedSize = 0;
+        this.#sizes = sizes;
+        this.#removeItemSize = (index) => {
+          this.#calculatedSize -= sizes[index];
+          sizes[index] = 0;
+        };
+        this.#requireSize = (k, v, size, sizeCalculation) => {
+          if (this.#isBackgroundFetch(v)) {
+            return 0;
+          }
+          if (!isPosInt(size)) {
+            if (sizeCalculation) {
+              if (typeof sizeCalculation !== "function") {
+                throw new TypeError("sizeCalculation must be a function");
+              }
+              size = sizeCalculation(v, k);
+              if (!isPosInt(size)) {
+                throw new TypeError("sizeCalculation return invalid (expect positive integer)");
+              }
+            } else {
+              throw new TypeError("invalid size value (must be positive integer). When maxSize or maxEntrySize is used, sizeCalculation or size must be set.");
+            }
+          }
+          return size;
+        };
+        this.#addItemSize = (index, size, status) => {
+          sizes[index] = size;
+          if (this.#maxSize) {
+            const maxSize = this.#maxSize - sizes[index];
+            while (this.#calculatedSize > maxSize) {
+              this.#evict(true);
+            }
+          }
+          this.#calculatedSize += sizes[index];
+          if (status) {
+            status.entrySize = size;
+            status.totalCalculatedSize = this.#calculatedSize;
+          }
+        };
+      }
+      #removeItemSize = (_i) => {
+      };
+      #addItemSize = (_i, _s, _st) => {
+      };
+      #requireSize = (_k, _v, size, sizeCalculation) => {
+        if (size || sizeCalculation) {
+          throw new TypeError("cannot set size without setting maxSize or maxEntrySize on cache");
         }
-        if (self.nodir) {
-          all = all.filter(function(e) {
-            var notDir = !/\/$/.test(e);
-            var c = self.cache[e] || self.cache[makeAbs(self, e)];
-            if (notDir && c)
-              notDir = c !== "DIR" && !Array.isArray(c);
-            return notDir;
-          });
+        return 0;
+      };
+      *#indexes({ allowStale = this.allowStale } = {}) {
+        if (this.#size) {
+          for (let i = this.#tail; true; ) {
+            if (!this.#isValidIndex(i)) {
+              break;
+            }
+            if (allowStale || !this.#isStale(i)) {
+              yield i;
+            }
+            if (i === this.#head) {
+              break;
+            } else {
+              i = this.#prev[i];
+            }
+          }
         }
       }
-      if (self.ignore.length)
-        all = all.filter(function(m2) {
-          return !isIgnored(self, m2);
-        });
-      self.found = all;
-    }
-    function mark(self, p) {
-      var abs = makeAbs(self, p);
-      var c = self.cache[abs];
-      var m = p;
-      if (c) {
-        var isDir = c === "DIR" || Array.isArray(c);
-        var slash = p.slice(-1) === "/";
-        if (isDir && !slash)
-          m += "/";
-        else if (!isDir && slash)
-          m = m.slice(0, -1);
-        if (m !== p) {
-          var mabs = makeAbs(self, m);
-          self.statCache[mabs] = self.statCache[abs];
-          self.cache[mabs] = self.cache[abs];
+      *#rindexes({ allowStale = this.allowStale } = {}) {
+        if (this.#size) {
+          for (let i = this.#head; true; ) {
+            if (!this.#isValidIndex(i)) {
+              break;
+            }
+            if (allowStale || !this.#isStale(i)) {
+              yield i;
+            }
+            if (i === this.#tail) {
+              break;
+            } else {
+              i = this.#next[i];
+            }
+          }
         }
       }
-      return m;
-    }
-    function makeAbs(self, f) {
-      var abs = f;
-      if (f.charAt(0) === "/") {
-        abs = path.join(self.root, f);
-      } else if (isAbsolute(f) || f === "") {
-        abs = f;
-      } else if (self.changedCwd) {
-        abs = path.resolve(self.cwd, f);
-      } else {
-        abs = path.resolve(f);
+      #isValidIndex(index) {
+        return index !== void 0 && this.#keyMap.get(this.#keyList[index]) === index;
       }
-      if (process.platform === "win32")
-        abs = abs.replace(/\\/g, "/");
-      return abs;
-    }
-    function isIgnored(self, path2) {
-      if (!self.ignore.length)
-        return false;
-      return self.ignore.some(function(item) {
-        return item.matcher.match(path2) || !!(item.gmatcher && item.gmatcher.match(path2));
-      });
-    }
-    function childrenIgnored(self, path2) {
-      if (!self.ignore.length)
-        return false;
-      return self.ignore.some(function(item) {
-        return !!(item.gmatcher && item.gmatcher.match(path2));
-      });
-    }
-  }
-});
-
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/glob/sync.js
-var require_sync = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/glob/sync.js"(exports2, module2) {
-    module2.exports = globSync;
-    globSync.GlobSync = GlobSync;
-    var rp = require_fs();
-    var minimatch = require_minimatch();
-    var Minimatch = minimatch.Minimatch;
-    var Glob = require_glob().Glob;
-    var util = require("util");
-    var path = require("path");
-    var assert = require("assert");
-    var isAbsolute = require("path").isAbsolute;
-    var common = require_common();
-    var setopts = common.setopts;
-    var ownProp = common.ownProp;
-    var childrenIgnored = common.childrenIgnored;
-    var isIgnored = common.isIgnored;
-    function globSync(pattern, options) {
-      if (typeof options === "function" || arguments.length === 3)
-        throw new TypeError("callback provided to sync glob\nSee: https://github.com/isaacs/node-glob/issues/167");
-      return new GlobSync(pattern, options).found;
-    }
-    function GlobSync(pattern, options) {
-      if (!pattern)
-        throw new Error("must provide pattern");
-      if (typeof options === "function" || arguments.length === 3)
-        throw new TypeError("callback provided to sync glob\nSee: https://github.com/isaacs/node-glob/issues/167");
-      if (!(this instanceof GlobSync))
-        return new GlobSync(pattern, options);
-      setopts(this, pattern, options);
-      if (this.noprocess)
+      /**
+       * Return a generator yielding `[key, value]` pairs,
+       * in order from most recently used to least recently used.
+       */
+      *entries() {
+        for (const i of this.#indexes()) {
+          if (this.#valList[i] !== void 0 && this.#keyList[i] !== void 0 && !this.#isBackgroundFetch(this.#valList[i])) {
+            yield [this.#keyList[i], this.#valList[i]];
+          }
+        }
+      }
+      /**
+       * Inverse order version of {@link LRUCache.entries}
+       *
+       * Return a generator yielding `[key, value]` pairs,
+       * in order from least recently used to most recently used.
+       */
+      *rentries() {
+        for (const i of this.#rindexes()) {
+          if (this.#valList[i] !== void 0 && this.#keyList[i] !== void 0 && !this.#isBackgroundFetch(this.#valList[i])) {
+            yield [this.#keyList[i], this.#valList[i]];
+          }
+        }
+      }
+      /**
+       * Return a generator yielding the keys in the cache,
+       * in order from most recently used to least recently used.
+       */
+      *keys() {
+        for (const i of this.#indexes()) {
+          const k = this.#keyList[i];
+          if (k !== void 0 && !this.#isBackgroundFetch(this.#valList[i])) {
+            yield k;
+          }
+        }
+      }
+      /**
+       * Inverse order version of {@link LRUCache.keys}
+       *
+       * Return a generator yielding the keys in the cache,
+       * in order from least recently used to most recently used.
+       */
+      *rkeys() {
+        for (const i of this.#rindexes()) {
+          const k = this.#keyList[i];
+          if (k !== void 0 && !this.#isBackgroundFetch(this.#valList[i])) {
+            yield k;
+          }
+        }
+      }
+      /**
+       * Return a generator yielding the values in the cache,
+       * in order from most recently used to least recently used.
+       */
+      *values() {
+        for (const i of this.#indexes()) {
+          const v = this.#valList[i];
+          if (v !== void 0 && !this.#isBackgroundFetch(this.#valList[i])) {
+            yield this.#valList[i];
+          }
+        }
+      }
+      /**
+       * Inverse order version of {@link LRUCache.values}
+       *
+       * Return a generator yielding the values in the cache,
+       * in order from least recently used to most recently used.
+       */
+      *rvalues() {
+        for (const i of this.#rindexes()) {
+          const v = this.#valList[i];
+          if (v !== void 0 && !this.#isBackgroundFetch(this.#valList[i])) {
+            yield this.#valList[i];
+          }
+        }
+      }
+      /**
+       * Iterating over the cache itself yields the same results as
+       * {@link LRUCache.entries}
+       */
+      [Symbol.iterator]() {
+        return this.entries();
+      }
+      /**
+       * Find a value for which the supplied fn method returns a truthy value,
+       * similar to Array.find().  fn is called as fn(value, key, cache).
+       */
+      find(fn, getOptions = {}) {
+        for (const i of this.#indexes()) {
+          const v = this.#valList[i];
+          const value = this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
+          if (value === void 0)
+            continue;
+          if (fn(value, this.#keyList[i], this)) {
+            return this.get(this.#keyList[i], getOptions);
+          }
+        }
+      }
+      /**
+       * Call the supplied function on each item in the cache, in order from
+       * most recently used to least recently used.  fn is called as
+       * fn(value, key, cache).  Does not update age or recenty of use.
+       * Does not iterate over stale values.
+       */
+      forEach(fn, thisp = this) {
+        for (const i of this.#indexes()) {
+          const v = this.#valList[i];
+          const value = this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
+          if (value === void 0)
+            continue;
+          fn.call(thisp, value, this.#keyList[i], this);
+        }
+      }
+      /**
+       * The same as {@link LRUCache.forEach} but items are iterated over in
+       * reverse order.  (ie, less recently used items are iterated over first.)
+       */
+      rforEach(fn, thisp = this) {
+        for (const i of this.#rindexes()) {
+          const v = this.#valList[i];
+          const value = this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
+          if (value === void 0)
+            continue;
+          fn.call(thisp, value, this.#keyList[i], this);
+        }
+      }
+      /**
+       * Delete any stale entries. Returns true if anything was removed,
+       * false otherwise.
+       */
+      purgeStale() {
+        let deleted = false;
+        for (const i of this.#rindexes({ allowStale: true })) {
+          if (this.#isStale(i)) {
+            this.delete(this.#keyList[i]);
+            deleted = true;
+          }
+        }
+        return deleted;
+      }
+      /**
+       * Return an array of [key, {@link LRUCache.Entry}] tuples which can be
+       * passed to cache.load()
+       */
+      dump() {
+        const arr = [];
+        for (const i of this.#indexes({ allowStale: true })) {
+          const key = this.#keyList[i];
+          const v = this.#valList[i];
+          const value = this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
+          if (value === void 0 || key === void 0)
+            continue;
+          const entry = { value };
+          if (this.#ttls && this.#starts) {
+            entry.ttl = this.#ttls[i];
+            const age = perf.now() - this.#starts[i];
+            entry.start = Math.floor(Date.now() - age);
+          }
+          if (this.#sizes) {
+            entry.size = this.#sizes[i];
+          }
+          arr.unshift([key, entry]);
+        }
+        return arr;
+      }
+      /**
+       * Reset the cache and load in the items in entries in the order listed.
+       * Note that the shape of the resulting cache may be different if the
+       * same options are not used in both caches.
+       */
+      load(arr) {
+        this.clear();
+        for (const [key, entry] of arr) {
+          if (entry.start) {
+            const age = Date.now() - entry.start;
+            entry.start = perf.now() - age;
+          }
+          this.set(key, entry.value, entry);
+        }
+      }
+      /**
+       * Add a value to the cache.
+       *
+       * Note: if `undefined` is specified as a value, this is an alias for
+       * {@link LRUCache#delete}
+       */
+      set(k, v, setOptions = {}) {
+        if (v === void 0) {
+          this.delete(k);
+          return this;
+        }
+        const { ttl = this.ttl, start, noDisposeOnSet = this.noDisposeOnSet, sizeCalculation = this.sizeCalculation, status } = setOptions;
+        let { noUpdateTTL = this.noUpdateTTL } = setOptions;
+        const size = this.#requireSize(k, v, setOptions.size || 0, sizeCalculation);
+        if (this.maxEntrySize && size > this.maxEntrySize) {
+          if (status) {
+            status.set = "miss";
+            status.maxEntrySizeExceeded = true;
+          }
+          this.delete(k);
+          return this;
+        }
+        let index = this.#size === 0 ? void 0 : this.#keyMap.get(k);
+        if (index === void 0) {
+          index = this.#size === 0 ? this.#tail : this.#free.length !== 0 ? this.#free.pop() : this.#size === this.#max ? this.#evict(false) : this.#size;
+          this.#keyList[index] = k;
+          this.#valList[index] = v;
+          this.#keyMap.set(k, index);
+          this.#next[this.#tail] = index;
+          this.#prev[index] = this.#tail;
+          this.#tail = index;
+          this.#size++;
+          this.#addItemSize(index, size, status);
+          if (status)
+            status.set = "add";
+          noUpdateTTL = false;
+        } else {
+          this.#moveToTail(index);
+          const oldVal = this.#valList[index];
+          if (v !== oldVal) {
+            if (this.#hasFetchMethod && this.#isBackgroundFetch(oldVal)) {
+              oldVal.__abortController.abort(new Error("replaced"));
+            } else if (!noDisposeOnSet) {
+              if (this.#hasDispose) {
+                this.#dispose?.(oldVal, k, "set");
+              }
+              if (this.#hasDisposeAfter) {
+                this.#disposed?.push([oldVal, k, "set"]);
+              }
+            }
+            this.#removeItemSize(index);
+            this.#addItemSize(index, size, status);
+            this.#valList[index] = v;
+            if (status) {
+              status.set = "replace";
+              const oldValue = oldVal && this.#isBackgroundFetch(oldVal) ? oldVal.__staleWhileFetching : oldVal;
+              if (oldValue !== void 0)
+                status.oldValue = oldValue;
+            }
+          } else if (status) {
+            status.set = "update";
+          }
+        }
+        if (ttl !== 0 && !this.#ttls) {
+          this.#initializeTTLTracking();
+        }
+        if (this.#ttls) {
+          if (!noUpdateTTL) {
+            this.#setItemTTL(index, ttl, start);
+          }
+          if (status)
+            this.#statusTTL(status, index);
+        }
+        if (!noDisposeOnSet && this.#hasDisposeAfter && this.#disposed) {
+          const dt = this.#disposed;
+          let task;
+          while (task = dt?.shift()) {
+            this.#disposeAfter?.(...task);
+          }
+        }
         return this;
-      var n = this.minimatch.set.length;
-      this.matches = new Array(n);
-      for (var i = 0; i < n; i++) {
-        this._process(this.minimatch.set[i], i, false);
       }
-      this._finish();
-    }
-    GlobSync.prototype._finish = function() {
-      assert.ok(this instanceof GlobSync);
-      if (this.realpath) {
-        var self = this;
-        this.matches.forEach(function(matchset, index) {
-          var set = self.matches[index] = /* @__PURE__ */ Object.create(null);
-          for (var p in matchset) {
-            try {
-              p = self._makeAbs(p);
-              var real = rp.realpathSync(p, self.realpathCache);
-              set[real] = true;
-            } catch (er) {
-              if (er.syscall === "stat")
-                set[self._makeAbs(p)] = true;
-              else
-                throw er;
+      /**
+       * Evict the least recently used item, returning its value or
+       * `undefined` if cache is empty.
+       */
+      pop() {
+        try {
+          while (this.#size) {
+            const val = this.#valList[this.#head];
+            this.#evict(true);
+            if (this.#isBackgroundFetch(val)) {
+              if (val.__staleWhileFetching) {
+                return val.__staleWhileFetching;
+              }
+            } else if (val !== void 0) {
+              return val;
             }
           }
-        });
-      }
-      common.finish(this);
-    };
-    GlobSync.prototype._process = function(pattern, index, inGlobStar) {
-      assert.ok(this instanceof GlobSync);
-      var n = 0;
-      while (typeof pattern[n] === "string") {
-        n++;
-      }
-      var prefix;
-      switch (n) {
-        case pattern.length:
-          this._processSimple(pattern.join("/"), index);
-          return;
-        case 0:
-          prefix = null;
-          break;
-        default:
-          prefix = pattern.slice(0, n).join("/");
-          break;
-      }
-      var remain = pattern.slice(n);
-      var read;
-      if (prefix === null)
-        read = ".";
-      else if (isAbsolute(prefix) || isAbsolute(pattern.map(function(p) {
-        return typeof p === "string" ? p : "[*]";
-      }).join("/"))) {
-        if (!prefix || !isAbsolute(prefix))
-          prefix = "/" + prefix;
-        read = prefix;
-      } else
-        read = prefix;
-      var abs = this._makeAbs(read);
-      if (childrenIgnored(this, read))
-        return;
-      var isGlobStar = remain[0] === minimatch.GLOBSTAR;
-      if (isGlobStar)
-        this._processGlobStar(prefix, read, abs, remain, index, inGlobStar);
-      else
-        this._processReaddir(prefix, read, abs, remain, index, inGlobStar);
-    };
-    GlobSync.prototype._processReaddir = function(prefix, read, abs, remain, index, inGlobStar) {
-      var entries = this._readdir(abs, inGlobStar);
-      if (!entries)
-        return;
-      var pn = remain[0];
-      var negate = !!this.minimatch.negate;
-      var rawGlob = pn._glob;
-      var dotOk = this.dot || rawGlob.charAt(0) === ".";
-      var matchedEntries = [];
-      for (var i = 0; i < entries.length; i++) {
-        var e = entries[i];
-        if (e.charAt(0) !== "." || dotOk) {
-          var m;
-          if (negate && !prefix) {
-            m = !e.match(pn);
-          } else {
-            m = e.match(pn);
+        } finally {
+          if (this.#hasDisposeAfter && this.#disposed) {
+            const dt = this.#disposed;
+            let task;
+            while (task = dt?.shift()) {
+              this.#disposeAfter?.(...task);
+            }
           }
-          if (m)
-            matchedEntries.push(e);
         }
       }
-      var len = matchedEntries.length;
-      if (len === 0)
-        return;
-      if (remain.length === 1 && !this.mark && !this.stat) {
-        if (!this.matches[index])
-          this.matches[index] = /* @__PURE__ */ Object.create(null);
-        for (var i = 0; i < len; i++) {
-          var e = matchedEntries[i];
-          if (prefix) {
-            if (prefix.slice(-1) !== "/")
-              e = prefix + "/" + e;
-            else
-              e = prefix + e;
+      #evict(free) {
+        const head = this.#head;
+        const k = this.#keyList[head];
+        const v = this.#valList[head];
+        if (this.#hasFetchMethod && this.#isBackgroundFetch(v)) {
+          v.__abortController.abort(new Error("evicted"));
+        } else if (this.#hasDispose || this.#hasDisposeAfter) {
+          if (this.#hasDispose) {
+            this.#dispose?.(v, k, "evict");
           }
-          if (e.charAt(0) === "/" && !this.nomount) {
-            e = path.join(this.root, e);
+          if (this.#hasDisposeAfter) {
+            this.#disposed?.push([v, k, "evict"]);
           }
-          this._emitMatch(index, e);
         }
-        return;
-      }
-      remain.shift();
-      for (var i = 0; i < len; i++) {
-        var e = matchedEntries[i];
-        var newPattern;
-        if (prefix)
-          newPattern = [prefix, e];
-        else
-          newPattern = [e];
-        this._process(newPattern.concat(remain), index, inGlobStar);
-      }
-    };
-    GlobSync.prototype._emitMatch = function(index, e) {
-      if (isIgnored(this, e))
-        return;
-      var abs = this._makeAbs(e);
-      if (this.mark)
-        e = this._mark(e);
-      if (this.absolute) {
-        e = abs;
-      }
-      if (this.matches[index][e])
-        return;
-      if (this.nodir) {
-        var c = this.cache[abs];
-        if (c === "DIR" || Array.isArray(c))
-          return;
-      }
-      this.matches[index][e] = true;
-      if (this.stat)
-        this._stat(e);
-    };
-    GlobSync.prototype._readdirInGlobStar = function(abs) {
-      if (this.follow)
-        return this._readdir(abs, false);
-      var entries;
-      var lstat;
-      var stat;
-      try {
-        lstat = this.fs.lstatSync(abs);
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return null;
+        this.#removeItemSize(head);
+        if (free) {
+          this.#keyList[head] = void 0;
+          this.#valList[head] = void 0;
+          this.#free.push(head);
         }
-      }
-      var isSym = lstat && lstat.isSymbolicLink();
-      this.symlinks[abs] = isSym;
-      if (!isSym && lstat && !lstat.isDirectory())
-        this.cache[abs] = "FILE";
-      else
-        entries = this._readdir(abs, false);
-      return entries;
-    };
-    GlobSync.prototype._readdir = function(abs, inGlobStar) {
-      var entries;
-      if (inGlobStar && !ownProp(this.symlinks, abs))
-        return this._readdirInGlobStar(abs);
-      if (ownProp(this.cache, abs)) {
-        var c = this.cache[abs];
-        if (!c || c === "FILE")
-          return null;
-        if (Array.isArray(c))
-          return c;
-      }
-      try {
-        return this._readdirEntries(abs, this.fs.readdirSync(abs));
-      } catch (er) {
-        this._readdirError(abs, er);
-        return null;
-      }
-    };
-    GlobSync.prototype._readdirEntries = function(abs, entries) {
-      if (!this.mark && !this.stat) {
-        for (var i = 0; i < entries.length; i++) {
-          var e = entries[i];
-          if (abs === "/")
-            e = abs + e;
-          else
-            e = abs + "/" + e;
-          this.cache[e] = true;
-        }
-      }
-      this.cache[abs] = entries;
-      return entries;
-    };
-    GlobSync.prototype._readdirError = function(f, er) {
-      switch (er.code) {
-        case "ENOTSUP":
-        case "ENOTDIR":
-          var abs = this._makeAbs(f);
-          this.cache[abs] = "FILE";
-          if (abs === this.cwdAbs) {
-            var error = new Error(er.code + " invalid cwd " + this.cwd);
-            error.path = this.cwd;
-            error.code = er.code;
-            throw error;
-          }
-          break;
-        case "ENOENT":
-        case "ELOOP":
-        case "ENAMETOOLONG":
-        case "UNKNOWN":
-          this.cache[this._makeAbs(f)] = false;
-          break;
-        default:
-          this.cache[this._makeAbs(f)] = false;
-          if (this.strict)
-            throw er;
-          if (!this.silent)
-            console.error("glob error", er);
-          break;
-      }
-    };
-    GlobSync.prototype._processGlobStar = function(prefix, read, abs, remain, index, inGlobStar) {
-      var entries = this._readdir(abs, inGlobStar);
-      if (!entries)
-        return;
-      var remainWithoutGlobStar = remain.slice(1);
-      var gspref = prefix ? [prefix] : [];
-      var noGlobStar = gspref.concat(remainWithoutGlobStar);
-      this._process(noGlobStar, index, false);
-      var len = entries.length;
-      var isSym = this.symlinks[abs];
-      if (isSym && inGlobStar)
-        return;
-      for (var i = 0; i < len; i++) {
-        var e = entries[i];
-        if (e.charAt(0) === "." && !this.dot)
-          continue;
-        var instead = gspref.concat(entries[i], remainWithoutGlobStar);
-        this._process(instead, index, true);
-        var below = gspref.concat(entries[i], remain);
-        this._process(below, index, true);
-      }
-    };
-    GlobSync.prototype._processSimple = function(prefix, index) {
-      var exists = this._stat(prefix);
-      if (!this.matches[index])
-        this.matches[index] = /* @__PURE__ */ Object.create(null);
-      if (!exists)
-        return;
-      if (prefix && isAbsolute(prefix) && !this.nomount) {
-        var trail = /[\/\\]$/.test(prefix);
-        if (prefix.charAt(0) === "/") {
-          prefix = path.join(this.root, prefix);
+        if (this.#size === 1) {
+          this.#head = this.#tail = 0;
+          this.#free.length = 0;
         } else {
-          prefix = path.resolve(this.root, prefix);
-          if (trail)
-            prefix += "/";
+          this.#head = this.#next[head];
         }
+        this.#keyMap.delete(k);
+        this.#size--;
+        return head;
       }
-      if (process.platform === "win32")
-        prefix = prefix.replace(/\\/g, "/");
-      this._emitMatch(index, prefix);
-    };
-    GlobSync.prototype._stat = function(f) {
-      var abs = this._makeAbs(f);
-      var needDir = f.slice(-1) === "/";
-      if (f.length > this.maxLength)
-        return false;
-      if (!this.stat && ownProp(this.cache, abs)) {
-        var c = this.cache[abs];
-        if (Array.isArray(c))
-          c = "DIR";
-        if (!needDir || c === "DIR")
-          return c;
-        if (needDir && c === "FILE")
-          return false;
-      }
-      var exists;
-      var stat = this.statCache[abs];
-      if (!stat) {
-        var lstat;
-        try {
-          lstat = this.fs.lstatSync(abs);
-        } catch (er) {
-          if (er && (er.code === "ENOENT" || er.code === "ENOTDIR")) {
-            this.statCache[abs] = false;
+      /**
+       * Check if a key is in the cache, without updating the recency of use.
+       * Will return false if the item is stale, even though it is technically
+       * in the cache.
+       *
+       * Will not update item age unless
+       * {@link LRUCache.OptionsBase.updateAgeOnHas} is set.
+       */
+      has(k, hasOptions = {}) {
+        const { updateAgeOnHas = this.updateAgeOnHas, status } = hasOptions;
+        const index = this.#keyMap.get(k);
+        if (index !== void 0) {
+          const v = this.#valList[index];
+          if (this.#isBackgroundFetch(v) && v.__staleWhileFetching === void 0) {
             return false;
           }
-        }
-        if (lstat && lstat.isSymbolicLink()) {
-          try {
-            stat = this.fs.statSync(abs);
-          } catch (er) {
-            stat = lstat;
+          if (!this.#isStale(index)) {
+            if (updateAgeOnHas) {
+              this.#updateItemAge(index);
+            }
+            if (status) {
+              status.has = "hit";
+              this.#statusTTL(status, index);
+            }
+            return true;
+          } else if (status) {
+            status.has = "stale";
+            this.#statusTTL(status, index);
           }
-        } else {
-          stat = lstat;
+        } else if (status) {
+          status.has = "miss";
+        }
+        return false;
+      }
+      /**
+       * Like {@link LRUCache#get} but doesn't update recency or delete stale
+       * items.
+       *
+       * Returns `undefined` if the item is stale, unless
+       * {@link LRUCache.OptionsBase.allowStale} is set.
+       */
+      peek(k, peekOptions = {}) {
+        const { allowStale = this.allowStale } = peekOptions;
+        const index = this.#keyMap.get(k);
+        if (index !== void 0 && (allowStale || !this.#isStale(index))) {
+          const v = this.#valList[index];
+          return this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
         }
       }
-      this.statCache[abs] = stat;
-      var c = true;
-      if (stat)
-        c = stat.isDirectory() ? "DIR" : "FILE";
-      this.cache[abs] = this.cache[abs] || c;
-      if (needDir && c === "FILE")
-        return false;
-      return c;
+      #backgroundFetch(k, index, options, context) {
+        const v = index === void 0 ? void 0 : this.#valList[index];
+        if (this.#isBackgroundFetch(v)) {
+          return v;
+        }
+        const ac = new AC();
+        const { signal } = options;
+        signal?.addEventListener("abort", () => ac.abort(signal.reason), {
+          signal: ac.signal
+        });
+        const fetchOpts = {
+          signal: ac.signal,
+          options,
+          context
+        };
+        const cb = (v2, updateCache = false) => {
+          const { aborted } = ac.signal;
+          const ignoreAbort = options.ignoreFetchAbort && v2 !== void 0;
+          if (options.status) {
+            if (aborted && !updateCache) {
+              options.status.fetchAborted = true;
+              options.status.fetchError = ac.signal.reason;
+              if (ignoreAbort)
+                options.status.fetchAbortIgnored = true;
+            } else {
+              options.status.fetchResolved = true;
+            }
+          }
+          if (aborted && !ignoreAbort && !updateCache) {
+            return fetchFail(ac.signal.reason);
+          }
+          const bf2 = p;
+          if (this.#valList[index] === p) {
+            if (v2 === void 0) {
+              if (bf2.__staleWhileFetching) {
+                this.#valList[index] = bf2.__staleWhileFetching;
+              } else {
+                this.delete(k);
+              }
+            } else {
+              if (options.status)
+                options.status.fetchUpdated = true;
+              this.set(k, v2, fetchOpts.options);
+            }
+          }
+          return v2;
+        };
+        const eb = (er) => {
+          if (options.status) {
+            options.status.fetchRejected = true;
+            options.status.fetchError = er;
+          }
+          return fetchFail(er);
+        };
+        const fetchFail = (er) => {
+          const { aborted } = ac.signal;
+          const allowStaleAborted = aborted && options.allowStaleOnFetchAbort;
+          const allowStale = allowStaleAborted || options.allowStaleOnFetchRejection;
+          const noDelete = allowStale || options.noDeleteOnFetchRejection;
+          const bf2 = p;
+          if (this.#valList[index] === p) {
+            const del = !noDelete || bf2.__staleWhileFetching === void 0;
+            if (del) {
+              this.delete(k);
+            } else if (!allowStaleAborted) {
+              this.#valList[index] = bf2.__staleWhileFetching;
+            }
+          }
+          if (allowStale) {
+            if (options.status && bf2.__staleWhileFetching !== void 0) {
+              options.status.returnedStale = true;
+            }
+            return bf2.__staleWhileFetching;
+          } else if (bf2.__returned === bf2) {
+            throw er;
+          }
+        };
+        const pcall = (res, rej) => {
+          const fmp = this.#fetchMethod?.(k, v, fetchOpts);
+          if (fmp && fmp instanceof Promise) {
+            fmp.then((v2) => res(v2), rej);
+          }
+          ac.signal.addEventListener("abort", () => {
+            if (!options.ignoreFetchAbort || options.allowStaleOnFetchAbort) {
+              res();
+              if (options.allowStaleOnFetchAbort) {
+                res = (v2) => cb(v2, true);
+              }
+            }
+          });
+        };
+        if (options.status)
+          options.status.fetchDispatched = true;
+        const p = new Promise(pcall).then(cb, eb);
+        const bf = Object.assign(p, {
+          __abortController: ac,
+          __staleWhileFetching: v,
+          __returned: void 0
+        });
+        if (index === void 0) {
+          this.set(k, bf, { ...fetchOpts.options, status: void 0 });
+          index = this.#keyMap.get(k);
+        } else {
+          this.#valList[index] = bf;
+        }
+        return bf;
+      }
+      #isBackgroundFetch(p) {
+        if (!this.#hasFetchMethod)
+          return false;
+        const b = p;
+        return !!b && b instanceof Promise && b.hasOwnProperty("__staleWhileFetching") && b.__abortController instanceof AC;
+      }
+      async fetch(k, fetchOptions = {}) {
+        const {
+          // get options
+          allowStale = this.allowStale,
+          updateAgeOnGet = this.updateAgeOnGet,
+          noDeleteOnStaleGet = this.noDeleteOnStaleGet,
+          // set options
+          ttl = this.ttl,
+          noDisposeOnSet = this.noDisposeOnSet,
+          size = 0,
+          sizeCalculation = this.sizeCalculation,
+          noUpdateTTL = this.noUpdateTTL,
+          // fetch exclusive options
+          noDeleteOnFetchRejection = this.noDeleteOnFetchRejection,
+          allowStaleOnFetchRejection = this.allowStaleOnFetchRejection,
+          ignoreFetchAbort = this.ignoreFetchAbort,
+          allowStaleOnFetchAbort = this.allowStaleOnFetchAbort,
+          context,
+          forceRefresh = false,
+          status,
+          signal
+        } = fetchOptions;
+        if (!this.#hasFetchMethod) {
+          if (status)
+            status.fetch = "get";
+          return this.get(k, {
+            allowStale,
+            updateAgeOnGet,
+            noDeleteOnStaleGet,
+            status
+          });
+        }
+        const options = {
+          allowStale,
+          updateAgeOnGet,
+          noDeleteOnStaleGet,
+          ttl,
+          noDisposeOnSet,
+          size,
+          sizeCalculation,
+          noUpdateTTL,
+          noDeleteOnFetchRejection,
+          allowStaleOnFetchRejection,
+          allowStaleOnFetchAbort,
+          ignoreFetchAbort,
+          status,
+          signal
+        };
+        let index = this.#keyMap.get(k);
+        if (index === void 0) {
+          if (status)
+            status.fetch = "miss";
+          const p = this.#backgroundFetch(k, index, options, context);
+          return p.__returned = p;
+        } else {
+          const v = this.#valList[index];
+          if (this.#isBackgroundFetch(v)) {
+            const stale = allowStale && v.__staleWhileFetching !== void 0;
+            if (status) {
+              status.fetch = "inflight";
+              if (stale)
+                status.returnedStale = true;
+            }
+            return stale ? v.__staleWhileFetching : v.__returned = v;
+          }
+          const isStale = this.#isStale(index);
+          if (!forceRefresh && !isStale) {
+            if (status)
+              status.fetch = "hit";
+            this.#moveToTail(index);
+            if (updateAgeOnGet) {
+              this.#updateItemAge(index);
+            }
+            if (status)
+              this.#statusTTL(status, index);
+            return v;
+          }
+          const p = this.#backgroundFetch(k, index, options, context);
+          const hasStale = p.__staleWhileFetching !== void 0;
+          const staleVal = hasStale && allowStale;
+          if (status) {
+            status.fetch = isStale ? "stale" : "refresh";
+            if (staleVal && isStale)
+              status.returnedStale = true;
+          }
+          return staleVal ? p.__staleWhileFetching : p.__returned = p;
+        }
+      }
+      /**
+       * Return a value from the cache. Will update the recency of the cache
+       * entry found.
+       *
+       * If the key is not found, get() will return `undefined`.
+       */
+      get(k, getOptions = {}) {
+        const { allowStale = this.allowStale, updateAgeOnGet = this.updateAgeOnGet, noDeleteOnStaleGet = this.noDeleteOnStaleGet, status } = getOptions;
+        const index = this.#keyMap.get(k);
+        if (index !== void 0) {
+          const value = this.#valList[index];
+          const fetching = this.#isBackgroundFetch(value);
+          if (status)
+            this.#statusTTL(status, index);
+          if (this.#isStale(index)) {
+            if (status)
+              status.get = "stale";
+            if (!fetching) {
+              if (!noDeleteOnStaleGet) {
+                this.delete(k);
+              }
+              if (status && allowStale)
+                status.returnedStale = true;
+              return allowStale ? value : void 0;
+            } else {
+              if (status && allowStale && value.__staleWhileFetching !== void 0) {
+                status.returnedStale = true;
+              }
+              return allowStale ? value.__staleWhileFetching : void 0;
+            }
+          } else {
+            if (status)
+              status.get = "hit";
+            if (fetching) {
+              return value.__staleWhileFetching;
+            }
+            this.#moveToTail(index);
+            if (updateAgeOnGet) {
+              this.#updateItemAge(index);
+            }
+            return value;
+          }
+        } else if (status) {
+          status.get = "miss";
+        }
+      }
+      #connect(p, n) {
+        this.#prev[n] = p;
+        this.#next[p] = n;
+      }
+      #moveToTail(index) {
+        if (index !== this.#tail) {
+          if (index === this.#head) {
+            this.#head = this.#next[index];
+          } else {
+            this.#connect(this.#prev[index], this.#next[index]);
+          }
+          this.#connect(this.#tail, index);
+          this.#tail = index;
+        }
+      }
+      /**
+       * Deletes a key out of the cache.
+       * Returns true if the key was deleted, false otherwise.
+       */
+      delete(k) {
+        let deleted = false;
+        if (this.#size !== 0) {
+          const index = this.#keyMap.get(k);
+          if (index !== void 0) {
+            deleted = true;
+            if (this.#size === 1) {
+              this.clear();
+            } else {
+              this.#removeItemSize(index);
+              const v = this.#valList[index];
+              if (this.#isBackgroundFetch(v)) {
+                v.__abortController.abort(new Error("deleted"));
+              } else if (this.#hasDispose || this.#hasDisposeAfter) {
+                if (this.#hasDispose) {
+                  this.#dispose?.(v, k, "delete");
+                }
+                if (this.#hasDisposeAfter) {
+                  this.#disposed?.push([v, k, "delete"]);
+                }
+              }
+              this.#keyMap.delete(k);
+              this.#keyList[index] = void 0;
+              this.#valList[index] = void 0;
+              if (index === this.#tail) {
+                this.#tail = this.#prev[index];
+              } else if (index === this.#head) {
+                this.#head = this.#next[index];
+              } else {
+                this.#next[this.#prev[index]] = this.#next[index];
+                this.#prev[this.#next[index]] = this.#prev[index];
+              }
+              this.#size--;
+              this.#free.push(index);
+            }
+          }
+        }
+        if (this.#hasDisposeAfter && this.#disposed?.length) {
+          const dt = this.#disposed;
+          let task;
+          while (task = dt?.shift()) {
+            this.#disposeAfter?.(...task);
+          }
+        }
+        return deleted;
+      }
+      /**
+       * Clear the cache entirely, throwing away all values.
+       */
+      clear() {
+        for (const index of this.#rindexes({ allowStale: true })) {
+          const v = this.#valList[index];
+          if (this.#isBackgroundFetch(v)) {
+            v.__abortController.abort(new Error("deleted"));
+          } else {
+            const k = this.#keyList[index];
+            if (this.#hasDispose) {
+              this.#dispose?.(v, k, "delete");
+            }
+            if (this.#hasDisposeAfter) {
+              this.#disposed?.push([v, k, "delete"]);
+            }
+          }
+        }
+        this.#keyMap.clear();
+        this.#valList.fill(void 0);
+        this.#keyList.fill(void 0);
+        if (this.#ttls && this.#starts) {
+          this.#ttls.fill(0);
+          this.#starts.fill(0);
+        }
+        if (this.#sizes) {
+          this.#sizes.fill(0);
+        }
+        this.#head = 0;
+        this.#tail = 0;
+        this.#free.length = 0;
+        this.#calculatedSize = 0;
+        this.#size = 0;
+        if (this.#hasDisposeAfter && this.#disposed) {
+          const dt = this.#disposed;
+          let task;
+          while (task = dt?.shift()) {
+            this.#disposeAfter?.(...task);
+          }
+        }
+      }
     };
-    GlobSync.prototype._mark = function(p) {
-      return common.mark(this, p);
-    };
-    GlobSync.prototype._makeAbs = function(f) {
-      return common.makeAbs(this, f);
-    };
+    exports2.LRUCache = LRUCache;
   }
 });
 
-// node_modules/wrappy/wrappy.js
-var require_wrappy = __commonJS({
-  "node_modules/wrappy/wrappy.js"(exports2, module2) {
-    module2.exports = wrappy;
-    function wrappy(fn, cb) {
-      if (fn && cb)
-        return wrappy(fn)(cb);
-      if (typeof fn !== "function")
-        throw new TypeError("need wrapper function");
-      Object.keys(fn).forEach(function(k) {
-        wrapper[k] = fn[k];
-      });
-      return wrapper;
-      function wrapper() {
-        var args = new Array(arguments.length);
-        for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i];
+// node_modules/minipass/index.js
+var require_minipass = __commonJS({
+  "node_modules/minipass/index.js"(exports2) {
+    "use strict";
+    var proc = typeof process === "object" && process ? process : {
+      stdout: null,
+      stderr: null
+    };
+    var EE = require("events");
+    var Stream = require("stream");
+    var stringdecoder = require("string_decoder");
+    var SD = stringdecoder.StringDecoder;
+    var EOF = Symbol("EOF");
+    var MAYBE_EMIT_END = Symbol("maybeEmitEnd");
+    var EMITTED_END = Symbol("emittedEnd");
+    var EMITTING_END = Symbol("emittingEnd");
+    var EMITTED_ERROR = Symbol("emittedError");
+    var CLOSED = Symbol("closed");
+    var READ = Symbol("read");
+    var FLUSH = Symbol("flush");
+    var FLUSHCHUNK = Symbol("flushChunk");
+    var ENCODING = Symbol("encoding");
+    var DECODER = Symbol("decoder");
+    var FLOWING = Symbol("flowing");
+    var PAUSED = Symbol("paused");
+    var RESUME = Symbol("resume");
+    var BUFFER = Symbol("buffer");
+    var PIPES = Symbol("pipes");
+    var BUFFERLENGTH = Symbol("bufferLength");
+    var BUFFERPUSH = Symbol("bufferPush");
+    var BUFFERSHIFT = Symbol("bufferShift");
+    var OBJECTMODE = Symbol("objectMode");
+    var DESTROYED = Symbol("destroyed");
+    var ERROR = Symbol("error");
+    var EMITDATA = Symbol("emitData");
+    var EMITEND = Symbol("emitEnd");
+    var EMITEND2 = Symbol("emitEnd2");
+    var ASYNC = Symbol("async");
+    var ABORT = Symbol("abort");
+    var ABORTED = Symbol("aborted");
+    var SIGNAL = Symbol("signal");
+    var defer = (fn) => Promise.resolve().then(fn);
+    var doIter = global._MP_NO_ITERATOR_SYMBOLS_ !== "1";
+    var ASYNCITERATOR = doIter && Symbol.asyncIterator || Symbol("asyncIterator not implemented");
+    var ITERATOR = doIter && Symbol.iterator || Symbol("iterator not implemented");
+    var isEndish = (ev) => ev === "end" || ev === "finish" || ev === "prefinish";
+    var isArrayBuffer = (b) => b instanceof ArrayBuffer || typeof b === "object" && b.constructor && b.constructor.name === "ArrayBuffer" && b.byteLength >= 0;
+    var isArrayBufferView = (b) => !Buffer.isBuffer(b) && ArrayBuffer.isView(b);
+    var Pipe = class {
+      constructor(src, dest, opts) {
+        this.src = src;
+        this.dest = dest;
+        this.opts = opts;
+        this.ondrain = () => src[RESUME]();
+        dest.on("drain", this.ondrain);
+      }
+      unpipe() {
+        this.dest.removeListener("drain", this.ondrain);
+      }
+      // istanbul ignore next - only here for the prototype
+      proxyErrors() {
+      }
+      end() {
+        this.unpipe();
+        if (this.opts.end)
+          this.dest.end();
+      }
+    };
+    var PipeProxyErrors = class extends Pipe {
+      unpipe() {
+        this.src.removeListener("error", this.proxyErrors);
+        super.unpipe();
+      }
+      constructor(src, dest, opts) {
+        super(src, dest, opts);
+        this.proxyErrors = (er) => dest.emit("error", er);
+        src.on("error", this.proxyErrors);
+      }
+    };
+    var Minipass = class extends Stream {
+      constructor(options) {
+        super();
+        this[FLOWING] = false;
+        this[PAUSED] = false;
+        this[PIPES] = [];
+        this[BUFFER] = [];
+        this[OBJECTMODE] = options && options.objectMode || false;
+        if (this[OBJECTMODE])
+          this[ENCODING] = null;
+        else
+          this[ENCODING] = options && options.encoding || null;
+        if (this[ENCODING] === "buffer")
+          this[ENCODING] = null;
+        this[ASYNC] = options && !!options.async || false;
+        this[DECODER] = this[ENCODING] ? new SD(this[ENCODING]) : null;
+        this[EOF] = false;
+        this[EMITTED_END] = false;
+        this[EMITTING_END] = false;
+        this[CLOSED] = false;
+        this[EMITTED_ERROR] = null;
+        this.writable = true;
+        this.readable = true;
+        this[BUFFERLENGTH] = 0;
+        this[DESTROYED] = false;
+        if (options && options.debugExposeBuffer === true) {
+          Object.defineProperty(this, "buffer", { get: () => this[BUFFER] });
         }
-        var ret = fn.apply(this, args);
-        var cb2 = args[args.length - 1];
-        if (typeof ret === "function" && ret !== cb2) {
-          Object.keys(cb2).forEach(function(k) {
-            ret[k] = cb2[k];
-          });
+        if (options && options.debugExposePipes === true) {
+          Object.defineProperty(this, "pipes", { get: () => this[PIPES] });
+        }
+        this[SIGNAL] = options && options.signal;
+        this[ABORTED] = false;
+        if (this[SIGNAL]) {
+          this[SIGNAL].addEventListener("abort", () => this[ABORT]());
+          if (this[SIGNAL].aborted) {
+            this[ABORT]();
+          }
+        }
+      }
+      get bufferLength() {
+        return this[BUFFERLENGTH];
+      }
+      get encoding() {
+        return this[ENCODING];
+      }
+      set encoding(enc) {
+        if (this[OBJECTMODE])
+          throw new Error("cannot set encoding in objectMode");
+        if (this[ENCODING] && enc !== this[ENCODING] && (this[DECODER] && this[DECODER].lastNeed || this[BUFFERLENGTH]))
+          throw new Error("cannot change encoding");
+        if (this[ENCODING] !== enc) {
+          this[DECODER] = enc ? new SD(enc) : null;
+          if (this[BUFFER].length)
+            this[BUFFER] = this[BUFFER].map((chunk) => this[DECODER].write(chunk));
+        }
+        this[ENCODING] = enc;
+      }
+      setEncoding(enc) {
+        this.encoding = enc;
+      }
+      get objectMode() {
+        return this[OBJECTMODE];
+      }
+      set objectMode(om) {
+        this[OBJECTMODE] = this[OBJECTMODE] || !!om;
+      }
+      get ["async"]() {
+        return this[ASYNC];
+      }
+      set ["async"](a) {
+        this[ASYNC] = this[ASYNC] || !!a;
+      }
+      // drop everything and get out of the flow completely
+      [ABORT]() {
+        this[ABORTED] = true;
+        this.emit("abort", this[SIGNAL].reason);
+        this.destroy(this[SIGNAL].reason);
+      }
+      get aborted() {
+        return this[ABORTED];
+      }
+      set aborted(_) {
+      }
+      write(chunk, encoding, cb) {
+        if (this[ABORTED])
+          return false;
+        if (this[EOF])
+          throw new Error("write after end");
+        if (this[DESTROYED]) {
+          this.emit(
+            "error",
+            Object.assign(
+              new Error("Cannot call write after a stream was destroyed"),
+              { code: "ERR_STREAM_DESTROYED" }
+            )
+          );
+          return true;
+        }
+        if (typeof encoding === "function")
+          cb = encoding, encoding = "utf8";
+        if (!encoding)
+          encoding = "utf8";
+        const fn = this[ASYNC] ? defer : (f) => f();
+        if (!this[OBJECTMODE] && !Buffer.isBuffer(chunk)) {
+          if (isArrayBufferView(chunk))
+            chunk = Buffer.from(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+          else if (isArrayBuffer(chunk))
+            chunk = Buffer.from(chunk);
+          else if (typeof chunk !== "string")
+            this.objectMode = true;
+        }
+        if (this[OBJECTMODE]) {
+          if (this.flowing && this[BUFFERLENGTH] !== 0)
+            this[FLUSH](true);
+          if (this.flowing)
+            this.emit("data", chunk);
+          else
+            this[BUFFERPUSH](chunk);
+          if (this[BUFFERLENGTH] !== 0)
+            this.emit("readable");
+          if (cb)
+            fn(cb);
+          return this.flowing;
+        }
+        if (!chunk.length) {
+          if (this[BUFFERLENGTH] !== 0)
+            this.emit("readable");
+          if (cb)
+            fn(cb);
+          return this.flowing;
+        }
+        if (typeof chunk === "string" && // unless it is a string already ready for us to use
+        !(encoding === this[ENCODING] && !this[DECODER].lastNeed)) {
+          chunk = Buffer.from(chunk, encoding);
+        }
+        if (Buffer.isBuffer(chunk) && this[ENCODING])
+          chunk = this[DECODER].write(chunk);
+        if (this.flowing && this[BUFFERLENGTH] !== 0)
+          this[FLUSH](true);
+        if (this.flowing)
+          this.emit("data", chunk);
+        else
+          this[BUFFERPUSH](chunk);
+        if (this[BUFFERLENGTH] !== 0)
+          this.emit("readable");
+        if (cb)
+          fn(cb);
+        return this.flowing;
+      }
+      read(n) {
+        if (this[DESTROYED])
+          return null;
+        if (this[BUFFERLENGTH] === 0 || n === 0 || n > this[BUFFERLENGTH]) {
+          this[MAYBE_EMIT_END]();
+          return null;
+        }
+        if (this[OBJECTMODE])
+          n = null;
+        if (this[BUFFER].length > 1 && !this[OBJECTMODE]) {
+          if (this.encoding)
+            this[BUFFER] = [this[BUFFER].join("")];
+          else
+            this[BUFFER] = [Buffer.concat(this[BUFFER], this[BUFFERLENGTH])];
+        }
+        const ret = this[READ](n || null, this[BUFFER][0]);
+        this[MAYBE_EMIT_END]();
+        return ret;
+      }
+      [READ](n, chunk) {
+        if (n === chunk.length || n === null)
+          this[BUFFERSHIFT]();
+        else {
+          this[BUFFER][0] = chunk.slice(n);
+          chunk = chunk.slice(0, n);
+          this[BUFFERLENGTH] -= n;
+        }
+        this.emit("data", chunk);
+        if (!this[BUFFER].length && !this[EOF])
+          this.emit("drain");
+        return chunk;
+      }
+      end(chunk, encoding, cb) {
+        if (typeof chunk === "function")
+          cb = chunk, chunk = null;
+        if (typeof encoding === "function")
+          cb = encoding, encoding = "utf8";
+        if (chunk)
+          this.write(chunk, encoding);
+        if (cb)
+          this.once("end", cb);
+        this[EOF] = true;
+        this.writable = false;
+        if (this.flowing || !this[PAUSED])
+          this[MAYBE_EMIT_END]();
+        return this;
+      }
+      // don't let the internal resume be overwritten
+      [RESUME]() {
+        if (this[DESTROYED])
+          return;
+        this[PAUSED] = false;
+        this[FLOWING] = true;
+        this.emit("resume");
+        if (this[BUFFER].length)
+          this[FLUSH]();
+        else if (this[EOF])
+          this[MAYBE_EMIT_END]();
+        else
+          this.emit("drain");
+      }
+      resume() {
+        return this[RESUME]();
+      }
+      pause() {
+        this[FLOWING] = false;
+        this[PAUSED] = true;
+      }
+      get destroyed() {
+        return this[DESTROYED];
+      }
+      get flowing() {
+        return this[FLOWING];
+      }
+      get paused() {
+        return this[PAUSED];
+      }
+      [BUFFERPUSH](chunk) {
+        if (this[OBJECTMODE])
+          this[BUFFERLENGTH] += 1;
+        else
+          this[BUFFERLENGTH] += chunk.length;
+        this[BUFFER].push(chunk);
+      }
+      [BUFFERSHIFT]() {
+        if (this[OBJECTMODE])
+          this[BUFFERLENGTH] -= 1;
+        else
+          this[BUFFERLENGTH] -= this[BUFFER][0].length;
+        return this[BUFFER].shift();
+      }
+      [FLUSH](noDrain) {
+        do {
+        } while (this[FLUSHCHUNK](this[BUFFERSHIFT]()) && this[BUFFER].length);
+        if (!noDrain && !this[BUFFER].length && !this[EOF])
+          this.emit("drain");
+      }
+      [FLUSHCHUNK](chunk) {
+        this.emit("data", chunk);
+        return this.flowing;
+      }
+      pipe(dest, opts) {
+        if (this[DESTROYED])
+          return;
+        const ended = this[EMITTED_END];
+        opts = opts || {};
+        if (dest === proc.stdout || dest === proc.stderr)
+          opts.end = false;
+        else
+          opts.end = opts.end !== false;
+        opts.proxyErrors = !!opts.proxyErrors;
+        if (ended) {
+          if (opts.end)
+            dest.end();
+        } else {
+          this[PIPES].push(
+            !opts.proxyErrors ? new Pipe(this, dest, opts) : new PipeProxyErrors(this, dest, opts)
+          );
+          if (this[ASYNC])
+            defer(() => this[RESUME]());
+          else
+            this[RESUME]();
+        }
+        return dest;
+      }
+      unpipe(dest) {
+        const p = this[PIPES].find((p2) => p2.dest === dest);
+        if (p) {
+          this[PIPES].splice(this[PIPES].indexOf(p), 1);
+          p.unpipe();
+        }
+      }
+      addListener(ev, fn) {
+        return this.on(ev, fn);
+      }
+      on(ev, fn) {
+        const ret = super.on(ev, fn);
+        if (ev === "data" && !this[PIPES].length && !this.flowing)
+          this[RESUME]();
+        else if (ev === "readable" && this[BUFFERLENGTH] !== 0)
+          super.emit("readable");
+        else if (isEndish(ev) && this[EMITTED_END]) {
+          super.emit(ev);
+          this.removeAllListeners(ev);
+        } else if (ev === "error" && this[EMITTED_ERROR]) {
+          if (this[ASYNC])
+            defer(() => fn.call(this, this[EMITTED_ERROR]));
+          else
+            fn.call(this, this[EMITTED_ERROR]);
         }
         return ret;
       }
-    }
-  }
-});
-
-// node_modules/once/once.js
-var require_once = __commonJS({
-  "node_modules/once/once.js"(exports2, module2) {
-    var wrappy = require_wrappy();
-    module2.exports = wrappy(once);
-    module2.exports.strict = wrappy(onceStrict);
-    once.proto = once(function() {
-      Object.defineProperty(Function.prototype, "once", {
-        value: function() {
-          return once(this);
-        },
-        configurable: true
-      });
-      Object.defineProperty(Function.prototype, "onceStrict", {
-        value: function() {
-          return onceStrict(this);
-        },
-        configurable: true
-      });
-    });
-    function once(fn) {
-      var f = function() {
-        if (f.called)
-          return f.value;
-        f.called = true;
-        return f.value = fn.apply(this, arguments);
-      };
-      f.called = false;
-      return f;
-    }
-    function onceStrict(fn) {
-      var f = function() {
-        if (f.called)
-          throw new Error(f.onceError);
-        f.called = true;
-        return f.value = fn.apply(this, arguments);
-      };
-      var name = fn.name || "Function wrapped with `once`";
-      f.onceError = name + " shouldn't be called more than once";
-      f.called = false;
-      return f;
-    }
-  }
-});
-
-// node_modules/inflight/inflight.js
-var require_inflight = __commonJS({
-  "node_modules/inflight/inflight.js"(exports2, module2) {
-    var wrappy = require_wrappy();
-    var reqs = /* @__PURE__ */ Object.create(null);
-    var once = require_once();
-    module2.exports = wrappy(inflight);
-    function inflight(key, cb) {
-      if (reqs[key]) {
-        reqs[key].push(cb);
-        return null;
-      } else {
-        reqs[key] = [cb];
-        return makeres(key);
+      get emittedEnd() {
+        return this[EMITTED_END];
       }
-    }
-    function makeres(key) {
-      return once(function RES() {
-        var cbs = reqs[key];
-        var len = cbs.length;
-        var args = slice(arguments);
-        try {
-          for (var i = 0; i < len; i++) {
-            cbs[i].apply(null, args);
-          }
-        } finally {
-          if (cbs.length > len) {
-            cbs.splice(0, len);
-            process.nextTick(function() {
-              RES.apply(null, args);
-            });
-          } else {
-            delete reqs[key];
+      [MAYBE_EMIT_END]() {
+        if (!this[EMITTING_END] && !this[EMITTED_END] && !this[DESTROYED] && this[BUFFER].length === 0 && this[EOF]) {
+          this[EMITTING_END] = true;
+          this.emit("end");
+          this.emit("prefinish");
+          this.emit("finish");
+          if (this[CLOSED])
+            this.emit("close");
+          this[EMITTING_END] = false;
+        }
+      }
+      emit(ev, data, ...extra) {
+        if (ev !== "error" && ev !== "close" && ev !== DESTROYED && this[DESTROYED])
+          return;
+        else if (ev === "data") {
+          return !this[OBJECTMODE] && !data ? false : this[ASYNC] ? defer(() => this[EMITDATA](data)) : this[EMITDATA](data);
+        } else if (ev === "end") {
+          return this[EMITEND]();
+        } else if (ev === "close") {
+          this[CLOSED] = true;
+          if (!this[EMITTED_END] && !this[DESTROYED])
+            return;
+          const ret2 = super.emit("close");
+          this.removeAllListeners("close");
+          return ret2;
+        } else if (ev === "error") {
+          this[EMITTED_ERROR] = data;
+          super.emit(ERROR, data);
+          const ret2 = !this[SIGNAL] || this.listeners("error").length ? super.emit("error", data) : false;
+          this[MAYBE_EMIT_END]();
+          return ret2;
+        } else if (ev === "resume") {
+          const ret2 = super.emit("resume");
+          this[MAYBE_EMIT_END]();
+          return ret2;
+        } else if (ev === "finish" || ev === "prefinish") {
+          const ret2 = super.emit(ev);
+          this.removeAllListeners(ev);
+          return ret2;
+        }
+        const ret = super.emit(ev, data, ...extra);
+        this[MAYBE_EMIT_END]();
+        return ret;
+      }
+      [EMITDATA](data) {
+        for (const p of this[PIPES]) {
+          if (p.dest.write(data) === false)
+            this.pause();
+        }
+        const ret = super.emit("data", data);
+        this[MAYBE_EMIT_END]();
+        return ret;
+      }
+      [EMITEND]() {
+        if (this[EMITTED_END])
+          return;
+        this[EMITTED_END] = true;
+        this.readable = false;
+        if (this[ASYNC])
+          defer(() => this[EMITEND2]());
+        else
+          this[EMITEND2]();
+      }
+      [EMITEND2]() {
+        if (this[DECODER]) {
+          const data = this[DECODER].end();
+          if (data) {
+            for (const p of this[PIPES]) {
+              p.dest.write(data);
+            }
+            super.emit("data", data);
           }
         }
-      });
-    }
-    function slice(args) {
-      var length = args.length;
-      var array = [];
-      for (var i = 0; i < length; i++)
-        array[i] = args[i];
-      return array;
-    }
+        for (const p of this[PIPES]) {
+          p.end();
+        }
+        const ret = super.emit("end");
+        this.removeAllListeners("end");
+        return ret;
+      }
+      // const all = await stream.collect()
+      collect() {
+        const buf = [];
+        if (!this[OBJECTMODE])
+          buf.dataLength = 0;
+        const p = this.promise();
+        this.on("data", (c) => {
+          buf.push(c);
+          if (!this[OBJECTMODE])
+            buf.dataLength += c.length;
+        });
+        return p.then(() => buf);
+      }
+      // const data = await stream.concat()
+      concat() {
+        return this[OBJECTMODE] ? Promise.reject(new Error("cannot concat in objectMode")) : this.collect().then(
+          (buf) => this[OBJECTMODE] ? Promise.reject(new Error("cannot concat in objectMode")) : this[ENCODING] ? buf.join("") : Buffer.concat(buf, buf.dataLength)
+        );
+      }
+      // stream.promise().then(() => done, er => emitted error)
+      promise() {
+        return new Promise((resolve, reject) => {
+          this.on(DESTROYED, () => reject(new Error("stream destroyed")));
+          this.on("error", (er) => reject(er));
+          this.on("end", () => resolve());
+        });
+      }
+      // for await (let chunk of stream)
+      [ASYNCITERATOR]() {
+        let stopped = false;
+        const stop = () => {
+          this.pause();
+          stopped = true;
+          return Promise.resolve({ done: true });
+        };
+        const next = () => {
+          if (stopped)
+            return stop();
+          const res = this.read();
+          if (res !== null)
+            return Promise.resolve({ done: false, value: res });
+          if (this[EOF])
+            return stop();
+          let resolve = null;
+          let reject = null;
+          const onerr = (er) => {
+            this.removeListener("data", ondata);
+            this.removeListener("end", onend);
+            this.removeListener(DESTROYED, ondestroy);
+            stop();
+            reject(er);
+          };
+          const ondata = (value) => {
+            this.removeListener("error", onerr);
+            this.removeListener("end", onend);
+            this.removeListener(DESTROYED, ondestroy);
+            this.pause();
+            resolve({ value, done: !!this[EOF] });
+          };
+          const onend = () => {
+            this.removeListener("error", onerr);
+            this.removeListener("data", ondata);
+            this.removeListener(DESTROYED, ondestroy);
+            stop();
+            resolve({ done: true });
+          };
+          const ondestroy = () => onerr(new Error("stream destroyed"));
+          return new Promise((res2, rej) => {
+            reject = rej;
+            resolve = res2;
+            this.once(DESTROYED, ondestroy);
+            this.once("error", onerr);
+            this.once("end", onend);
+            this.once("data", ondata);
+          });
+        };
+        return {
+          next,
+          throw: stop,
+          return: stop,
+          [ASYNCITERATOR]() {
+            return this;
+          }
+        };
+      }
+      // for (let chunk of stream)
+      [ITERATOR]() {
+        let stopped = false;
+        const stop = () => {
+          this.pause();
+          this.removeListener(ERROR, stop);
+          this.removeListener(DESTROYED, stop);
+          this.removeListener("end", stop);
+          stopped = true;
+          return { done: true };
+        };
+        const next = () => {
+          if (stopped)
+            return stop();
+          const value = this.read();
+          return value === null ? stop() : { value };
+        };
+        this.once("end", stop);
+        this.once(ERROR, stop);
+        this.once(DESTROYED, stop);
+        return {
+          next,
+          throw: stop,
+          return: stop,
+          [ITERATOR]() {
+            return this;
+          }
+        };
+      }
+      destroy(er) {
+        if (this[DESTROYED]) {
+          if (er)
+            this.emit("error", er);
+          else
+            this.emit(DESTROYED);
+          return this;
+        }
+        this[DESTROYED] = true;
+        this[BUFFER].length = 0;
+        this[BUFFERLENGTH] = 0;
+        if (typeof this.close === "function" && !this[CLOSED])
+          this.close();
+        if (er)
+          this.emit("error", er);
+        else
+          this.emit(DESTROYED);
+        return this;
+      }
+      static isStream(s) {
+        return !!s && (s instanceof Minipass || s instanceof Stream || s instanceof EE && // readable
+        (typeof s.pipe === "function" || // writable
+        typeof s.write === "function" && typeof s.end === "function"));
+      }
+    };
+    exports2.Minipass = Minipass;
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/glob/glob.js
-var require_glob = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/glob/glob.js"(exports2, module2) {
-    module2.exports = glob;
-    var rp = require_fs();
-    var minimatch = require_minimatch();
-    var Minimatch = minimatch.Minimatch;
-    var inherits = require_inherits();
-    var EE = require("events").EventEmitter;
-    var path = require("path");
-    var assert = require("assert");
-    var isAbsolute = require("path").isAbsolute;
-    var globSync = require_sync();
-    var common = require_common();
-    var setopts = common.setopts;
-    var ownProp = common.ownProp;
-    var inflight = require_inflight();
-    var util = require("util");
-    var childrenIgnored = common.childrenIgnored;
-    var isIgnored = common.isIgnored;
-    var once = require_once();
-    function glob(pattern, options, cb) {
-      if (typeof options === "function")
-        cb = options, options = {};
-      if (!options)
-        options = {};
-      if (options.sync) {
-        if (cb)
-          throw new TypeError("callback provided to sync glob");
-        return globSync(pattern, options);
+// node_modules/path-scurry/dist/cjs/index.js
+var require_cjs3 = __commonJS({
+  "node_modules/path-scurry/dist/cjs/index.js"(exports2) {
+    "use strict";
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
       }
-      return new Glob(pattern, options, cb);
-    }
-    glob.sync = globSync;
-    var GlobSync = glob.GlobSync = globSync.GlobSync;
-    glob.glob = glob;
-    function extend(origin, add) {
-      if (add === null || typeof add !== "object") {
-        return origin;
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod)
+          if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+            __createBinding(result, mod, k);
       }
-      var keys = Object.keys(add);
-      var i = keys.length;
-      while (i--) {
-        origin[keys[i]] = add[keys[i]];
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.PathScurry = exports2.Path = exports2.PathScurryDarwin = exports2.PathScurryPosix = exports2.PathScurryWin32 = exports2.PathScurryBase = exports2.PathPosix = exports2.PathWin32 = exports2.PathBase = exports2.ChildrenCache = exports2.ResolveCache = void 0;
+    var lru_cache_1 = require_cjs2();
+    var path_1 = require("path");
+    var url_1 = require("url");
+    var actualFS = __importStar(require("fs"));
+    var fs_1 = require("fs");
+    var realpathSync = fs_1.realpathSync.native;
+    var promises_1 = require("fs/promises");
+    var minipass_1 = require_minipass();
+    var defaultFS = {
+      lstatSync: fs_1.lstatSync,
+      readdir: fs_1.readdir,
+      readdirSync: fs_1.readdirSync,
+      readlinkSync: fs_1.readlinkSync,
+      realpathSync,
+      promises: {
+        lstat: promises_1.lstat,
+        readdir: promises_1.readdir,
+        readlink: promises_1.readlink,
+        realpath: promises_1.realpath
       }
-      return origin;
-    }
-    glob.hasMagic = function(pattern, options_) {
-      var options = extend({}, options_);
-      options.noprocess = true;
-      var g = new Glob(pattern, options);
-      var set = g.minimatch.set;
-      if (!pattern)
-        return false;
-      if (set.length > 1)
+    };
+    var fsFromOption = (fsOption) => !fsOption || fsOption === defaultFS || fsOption === actualFS ? defaultFS : {
+      ...defaultFS,
+      ...fsOption,
+      promises: {
+        ...defaultFS.promises,
+        ...fsOption.promises || {}
+      }
+    };
+    var uncDriveRegexp = /^\\\\\?\\([a-z]:)\\?$/i;
+    var uncToDrive = (rootPath) => rootPath.replace(/\//g, "\\").replace(uncDriveRegexp, "$1\\");
+    var eitherSep = /[\\\/]/;
+    var UNKNOWN = 0;
+    var IFIFO = 1;
+    var IFCHR = 2;
+    var IFDIR = 4;
+    var IFBLK = 6;
+    var IFREG = 8;
+    var IFLNK = 10;
+    var IFSOCK = 12;
+    var IFMT = 15;
+    var IFMT_UNKNOWN = ~IFMT;
+    var READDIR_CALLED = 16;
+    var LSTAT_CALLED = 32;
+    var ENOTDIR = 64;
+    var ENOENT = 128;
+    var ENOREADLINK = 256;
+    var ENOREALPATH = 512;
+    var ENOCHILD = ENOTDIR | ENOENT | ENOREALPATH;
+    var TYPEMASK = 1023;
+    var entToType = (s) => s.isFile() ? IFREG : s.isDirectory() ? IFDIR : s.isSymbolicLink() ? IFLNK : s.isCharacterDevice() ? IFCHR : s.isBlockDevice() ? IFBLK : s.isSocket() ? IFSOCK : s.isFIFO() ? IFIFO : UNKNOWN;
+    var normalizeCache = /* @__PURE__ */ new Map();
+    var normalize = (s) => {
+      const c = normalizeCache.get(s);
+      if (c)
+        return c;
+      const n = s.normalize("NFKD");
+      normalizeCache.set(s, n);
+      return n;
+    };
+    var normalizeNocaseCache = /* @__PURE__ */ new Map();
+    var normalizeNocase = (s) => {
+      const c = normalizeNocaseCache.get(s);
+      if (c)
+        return c;
+      const n = normalize(s.toLowerCase());
+      normalizeNocaseCache.set(s, n);
+      return n;
+    };
+    var ResolveCache = class extends lru_cache_1.LRUCache {
+      constructor() {
+        super({ max: 256 });
+      }
+    };
+    exports2.ResolveCache = ResolveCache;
+    var ChildrenCache = class extends lru_cache_1.LRUCache {
+      constructor(maxSize = 16 * 1024) {
+        super({
+          maxSize,
+          // parent + children
+          sizeCalculation: (a) => a.length + 1
+        });
+      }
+    };
+    exports2.ChildrenCache = ChildrenCache;
+    var setAsCwd = Symbol("PathScurry setAsCwd");
+    var PathBase = class {
+      /**
+       * the basename of this path
+       *
+       * **Important**: *always* test the path name against any test string
+       * usingthe {@link isNamed} method, and not by directly comparing this
+       * string. Otherwise, unicode path strings that the system sees as identical
+       * will not be properly treated as the same path, leading to incorrect
+       * behavior and possible security issues.
+       */
+      name;
+      /**
+       * the Path entry corresponding to the path root.
+       *
+       * @internal
+       */
+      root;
+      /**
+       * All roots found within the current PathScurry family
+       *
+       * @internal
+       */
+      roots;
+      /**
+       * a reference to the parent path, or undefined in the case of root entries
+       *
+       * @internal
+       */
+      parent;
+      /**
+       * boolean indicating whether paths are compared case-insensitively
+       * @internal
+       */
+      nocase;
+      // potential default fs override
+      #fs;
+      // Stats fields
+      #dev;
+      get dev() {
+        return this.#dev;
+      }
+      #mode;
+      get mode() {
+        return this.#mode;
+      }
+      #nlink;
+      get nlink() {
+        return this.#nlink;
+      }
+      #uid;
+      get uid() {
+        return this.#uid;
+      }
+      #gid;
+      get gid() {
+        return this.#gid;
+      }
+      #rdev;
+      get rdev() {
+        return this.#rdev;
+      }
+      #blksize;
+      get blksize() {
+        return this.#blksize;
+      }
+      #ino;
+      get ino() {
+        return this.#ino;
+      }
+      #size;
+      get size() {
+        return this.#size;
+      }
+      #blocks;
+      get blocks() {
+        return this.#blocks;
+      }
+      #atimeMs;
+      get atimeMs() {
+        return this.#atimeMs;
+      }
+      #mtimeMs;
+      get mtimeMs() {
+        return this.#mtimeMs;
+      }
+      #ctimeMs;
+      get ctimeMs() {
+        return this.#ctimeMs;
+      }
+      #birthtimeMs;
+      get birthtimeMs() {
+        return this.#birthtimeMs;
+      }
+      #atime;
+      get atime() {
+        return this.#atime;
+      }
+      #mtime;
+      get mtime() {
+        return this.#mtime;
+      }
+      #ctime;
+      get ctime() {
+        return this.#ctime;
+      }
+      #birthtime;
+      get birthtime() {
+        return this.#birthtime;
+      }
+      #matchName;
+      #depth;
+      #fullpath;
+      #fullpathPosix;
+      #relative;
+      #relativePosix;
+      #type;
+      #children;
+      #linkTarget;
+      #realpath;
+      /**
+       * This property is for compatibility with the Dirent class as of
+       * Node v20, where Dirent['path'] refers to the path of the directory
+       * that was passed to readdir.  So, somewhat counterintuitively, this
+       * property refers to the *parent* path, not the path object itself.
+       * For root entries, it's the path to the entry itself.
+       */
+      get path() {
+        return (this.parent || this).fullpath();
+      }
+      /**
+       * Do not create new Path objects directly.  They should always be accessed
+       * via the PathScurry class or other methods on the Path class.
+       *
+       * @internal
+       */
+      constructor(name, type = UNKNOWN, root, roots, nocase, children, opts) {
+        this.name = name;
+        this.#matchName = nocase ? normalizeNocase(name) : normalize(name);
+        this.#type = type & TYPEMASK;
+        this.nocase = nocase;
+        this.roots = roots;
+        this.root = root || this;
+        this.#children = children;
+        this.#fullpath = opts.fullpath;
+        this.#relative = opts.relative;
+        this.#relativePosix = opts.relativePosix;
+        this.parent = opts.parent;
+        if (this.parent) {
+          this.#fs = this.parent.#fs;
+        } else {
+          this.#fs = fsFromOption(opts.fs);
+        }
+      }
+      /**
+       * Returns the depth of the Path object from its root.
+       *
+       * For example, a path at `/foo/bar` would have a depth of 2.
+       */
+      depth() {
+        if (this.#depth !== void 0)
+          return this.#depth;
+        if (!this.parent)
+          return this.#depth = 0;
+        return this.#depth = this.parent.depth() + 1;
+      }
+      /**
+       * @internal
+       */
+      childrenCache() {
+        return this.#children;
+      }
+      /**
+       * Get the Path object referenced by the string path, resolved from this Path
+       */
+      resolve(path) {
+        if (!path) {
+          return this;
+        }
+        const rootPath = this.getRootString(path);
+        const dir = path.substring(rootPath.length);
+        const dirParts = dir.split(this.splitSep);
+        const result = rootPath ? this.getRoot(rootPath).#resolveParts(dirParts) : this.#resolveParts(dirParts);
+        return result;
+      }
+      #resolveParts(dirParts) {
+        let p = this;
+        for (const part of dirParts) {
+          p = p.child(part);
+        }
+        return p;
+      }
+      /**
+       * Returns the cached children Path objects, if still available.  If they
+       * have fallen out of the cache, then returns an empty array, and resets the
+       * READDIR_CALLED bit, so that future calls to readdir() will require an fs
+       * lookup.
+       *
+       * @internal
+       */
+      children() {
+        const cached = this.#children.get(this);
+        if (cached) {
+          return cached;
+        }
+        const children = Object.assign([], { provisional: 0 });
+        this.#children.set(this, children);
+        this.#type &= ~READDIR_CALLED;
+        return children;
+      }
+      /**
+       * Resolves a path portion and returns or creates the child Path.
+       *
+       * Returns `this` if pathPart is `''` or `'.'`, or `parent` if pathPart is
+       * `'..'`.
+       *
+       * This should not be called directly.  If `pathPart` contains any path
+       * separators, it will lead to unsafe undefined behavior.
+       *
+       * Use `Path.resolve()` instead.
+       *
+       * @internal
+       */
+      child(pathPart, opts) {
+        if (pathPart === "" || pathPart === ".") {
+          return this;
+        }
+        if (pathPart === "..") {
+          return this.parent || this;
+        }
+        const children = this.children();
+        const name = this.nocase ? normalizeNocase(pathPart) : normalize(pathPart);
+        for (const p of children) {
+          if (p.#matchName === name) {
+            return p;
+          }
+        }
+        const s = this.parent ? this.sep : "";
+        const fullpath = this.#fullpath ? this.#fullpath + s + pathPart : void 0;
+        const pchild = this.newChild(pathPart, UNKNOWN, {
+          ...opts,
+          parent: this,
+          fullpath
+        });
+        if (!this.canReaddir()) {
+          pchild.#type |= ENOENT;
+        }
+        children.push(pchild);
+        return pchild;
+      }
+      /**
+       * The relative path from the cwd. If it does not share an ancestor with
+       * the cwd, then this ends up being equivalent to the fullpath()
+       */
+      relative() {
+        if (this.#relative !== void 0) {
+          return this.#relative;
+        }
+        const name = this.name;
+        const p = this.parent;
+        if (!p) {
+          return this.#relative = this.name;
+        }
+        const pv = p.relative();
+        return pv + (!pv || !p.parent ? "" : this.sep) + name;
+      }
+      /**
+       * The relative path from the cwd, using / as the path separator.
+       * If it does not share an ancestor with
+       * the cwd, then this ends up being equivalent to the fullpathPosix()
+       * On posix systems, this is identical to relative().
+       */
+      relativePosix() {
+        if (this.sep === "/")
+          return this.relative();
+        if (this.#relativePosix !== void 0)
+          return this.#relativePosix;
+        const name = this.name;
+        const p = this.parent;
+        if (!p) {
+          return this.#relativePosix = this.fullpathPosix();
+        }
+        const pv = p.relativePosix();
+        return pv + (!pv || !p.parent ? "" : "/") + name;
+      }
+      /**
+       * The fully resolved path string for this Path entry
+       */
+      fullpath() {
+        if (this.#fullpath !== void 0) {
+          return this.#fullpath;
+        }
+        const name = this.name;
+        const p = this.parent;
+        if (!p) {
+          return this.#fullpath = this.name;
+        }
+        const pv = p.fullpath();
+        const fp = pv + (!p.parent ? "" : this.sep) + name;
+        return this.#fullpath = fp;
+      }
+      /**
+       * On platforms other than windows, this is identical to fullpath.
+       *
+       * On windows, this is overridden to return the forward-slash form of the
+       * full UNC path.
+       */
+      fullpathPosix() {
+        if (this.#fullpathPosix !== void 0)
+          return this.#fullpathPosix;
+        if (this.sep === "/")
+          return this.#fullpathPosix = this.fullpath();
+        if (!this.parent) {
+          const p2 = this.fullpath().replace(/\\/g, "/");
+          if (/^[a-z]:\//i.test(p2)) {
+            return this.#fullpathPosix = `//?/${p2}`;
+          } else {
+            return this.#fullpathPosix = p2;
+          }
+        }
+        const p = this.parent;
+        const pfpp = p.fullpathPosix();
+        const fpp = pfpp + (!pfpp || !p.parent ? "" : "/") + this.name;
+        return this.#fullpathPosix = fpp;
+      }
+      /**
+       * Is the Path of an unknown type?
+       *
+       * Note that we might know *something* about it if there has been a previous
+       * filesystem operation, for example that it does not exist, or is not a
+       * link, or whether it has child entries.
+       */
+      isUnknown() {
+        return (this.#type & IFMT) === UNKNOWN;
+      }
+      /**
+       * Is the Path a regular file?
+       */
+      isFile() {
+        return (this.#type & IFMT) === IFREG;
+      }
+      /**
+       * Is the Path a directory?
+       */
+      isDirectory() {
+        return (this.#type & IFMT) === IFDIR;
+      }
+      /**
+       * Is the path a character device?
+       */
+      isCharacterDevice() {
+        return (this.#type & IFMT) === IFCHR;
+      }
+      /**
+       * Is the path a block device?
+       */
+      isBlockDevice() {
+        return (this.#type & IFMT) === IFBLK;
+      }
+      /**
+       * Is the path a FIFO pipe?
+       */
+      isFIFO() {
+        return (this.#type & IFMT) === IFIFO;
+      }
+      /**
+       * Is the path a socket?
+       */
+      isSocket() {
+        return (this.#type & IFMT) === IFSOCK;
+      }
+      /**
+       * Is the path a symbolic link?
+       */
+      isSymbolicLink() {
+        return (this.#type & IFLNK) === IFLNK;
+      }
+      /**
+       * Return the entry if it has been subject of a successful lstat, or
+       * undefined otherwise.
+       *
+       * Does not read the filesystem, so an undefined result *could* simply
+       * mean that we haven't called lstat on it.
+       */
+      lstatCached() {
+        return this.#type & LSTAT_CALLED ? this : void 0;
+      }
+      /**
+       * Return the cached link target if the entry has been the subject of a
+       * successful readlink, or undefined otherwise.
+       *
+       * Does not read the filesystem, so an undefined result *could* just mean we
+       * don't have any cached data. Only use it if you are very sure that a
+       * readlink() has been called at some point.
+       */
+      readlinkCached() {
+        return this.#linkTarget;
+      }
+      /**
+       * Returns the cached realpath target if the entry has been the subject
+       * of a successful realpath, or undefined otherwise.
+       *
+       * Does not read the filesystem, so an undefined result *could* just mean we
+       * don't have any cached data. Only use it if you are very sure that a
+       * realpath() has been called at some point.
+       */
+      realpathCached() {
+        return this.#realpath;
+      }
+      /**
+       * Returns the cached child Path entries array if the entry has been the
+       * subject of a successful readdir(), or [] otherwise.
+       *
+       * Does not read the filesystem, so an empty array *could* just mean we
+       * don't have any cached data. Only use it if you are very sure that a
+       * readdir() has been called recently enough to still be valid.
+       */
+      readdirCached() {
+        const children = this.children();
+        return children.slice(0, children.provisional);
+      }
+      /**
+       * Return true if it's worth trying to readlink.  Ie, we don't (yet) have
+       * any indication that readlink will definitely fail.
+       *
+       * Returns false if the path is known to not be a symlink, if a previous
+       * readlink failed, or if the entry does not exist.
+       */
+      canReadlink() {
+        if (this.#linkTarget)
+          return true;
+        if (!this.parent)
+          return false;
+        const ifmt = this.#type & IFMT;
+        return !(ifmt !== UNKNOWN && ifmt !== IFLNK || this.#type & ENOREADLINK || this.#type & ENOENT);
+      }
+      /**
+       * Return true if readdir has previously been successfully called on this
+       * path, indicating that cachedReaddir() is likely valid.
+       */
+      calledReaddir() {
+        return !!(this.#type & READDIR_CALLED);
+      }
+      /**
+       * Returns true if the path is known to not exist. That is, a previous lstat
+       * or readdir failed to verify its existence when that would have been
+       * expected, or a parent entry was marked either enoent or enotdir.
+       */
+      isENOENT() {
+        return !!(this.#type & ENOENT);
+      }
+      /**
+       * Return true if the path is a match for the given path name.  This handles
+       * case sensitivity and unicode normalization.
+       *
+       * Note: even on case-sensitive systems, it is **not** safe to test the
+       * equality of the `.name` property to determine whether a given pathname
+       * matches, due to unicode normalization mismatches.
+       *
+       * Always use this method instead of testing the `path.name` property
+       * directly.
+       */
+      isNamed(n) {
+        return !this.nocase ? this.#matchName === normalize(n) : this.#matchName === normalizeNocase(n);
+      }
+      /**
+       * Return the Path object corresponding to the target of a symbolic link.
+       *
+       * If the Path is not a symbolic link, or if the readlink call fails for any
+       * reason, `undefined` is returned.
+       *
+       * Result is cached, and thus may be outdated if the filesystem is mutated.
+       */
+      async readlink() {
+        const target = this.#linkTarget;
+        if (target) {
+          return target;
+        }
+        if (!this.canReadlink()) {
+          return void 0;
+        }
+        if (!this.parent) {
+          return void 0;
+        }
+        try {
+          const read = await this.#fs.promises.readlink(this.fullpath());
+          const linkTarget = this.parent.resolve(read);
+          if (linkTarget) {
+            return this.#linkTarget = linkTarget;
+          }
+        } catch (er) {
+          this.#readlinkFail(er.code);
+          return void 0;
+        }
+      }
+      /**
+       * Synchronous {@link PathBase.readlink}
+       */
+      readlinkSync() {
+        const target = this.#linkTarget;
+        if (target) {
+          return target;
+        }
+        if (!this.canReadlink()) {
+          return void 0;
+        }
+        if (!this.parent) {
+          return void 0;
+        }
+        try {
+          const read = this.#fs.readlinkSync(this.fullpath());
+          const linkTarget = this.parent.resolve(read);
+          if (linkTarget) {
+            return this.#linkTarget = linkTarget;
+          }
+        } catch (er) {
+          this.#readlinkFail(er.code);
+          return void 0;
+        }
+      }
+      #readdirSuccess(children) {
+        this.#type |= READDIR_CALLED;
+        for (let p = children.provisional; p < children.length; p++) {
+          children[p].#markENOENT();
+        }
+      }
+      #markENOENT() {
+        if (this.#type & ENOENT)
+          return;
+        this.#type = (this.#type | ENOENT) & IFMT_UNKNOWN;
+        this.#markChildrenENOENT();
+      }
+      #markChildrenENOENT() {
+        const children = this.children();
+        children.provisional = 0;
+        for (const p of children) {
+          p.#markENOENT();
+        }
+      }
+      #markENOREALPATH() {
+        this.#type |= ENOREALPATH;
+        this.#markENOTDIR();
+      }
+      // save the information when we know the entry is not a dir
+      #markENOTDIR() {
+        if (this.#type & ENOTDIR)
+          return;
+        let t = this.#type;
+        if ((t & IFMT) === IFDIR)
+          t &= IFMT_UNKNOWN;
+        this.#type = t | ENOTDIR;
+        this.#markChildrenENOENT();
+      }
+      #readdirFail(code = "") {
+        if (code === "ENOTDIR" || code === "EPERM") {
+          this.#markENOTDIR();
+        } else if (code === "ENOENT") {
+          this.#markENOENT();
+        } else {
+          this.children().provisional = 0;
+        }
+      }
+      #lstatFail(code = "") {
+        if (code === "ENOTDIR") {
+          const p = this.parent;
+          p.#markENOTDIR();
+        } else if (code === "ENOENT") {
+          this.#markENOENT();
+        }
+      }
+      #readlinkFail(code = "") {
+        let ter = this.#type;
+        ter |= ENOREADLINK;
+        if (code === "ENOENT")
+          ter |= ENOENT;
+        if (code === "EINVAL" || code === "UNKNOWN") {
+          ter &= IFMT_UNKNOWN;
+        }
+        this.#type = ter;
+        if (code === "ENOTDIR" && this.parent) {
+          this.parent.#markENOTDIR();
+        }
+      }
+      #readdirAddChild(e, c) {
+        return this.#readdirMaybePromoteChild(e, c) || this.#readdirAddNewChild(e, c);
+      }
+      #readdirAddNewChild(e, c) {
+        const type = entToType(e);
+        const child = this.newChild(e.name, type, { parent: this });
+        const ifmt = child.#type & IFMT;
+        if (ifmt !== IFDIR && ifmt !== IFLNK && ifmt !== UNKNOWN) {
+          child.#type |= ENOTDIR;
+        }
+        c.unshift(child);
+        c.provisional++;
+        return child;
+      }
+      #readdirMaybePromoteChild(e, c) {
+        for (let p = c.provisional; p < c.length; p++) {
+          const pchild = c[p];
+          const name = this.nocase ? normalizeNocase(e.name) : normalize(e.name);
+          if (name !== pchild.#matchName) {
+            continue;
+          }
+          return this.#readdirPromoteChild(e, pchild, p, c);
+        }
+      }
+      #readdirPromoteChild(e, p, index, c) {
+        const v = p.name;
+        p.#type = p.#type & IFMT_UNKNOWN | entToType(e);
+        if (v !== e.name)
+          p.name = e.name;
+        if (index !== c.provisional) {
+          if (index === c.length - 1)
+            c.pop();
+          else
+            c.splice(index, 1);
+          c.unshift(p);
+        }
+        c.provisional++;
+        return p;
+      }
+      /**
+       * Call lstat() on this Path, and update all known information that can be
+       * determined.
+       *
+       * Note that unlike `fs.lstat()`, the returned value does not contain some
+       * information, such as `mode`, `dev`, `nlink`, and `ino`.  If that
+       * information is required, you will need to call `fs.lstat` yourself.
+       *
+       * If the Path refers to a nonexistent file, or if the lstat call fails for
+       * any reason, `undefined` is returned.  Otherwise the updated Path object is
+       * returned.
+       *
+       * Results are cached, and thus may be out of date if the filesystem is
+       * mutated.
+       */
+      async lstat() {
+        if ((this.#type & ENOENT) === 0) {
+          try {
+            this.#applyStat(await this.#fs.promises.lstat(this.fullpath()));
+            return this;
+          } catch (er) {
+            this.#lstatFail(er.code);
+          }
+        }
+      }
+      /**
+       * synchronous {@link PathBase.lstat}
+       */
+      lstatSync() {
+        if ((this.#type & ENOENT) === 0) {
+          try {
+            this.#applyStat(this.#fs.lstatSync(this.fullpath()));
+            return this;
+          } catch (er) {
+            this.#lstatFail(er.code);
+          }
+        }
+      }
+      #applyStat(st) {
+        const { atime, atimeMs, birthtime, birthtimeMs, blksize, blocks, ctime, ctimeMs, dev, gid, ino, mode, mtime, mtimeMs, nlink, rdev, size, uid } = st;
+        this.#atime = atime;
+        this.#atimeMs = atimeMs;
+        this.#birthtime = birthtime;
+        this.#birthtimeMs = birthtimeMs;
+        this.#blksize = blksize;
+        this.#blocks = blocks;
+        this.#ctime = ctime;
+        this.#ctimeMs = ctimeMs;
+        this.#dev = dev;
+        this.#gid = gid;
+        this.#ino = ino;
+        this.#mode = mode;
+        this.#mtime = mtime;
+        this.#mtimeMs = mtimeMs;
+        this.#nlink = nlink;
+        this.#rdev = rdev;
+        this.#size = size;
+        this.#uid = uid;
+        const ifmt = entToType(st);
+        this.#type = this.#type & IFMT_UNKNOWN | ifmt | LSTAT_CALLED;
+        if (ifmt !== UNKNOWN && ifmt !== IFDIR && ifmt !== IFLNK) {
+          this.#type |= ENOTDIR;
+        }
+      }
+      #onReaddirCB = [];
+      #readdirCBInFlight = false;
+      #callOnReaddirCB(children) {
+        this.#readdirCBInFlight = false;
+        const cbs = this.#onReaddirCB.slice();
+        this.#onReaddirCB.length = 0;
+        cbs.forEach((cb) => cb(null, children));
+      }
+      /**
+       * Standard node-style callback interface to get list of directory entries.
+       *
+       * If the Path cannot or does not contain any children, then an empty array
+       * is returned.
+       *
+       * Results are cached, and thus may be out of date if the filesystem is
+       * mutated.
+       *
+       * @param cb The callback called with (er, entries).  Note that the `er`
+       * param is somewhat extraneous, as all readdir() errors are handled and
+       * simply result in an empty set of entries being returned.
+       * @param allowZalgo Boolean indicating that immediately known results should
+       * *not* be deferred with `queueMicrotask`. Defaults to `false`. Release
+       * zalgo at your peril, the dark pony lord is devious and unforgiving.
+       */
+      readdirCB(cb, allowZalgo = false) {
+        if (!this.canReaddir()) {
+          if (allowZalgo)
+            cb(null, []);
+          else
+            queueMicrotask(() => cb(null, []));
+          return;
+        }
+        const children = this.children();
+        if (this.calledReaddir()) {
+          const c = children.slice(0, children.provisional);
+          if (allowZalgo)
+            cb(null, c);
+          else
+            queueMicrotask(() => cb(null, c));
+          return;
+        }
+        this.#onReaddirCB.push(cb);
+        if (this.#readdirCBInFlight) {
+          return;
+        }
+        this.#readdirCBInFlight = true;
+        const fullpath = this.fullpath();
+        this.#fs.readdir(fullpath, { withFileTypes: true }, (er, entries) => {
+          if (er) {
+            this.#readdirFail(er.code);
+            children.provisional = 0;
+          } else {
+            for (const e of entries) {
+              this.#readdirAddChild(e, children);
+            }
+            this.#readdirSuccess(children);
+          }
+          this.#callOnReaddirCB(children.slice(0, children.provisional));
+          return;
+        });
+      }
+      #asyncReaddirInFlight;
+      /**
+       * Return an array of known child entries.
+       *
+       * If the Path cannot or does not contain any children, then an empty array
+       * is returned.
+       *
+       * Results are cached, and thus may be out of date if the filesystem is
+       * mutated.
+       */
+      async readdir() {
+        if (!this.canReaddir()) {
+          return [];
+        }
+        const children = this.children();
+        if (this.calledReaddir()) {
+          return children.slice(0, children.provisional);
+        }
+        const fullpath = this.fullpath();
+        if (this.#asyncReaddirInFlight) {
+          await this.#asyncReaddirInFlight;
+        } else {
+          let resolve = () => {
+          };
+          this.#asyncReaddirInFlight = new Promise((res) => resolve = res);
+          try {
+            for (const e of await this.#fs.promises.readdir(fullpath, {
+              withFileTypes: true
+            })) {
+              this.#readdirAddChild(e, children);
+            }
+            this.#readdirSuccess(children);
+          } catch (er) {
+            this.#readdirFail(er.code);
+            children.provisional = 0;
+          }
+          this.#asyncReaddirInFlight = void 0;
+          resolve();
+        }
+        return children.slice(0, children.provisional);
+      }
+      /**
+       * synchronous {@link PathBase.readdir}
+       */
+      readdirSync() {
+        if (!this.canReaddir()) {
+          return [];
+        }
+        const children = this.children();
+        if (this.calledReaddir()) {
+          return children.slice(0, children.provisional);
+        }
+        const fullpath = this.fullpath();
+        try {
+          for (const e of this.#fs.readdirSync(fullpath, {
+            withFileTypes: true
+          })) {
+            this.#readdirAddChild(e, children);
+          }
+          this.#readdirSuccess(children);
+        } catch (er) {
+          this.#readdirFail(er.code);
+          children.provisional = 0;
+        }
+        return children.slice(0, children.provisional);
+      }
+      canReaddir() {
+        if (this.#type & ENOCHILD)
+          return false;
+        const ifmt = IFMT & this.#type;
+        if (!(ifmt === UNKNOWN || ifmt === IFDIR || ifmt === IFLNK)) {
+          return false;
+        }
         return true;
-      for (var j = 0; j < set[0].length; j++) {
-        if (typeof set[0][j] !== "string")
+      }
+      shouldWalk(dirs, walkFilter) {
+        return (this.#type & IFDIR) === IFDIR && !(this.#type & ENOCHILD) && !dirs.has(this) && (!walkFilter || walkFilter(this));
+      }
+      /**
+       * Return the Path object corresponding to path as resolved
+       * by realpath(3).
+       *
+       * If the realpath call fails for any reason, `undefined` is returned.
+       *
+       * Result is cached, and thus may be outdated if the filesystem is mutated.
+       * On success, returns a Path object.
+       */
+      async realpath() {
+        if (this.#realpath)
+          return this.#realpath;
+        if ((ENOREALPATH | ENOREADLINK | ENOENT) & this.#type)
+          return void 0;
+        try {
+          const rp = await this.#fs.promises.realpath(this.fullpath());
+          return this.#realpath = this.resolve(rp);
+        } catch (_) {
+          this.#markENOREALPATH();
+        }
+      }
+      /**
+       * Synchronous {@link realpath}
+       */
+      realpathSync() {
+        if (this.#realpath)
+          return this.#realpath;
+        if ((ENOREALPATH | ENOREADLINK | ENOENT) & this.#type)
+          return void 0;
+        try {
+          const rp = this.#fs.realpathSync(this.fullpath());
+          return this.#realpath = this.resolve(rp);
+        } catch (_) {
+          this.#markENOREALPATH();
+        }
+      }
+      /**
+       * Internal method to mark this Path object as the scurry cwd,
+       * called by {@link PathScurry#chdir}
+       *
+       * @internal
+       */
+      [setAsCwd](oldCwd) {
+        if (oldCwd === this)
+          return;
+        const changed = /* @__PURE__ */ new Set([]);
+        let rp = [];
+        let p = this;
+        while (p && p.parent) {
+          changed.add(p);
+          p.#relative = rp.join(this.sep);
+          p.#relativePosix = rp.join("/");
+          p = p.parent;
+          rp.push("..");
+        }
+        p = oldCwd;
+        while (p && p.parent && !changed.has(p)) {
+          p.#relative = void 0;
+          p.#relativePosix = void 0;
+          p = p.parent;
+        }
+      }
+    };
+    exports2.PathBase = PathBase;
+    var PathWin32 = class extends PathBase {
+      /**
+       * Separator for generating path strings.
+       */
+      sep = "\\";
+      /**
+       * Separator for parsing path strings.
+       */
+      splitSep = eitherSep;
+      /**
+       * Do not create new Path objects directly.  They should always be accessed
+       * via the PathScurry class or other methods on the Path class.
+       *
+       * @internal
+       */
+      constructor(name, type = UNKNOWN, root, roots, nocase, children, opts) {
+        super(name, type, root, roots, nocase, children, opts);
+      }
+      /**
+       * @internal
+       */
+      newChild(name, type = UNKNOWN, opts = {}) {
+        return new PathWin32(name, type, this.root, this.roots, this.nocase, this.childrenCache(), opts);
+      }
+      /**
+       * @internal
+       */
+      getRootString(path) {
+        return path_1.win32.parse(path).root;
+      }
+      /**
+       * @internal
+       */
+      getRoot(rootPath) {
+        rootPath = uncToDrive(rootPath.toUpperCase());
+        if (rootPath === this.root.name) {
+          return this.root;
+        }
+        for (const [compare, root] of Object.entries(this.roots)) {
+          if (this.sameRoot(rootPath, compare)) {
+            return this.roots[rootPath] = root;
+          }
+        }
+        return this.roots[rootPath] = new PathScurryWin32(rootPath, this).root;
+      }
+      /**
+       * @internal
+       */
+      sameRoot(rootPath, compare = this.root.name) {
+        rootPath = rootPath.toUpperCase().replace(/\//g, "\\").replace(uncDriveRegexp, "$1\\");
+        return rootPath === compare;
+      }
+    };
+    exports2.PathWin32 = PathWin32;
+    var PathPosix = class extends PathBase {
+      /**
+       * separator for parsing path strings
+       */
+      splitSep = "/";
+      /**
+       * separator for generating path strings
+       */
+      sep = "/";
+      /**
+       * Do not create new Path objects directly.  They should always be accessed
+       * via the PathScurry class or other methods on the Path class.
+       *
+       * @internal
+       */
+      constructor(name, type = UNKNOWN, root, roots, nocase, children, opts) {
+        super(name, type, root, roots, nocase, children, opts);
+      }
+      /**
+       * @internal
+       */
+      getRootString(path) {
+        return path.startsWith("/") ? "/" : "";
+      }
+      /**
+       * @internal
+       */
+      getRoot(_rootPath) {
+        return this.root;
+      }
+      /**
+       * @internal
+       */
+      newChild(name, type = UNKNOWN, opts = {}) {
+        return new PathPosix(name, type, this.root, this.roots, this.nocase, this.childrenCache(), opts);
+      }
+    };
+    exports2.PathPosix = PathPosix;
+    var PathScurryBase = class {
+      /**
+       * The root Path entry for the current working directory of this Scurry
+       */
+      root;
+      /**
+       * The string path for the root of this Scurry's current working directory
+       */
+      rootPath;
+      /**
+       * A collection of all roots encountered, referenced by rootPath
+       */
+      roots;
+      /**
+       * The Path entry corresponding to this PathScurry's current working directory.
+       */
+      cwd;
+      #resolveCache;
+      #resolvePosixCache;
+      #children;
+      /**
+       * Perform path comparisons case-insensitively.
+       *
+       * Defaults true on Darwin and Windows systems, false elsewhere.
+       */
+      nocase;
+      #fs;
+      /**
+       * This class should not be instantiated directly.
+       *
+       * Use PathScurryWin32, PathScurryDarwin, PathScurryPosix, or PathScurry
+       *
+       * @internal
+       */
+      constructor(cwd = process.cwd(), pathImpl, sep, { nocase, childrenCacheSize = 16 * 1024, fs = defaultFS } = {}) {
+        this.#fs = fsFromOption(fs);
+        if (cwd instanceof URL || cwd.startsWith("file://")) {
+          cwd = (0, url_1.fileURLToPath)(cwd);
+        }
+        const cwdPath = pathImpl.resolve(cwd);
+        this.roots = /* @__PURE__ */ Object.create(null);
+        this.rootPath = this.parseRootPath(cwdPath);
+        this.#resolveCache = new ResolveCache();
+        this.#resolvePosixCache = new ResolveCache();
+        this.#children = new ChildrenCache(childrenCacheSize);
+        const split = cwdPath.substring(this.rootPath.length).split(sep);
+        if (split.length === 1 && !split[0]) {
+          split.pop();
+        }
+        if (nocase === void 0) {
+          throw new TypeError("must provide nocase setting to PathScurryBase ctor");
+        }
+        this.nocase = nocase;
+        this.root = this.newRoot(this.#fs);
+        this.roots[this.rootPath] = this.root;
+        let prev = this.root;
+        let len = split.length - 1;
+        const joinSep = pathImpl.sep;
+        let abs = this.rootPath;
+        let sawFirst = false;
+        for (const part of split) {
+          const l = len--;
+          prev = prev.child(part, {
+            relative: new Array(l).fill("..").join(joinSep),
+            relativePosix: new Array(l).fill("..").join("/"),
+            fullpath: abs += (sawFirst ? "" : joinSep) + part
+          });
+          sawFirst = true;
+        }
+        this.cwd = prev;
+      }
+      /**
+       * Get the depth of a provided path, string, or the cwd
+       */
+      depth(path = this.cwd) {
+        if (typeof path === "string") {
+          path = this.cwd.resolve(path);
+        }
+        return path.depth();
+      }
+      /**
+       * Return the cache of child entries.  Exposed so subclasses can create
+       * child Path objects in a platform-specific way.
+       *
+       * @internal
+       */
+      childrenCache() {
+        return this.#children;
+      }
+      /**
+       * Resolve one or more path strings to a resolved string
+       *
+       * Same interface as require('path').resolve.
+       *
+       * Much faster than path.resolve() when called multiple times for the same
+       * path, because the resolved Path objects are cached.  Much slower
+       * otherwise.
+       */
+      resolve(...paths) {
+        let r = "";
+        for (let i = paths.length - 1; i >= 0; i--) {
+          const p = paths[i];
+          if (!p || p === ".")
+            continue;
+          r = r ? `${p}/${r}` : p;
+          if (this.isAbsolute(p)) {
+            break;
+          }
+        }
+        const cached = this.#resolveCache.get(r);
+        if (cached !== void 0) {
+          return cached;
+        }
+        const result = this.cwd.resolve(r).fullpath();
+        this.#resolveCache.set(r, result);
+        return result;
+      }
+      /**
+       * Resolve one or more path strings to a resolved string, returning
+       * the posix path.  Identical to .resolve() on posix systems, but on
+       * windows will return a forward-slash separated UNC path.
+       *
+       * Same interface as require('path').resolve.
+       *
+       * Much faster than path.resolve() when called multiple times for the same
+       * path, because the resolved Path objects are cached.  Much slower
+       * otherwise.
+       */
+      resolvePosix(...paths) {
+        let r = "";
+        for (let i = paths.length - 1; i >= 0; i--) {
+          const p = paths[i];
+          if (!p || p === ".")
+            continue;
+          r = r ? `${p}/${r}` : p;
+          if (this.isAbsolute(p)) {
+            break;
+          }
+        }
+        const cached = this.#resolvePosixCache.get(r);
+        if (cached !== void 0) {
+          return cached;
+        }
+        const result = this.cwd.resolve(r).fullpathPosix();
+        this.#resolvePosixCache.set(r, result);
+        return result;
+      }
+      /**
+       * find the relative path from the cwd to the supplied path string or entry
+       */
+      relative(entry = this.cwd) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        }
+        return entry.relative();
+      }
+      /**
+       * find the relative path from the cwd to the supplied path string or
+       * entry, using / as the path delimiter, even on Windows.
+       */
+      relativePosix(entry = this.cwd) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        }
+        return entry.relativePosix();
+      }
+      /**
+       * Return the basename for the provided string or Path object
+       */
+      basename(entry = this.cwd) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        }
+        return entry.name;
+      }
+      /**
+       * Return the dirname for the provided string or Path object
+       */
+      dirname(entry = this.cwd) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        }
+        return (entry.parent || entry).fullpath();
+      }
+      async readdir(entry = this.cwd, opts = {
+        withFileTypes: true
+      }) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes } = opts;
+        if (!entry.canReaddir()) {
+          return [];
+        } else {
+          const p = await entry.readdir();
+          return withFileTypes ? p : p.map((e) => e.name);
+        }
+      }
+      readdirSync(entry = this.cwd, opts = {
+        withFileTypes: true
+      }) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes = true } = opts;
+        if (!entry.canReaddir()) {
+          return [];
+        } else if (withFileTypes) {
+          return entry.readdirSync();
+        } else {
+          return entry.readdirSync().map((e) => e.name);
+        }
+      }
+      /**
+       * Call lstat() on the string or Path object, and update all known
+       * information that can be determined.
+       *
+       * Note that unlike `fs.lstat()`, the returned value does not contain some
+       * information, such as `mode`, `dev`, `nlink`, and `ino`.  If that
+       * information is required, you will need to call `fs.lstat` yourself.
+       *
+       * If the Path refers to a nonexistent file, or if the lstat call fails for
+       * any reason, `undefined` is returned.  Otherwise the updated Path object is
+       * returned.
+       *
+       * Results are cached, and thus may be out of date if the filesystem is
+       * mutated.
+       */
+      async lstat(entry = this.cwd) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        }
+        return entry.lstat();
+      }
+      /**
+       * synchronous {@link PathScurryBase.lstat}
+       */
+      lstatSync(entry = this.cwd) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        }
+        return entry.lstatSync();
+      }
+      async readlink(entry = this.cwd, { withFileTypes } = {
+        withFileTypes: false
+      }) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          withFileTypes = entry.withFileTypes;
+          entry = this.cwd;
+        }
+        const e = await entry.readlink();
+        return withFileTypes ? e : e?.fullpath();
+      }
+      readlinkSync(entry = this.cwd, { withFileTypes } = {
+        withFileTypes: false
+      }) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          withFileTypes = entry.withFileTypes;
+          entry = this.cwd;
+        }
+        const e = entry.readlinkSync();
+        return withFileTypes ? e : e?.fullpath();
+      }
+      async realpath(entry = this.cwd, { withFileTypes } = {
+        withFileTypes: false
+      }) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          withFileTypes = entry.withFileTypes;
+          entry = this.cwd;
+        }
+        const e = await entry.realpath();
+        return withFileTypes ? e : e?.fullpath();
+      }
+      realpathSync(entry = this.cwd, { withFileTypes } = {
+        withFileTypes: false
+      }) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          withFileTypes = entry.withFileTypes;
+          entry = this.cwd;
+        }
+        const e = entry.realpathSync();
+        return withFileTypes ? e : e?.fullpath();
+      }
+      async walk(entry = this.cwd, opts = {}) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes = true, follow = false, filter, walkFilter } = opts;
+        const results = [];
+        if (!filter || filter(entry)) {
+          results.push(withFileTypes ? entry : entry.fullpath());
+        }
+        const dirs = /* @__PURE__ */ new Set();
+        const walk = (dir, cb) => {
+          dirs.add(dir);
+          dir.readdirCB((er, entries) => {
+            if (er) {
+              return cb(er);
+            }
+            let len = entries.length;
+            if (!len)
+              return cb();
+            const next = () => {
+              if (--len === 0) {
+                cb();
+              }
+            };
+            for (const e of entries) {
+              if (!filter || filter(e)) {
+                results.push(withFileTypes ? e : e.fullpath());
+              }
+              if (follow && e.isSymbolicLink()) {
+                e.realpath().then((r) => r?.isUnknown() ? r.lstat() : r).then((r) => r?.shouldWalk(dirs, walkFilter) ? walk(r, next) : next());
+              } else {
+                if (e.shouldWalk(dirs, walkFilter)) {
+                  walk(e, next);
+                } else {
+                  next();
+                }
+              }
+            }
+          }, true);
+        };
+        const start = entry;
+        return new Promise((res, rej) => {
+          walk(start, (er) => {
+            if (er)
+              return rej(er);
+            res(results);
+          });
+        });
+      }
+      walkSync(entry = this.cwd, opts = {}) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes = true, follow = false, filter, walkFilter } = opts;
+        const results = [];
+        if (!filter || filter(entry)) {
+          results.push(withFileTypes ? entry : entry.fullpath());
+        }
+        const dirs = /* @__PURE__ */ new Set([entry]);
+        for (const dir of dirs) {
+          const entries = dir.readdirSync();
+          for (const e of entries) {
+            if (!filter || filter(e)) {
+              results.push(withFileTypes ? e : e.fullpath());
+            }
+            let r = e;
+            if (e.isSymbolicLink()) {
+              if (!(follow && (r = e.realpathSync())))
+                continue;
+              if (r.isUnknown())
+                r.lstatSync();
+            }
+            if (r.shouldWalk(dirs, walkFilter)) {
+              dirs.add(r);
+            }
+          }
+        }
+        return results;
+      }
+      /**
+       * Support for `for await`
+       *
+       * Alias for {@link PathScurryBase.iterate}
+       *
+       * Note: As of Node 19, this is very slow, compared to other methods of
+       * walking.  Consider using {@link PathScurryBase.stream} if memory overhead
+       * and backpressure are concerns, or {@link PathScurryBase.walk} if not.
+       */
+      [Symbol.asyncIterator]() {
+        return this.iterate();
+      }
+      iterate(entry = this.cwd, options = {}) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          options = entry;
+          entry = this.cwd;
+        }
+        return this.stream(entry, options)[Symbol.asyncIterator]();
+      }
+      /**
+       * Iterating over a PathScurry performs a synchronous walk.
+       *
+       * Alias for {@link PathScurryBase.iterateSync}
+       */
+      [Symbol.iterator]() {
+        return this.iterateSync();
+      }
+      *iterateSync(entry = this.cwd, opts = {}) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes = true, follow = false, filter, walkFilter } = opts;
+        if (!filter || filter(entry)) {
+          yield withFileTypes ? entry : entry.fullpath();
+        }
+        const dirs = /* @__PURE__ */ new Set([entry]);
+        for (const dir of dirs) {
+          const entries = dir.readdirSync();
+          for (const e of entries) {
+            if (!filter || filter(e)) {
+              yield withFileTypes ? e : e.fullpath();
+            }
+            let r = e;
+            if (e.isSymbolicLink()) {
+              if (!(follow && (r = e.realpathSync())))
+                continue;
+              if (r.isUnknown())
+                r.lstatSync();
+            }
+            if (r.shouldWalk(dirs, walkFilter)) {
+              dirs.add(r);
+            }
+          }
+        }
+      }
+      stream(entry = this.cwd, opts = {}) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes = true, follow = false, filter, walkFilter } = opts;
+        const results = new minipass_1.Minipass({ objectMode: true });
+        if (!filter || filter(entry)) {
+          results.write(withFileTypes ? entry : entry.fullpath());
+        }
+        const dirs = /* @__PURE__ */ new Set();
+        const queue = [entry];
+        let processing = 0;
+        const process2 = () => {
+          let paused = false;
+          while (!paused) {
+            const dir = queue.shift();
+            if (!dir) {
+              if (processing === 0)
+                results.end();
+              return;
+            }
+            processing++;
+            dirs.add(dir);
+            const onReaddir = (er, entries, didRealpaths = false) => {
+              if (er)
+                return results.emit("error", er);
+              if (follow && !didRealpaths) {
+                const promises = [];
+                for (const e of entries) {
+                  if (e.isSymbolicLink()) {
+                    promises.push(e.realpath().then((r) => r?.isUnknown() ? r.lstat() : r));
+                  }
+                }
+                if (promises.length) {
+                  Promise.all(promises).then(() => onReaddir(null, entries, true));
+                  return;
+                }
+              }
+              for (const e of entries) {
+                if (e && (!filter || filter(e))) {
+                  if (!results.write(withFileTypes ? e : e.fullpath())) {
+                    paused = true;
+                  }
+                }
+              }
+              processing--;
+              for (const e of entries) {
+                const r = e.realpathCached() || e;
+                if (r.shouldWalk(dirs, walkFilter)) {
+                  queue.push(r);
+                }
+              }
+              if (paused && !results.flowing) {
+                results.once("drain", process2);
+              } else if (!sync) {
+                process2();
+              }
+            };
+            let sync = true;
+            dir.readdirCB(onReaddir, true);
+            sync = false;
+          }
+        };
+        process2();
+        return results;
+      }
+      streamSync(entry = this.cwd, opts = {}) {
+        if (typeof entry === "string") {
+          entry = this.cwd.resolve(entry);
+        } else if (!(entry instanceof PathBase)) {
+          opts = entry;
+          entry = this.cwd;
+        }
+        const { withFileTypes = true, follow = false, filter, walkFilter } = opts;
+        const results = new minipass_1.Minipass({ objectMode: true });
+        const dirs = /* @__PURE__ */ new Set();
+        if (!filter || filter(entry)) {
+          results.write(withFileTypes ? entry : entry.fullpath());
+        }
+        const queue = [entry];
+        let processing = 0;
+        const process2 = () => {
+          let paused = false;
+          while (!paused) {
+            const dir = queue.shift();
+            if (!dir) {
+              if (processing === 0)
+                results.end();
+              return;
+            }
+            processing++;
+            dirs.add(dir);
+            const entries = dir.readdirSync();
+            for (const e of entries) {
+              if (!filter || filter(e)) {
+                if (!results.write(withFileTypes ? e : e.fullpath())) {
+                  paused = true;
+                }
+              }
+            }
+            processing--;
+            for (const e of entries) {
+              let r = e;
+              if (e.isSymbolicLink()) {
+                if (!(follow && (r = e.realpathSync())))
+                  continue;
+                if (r.isUnknown())
+                  r.lstatSync();
+              }
+              if (r.shouldWalk(dirs, walkFilter)) {
+                queue.push(r);
+              }
+            }
+          }
+          if (paused && !results.flowing)
+            results.once("drain", process2);
+        };
+        process2();
+        return results;
+      }
+      chdir(path = this.cwd) {
+        const oldCwd = this.cwd;
+        this.cwd = typeof path === "string" ? this.cwd.resolve(path) : path;
+        this.cwd[setAsCwd](oldCwd);
+      }
+    };
+    exports2.PathScurryBase = PathScurryBase;
+    var PathScurryWin32 = class extends PathScurryBase {
+      /**
+       * separator for generating path strings
+       */
+      sep = "\\";
+      constructor(cwd = process.cwd(), opts = {}) {
+        const { nocase = true } = opts;
+        super(cwd, path_1.win32, "\\", { ...opts, nocase });
+        this.nocase = nocase;
+        for (let p = this.cwd; p; p = p.parent) {
+          p.nocase = this.nocase;
+        }
+      }
+      /**
+       * @internal
+       */
+      parseRootPath(dir) {
+        return path_1.win32.parse(dir).root.toUpperCase();
+      }
+      /**
+       * @internal
+       */
+      newRoot(fs) {
+        return new PathWin32(this.rootPath, IFDIR, void 0, this.roots, this.nocase, this.childrenCache(), { fs });
+      }
+      /**
+       * Return true if the provided path string is an absolute path
+       */
+      isAbsolute(p) {
+        return p.startsWith("/") || p.startsWith("\\") || /^[a-z]:(\/|\\)/i.test(p);
+      }
+    };
+    exports2.PathScurryWin32 = PathScurryWin32;
+    var PathScurryPosix = class extends PathScurryBase {
+      /**
+       * separator for generating path strings
+       */
+      sep = "/";
+      constructor(cwd = process.cwd(), opts = {}) {
+        const { nocase = false } = opts;
+        super(cwd, path_1.posix, "/", { ...opts, nocase });
+        this.nocase = nocase;
+      }
+      /**
+       * @internal
+       */
+      parseRootPath(_dir) {
+        return "/";
+      }
+      /**
+       * @internal
+       */
+      newRoot(fs) {
+        return new PathPosix(this.rootPath, IFDIR, void 0, this.roots, this.nocase, this.childrenCache(), { fs });
+      }
+      /**
+       * Return true if the provided path string is an absolute path
+       */
+      isAbsolute(p) {
+        return p.startsWith("/");
+      }
+    };
+    exports2.PathScurryPosix = PathScurryPosix;
+    var PathScurryDarwin = class extends PathScurryPosix {
+      constructor(cwd = process.cwd(), opts = {}) {
+        const { nocase = true } = opts;
+        super(cwd, { ...opts, nocase });
+      }
+    };
+    exports2.PathScurryDarwin = PathScurryDarwin;
+    exports2.Path = process.platform === "win32" ? PathWin32 : PathPosix;
+    exports2.PathScurry = process.platform === "win32" ? PathScurryWin32 : process.platform === "darwin" ? PathScurryDarwin : PathScurryPosix;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/pattern.js
+var require_pattern = __commonJS({
+  "node_modules/glob/dist/cjs/src/pattern.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.Pattern = void 0;
+    var minimatch_1 = require_cjs();
+    var isPatternList = (pl) => pl.length >= 1;
+    var isGlobList = (gl) => gl.length >= 1;
+    var Pattern = class {
+      #patternList;
+      #globList;
+      #index;
+      length;
+      #platform;
+      #rest;
+      #globString;
+      #isDrive;
+      #isUNC;
+      #isAbsolute;
+      #followGlobstar = true;
+      constructor(patternList, globList, index, platform) {
+        if (!isPatternList(patternList)) {
+          throw new TypeError("empty pattern list");
+        }
+        if (!isGlobList(globList)) {
+          throw new TypeError("empty glob list");
+        }
+        if (globList.length !== patternList.length) {
+          throw new TypeError("mismatched pattern list and glob list lengths");
+        }
+        this.length = patternList.length;
+        if (index < 0 || index >= this.length) {
+          throw new TypeError("index out of range");
+        }
+        this.#patternList = patternList;
+        this.#globList = globList;
+        this.#index = index;
+        this.#platform = platform;
+        if (this.#index === 0) {
+          if (this.isUNC()) {
+            const [p0, p1, p2, p3, ...prest] = this.#patternList;
+            const [g0, g1, g2, g3, ...grest] = this.#globList;
+            if (prest[0] === "") {
+              prest.shift();
+              grest.shift();
+            }
+            const p = [p0, p1, p2, p3, ""].join("/");
+            const g = [g0, g1, g2, g3, ""].join("/");
+            this.#patternList = [p, ...prest];
+            this.#globList = [g, ...grest];
+            this.length = this.#patternList.length;
+          } else if (this.isDrive() || this.isAbsolute()) {
+            const [p1, ...prest] = this.#patternList;
+            const [g1, ...grest] = this.#globList;
+            if (prest[0] === "") {
+              prest.shift();
+              grest.shift();
+            }
+            const p = p1 + "/";
+            const g = g1 + "/";
+            this.#patternList = [p, ...prest];
+            this.#globList = [g, ...grest];
+            this.length = this.#patternList.length;
+          }
+        }
+      }
+      /**
+       * The first entry in the parsed list of patterns
+       */
+      pattern() {
+        return this.#patternList[this.#index];
+      }
+      /**
+       * true of if pattern() returns a string
+       */
+      isString() {
+        return typeof this.#patternList[this.#index] === "string";
+      }
+      /**
+       * true of if pattern() returns GLOBSTAR
+       */
+      isGlobstar() {
+        return this.#patternList[this.#index] === minimatch_1.GLOBSTAR;
+      }
+      /**
+       * true if pattern() returns a regexp
+       */
+      isRegExp() {
+        return this.#patternList[this.#index] instanceof RegExp;
+      }
+      /**
+       * The /-joined set of glob parts that make up this pattern
+       */
+      globString() {
+        return this.#globString = this.#globString || (this.#index === 0 ? this.isAbsolute() ? this.#globList[0] + this.#globList.slice(1).join("/") : this.#globList.join("/") : this.#globList.slice(this.#index).join("/"));
+      }
+      /**
+       * true if there are more pattern parts after this one
+       */
+      hasMore() {
+        return this.length > this.#index + 1;
+      }
+      /**
+       * The rest of the pattern after this part, or null if this is the end
+       */
+      rest() {
+        if (this.#rest !== void 0)
+          return this.#rest;
+        if (!this.hasMore())
+          return this.#rest = null;
+        this.#rest = new Pattern(this.#patternList, this.#globList, this.#index + 1, this.#platform);
+        this.#rest.#isAbsolute = this.#isAbsolute;
+        this.#rest.#isUNC = this.#isUNC;
+        this.#rest.#isDrive = this.#isDrive;
+        return this.#rest;
+      }
+      /**
+       * true if the pattern represents a //unc/path/ on windows
+       */
+      isUNC() {
+        const pl = this.#patternList;
+        return this.#isUNC !== void 0 ? this.#isUNC : this.#isUNC = this.#platform === "win32" && this.#index === 0 && pl[0] === "" && pl[1] === "" && typeof pl[2] === "string" && !!pl[2] && typeof pl[3] === "string" && !!pl[3];
+      }
+      // pattern like C:/...
+      // split = ['C:', ...]
+      // XXX: would be nice to handle patterns like `c:*` to test the cwd
+      // in c: for *, but I don't know of a way to even figure out what that
+      // cwd is without actually chdir'ing into it?
+      /**
+       * True if the pattern starts with a drive letter on Windows
+       */
+      isDrive() {
+        const pl = this.#patternList;
+        return this.#isDrive !== void 0 ? this.#isDrive : this.#isDrive = this.#platform === "win32" && this.#index === 0 && this.length > 1 && typeof pl[0] === "string" && /^[a-z]:$/i.test(pl[0]);
+      }
+      // pattern = '/' or '/...' or '/x/...'
+      // split = ['', ''] or ['', ...] or ['', 'x', ...]
+      // Drive and UNC both considered absolute on windows
+      /**
+       * True if the pattern is rooted on an absolute path
+       */
+      isAbsolute() {
+        const pl = this.#patternList;
+        return this.#isAbsolute !== void 0 ? this.#isAbsolute : this.#isAbsolute = pl[0] === "" && pl.length > 1 || this.isDrive() || this.isUNC();
+      }
+      /**
+       * consume the root of the pattern, and return it
+       */
+      root() {
+        const p = this.#patternList[0];
+        return typeof p === "string" && this.isAbsolute() && this.#index === 0 ? p : "";
+      }
+      /**
+       * Check to see if the current globstar pattern is allowed to follow
+       * a symbolic link.
+       */
+      checkFollowGlobstar() {
+        return !(this.#index === 0 || !this.isGlobstar() || !this.#followGlobstar);
+      }
+      /**
+       * Mark that the current globstar pattern is following a symbolic link
+       */
+      markFollowGlobstar() {
+        if (this.#index === 0 || !this.isGlobstar() || !this.#followGlobstar)
+          return false;
+        this.#followGlobstar = false;
+        return true;
+      }
+    };
+    exports2.Pattern = Pattern;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/ignore.js
+var require_ignore = __commonJS({
+  "node_modules/glob/dist/cjs/src/ignore.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.Ignore = void 0;
+    var minimatch_1 = require_cjs();
+    var pattern_js_1 = require_pattern();
+    var defaultPlatform = typeof process === "object" && process && typeof process.platform === "string" ? process.platform : "linux";
+    var Ignore = class {
+      relative;
+      relativeChildren;
+      absolute;
+      absoluteChildren;
+      constructor(ignored, { nobrace, nocase, noext, noglobstar, platform = defaultPlatform }) {
+        this.relative = [];
+        this.absolute = [];
+        this.relativeChildren = [];
+        this.absoluteChildren = [];
+        const mmopts = {
+          dot: true,
+          nobrace,
+          nocase,
+          noext,
+          noglobstar,
+          optimizationLevel: 2,
+          platform,
+          nocomment: true,
+          nonegate: true
+        };
+        for (const ign of ignored) {
+          const mm = new minimatch_1.Minimatch(ign, mmopts);
+          for (let i = 0; i < mm.set.length; i++) {
+            const parsed = mm.set[i];
+            const globParts = mm.globParts[i];
+            const p = new pattern_js_1.Pattern(parsed, globParts, 0, platform);
+            const m = new minimatch_1.Minimatch(p.globString(), mmopts);
+            const children = globParts[globParts.length - 1] === "**";
+            const absolute = p.isAbsolute();
+            if (absolute)
+              this.absolute.push(m);
+            else
+              this.relative.push(m);
+            if (children) {
+              if (absolute)
+                this.absoluteChildren.push(m);
+              else
+                this.relativeChildren.push(m);
+            }
+          }
+        }
+      }
+      ignored(p) {
+        const fullpath = p.fullpath();
+        const fullpaths = `${fullpath}/`;
+        const relative = p.relative() || ".";
+        const relatives = `${relative}/`;
+        for (const m of this.relative) {
+          if (m.match(relative) || m.match(relatives))
+            return true;
+        }
+        for (const m of this.absolute) {
+          if (m.match(fullpath) || m.match(fullpaths))
+            return true;
+        }
+        return false;
+      }
+      childrenIgnored(p) {
+        const fullpath = p.fullpath() + "/";
+        const relative = (p.relative() || ".") + "/";
+        for (const m of this.relativeChildren) {
+          if (m.match(relative))
+            return true;
+        }
+        for (const m of this.absoluteChildren) {
+          if (m.match(fullpath))
+            true;
+        }
+        return false;
+      }
+    };
+    exports2.Ignore = Ignore;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/processor.js
+var require_processor = __commonJS({
+  "node_modules/glob/dist/cjs/src/processor.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.Processor = exports2.SubWalks = exports2.MatchRecord = exports2.HasWalkedCache = void 0;
+    var minimatch_1 = require_cjs();
+    var HasWalkedCache = class {
+      store;
+      constructor(store = /* @__PURE__ */ new Map()) {
+        this.store = store;
+      }
+      copy() {
+        return new HasWalkedCache(new Map(this.store));
+      }
+      hasWalked(target, pattern) {
+        return this.store.get(target.fullpath())?.has(pattern.globString());
+      }
+      storeWalked(target, pattern) {
+        const fullpath = target.fullpath();
+        const cached = this.store.get(fullpath);
+        if (cached)
+          cached.add(pattern.globString());
+        else
+          this.store.set(fullpath, /* @__PURE__ */ new Set([pattern.globString()]));
+      }
+    };
+    exports2.HasWalkedCache = HasWalkedCache;
+    var MatchRecord = class {
+      store = /* @__PURE__ */ new Map();
+      add(target, absolute, ifDir) {
+        const n = (absolute ? 2 : 0) | (ifDir ? 1 : 0);
+        const current = this.store.get(target);
+        this.store.set(target, current === void 0 ? n : n & current);
+      }
+      // match, absolute, ifdir
+      entries() {
+        return [...this.store.entries()].map(([path, n]) => [
+          path,
+          !!(n & 2),
+          !!(n & 1)
+        ]);
+      }
+    };
+    exports2.MatchRecord = MatchRecord;
+    var SubWalks = class {
+      store = /* @__PURE__ */ new Map();
+      add(target, pattern) {
+        if (!target.canReaddir()) {
+          return;
+        }
+        const subs = this.store.get(target);
+        if (subs) {
+          if (!subs.find((p) => p.globString() === pattern.globString())) {
+            subs.push(pattern);
+          }
+        } else
+          this.store.set(target, [pattern]);
+      }
+      get(target) {
+        const subs = this.store.get(target);
+        if (!subs) {
+          throw new Error("attempting to walk unknown path");
+        }
+        return subs;
+      }
+      entries() {
+        return this.keys().map((k) => [k, this.store.get(k)]);
+      }
+      keys() {
+        return [...this.store.keys()].filter((t) => t.canReaddir());
+      }
+    };
+    exports2.SubWalks = SubWalks;
+    var Processor = class {
+      hasWalkedCache;
+      matches = new MatchRecord();
+      subwalks = new SubWalks();
+      patterns;
+      follow;
+      dot;
+      opts;
+      constructor(opts, hasWalkedCache) {
+        this.opts = opts;
+        this.follow = !!opts.follow;
+        this.dot = !!opts.dot;
+        this.hasWalkedCache = hasWalkedCache ? hasWalkedCache.copy() : new HasWalkedCache();
+      }
+      processPatterns(target, patterns) {
+        this.patterns = patterns;
+        const processingSet = patterns.map((p) => [target, p]);
+        for (let [t, pattern] of processingSet) {
+          this.hasWalkedCache.storeWalked(t, pattern);
+          const root = pattern.root();
+          const absolute = pattern.isAbsolute() && this.opts.absolute !== false;
+          if (root) {
+            t = t.resolve(root === "/" && this.opts.root !== void 0 ? this.opts.root : root);
+            const rest2 = pattern.rest();
+            if (!rest2) {
+              this.matches.add(t, true, false);
+              continue;
+            } else {
+              pattern = rest2;
+            }
+          }
+          if (t.isENOENT())
+            continue;
+          let p;
+          let rest;
+          let changed = false;
+          while (typeof (p = pattern.pattern()) === "string" && (rest = pattern.rest())) {
+            const c = t.resolve(p);
+            if (c.isUnknown() && p !== "..")
+              break;
+            t = c;
+            pattern = rest;
+            changed = true;
+          }
+          p = pattern.pattern();
+          rest = pattern.rest();
+          if (changed) {
+            if (this.hasWalkedCache.hasWalked(t, pattern))
+              continue;
+            this.hasWalkedCache.storeWalked(t, pattern);
+          }
+          if (typeof p === "string") {
+            if (!rest) {
+              const ifDir = p === ".." || p === "" || p === ".";
+              this.matches.add(t.resolve(p), absolute, ifDir);
+            } else {
+              this.subwalks.add(t, pattern);
+            }
+            continue;
+          } else if (p === minimatch_1.GLOBSTAR) {
+            if (!t.isSymbolicLink() || this.follow || pattern.checkFollowGlobstar()) {
+              this.subwalks.add(t, pattern);
+            }
+            const rp = rest?.pattern();
+            const rrest = rest?.rest();
+            if (!rest || (rp === "" || rp === ".") && !rrest) {
+              this.matches.add(t, absolute, rp === "" || rp === ".");
+            } else {
+              if (rp === "..") {
+                const tp = t.parent || t;
+                if (!rrest)
+                  this.matches.add(tp, absolute, true);
+                else if (!this.hasWalkedCache.hasWalked(tp, rrest)) {
+                  this.subwalks.add(tp, rrest);
+                }
+              }
+            }
+          } else if (p instanceof RegExp) {
+            this.subwalks.add(t, pattern);
+          }
+        }
+        return this;
+      }
+      subwalkTargets() {
+        return this.subwalks.keys();
+      }
+      child() {
+        return new Processor(this.opts, this.hasWalkedCache);
+      }
+      // return a new Processor containing the subwalks for each
+      // child entry, and a set of matches, and
+      // a hasWalkedCache that's a copy of this one
+      // then we're going to call
+      filterEntries(parent, entries) {
+        const patterns = this.subwalks.get(parent);
+        const results = this.child();
+        for (const e of entries) {
+          for (const pattern of patterns) {
+            const absolute = pattern.isAbsolute();
+            const p = pattern.pattern();
+            const rest = pattern.rest();
+            if (p === minimatch_1.GLOBSTAR) {
+              results.testGlobstar(e, pattern, rest, absolute);
+            } else if (p instanceof RegExp) {
+              results.testRegExp(e, p, rest, absolute);
+            } else {
+              results.testString(e, p, rest, absolute);
+            }
+          }
+        }
+        return results;
+      }
+      testGlobstar(e, pattern, rest, absolute) {
+        if (this.dot || !e.name.startsWith(".")) {
+          if (!pattern.hasMore()) {
+            this.matches.add(e, absolute, false);
+          }
+          if (e.canReaddir()) {
+            if (this.follow || !e.isSymbolicLink()) {
+              this.subwalks.add(e, pattern);
+            } else if (e.isSymbolicLink()) {
+              if (rest && pattern.checkFollowGlobstar()) {
+                this.subwalks.add(e, rest);
+              } else if (pattern.markFollowGlobstar()) {
+                this.subwalks.add(e, pattern);
+              }
+            }
+          }
+        }
+        if (rest) {
+          const rp = rest.pattern();
+          if (typeof rp === "string" && // dots and empty were handled already
+          rp !== ".." && rp !== "" && rp !== ".") {
+            this.testString(e, rp, rest.rest(), absolute);
+          } else if (rp === "..") {
+            const ep = e.parent || e;
+            this.subwalks.add(ep, rest);
+          } else if (rp instanceof RegExp) {
+            this.testRegExp(e, rp, rest.rest(), absolute);
+          }
+        }
+      }
+      testRegExp(e, p, rest, absolute) {
+        if (!p.test(e.name))
+          return;
+        if (!rest) {
+          this.matches.add(e, absolute, false);
+        } else {
+          this.subwalks.add(e, rest);
+        }
+      }
+      testString(e, p, rest, absolute) {
+        if (!e.isNamed(p))
+          return;
+        if (!rest) {
+          this.matches.add(e, absolute, false);
+        } else {
+          this.subwalks.add(e, rest);
+        }
+      }
+    };
+    exports2.Processor = Processor;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/walker.js
+var require_walker = __commonJS({
+  "node_modules/glob/dist/cjs/src/walker.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.GlobStream = exports2.GlobWalker = exports2.GlobUtil = void 0;
+    var minipass_1 = require_minipass();
+    var ignore_js_1 = require_ignore();
+    var processor_js_1 = require_processor();
+    var makeIgnore = (ignore, opts) => typeof ignore === "string" ? new ignore_js_1.Ignore([ignore], opts) : Array.isArray(ignore) ? new ignore_js_1.Ignore(ignore, opts) : ignore;
+    var GlobUtil = class {
+      path;
+      patterns;
+      opts;
+      seen = /* @__PURE__ */ new Set();
+      paused = false;
+      aborted = false;
+      #onResume = [];
+      #ignore;
+      #sep;
+      signal;
+      maxDepth;
+      constructor(patterns, path, opts) {
+        this.patterns = patterns;
+        this.path = path;
+        this.opts = opts;
+        this.#sep = !opts.posix && opts.platform === "win32" ? "\\" : "/";
+        if (opts.ignore) {
+          this.#ignore = makeIgnore(opts.ignore, opts);
+        }
+        this.maxDepth = opts.maxDepth || Infinity;
+        if (opts.signal) {
+          this.signal = opts.signal;
+          this.signal.addEventListener("abort", () => {
+            this.#onResume.length = 0;
+          });
+        }
+      }
+      #ignored(path) {
+        return this.seen.has(path) || !!this.#ignore?.ignored?.(path);
+      }
+      #childrenIgnored(path) {
+        return !!this.#ignore?.childrenIgnored?.(path);
+      }
+      // backpressure mechanism
+      pause() {
+        this.paused = true;
+      }
+      resume() {
+        if (this.signal?.aborted)
+          return;
+        this.paused = false;
+        let fn = void 0;
+        while (!this.paused && (fn = this.#onResume.shift())) {
+          fn();
+        }
+      }
+      onResume(fn) {
+        if (this.signal?.aborted)
+          return;
+        if (!this.paused) {
+          fn();
+        } else {
+          this.#onResume.push(fn);
+        }
+      }
+      // do the requisite realpath/stat checking, and return the path
+      // to add or undefined to filter it out.
+      async matchCheck(e, ifDir) {
+        if (ifDir && this.opts.nodir)
+          return void 0;
+        let rpc;
+        if (this.opts.realpath) {
+          rpc = e.realpathCached() || await e.realpath();
+          if (!rpc)
+            return void 0;
+          e = rpc;
+        }
+        const needStat = e.isUnknown() || this.opts.stat;
+        return this.matchCheckTest(needStat ? await e.lstat() : e, ifDir);
+      }
+      matchCheckTest(e, ifDir) {
+        return e && (this.maxDepth === Infinity || e.depth() <= this.maxDepth) && (!ifDir || e.canReaddir()) && (!this.opts.nodir || !e.isDirectory()) && !this.#ignored(e) ? e : void 0;
+      }
+      matchCheckSync(e, ifDir) {
+        if (ifDir && this.opts.nodir)
+          return void 0;
+        let rpc;
+        if (this.opts.realpath) {
+          rpc = e.realpathCached() || e.realpathSync();
+          if (!rpc)
+            return void 0;
+          e = rpc;
+        }
+        const needStat = e.isUnknown() || this.opts.stat;
+        return this.matchCheckTest(needStat ? e.lstatSync() : e, ifDir);
+      }
+      matchFinish(e, absolute) {
+        if (this.#ignored(e))
+          return;
+        const abs = this.opts.absolute === void 0 ? absolute : this.opts.absolute;
+        this.seen.add(e);
+        const mark = this.opts.mark && e.isDirectory() ? this.#sep : "";
+        if (this.opts.withFileTypes) {
+          this.matchEmit(e);
+        } else if (abs) {
+          const abs2 = this.opts.posix ? e.fullpathPosix() : e.fullpath();
+          this.matchEmit(abs2 + mark);
+        } else {
+          const rel = this.opts.posix ? e.relativePosix() : e.relative();
+          const pre = this.opts.dotRelative && !rel.startsWith(".." + this.#sep) ? "." + this.#sep : "";
+          this.matchEmit(!rel ? "." + mark : pre + rel + mark);
+        }
+      }
+      async match(e, absolute, ifDir) {
+        const p = await this.matchCheck(e, ifDir);
+        if (p)
+          this.matchFinish(p, absolute);
+      }
+      matchSync(e, absolute, ifDir) {
+        const p = this.matchCheckSync(e, ifDir);
+        if (p)
+          this.matchFinish(p, absolute);
+      }
+      walkCB(target, patterns, cb) {
+        if (this.signal?.aborted)
+          cb();
+        this.walkCB2(target, patterns, new processor_js_1.Processor(this.opts), cb);
+      }
+      walkCB2(target, patterns, processor, cb) {
+        if (this.#childrenIgnored(target))
+          return cb();
+        if (this.signal?.aborted)
+          cb();
+        if (this.paused) {
+          this.onResume(() => this.walkCB2(target, patterns, processor, cb));
+          return;
+        }
+        processor.processPatterns(target, patterns);
+        let tasks = 1;
+        const next = () => {
+          if (--tasks === 0)
+            cb();
+        };
+        for (const [m, absolute, ifDir] of processor.matches.entries()) {
+          if (this.#ignored(m))
+            continue;
+          tasks++;
+          this.match(m, absolute, ifDir).then(() => next());
+        }
+        for (const t of processor.subwalkTargets()) {
+          if (this.maxDepth !== Infinity && t.depth() >= this.maxDepth) {
+            continue;
+          }
+          tasks++;
+          const childrenCached = t.readdirCached();
+          if (t.calledReaddir())
+            this.walkCB3(t, childrenCached, processor, next);
+          else {
+            t.readdirCB((_, entries) => this.walkCB3(t, entries, processor, next), true);
+          }
+        }
+        next();
+      }
+      walkCB3(target, entries, processor, cb) {
+        processor = processor.filterEntries(target, entries);
+        let tasks = 1;
+        const next = () => {
+          if (--tasks === 0)
+            cb();
+        };
+        for (const [m, absolute, ifDir] of processor.matches.entries()) {
+          if (this.#ignored(m))
+            continue;
+          tasks++;
+          this.match(m, absolute, ifDir).then(() => next());
+        }
+        for (const [target2, patterns] of processor.subwalks.entries()) {
+          tasks++;
+          this.walkCB2(target2, patterns, processor.child(), next);
+        }
+        next();
+      }
+      walkCBSync(target, patterns, cb) {
+        if (this.signal?.aborted)
+          cb();
+        this.walkCB2Sync(target, patterns, new processor_js_1.Processor(this.opts), cb);
+      }
+      walkCB2Sync(target, patterns, processor, cb) {
+        if (this.#childrenIgnored(target))
+          return cb();
+        if (this.signal?.aborted)
+          cb();
+        if (this.paused) {
+          this.onResume(() => this.walkCB2Sync(target, patterns, processor, cb));
+          return;
+        }
+        processor.processPatterns(target, patterns);
+        let tasks = 1;
+        const next = () => {
+          if (--tasks === 0)
+            cb();
+        };
+        for (const [m, absolute, ifDir] of processor.matches.entries()) {
+          if (this.#ignored(m))
+            continue;
+          this.matchSync(m, absolute, ifDir);
+        }
+        for (const t of processor.subwalkTargets()) {
+          if (this.maxDepth !== Infinity && t.depth() >= this.maxDepth) {
+            continue;
+          }
+          tasks++;
+          const children = t.readdirSync();
+          this.walkCB3Sync(t, children, processor, next);
+        }
+        next();
+      }
+      walkCB3Sync(target, entries, processor, cb) {
+        processor = processor.filterEntries(target, entries);
+        let tasks = 1;
+        const next = () => {
+          if (--tasks === 0)
+            cb();
+        };
+        for (const [m, absolute, ifDir] of processor.matches.entries()) {
+          if (this.#ignored(m))
+            continue;
+          this.matchSync(m, absolute, ifDir);
+        }
+        for (const [target2, patterns] of processor.subwalks.entries()) {
+          tasks++;
+          this.walkCB2Sync(target2, patterns, processor.child(), next);
+        }
+        next();
+      }
+    };
+    exports2.GlobUtil = GlobUtil;
+    var GlobWalker = class extends GlobUtil {
+      matches;
+      constructor(patterns, path, opts) {
+        super(patterns, path, opts);
+        this.matches = /* @__PURE__ */ new Set();
+      }
+      matchEmit(e) {
+        this.matches.add(e);
+      }
+      async walk() {
+        if (this.signal?.aborted)
+          throw this.signal.reason;
+        if (this.path.isUnknown()) {
+          await this.path.lstat();
+        }
+        await new Promise((res, rej) => {
+          this.walkCB(this.path, this.patterns, () => {
+            if (this.signal?.aborted) {
+              rej(this.signal.reason);
+            } else {
+              res(this.matches);
+            }
+          });
+        });
+        return this.matches;
+      }
+      walkSync() {
+        if (this.signal?.aborted)
+          throw this.signal.reason;
+        if (this.path.isUnknown()) {
+          this.path.lstatSync();
+        }
+        this.walkCBSync(this.path, this.patterns, () => {
+          if (this.signal?.aborted)
+            throw this.signal.reason;
+        });
+        return this.matches;
+      }
+    };
+    exports2.GlobWalker = GlobWalker;
+    var GlobStream = class extends GlobUtil {
+      results;
+      constructor(patterns, path, opts) {
+        super(patterns, path, opts);
+        this.results = new minipass_1.Minipass({
+          signal: this.signal,
+          objectMode: true
+        });
+        this.results.on("drain", () => this.resume());
+        this.results.on("resume", () => this.resume());
+      }
+      matchEmit(e) {
+        this.results.write(e);
+        if (!this.results.flowing)
+          this.pause();
+      }
+      stream() {
+        const target = this.path;
+        if (target.isUnknown()) {
+          target.lstat().then(() => {
+            this.walkCB(target, this.patterns, () => this.results.end());
+          });
+        } else {
+          this.walkCB(target, this.patterns, () => this.results.end());
+        }
+        return this.results;
+      }
+      streamSync() {
+        if (this.path.isUnknown()) {
+          this.path.lstatSync();
+        }
+        this.walkCBSync(this.path, this.patterns, () => this.results.end());
+        return this.results;
+      }
+    };
+    exports2.GlobStream = GlobStream;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/glob.js
+var require_glob = __commonJS({
+  "node_modules/glob/dist/cjs/src/glob.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.Glob = void 0;
+    var minimatch_1 = require_cjs();
+    var path_scurry_1 = require_cjs3();
+    var url_1 = require("url");
+    var pattern_js_1 = require_pattern();
+    var walker_js_1 = require_walker();
+    var defaultPlatform = typeof process === "object" && process && typeof process.platform === "string" ? process.platform : "linux";
+    var Glob = class {
+      absolute;
+      cwd;
+      root;
+      dot;
+      dotRelative;
+      follow;
+      ignore;
+      magicalBraces;
+      mark;
+      matchBase;
+      maxDepth;
+      nobrace;
+      nocase;
+      nodir;
+      noext;
+      noglobstar;
+      pattern;
+      platform;
+      realpath;
+      scurry;
+      stat;
+      signal;
+      windowsPathsNoEscape;
+      withFileTypes;
+      /**
+       * The options provided to the constructor.
+       */
+      opts;
+      /**
+       * An array of parsed immutable {@link Pattern} objects.
+       */
+      patterns;
+      /**
+       * All options are stored as properties on the `Glob` object.
+       *
+       * See {@link GlobOptions} for full options descriptions.
+       *
+       * Note that a previous `Glob` object can be passed as the
+       * `GlobOptions` to another `Glob` instantiation to re-use settings
+       * and caches with a new pattern.
+       *
+       * Traversal functions can be called multiple times to run the walk
+       * again.
+       */
+      constructor(pattern, opts) {
+        this.withFileTypes = !!opts.withFileTypes;
+        this.signal = opts.signal;
+        this.follow = !!opts.follow;
+        this.dot = !!opts.dot;
+        this.dotRelative = !!opts.dotRelative;
+        this.nodir = !!opts.nodir;
+        this.mark = !!opts.mark;
+        if (!opts.cwd) {
+          this.cwd = "";
+        } else if (opts.cwd instanceof URL || opts.cwd.startsWith("file://")) {
+          opts.cwd = (0, url_1.fileURLToPath)(opts.cwd);
+        }
+        this.cwd = opts.cwd || "";
+        this.root = opts.root;
+        this.magicalBraces = !!opts.magicalBraces;
+        this.nobrace = !!opts.nobrace;
+        this.noext = !!opts.noext;
+        this.realpath = !!opts.realpath;
+        this.absolute = opts.absolute;
+        this.noglobstar = !!opts.noglobstar;
+        this.matchBase = !!opts.matchBase;
+        this.maxDepth = typeof opts.maxDepth === "number" ? opts.maxDepth : Infinity;
+        this.stat = !!opts.stat;
+        this.ignore = opts.ignore;
+        if (this.withFileTypes && this.absolute !== void 0) {
+          throw new Error("cannot set absolute and withFileTypes:true");
+        }
+        if (typeof pattern === "string") {
+          pattern = [pattern];
+        }
+        this.windowsPathsNoEscape = !!opts.windowsPathsNoEscape || opts.allowWindowsEscape === false;
+        if (this.windowsPathsNoEscape) {
+          pattern = pattern.map((p) => p.replace(/\\/g, "/"));
+        }
+        if (this.matchBase) {
+          if (opts.noglobstar) {
+            throw new TypeError("base matching requires globstar");
+          }
+          pattern = pattern.map((p) => p.includes("/") ? p : `./**/${p}`);
+        }
+        this.pattern = pattern;
+        this.platform = opts.platform || defaultPlatform;
+        this.opts = { ...opts, platform: this.platform };
+        if (opts.scurry) {
+          this.scurry = opts.scurry;
+          if (opts.nocase !== void 0 && opts.nocase !== opts.scurry.nocase) {
+            throw new Error("nocase option contradicts provided scurry option");
+          }
+        } else {
+          const Scurry = opts.platform === "win32" ? path_scurry_1.PathScurryWin32 : opts.platform === "darwin" ? path_scurry_1.PathScurryDarwin : opts.platform ? path_scurry_1.PathScurryPosix : path_scurry_1.PathScurry;
+          this.scurry = new Scurry(this.cwd, {
+            nocase: opts.nocase,
+            fs: opts.fs
+          });
+        }
+        this.nocase = this.scurry.nocase;
+        const nocaseMagicOnly = this.platform === "darwin" || this.platform === "win32";
+        const mmo = {
+          // default nocase based on platform
+          ...opts,
+          dot: this.dot,
+          matchBase: this.matchBase,
+          nobrace: this.nobrace,
+          nocase: this.nocase,
+          nocaseMagicOnly,
+          nocomment: true,
+          noext: this.noext,
+          nonegate: true,
+          optimizationLevel: 2,
+          platform: this.platform,
+          windowsPathsNoEscape: this.windowsPathsNoEscape,
+          debug: !!this.opts.debug
+        };
+        const mms = this.pattern.map((p) => new minimatch_1.Minimatch(p, mmo));
+        const [matchSet, globParts] = mms.reduce((set, m) => {
+          set[0].push(...m.set);
+          set[1].push(...m.globParts);
+          return set;
+        }, [[], []]);
+        this.patterns = matchSet.map((set, i) => {
+          return new pattern_js_1.Pattern(set, globParts[i], 0, this.platform);
+        });
+      }
+      async walk() {
+        return [
+          ...await new walker_js_1.GlobWalker(this.patterns, this.scurry.cwd, {
+            ...this.opts,
+            maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
+            platform: this.platform,
+            nocase: this.nocase
+          }).walk()
+        ];
+      }
+      walkSync() {
+        return [
+          ...new walker_js_1.GlobWalker(this.patterns, this.scurry.cwd, {
+            ...this.opts,
+            maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
+            platform: this.platform,
+            nocase: this.nocase
+          }).walkSync()
+        ];
+      }
+      stream() {
+        return new walker_js_1.GlobStream(this.patterns, this.scurry.cwd, {
+          ...this.opts,
+          maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
+          platform: this.platform,
+          nocase: this.nocase
+        }).stream();
+      }
+      streamSync() {
+        return new walker_js_1.GlobStream(this.patterns, this.scurry.cwd, {
+          ...this.opts,
+          maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
+          platform: this.platform,
+          nocase: this.nocase
+        }).streamSync();
+      }
+      /**
+       * Default sync iteration function. Returns a Generator that
+       * iterates over the results.
+       */
+      iterateSync() {
+        return this.streamSync()[Symbol.iterator]();
+      }
+      [Symbol.iterator]() {
+        return this.iterateSync();
+      }
+      /**
+       * Default async iteration function. Returns an AsyncGenerator that
+       * iterates over the results.
+       */
+      iterate() {
+        return this.stream()[Symbol.asyncIterator]();
+      }
+      [Symbol.asyncIterator]() {
+        return this.iterate();
+      }
+    };
+    exports2.Glob = Glob;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/has-magic.js
+var require_has_magic = __commonJS({
+  "node_modules/glob/dist/cjs/src/has-magic.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.hasMagic = void 0;
+    var minimatch_1 = require_cjs();
+    var hasMagic = (pattern, options = {}) => {
+      if (!Array.isArray(pattern)) {
+        pattern = [pattern];
+      }
+      for (const p of pattern) {
+        if (new minimatch_1.Minimatch(p, options).hasMagic())
           return true;
       }
       return false;
     };
-    glob.Glob = Glob;
-    inherits(Glob, EE);
-    function Glob(pattern, options, cb) {
-      if (typeof options === "function") {
-        cb = options;
-        options = null;
-      }
-      if (options && options.sync) {
-        if (cb)
-          throw new TypeError("callback provided to sync glob");
-        return new GlobSync(pattern, options);
-      }
-      if (!(this instanceof Glob))
-        return new Glob(pattern, options, cb);
-      setopts(this, pattern, options);
-      this._didRealPath = false;
-      var n = this.minimatch.set.length;
-      this.matches = new Array(n);
-      if (typeof cb === "function") {
-        cb = once(cb);
-        this.on("error", cb);
-        this.on("end", function(matches) {
-          cb(null, matches);
-        });
-      }
-      var self = this;
-      this._processing = 0;
-      this._emitQueue = [];
-      this._processQueue = [];
-      this.paused = false;
-      if (this.noprocess)
-        return this;
-      if (n === 0)
-        return done();
-      var sync = true;
-      for (var i = 0; i < n; i++) {
-        this._process(this.minimatch.set[i], i, false, done);
-      }
-      sync = false;
-      function done() {
-        --self._processing;
-        if (self._processing <= 0) {
-          if (sync) {
-            process.nextTick(function() {
-              self._finish();
-            });
-          } else {
-            self._finish();
-          }
-        }
-      }
+    exports2.hasMagic = hasMagic;
+  }
+});
+
+// node_modules/glob/dist/cjs/src/index.js
+var require_src = __commonJS({
+  "node_modules/glob/dist/cjs/src/index.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.glob = exports2.hasMagic = exports2.Glob = exports2.unescape = exports2.escape = exports2.sync = exports2.iterate = exports2.iterateSync = exports2.stream = exports2.streamSync = exports2.globIterate = exports2.globIterateSync = exports2.globSync = exports2.globStream = exports2.globStreamSync = void 0;
+    var minimatch_1 = require_cjs();
+    var glob_js_1 = require_glob();
+    var has_magic_js_1 = require_has_magic();
+    function globStreamSync(pattern, options = {}) {
+      return new glob_js_1.Glob(pattern, options).streamSync();
     }
-    Glob.prototype._finish = function() {
-      assert(this instanceof Glob);
-      if (this.aborted)
-        return;
-      if (this.realpath && !this._didRealpath)
-        return this._realpath();
-      common.finish(this);
-      this.emit("end", this.found);
-    };
-    Glob.prototype._realpath = function() {
-      if (this._didRealpath)
-        return;
-      this._didRealpath = true;
-      var n = this.matches.length;
-      if (n === 0)
-        return this._finish();
-      var self = this;
-      for (var i = 0; i < this.matches.length; i++)
-        this._realpathSet(i, next);
-      function next() {
-        if (--n === 0)
-          self._finish();
-      }
-    };
-    Glob.prototype._realpathSet = function(index, cb) {
-      var matchset = this.matches[index];
-      if (!matchset)
-        return cb();
-      var found = Object.keys(matchset);
-      var self = this;
-      var n = found.length;
-      if (n === 0)
-        return cb();
-      var set = this.matches[index] = /* @__PURE__ */ Object.create(null);
-      found.forEach(function(p, i) {
-        p = self._makeAbs(p);
-        rp.realpath(p, self.realpathCache, function(er, real) {
-          if (!er)
-            set[real] = true;
-          else if (er.syscall === "stat")
-            set[p] = true;
-          else
-            self.emit("error", er);
-          if (--n === 0) {
-            self.matches[index] = set;
-            cb();
-          }
-        });
-      });
-    };
-    Glob.prototype._mark = function(p) {
-      return common.mark(this, p);
-    };
-    Glob.prototype._makeAbs = function(f) {
-      return common.makeAbs(this, f);
-    };
-    Glob.prototype.abort = function() {
-      this.aborted = true;
-      this.emit("abort");
-    };
-    Glob.prototype.pause = function() {
-      if (!this.paused) {
-        this.paused = true;
-        this.emit("pause");
-      }
-    };
-    Glob.prototype.resume = function() {
-      if (this.paused) {
-        this.emit("resume");
-        this.paused = false;
-        if (this._emitQueue.length) {
-          var eq = this._emitQueue.slice(0);
-          this._emitQueue.length = 0;
-          for (var i = 0; i < eq.length; i++) {
-            var e = eq[i];
-            this._emitMatch(e[0], e[1]);
-          }
-        }
-        if (this._processQueue.length) {
-          var pq = this._processQueue.slice(0);
-          this._processQueue.length = 0;
-          for (var i = 0; i < pq.length; i++) {
-            var p = pq[i];
-            this._processing--;
-            this._process(p[0], p[1], p[2], p[3]);
-          }
-        }
-      }
-    };
-    Glob.prototype._process = function(pattern, index, inGlobStar, cb) {
-      assert(this instanceof Glob);
-      assert(typeof cb === "function");
-      if (this.aborted)
-        return;
-      this._processing++;
-      if (this.paused) {
-        this._processQueue.push([pattern, index, inGlobStar, cb]);
-        return;
-      }
-      var n = 0;
-      while (typeof pattern[n] === "string") {
-        n++;
-      }
-      var prefix;
-      switch (n) {
-        case pattern.length:
-          this._processSimple(pattern.join("/"), index, cb);
-          return;
-        case 0:
-          prefix = null;
-          break;
-        default:
-          prefix = pattern.slice(0, n).join("/");
-          break;
-      }
-      var remain = pattern.slice(n);
-      var read;
-      if (prefix === null)
-        read = ".";
-      else if (isAbsolute(prefix) || isAbsolute(pattern.map(function(p) {
-        return typeof p === "string" ? p : "[*]";
-      }).join("/"))) {
-        if (!prefix || !isAbsolute(prefix))
-          prefix = "/" + prefix;
-        read = prefix;
-      } else
-        read = prefix;
-      var abs = this._makeAbs(read);
-      if (childrenIgnored(this, read))
-        return cb();
-      var isGlobStar = remain[0] === minimatch.GLOBSTAR;
-      if (isGlobStar)
-        this._processGlobStar(prefix, read, abs, remain, index, inGlobStar, cb);
-      else
-        this._processReaddir(prefix, read, abs, remain, index, inGlobStar, cb);
-    };
-    Glob.prototype._processReaddir = function(prefix, read, abs, remain, index, inGlobStar, cb) {
-      var self = this;
-      this._readdir(abs, inGlobStar, function(er, entries) {
-        return self._processReaddir2(prefix, read, abs, remain, index, inGlobStar, entries, cb);
-      });
-    };
-    Glob.prototype._processReaddir2 = function(prefix, read, abs, remain, index, inGlobStar, entries, cb) {
-      if (!entries)
-        return cb();
-      var pn = remain[0];
-      var negate = !!this.minimatch.negate;
-      var rawGlob = pn._glob;
-      var dotOk = this.dot || rawGlob.charAt(0) === ".";
-      var matchedEntries = [];
-      for (var i = 0; i < entries.length; i++) {
-        var e = entries[i];
-        if (e.charAt(0) !== "." || dotOk) {
-          var m;
-          if (negate && !prefix) {
-            m = !e.match(pn);
-          } else {
-            m = e.match(pn);
-          }
-          if (m)
-            matchedEntries.push(e);
-        }
-      }
-      var len = matchedEntries.length;
-      if (len === 0)
-        return cb();
-      if (remain.length === 1 && !this.mark && !this.stat) {
-        if (!this.matches[index])
-          this.matches[index] = /* @__PURE__ */ Object.create(null);
-        for (var i = 0; i < len; i++) {
-          var e = matchedEntries[i];
-          if (prefix) {
-            if (prefix !== "/")
-              e = prefix + "/" + e;
-            else
-              e = prefix + e;
-          }
-          if (e.charAt(0) === "/" && !this.nomount) {
-            e = path.join(this.root, e);
-          }
-          this._emitMatch(index, e);
-        }
-        return cb();
-      }
-      remain.shift();
-      for (var i = 0; i < len; i++) {
-        var e = matchedEntries[i];
-        var newPattern;
-        if (prefix) {
-          if (prefix !== "/")
-            e = prefix + "/" + e;
-          else
-            e = prefix + e;
-        }
-        this._process([e].concat(remain), index, inGlobStar, cb);
-      }
-      cb();
-    };
-    Glob.prototype._emitMatch = function(index, e) {
-      if (this.aborted)
-        return;
-      if (isIgnored(this, e))
-        return;
-      if (this.paused) {
-        this._emitQueue.push([index, e]);
-        return;
-      }
-      var abs = isAbsolute(e) ? e : this._makeAbs(e);
-      if (this.mark)
-        e = this._mark(e);
-      if (this.absolute)
-        e = abs;
-      if (this.matches[index][e])
-        return;
-      if (this.nodir) {
-        var c = this.cache[abs];
-        if (c === "DIR" || Array.isArray(c))
-          return;
-      }
-      this.matches[index][e] = true;
-      var st = this.statCache[abs];
-      if (st)
-        this.emit("stat", e, st);
-      this.emit("match", e);
-    };
-    Glob.prototype._readdirInGlobStar = function(abs, cb) {
-      if (this.aborted)
-        return;
-      if (this.follow)
-        return this._readdir(abs, false, cb);
-      var lstatkey = "lstat\0" + abs;
-      var self = this;
-      var lstatcb = inflight(lstatkey, lstatcb_);
-      if (lstatcb)
-        self.fs.lstat(abs, lstatcb);
-      function lstatcb_(er, lstat) {
-        if (er && er.code === "ENOENT")
-          return cb();
-        var isSym = lstat && lstat.isSymbolicLink();
-        self.symlinks[abs] = isSym;
-        if (!isSym && lstat && !lstat.isDirectory()) {
-          self.cache[abs] = "FILE";
-          cb();
-        } else
-          self._readdir(abs, false, cb);
-      }
-    };
-    Glob.prototype._readdir = function(abs, inGlobStar, cb) {
-      if (this.aborted)
-        return;
-      cb = inflight("readdir\0" + abs + "\0" + inGlobStar, cb);
-      if (!cb)
-        return;
-      if (inGlobStar && !ownProp(this.symlinks, abs))
-        return this._readdirInGlobStar(abs, cb);
-      if (ownProp(this.cache, abs)) {
-        var c = this.cache[abs];
-        if (!c || c === "FILE")
-          return cb();
-        if (Array.isArray(c))
-          return cb(null, c);
-      }
-      var self = this;
-      self.fs.readdir(abs, readdirCb(this, abs, cb));
-    };
-    function readdirCb(self, abs, cb) {
-      return function(er, entries) {
-        if (er)
-          self._readdirError(abs, er, cb);
-        else
-          self._readdirEntries(abs, entries, cb);
-      };
+    exports2.globStreamSync = globStreamSync;
+    function globStream(pattern, options = {}) {
+      return new glob_js_1.Glob(pattern, options).stream();
     }
-    Glob.prototype._readdirEntries = function(abs, entries, cb) {
-      if (this.aborted)
-        return;
-      if (!this.mark && !this.stat) {
-        for (var i = 0; i < entries.length; i++) {
-          var e = entries[i];
-          if (abs === "/")
-            e = abs + e;
-          else
-            e = abs + "/" + e;
-          this.cache[e] = true;
-        }
-      }
-      this.cache[abs] = entries;
-      return cb(null, entries);
-    };
-    Glob.prototype._readdirError = function(f, er, cb) {
-      if (this.aborted)
-        return;
-      switch (er.code) {
-        case "ENOTSUP":
-        case "ENOTDIR":
-          var abs = this._makeAbs(f);
-          this.cache[abs] = "FILE";
-          if (abs === this.cwdAbs) {
-            var error = new Error(er.code + " invalid cwd " + this.cwd);
-            error.path = this.cwd;
-            error.code = er.code;
-            this.emit("error", error);
-            this.abort();
-          }
-          break;
-        case "ENOENT":
-        case "ELOOP":
-        case "ENAMETOOLONG":
-        case "UNKNOWN":
-          this.cache[this._makeAbs(f)] = false;
-          break;
-        default:
-          this.cache[this._makeAbs(f)] = false;
-          if (this.strict) {
-            this.emit("error", er);
-            this.abort();
-          }
-          if (!this.silent)
-            console.error("glob error", er);
-          break;
-      }
-      return cb();
-    };
-    Glob.prototype._processGlobStar = function(prefix, read, abs, remain, index, inGlobStar, cb) {
-      var self = this;
-      this._readdir(abs, inGlobStar, function(er, entries) {
-        self._processGlobStar2(prefix, read, abs, remain, index, inGlobStar, entries, cb);
-      });
-    };
-    Glob.prototype._processGlobStar2 = function(prefix, read, abs, remain, index, inGlobStar, entries, cb) {
-      if (!entries)
-        return cb();
-      var remainWithoutGlobStar = remain.slice(1);
-      var gspref = prefix ? [prefix] : [];
-      var noGlobStar = gspref.concat(remainWithoutGlobStar);
-      this._process(noGlobStar, index, false, cb);
-      var isSym = this.symlinks[abs];
-      var len = entries.length;
-      if (isSym && inGlobStar)
-        return cb();
-      for (var i = 0; i < len; i++) {
-        var e = entries[i];
-        if (e.charAt(0) === "." && !this.dot)
-          continue;
-        var instead = gspref.concat(entries[i], remainWithoutGlobStar);
-        this._process(instead, index, true, cb);
-        var below = gspref.concat(entries[i], remain);
-        this._process(below, index, true, cb);
-      }
-      cb();
-    };
-    Glob.prototype._processSimple = function(prefix, index, cb) {
-      var self = this;
-      this._stat(prefix, function(er, exists) {
-        self._processSimple2(prefix, index, er, exists, cb);
-      });
-    };
-    Glob.prototype._processSimple2 = function(prefix, index, er, exists, cb) {
-      if (!this.matches[index])
-        this.matches[index] = /* @__PURE__ */ Object.create(null);
-      if (!exists)
-        return cb();
-      if (prefix && isAbsolute(prefix) && !this.nomount) {
-        var trail = /[\/\\]$/.test(prefix);
-        if (prefix.charAt(0) === "/") {
-          prefix = path.join(this.root, prefix);
-        } else {
-          prefix = path.resolve(this.root, prefix);
-          if (trail)
-            prefix += "/";
-        }
-      }
-      if (process.platform === "win32")
-        prefix = prefix.replace(/\\/g, "/");
-      this._emitMatch(index, prefix);
-      cb();
-    };
-    Glob.prototype._stat = function(f, cb) {
-      var abs = this._makeAbs(f);
-      var needDir = f.slice(-1) === "/";
-      if (f.length > this.maxLength)
-        return cb();
-      if (!this.stat && ownProp(this.cache, abs)) {
-        var c = this.cache[abs];
-        if (Array.isArray(c))
-          c = "DIR";
-        if (!needDir || c === "DIR")
-          return cb(null, c);
-        if (needDir && c === "FILE")
-          return cb();
-      }
-      var exists;
-      var stat = this.statCache[abs];
-      if (stat !== void 0) {
-        if (stat === false)
-          return cb(null, stat);
-        else {
-          var type = stat.isDirectory() ? "DIR" : "FILE";
-          if (needDir && type === "FILE")
-            return cb();
-          else
-            return cb(null, type, stat);
-        }
-      }
-      var self = this;
-      var statcb = inflight("stat\0" + abs, lstatcb_);
-      if (statcb)
-        self.fs.lstat(abs, statcb);
-      function lstatcb_(er, lstat) {
-        if (lstat && lstat.isSymbolicLink()) {
-          return self.fs.stat(abs, function(er2, stat2) {
-            if (er2)
-              self._stat2(f, abs, null, lstat, cb);
-            else
-              self._stat2(f, abs, er2, stat2, cb);
-          });
-        } else {
-          self._stat2(f, abs, er, lstat, cb);
-        }
-      }
-    };
-    Glob.prototype._stat2 = function(f, abs, er, stat, cb) {
-      if (er && (er.code === "ENOENT" || er.code === "ENOTDIR")) {
-        this.statCache[abs] = false;
-        return cb();
-      }
-      var needDir = f.slice(-1) === "/";
-      this.statCache[abs] = stat;
-      if (abs.slice(-1) === "/" && stat && !stat.isDirectory())
-        return cb(null, false, stat);
-      var c = true;
-      if (stat)
-        c = stat.isDirectory() ? "DIR" : "FILE";
-      this.cache[abs] = this.cache[abs] || c;
-      if (needDir && c === "FILE")
-        return cb();
-      return cb(null, c, stat);
-    };
+    exports2.globStream = globStream;
+    function globSync(pattern, options = {}) {
+      return new glob_js_1.Glob(pattern, options).walkSync();
+    }
+    exports2.globSync = globSync;
+    async function glob_(pattern, options = {}) {
+      return new glob_js_1.Glob(pattern, options).walk();
+    }
+    function globIterateSync(pattern, options = {}) {
+      return new glob_js_1.Glob(pattern, options).iterateSync();
+    }
+    exports2.globIterateSync = globIterateSync;
+    function globIterate(pattern, options = {}) {
+      return new glob_js_1.Glob(pattern, options).iterate();
+    }
+    exports2.globIterate = globIterate;
+    exports2.streamSync = globStreamSync;
+    exports2.stream = Object.assign(globStream, { sync: globStreamSync });
+    exports2.iterateSync = globIterateSync;
+    exports2.iterate = Object.assign(globIterate, {
+      sync: globIterateSync
+    });
+    exports2.sync = Object.assign(globSync, {
+      stream: globStreamSync,
+      iterate: globIterateSync
+    });
+    var minimatch_2 = require_cjs();
+    Object.defineProperty(exports2, "escape", { enumerable: true, get: function() {
+      return minimatch_2.escape;
+    } });
+    Object.defineProperty(exports2, "unescape", { enumerable: true, get: function() {
+      return minimatch_2.unescape;
+    } });
+    var glob_js_2 = require_glob();
+    Object.defineProperty(exports2, "Glob", { enumerable: true, get: function() {
+      return glob_js_2.Glob;
+    } });
+    var has_magic_js_2 = require_has_magic();
+    Object.defineProperty(exports2, "hasMagic", { enumerable: true, get: function() {
+      return has_magic_js_2.hasMagic;
+    } });
+    exports2.glob = Object.assign(glob_, {
+      glob: glob_,
+      globSync,
+      sync: exports2.sync,
+      globStream,
+      stream: exports2.stream,
+      globStreamSync,
+      streamSync: exports2.streamSync,
+      globIterate,
+      iterate: exports2.iterate,
+      globIterateSync,
+      iterateSync: exports2.iterateSync,
+      Glob: glob_js_1.Glob,
+      hasMagic: has_magic_js_1.hasMagic,
+      escape: minimatch_1.escape,
+      unescape: minimatch_1.unescape
+    });
+    exports2.glob.glob = exports2.glob;
   }
 });
 
@@ -2998,7 +7094,11 @@ var require_universalify = __commonJS({
           fn.apply(this, args);
         else {
           return new Promise((resolve, reject) => {
-            fn.call(this, ...args, (err, res) => err != null ? reject(err) : resolve(res));
+            fn.call(
+              this,
+              ...args,
+              (err, res) => err != null ? reject(err) : resolve(res)
+            );
           });
         }
       }, "name", { value: fn.name });
@@ -3148,19 +7248,24 @@ var require_polyfills = __commonJS({
       }(fs.readSync);
       function patchLchmod(fs2) {
         fs2.lchmod = function(path, mode, callback) {
-          fs2.open(path, constants.O_WRONLY | constants.O_SYMLINK, mode, function(err, fd) {
-            if (err) {
-              if (callback)
-                callback(err);
-              return;
-            }
-            fs2.fchmod(fd, mode, function(err2) {
-              fs2.close(fd, function(err22) {
+          fs2.open(
+            path,
+            constants.O_WRONLY | constants.O_SYMLINK,
+            mode,
+            function(err, fd) {
+              if (err) {
                 if (callback)
-                  callback(err2 || err22);
+                  callback(err);
+                return;
+              }
+              fs2.fchmod(fd, mode, function(err2) {
+                fs2.close(fd, function(err22) {
+                  if (callback)
+                    callback(err2 || err22);
+                });
               });
-            });
-          });
+            }
+          );
         };
         fs2.lchmodSync = function(path, mode) {
           var fd = fs2.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode);
@@ -3357,12 +7462,12 @@ var require_legacy_streams = __commonJS({
         if (this.encoding)
           this.setEncoding(this.encoding);
         if (this.start !== void 0) {
-          if (typeof this.start !== "number") {
+          if ("number" !== typeof this.start) {
             throw TypeError("start must be a Number");
           }
           if (this.end === void 0) {
             this.end = Infinity;
-          } else if (typeof this.end !== "number") {
+          } else if ("number" !== typeof this.end) {
             throw TypeError("end must be a Number");
           }
           if (this.start > this.end) {
@@ -3405,7 +7510,7 @@ var require_legacy_streams = __commonJS({
           this[key] = options[key];
         }
         if (this.start !== void 0) {
-          if (typeof this.start !== "number") {
+          if ("number" !== typeof this.start) {
             throw TypeError("start must be a Number");
           }
           if (this.start < 0) {
@@ -3611,9 +7716,19 @@ var require_graceful_fs = __commonJS({
         if (typeof options === "function")
           cb = options, options = null;
         var go$readdir = noReaddirOptionVersions.test(process.version) ? function go$readdir2(path2, options2, cb2, startTime) {
-          return fs$readdir(path2, fs$readdirCallback(path2, options2, cb2, startTime));
+          return fs$readdir(path2, fs$readdirCallback(
+            path2,
+            options2,
+            cb2,
+            startTime
+          ));
         } : function go$readdir2(path2, options2, cb2, startTime) {
-          return fs$readdir(path2, options2, fs$readdirCallback(path2, options2, cb2, startTime));
+          return fs$readdir(path2, options2, fs$readdirCallback(
+            path2,
+            options2,
+            cb2,
+            startTime
+          ));
         };
         return go$readdir(path, options, cb);
         function fs$readdirCallback(path2, options2, cb2, startTime) {
@@ -3808,9 +7923,9 @@ var require_graceful_fs = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/fs/index.js
-var require_fs2 = __commonJS({
-  "node_modules/fs-extra/lib/fs/index.js"(exports2) {
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/fs/index.js
+var require_fs = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/fs/index.js"(exports2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs = require_graceful_fs();
@@ -3888,31 +8003,45 @@ var require_fs2 = __commonJS({
         });
       });
     };
-    if (typeof fs.writev === "function") {
-      exports2.writev = function(fd, buffers, ...args) {
-        if (typeof args[args.length - 1] === "function") {
-          return fs.writev(fd, buffers, ...args);
-        }
-        return new Promise((resolve, reject) => {
-          fs.writev(fd, buffers, ...args, (err, bytesWritten, buffers2) => {
-            if (err)
-              return reject(err);
-            resolve({ bytesWritten, buffers: buffers2 });
-          });
+    exports2.readv = function(fd, buffers, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs.readv(fd, buffers, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs.readv(fd, buffers, ...args, (err, bytesRead, buffers2) => {
+          if (err)
+            return reject(err);
+          resolve({ bytesRead, buffers: buffers2 });
         });
-      };
-    }
+      });
+    };
+    exports2.writev = function(fd, buffers, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs.writev(fd, buffers, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs.writev(fd, buffers, ...args, (err, bytesWritten, buffers2) => {
+          if (err)
+            return reject(err);
+          resolve({ bytesWritten, buffers: buffers2 });
+        });
+      });
+    };
     if (typeof fs.realpath.native === "function") {
       exports2.realpath.native = u(fs.realpath.native);
     } else {
-      process.emitWarning("fs.realpath.native is not a function. Is fs being monkey-patched?", "Warning", "fs-extra-WARN0003");
+      process.emitWarning(
+        "fs.realpath.native is not a function. Is fs being monkey-patched?",
+        "Warning",
+        "fs-extra-WARN0003"
+      );
     }
   }
 });
 
-// node_modules/fs-extra/lib/mkdirs/utils.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/utils.js
 var require_utils = __commonJS({
-  "node_modules/fs-extra/lib/mkdirs/utils.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/utils.js"(exports2, module2) {
     "use strict";
     var path = require("path");
     module2.exports.checkPath = function checkPath(pth) {
@@ -3928,11 +8057,11 @@ var require_utils = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/mkdirs/make-dir.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/make-dir.js
 var require_make_dir = __commonJS({
-  "node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
     "use strict";
-    var fs = require_fs2();
+    var fs = require_fs();
     var { checkPath } = require_utils();
     var getMode = (options) => {
       const defaults = { mode: 511 };
@@ -3957,9 +8086,9 @@ var require_make_dir = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/mkdirs/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = __commonJS({
-  "node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var { makeDir: _makeDir, makeDirSync } = require_make_dir();
@@ -3967,6 +8096,7 @@ var require_mkdirs = __commonJS({
     module2.exports = {
       mkdirs: makeDir,
       mkdirsSync: makeDirSync,
+      // alias
       mkdirp: makeDir,
       mkdirpSync: makeDirSync,
       ensureDir: makeDir,
@@ -3975,12 +8105,12 @@ var require_mkdirs = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/path-exists/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/path-exists/index.js
 var require_path_exists = __commonJS({
-  "node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
-    var fs = require_fs2();
+    var fs = require_fs();
     function pathExists(path) {
       return fs.access(path).then(() => true).catch(() => false);
     }
@@ -3991,9 +8121,9 @@ var require_path_exists = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/util/utimes.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/utimes.js
 var require_utimes = __commonJS({
-  "node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     function utimesMillis(path, atime, mtime, callback) {
@@ -4020,11 +8150,11 @@ var require_utimes = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/util/stat.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/stat.js
 var require_stat = __commonJS({
-  "node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
     "use strict";
-    var fs = require_fs2();
+    var fs = require_fs();
     var path = require("path");
     var util = require("util");
     function getStats(src, dest, opts) {
@@ -4158,9 +8288,9 @@ var require_stat = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/copy/copy.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy.js
 var require_copy = __commonJS({
-  "node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -4181,7 +8311,11 @@ var require_copy = __commonJS({
       opts.clobber = "clobber" in opts ? !!opts.clobber : true;
       opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
       if (opts.preserveTimestamps && process.arch === "ia32") {
-        process.emitWarning("Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269", "Warning", "fs-extra-WARN0001");
+        process.emitWarning(
+          "Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269",
+          "Warning",
+          "fs-extra-WARN0001"
+        );
       }
       stat.checkPaths(src, dest, "copy", opts, (err, stats) => {
         if (err)
@@ -4190,9 +8324,13 @@ var require_copy = __commonJS({
         stat.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
           if (err2)
             return cb(err2);
-          if (opts.filter)
-            return handleFilter(checkParentDir, destStat, src, dest, opts, cb);
-          return checkParentDir(destStat, src, dest, opts, cb);
+          runFilter(src, dest, opts, (err3, include) => {
+            if (err3)
+              return cb(err3);
+            if (!include)
+              return cb();
+            checkParentDir(destStat, src, dest, opts, cb);
+          });
         });
       });
     }
@@ -4210,17 +8348,10 @@ var require_copy = __commonJS({
         });
       });
     }
-    function handleFilter(onInclude, destStat, src, dest, opts, cb) {
-      Promise.resolve(opts.filter(src, dest)).then((include) => {
-        if (include)
-          return onInclude(destStat, src, dest, opts, cb);
-        return cb();
-      }, (error) => cb(error));
-    }
-    function startCopy(destStat, src, dest, opts, cb) {
-      if (opts.filter)
-        return handleFilter(getStats, destStat, src, dest, opts, cb);
-      return getStats(destStat, src, dest, opts, cb);
+    function runFilter(src, dest, opts, cb) {
+      if (!opts.filter)
+        return cb(null, true);
+      Promise.resolve(opts.filter(src, dest)).then((include) => cb(null, include), (error) => cb(error));
     }
     function getStats(destStat, src, dest, opts, cb) {
       const stat2 = opts.dereference ? fs.stat : fs.lstat;
@@ -4331,14 +8462,20 @@ var require_copy = __commonJS({
     function copyDirItem(items, item, src, dest, opts, cb) {
       const srcItem = path.join(src, item);
       const destItem = path.join(dest, item);
-      stat.checkPaths(srcItem, destItem, "copy", opts, (err, stats) => {
+      runFilter(srcItem, destItem, opts, (err, include) => {
         if (err)
           return cb(err);
-        const { destStat } = stats;
-        startCopy(destStat, srcItem, destItem, opts, (err2) => {
+        if (!include)
+          return copyDirItems(items, src, dest, opts, cb);
+        stat.checkPaths(srcItem, destItem, "copy", opts, (err2, stats) => {
           if (err2)
             return cb(err2);
-          return copyDirItems(items, src, dest, opts, cb);
+          const { destStat } = stats;
+          getStats(destStat, srcItem, destItem, opts, (err3) => {
+            if (err3)
+              return cb(err3);
+            return copyDirItems(items, src, dest, opts, cb);
+          });
         });
       });
     }
@@ -4364,7 +8501,7 @@ var require_copy = __commonJS({
             if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
               return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
             }
-            if (destStat.isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+            if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
               return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
             }
             return copyLink(resolvedSrc, dest, cb);
@@ -4383,9 +8520,9 @@ var require_copy = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/copy/copy-sync.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = __commonJS({
-  "node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -4400,23 +8537,19 @@ var require_copy_sync = __commonJS({
       opts.clobber = "clobber" in opts ? !!opts.clobber : true;
       opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
       if (opts.preserveTimestamps && process.arch === "ia32") {
-        process.emitWarning("Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269", "Warning", "fs-extra-WARN0002");
+        process.emitWarning(
+          "Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269",
+          "Warning",
+          "fs-extra-WARN0002"
+        );
       }
       const { srcStat, destStat } = stat.checkPathsSync(src, dest, "copy", opts);
       stat.checkParentPathsSync(src, srcStat, dest, "copy");
-      return handleFilterAndCopy(destStat, src, dest, opts);
-    }
-    function handleFilterAndCopy(destStat, src, dest, opts) {
       if (opts.filter && !opts.filter(src, dest))
         return;
       const destParent = path.dirname(dest);
       if (!fs.existsSync(destParent))
         mkdirsSync(destParent);
-      return getStats(destStat, src, dest, opts);
-    }
-    function startCopy(destStat, src, dest, opts) {
-      if (opts.filter && !opts.filter(src, dest))
-        return;
       return getStats(destStat, src, dest, opts);
     }
     function getStats(destStat, src, dest, opts) {
@@ -4487,8 +8620,10 @@ var require_copy_sync = __commonJS({
     function copyDirItem(item, src, dest, opts) {
       const srcItem = path.join(src, item);
       const destItem = path.join(dest, item);
+      if (opts.filter && !opts.filter(srcItem, destItem))
+        return;
       const { destStat } = stat.checkPathsSync(srcItem, destItem, "copy", opts);
-      return startCopy(destStat, srcItem, destItem, opts);
+      return getStats(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
       let resolvedSrc = fs.readlinkSync(src);
@@ -4512,7 +8647,7 @@ var require_copy_sync = __commonJS({
         if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
           throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
         }
-        if (fs.statSync(dest).isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
         return copyLink(resolvedSrc, dest);
@@ -4526,9 +8661,9 @@ var require_copy_sync = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/copy/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/index.js
 var require_copy2 = __commonJS({
-  "node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     module2.exports = {
@@ -4538,261 +8673,17 @@ var require_copy2 = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/remove/rimraf.js
-var require_rimraf = __commonJS({
-  "node_modules/fs-extra/lib/remove/rimraf.js"(exports2, module2) {
-    "use strict";
-    var fs = require_graceful_fs();
-    var path = require("path");
-    var assert = require("assert");
-    var isWindows = process.platform === "win32";
-    function defaults(options) {
-      const methods = [
-        "unlink",
-        "chmod",
-        "stat",
-        "lstat",
-        "rmdir",
-        "readdir"
-      ];
-      methods.forEach((m) => {
-        options[m] = options[m] || fs[m];
-        m = m + "Sync";
-        options[m] = options[m] || fs[m];
-      });
-      options.maxBusyTries = options.maxBusyTries || 3;
-    }
-    function rimraf(p, options, cb) {
-      let busyTries = 0;
-      if (typeof options === "function") {
-        cb = options;
-        options = {};
-      }
-      assert(p, "rimraf: missing path");
-      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
-      assert.strictEqual(typeof cb, "function", "rimraf: callback function required");
-      assert(options, "rimraf: invalid options argument provided");
-      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
-      defaults(options);
-      rimraf_(p, options, function CB(er) {
-        if (er) {
-          if ((er.code === "EBUSY" || er.code === "ENOTEMPTY" || er.code === "EPERM") && busyTries < options.maxBusyTries) {
-            busyTries++;
-            const time = busyTries * 100;
-            return setTimeout(() => rimraf_(p, options, CB), time);
-          }
-          if (er.code === "ENOENT")
-            er = null;
-        }
-        cb(er);
-      });
-    }
-    function rimraf_(p, options, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.lstat(p, (er, st) => {
-        if (er && er.code === "ENOENT") {
-          return cb(null);
-        }
-        if (er && er.code === "EPERM" && isWindows) {
-          return fixWinEPERM(p, options, er, cb);
-        }
-        if (st && st.isDirectory()) {
-          return rmdir(p, options, er, cb);
-        }
-        options.unlink(p, (er2) => {
-          if (er2) {
-            if (er2.code === "ENOENT") {
-              return cb(null);
-            }
-            if (er2.code === "EPERM") {
-              return isWindows ? fixWinEPERM(p, options, er2, cb) : rmdir(p, options, er2, cb);
-            }
-            if (er2.code === "EISDIR") {
-              return rmdir(p, options, er2, cb);
-            }
-          }
-          return cb(er2);
-        });
-      });
-    }
-    function fixWinEPERM(p, options, er, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.chmod(p, 438, (er2) => {
-        if (er2) {
-          cb(er2.code === "ENOENT" ? null : er);
-        } else {
-          options.stat(p, (er3, stats) => {
-            if (er3) {
-              cb(er3.code === "ENOENT" ? null : er);
-            } else if (stats.isDirectory()) {
-              rmdir(p, options, er, cb);
-            } else {
-              options.unlink(p, cb);
-            }
-          });
-        }
-      });
-    }
-    function fixWinEPERMSync(p, options, er) {
-      let stats;
-      assert(p);
-      assert(options);
-      try {
-        options.chmodSync(p, 438);
-      } catch (er2) {
-        if (er2.code === "ENOENT") {
-          return;
-        } else {
-          throw er;
-        }
-      }
-      try {
-        stats = options.statSync(p);
-      } catch (er3) {
-        if (er3.code === "ENOENT") {
-          return;
-        } else {
-          throw er;
-        }
-      }
-      if (stats.isDirectory()) {
-        rmdirSync(p, options, er);
-      } else {
-        options.unlinkSync(p);
-      }
-    }
-    function rmdir(p, options, originalEr, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.rmdir(p, (er) => {
-        if (er && (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM")) {
-          rmkids(p, options, cb);
-        } else if (er && er.code === "ENOTDIR") {
-          cb(originalEr);
-        } else {
-          cb(er);
-        }
-      });
-    }
-    function rmkids(p, options, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.readdir(p, (er, files) => {
-        if (er)
-          return cb(er);
-        let n = files.length;
-        let errState;
-        if (n === 0)
-          return options.rmdir(p, cb);
-        files.forEach((f) => {
-          rimraf(path.join(p, f), options, (er2) => {
-            if (errState) {
-              return;
-            }
-            if (er2)
-              return cb(errState = er2);
-            if (--n === 0) {
-              options.rmdir(p, cb);
-            }
-          });
-        });
-      });
-    }
-    function rimrafSync(p, options) {
-      let st;
-      options = options || {};
-      defaults(options);
-      assert(p, "rimraf: missing path");
-      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
-      assert(options, "rimraf: missing options");
-      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
-      try {
-        st = options.lstatSync(p);
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return;
-        }
-        if (er.code === "EPERM" && isWindows) {
-          fixWinEPERMSync(p, options, er);
-        }
-      }
-      try {
-        if (st && st.isDirectory()) {
-          rmdirSync(p, options, null);
-        } else {
-          options.unlinkSync(p);
-        }
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return;
-        } else if (er.code === "EPERM") {
-          return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er);
-        } else if (er.code !== "EISDIR") {
-          throw er;
-        }
-        rmdirSync(p, options, er);
-      }
-    }
-    function rmdirSync(p, options, originalEr) {
-      assert(p);
-      assert(options);
-      try {
-        options.rmdirSync(p);
-      } catch (er) {
-        if (er.code === "ENOTDIR") {
-          throw originalEr;
-        } else if (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM") {
-          rmkidsSync(p, options);
-        } else if (er.code !== "ENOENT") {
-          throw er;
-        }
-      }
-    }
-    function rmkidsSync(p, options) {
-      assert(p);
-      assert(options);
-      options.readdirSync(p).forEach((f) => rimrafSync(path.join(p, f), options));
-      if (isWindows) {
-        const startTime = Date.now();
-        do {
-          try {
-            const ret = options.rmdirSync(p, options);
-            return ret;
-          } catch {
-          }
-        } while (Date.now() - startTime < 500);
-      } else {
-        const ret = options.rmdirSync(p, options);
-        return ret;
-      }
-    }
-    module2.exports = rimraf;
-    rimraf.sync = rimrafSync;
-  }
-});
-
-// node_modules/fs-extra/lib/remove/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/remove/index.js
 var require_remove = __commonJS({
-  "node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var u = require_universalify().fromCallback;
-    var rimraf = require_rimraf();
     function remove(path, callback) {
-      if (fs.rm)
-        return fs.rm(path, { recursive: true, force: true }, callback);
-      rimraf(path, callback);
+      fs.rm(path, { recursive: true, force: true }, callback);
     }
     function removeSync(path) {
-      if (fs.rmSync)
-        return fs.rmSync(path, { recursive: true, force: true });
-      rimraf.sync(path);
+      fs.rmSync(path, { recursive: true, force: true });
     }
     module2.exports = {
       remove: u(remove),
@@ -4801,12 +8692,12 @@ var require_remove = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/empty/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/empty/index.js
 var require_empty = __commonJS({
-  "node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
-    var fs = require_fs2();
+    var fs = require_fs();
     var path = require("path");
     var mkdir = require_mkdirs();
     var remove = require_remove();
@@ -4840,9 +8731,9 @@ var require_empty = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/ensure/file.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/file.js
 var require_file = __commonJS({
-  "node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var path = require("path");
@@ -4910,9 +8801,9 @@ var require_file = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/ensure/link.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/link.js
 var require_link = __commonJS({
-  "node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var path = require("path");
@@ -4979,9 +8870,9 @@ var require_link = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/ensure/symlink-paths.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = __commonJS({
-  "node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
     "use strict";
     var path = require("path");
     var fs = require_graceful_fs();
@@ -5061,9 +8952,9 @@ var require_symlink_paths = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/ensure/symlink-type.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = __commonJS({
-  "node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     function symlinkType(srcpath, type, callback) {
@@ -5096,13 +8987,13 @@ var require_symlink_type = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/ensure/symlink.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = __commonJS({
-  "node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var path = require("path");
-    var fs = require_fs2();
+    var fs = require_fs();
     var _mkdirs = require_mkdirs();
     var mkdirs = _mkdirs.mkdirs;
     var mkdirsSync = _mkdirs.mkdirsSync;
@@ -5183,22 +9074,25 @@ var require_symlink = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/ensure/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = __commonJS({
-  "node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
     "use strict";
     var { createFile, createFileSync } = require_file();
     var { createLink, createLinkSync } = require_link();
     var { createSymlink, createSymlinkSync } = require_symlink();
     module2.exports = {
+      // file
       createFile,
       createFileSync,
       ensureFile: createFile,
       ensureFileSync: createFileSync,
+      // link
       createLink,
       createLinkSync,
       ensureLink: createLink,
       ensureLinkSync: createLinkSync,
+      // symlink
       createSymlink,
       createSymlinkSync,
       ensureSymlink: createSymlink,
@@ -5210,7 +9104,7 @@ var require_ensure = __commonJS({
 // node_modules/jsonfile/utils.js
 var require_utils2 = __commonJS({
   "node_modules/jsonfile/utils.js"(exports2, module2) {
-    function stringify(obj, { EOL = "\n", finalEOL = true, replacer = null, spaces } = {}) {
+    function stringify2(obj, { EOL = "\n", finalEOL = true, replacer = null, spaces } = {}) {
       const EOF = finalEOL ? EOL : "";
       const str = JSON.stringify(obj, replacer, spaces);
       return str.replace(/\n/g, EOL) + EOF;
@@ -5220,7 +9114,7 @@ var require_utils2 = __commonJS({
         content = content.toString("utf8");
       return content.replace(/^\uFEFF/, "");
     }
-    module2.exports = { stringify, stripBom };
+    module2.exports = { stringify: stringify2, stripBom };
   }
 });
 
@@ -5234,7 +9128,7 @@ var require_jsonfile = __commonJS({
       _fs = require("fs");
     }
     var universalify = require_universalify();
-    var { stringify, stripBom } = require_utils2();
+    var { stringify: stringify2, stripBom } = require_utils2();
     async function _readFile(file, options = {}) {
       if (typeof options === "string") {
         options = { encoding: options };
@@ -5278,13 +9172,13 @@ var require_jsonfile = __commonJS({
     }
     async function _writeFile(file, obj, options = {}) {
       const fs = options.fs || _fs;
-      const str = stringify(obj, options);
+      const str = stringify2(obj, options);
       await universalify.fromCallback(fs.writeFile)(file, str, options);
     }
     var writeFile = universalify.fromPromise(_writeFile);
     function writeFileSync(file, obj, options = {}) {
       const fs = options.fs || _fs;
-      const str = stringify(obj, options);
+      const str = stringify2(obj, options);
       return fs.writeFileSync(file, str, options);
     }
     var jsonfile = {
@@ -5297,12 +9191,13 @@ var require_jsonfile = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/json/jsonfile.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile2 = __commonJS({
-  "node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
     "use strict";
     var jsonFile = require_jsonfile();
     module2.exports = {
+      // jsonfile exports
       readJson: jsonFile.readFile,
       readJsonSync: jsonFile.readFileSync,
       writeJson: jsonFile.writeFile,
@@ -5311,9 +9206,9 @@ var require_jsonfile2 = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/output-file/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/output-file/index.js
 var require_output_file = __commonJS({
-  "node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs = require_graceful_fs();
@@ -5353,37 +9248,37 @@ var require_output_file = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/json/output-json.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json.js
 var require_output_json = __commonJS({
-  "node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
     "use strict";
-    var { stringify } = require_utils2();
+    var { stringify: stringify2 } = require_utils2();
     var { outputFile } = require_output_file();
     async function outputJson(file, data, options = {}) {
-      const str = stringify(data, options);
+      const str = stringify2(data, options);
       await outputFile(file, str, options);
     }
     module2.exports = outputJson;
   }
 });
 
-// node_modules/fs-extra/lib/json/output-json-sync.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = __commonJS({
-  "node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
     "use strict";
-    var { stringify } = require_utils2();
+    var { stringify: stringify2 } = require_utils2();
     var { outputFileSync } = require_output_file();
     function outputJsonSync(file, data, options) {
-      const str = stringify(data, options);
+      const str = stringify2(data, options);
       outputFileSync(file, str, options);
     }
     module2.exports = outputJsonSync;
   }
 });
 
-// node_modules/fs-extra/lib/json/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/index.js
 var require_json = __commonJS({
-  "node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var jsonFile = require_jsonfile2();
@@ -5399,9 +9294,9 @@ var require_json = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/move/move.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move.js
 var require_move = __commonJS({
-  "node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -5469,7 +9364,8 @@ var require_move = __commonJS({
     function moveAcrossDevice(src, dest, overwrite, cb) {
       const opts = {
         overwrite,
-        errorOnExist: true
+        errorOnExist: true,
+        preserveTimestamps: true
       };
       copy(src, dest, opts, (err) => {
         if (err)
@@ -5481,9 +9377,9 @@ var require_move = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/move/move-sync.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = __commonJS({
-  "node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -5528,7 +9424,8 @@ var require_move_sync = __commonJS({
     function moveAcrossDevice(src, dest, overwrite) {
       const opts = {
         overwrite,
-        errorOnExist: true
+        errorOnExist: true,
+        preserveTimestamps: true
       };
       copySync(src, dest, opts);
       return removeSync(src);
@@ -5537,9 +9434,9 @@ var require_move_sync = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/move/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/index.js
 var require_move2 = __commonJS({
-  "node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     module2.exports = {
@@ -5549,12 +9446,14 @@ var require_move2 = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/index.js
+// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/index.js
 var require_lib = __commonJS({
-  "node_modules/fs-extra/lib/index.js"(exports2, module2) {
+  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/index.js"(exports2, module2) {
     "use strict";
     module2.exports = {
-      ...require_fs2(),
+      // Export promiseified graceful-fs:
+      ...require_fs(),
+      // Export extra methods:
       ...require_copy2(),
       ...require_empty(),
       ...require_ensure(),
@@ -5601,7 +9500,7 @@ var require_checkSolution = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkSolution = void 0;
-    var glob = require_glob();
+    var glob = require_src();
     var os = require("os");
     var path = require("path");
     var InputValidator_1 = require_InputValidator();
@@ -5881,7 +9780,7 @@ var require_deployPackage = __commonJS({
           const packagePath = path.isAbsolute(packagePathIn) ? packagePathIn : path.resolve(runnerParameters.workingDir, packagePathIn);
           logger.log(`Deploying package: ${packagePath}`);
           pacArgs.push("--package", packagePath);
-          logFile = path.resolve(outputDirectory, `${path.basename(packagePath, ".dll")}-${new Date().toISOString().replace(/:/g, "-")}.log`);
+          logFile = path.resolve(outputDirectory, `${path.basename(packagePath, ".dll")}-${(/* @__PURE__ */ new Date()).toISOString().replace(/:/g, "-")}.log`);
           fs.ensureDir(path.dirname(logFile));
           pacArgs.push("--logFile", logFile);
           validator.pushInput(pacArgs, "--logConsole", parameters.logConsole);
@@ -7400,9 +11299,13 @@ var require_submitCatalog = __commonJS({
           const pacArgs = ["catalog", "submit"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--path", parameters.path);
-          validator.pushInput(pacArgs, "--solution-zip", parameters.solutionZip);
-          validator.pushInput(pacArgs, "--package-zip", parameters.packageZip);
           validator.pushInput(pacArgs, "--poll-status", parameters.pollStatus);
+          if (validator.getInput(parameters.packageSolutionZipFile) === "SolutionZipFile") {
+            validator.pushInput(pacArgs, "--solution-zip", parameters.solutionZip);
+          }
+          if (validator.getInput(parameters.packageSolutionZipFile) === "PackageZipFile") {
+            validator.pushInput(pacArgs, "--package-zip", parameters.packageZip);
+          }
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
           const pacResult = yield pac(...pacArgs);
           logger.log("SubmitCatalog Action Result: " + pacResult);
@@ -7597,494 +11500,336 @@ var require_command = __commonJS({
   }
 });
 
-// node_modules/uuid/dist/rng.js
-var require_rng = __commonJS({
-  "node_modules/uuid/dist/rng.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = rng;
-    var _crypto = _interopRequireDefault(require("crypto"));
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    var rnds8Pool = new Uint8Array(256);
-    var poolPtr = rnds8Pool.length;
-    function rng() {
-      if (poolPtr > rnds8Pool.length - 16) {
-        _crypto.default.randomFillSync(rnds8Pool);
-        poolPtr = 0;
-      }
-      return rnds8Pool.slice(poolPtr, poolPtr += 16);
-    }
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/rng.js
+function rng() {
+  if (poolPtr > rnds8Pool.length - 16) {
+    import_crypto.default.randomFillSync(rnds8Pool);
+    poolPtr = 0;
+  }
+  return rnds8Pool.slice(poolPtr, poolPtr += 16);
+}
+var import_crypto, rnds8Pool, poolPtr;
+var init_rng = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/rng.js"() {
+    import_crypto = __toESM(require("crypto"));
+    rnds8Pool = new Uint8Array(256);
+    poolPtr = rnds8Pool.length;
   }
 });
 
-// node_modules/uuid/dist/regex.js
-var require_regex = __commonJS({
-  "node_modules/uuid/dist/regex.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/regex.js
+var regex_default;
+var init_regex = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/regex.js"() {
+    regex_default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
   }
 });
 
-// node_modules/uuid/dist/validate.js
-var require_validate = __commonJS({
-  "node_modules/uuid/dist/validate.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _regex = _interopRequireDefault(require_regex());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    function validate(uuid) {
-      return typeof uuid === "string" && _regex.default.test(uuid);
-    }
-    var _default = validate;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/validate.js
+function validate(uuid) {
+  return typeof uuid === "string" && regex_default.test(uuid);
+}
+var validate_default;
+var init_validate = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/validate.js"() {
+    init_regex();
+    validate_default = validate;
   }
 });
 
-// node_modules/uuid/dist/stringify.js
-var require_stringify = __commonJS({
-  "node_modules/uuid/dist/stringify.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _validate = _interopRequireDefault(require_validate());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    var byteToHex = [];
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/stringify.js
+function stringify(arr, offset = 0) {
+  const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + "-" + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + "-" + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + "-" + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + "-" + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase();
+  if (!validate_default(uuid)) {
+    throw TypeError("Stringified UUID is invalid");
+  }
+  return uuid;
+}
+var byteToHex, stringify_default;
+var init_stringify = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/stringify.js"() {
+    init_validate();
+    byteToHex = [];
     for (let i = 0; i < 256; ++i) {
       byteToHex.push((i + 256).toString(16).substr(1));
     }
-    function stringify(arr, offset = 0) {
-      const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + "-" + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + "-" + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + "-" + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + "-" + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase();
-      if (!(0, _validate.default)(uuid)) {
-        throw TypeError("Stringified UUID is invalid");
-      }
-      return uuid;
-    }
-    var _default = stringify;
-    exports2.default = _default;
+    stringify_default = stringify;
   }
 });
 
-// node_modules/uuid/dist/v1.js
-var require_v1 = __commonJS({
-  "node_modules/uuid/dist/v1.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _rng = _interopRequireDefault(require_rng());
-    var _stringify = _interopRequireDefault(require_stringify());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/v1.js
+function v1(options, buf, offset) {
+  let i = buf && offset || 0;
+  const b = buf || new Array(16);
+  options = options || {};
+  let node = options.node || _nodeId;
+  let clockseq = options.clockseq !== void 0 ? options.clockseq : _clockseq;
+  if (node == null || clockseq == null) {
+    const seedBytes = options.random || (options.rng || rng)();
+    if (node == null) {
+      node = _nodeId = [seedBytes[0] | 1, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
     }
-    var _nodeId;
-    var _clockseq;
-    var _lastMSecs = 0;
-    var _lastNSecs = 0;
-    function v1(options, buf, offset) {
-      let i = buf && offset || 0;
-      const b = buf || new Array(16);
-      options = options || {};
-      let node = options.node || _nodeId;
-      let clockseq = options.clockseq !== void 0 ? options.clockseq : _clockseq;
-      if (node == null || clockseq == null) {
-        const seedBytes = options.random || (options.rng || _rng.default)();
-        if (node == null) {
-          node = _nodeId = [seedBytes[0] | 1, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
-        }
-        if (clockseq == null) {
-          clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 16383;
-        }
-      }
-      let msecs = options.msecs !== void 0 ? options.msecs : Date.now();
-      let nsecs = options.nsecs !== void 0 ? options.nsecs : _lastNSecs + 1;
-      const dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 1e4;
-      if (dt < 0 && options.clockseq === void 0) {
-        clockseq = clockseq + 1 & 16383;
-      }
-      if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === void 0) {
-        nsecs = 0;
-      }
-      if (nsecs >= 1e4) {
-        throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
-      }
-      _lastMSecs = msecs;
-      _lastNSecs = nsecs;
-      _clockseq = clockseq;
-      msecs += 122192928e5;
-      const tl = ((msecs & 268435455) * 1e4 + nsecs) % 4294967296;
-      b[i++] = tl >>> 24 & 255;
-      b[i++] = tl >>> 16 & 255;
-      b[i++] = tl >>> 8 & 255;
-      b[i++] = tl & 255;
-      const tmh = msecs / 4294967296 * 1e4 & 268435455;
-      b[i++] = tmh >>> 8 & 255;
-      b[i++] = tmh & 255;
-      b[i++] = tmh >>> 24 & 15 | 16;
-      b[i++] = tmh >>> 16 & 255;
-      b[i++] = clockseq >>> 8 | 128;
-      b[i++] = clockseq & 255;
-      for (let n = 0; n < 6; ++n) {
-        b[i + n] = node[n];
-      }
-      return buf || (0, _stringify.default)(b);
+    if (clockseq == null) {
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 16383;
     }
-    var _default = v1;
-    exports2.default = _default;
+  }
+  let msecs = options.msecs !== void 0 ? options.msecs : Date.now();
+  let nsecs = options.nsecs !== void 0 ? options.nsecs : _lastNSecs + 1;
+  const dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 1e4;
+  if (dt < 0 && options.clockseq === void 0) {
+    clockseq = clockseq + 1 & 16383;
+  }
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === void 0) {
+    nsecs = 0;
+  }
+  if (nsecs >= 1e4) {
+    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
+  }
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+  msecs += 122192928e5;
+  const tl = ((msecs & 268435455) * 1e4 + nsecs) % 4294967296;
+  b[i++] = tl >>> 24 & 255;
+  b[i++] = tl >>> 16 & 255;
+  b[i++] = tl >>> 8 & 255;
+  b[i++] = tl & 255;
+  const tmh = msecs / 4294967296 * 1e4 & 268435455;
+  b[i++] = tmh >>> 8 & 255;
+  b[i++] = tmh & 255;
+  b[i++] = tmh >>> 24 & 15 | 16;
+  b[i++] = tmh >>> 16 & 255;
+  b[i++] = clockseq >>> 8 | 128;
+  b[i++] = clockseq & 255;
+  for (let n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+  return buf || stringify_default(b);
+}
+var _nodeId, _clockseq, _lastMSecs, _lastNSecs, v1_default;
+var init_v1 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/v1.js"() {
+    init_rng();
+    init_stringify();
+    _lastMSecs = 0;
+    _lastNSecs = 0;
+    v1_default = v1;
   }
 });
 
-// node_modules/uuid/dist/parse.js
-var require_parse = __commonJS({
-  "node_modules/uuid/dist/parse.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _validate = _interopRequireDefault(require_validate());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    function parse(uuid) {
-      if (!(0, _validate.default)(uuid)) {
-        throw TypeError("Invalid UUID");
-      }
-      let v;
-      const arr = new Uint8Array(16);
-      arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
-      arr[1] = v >>> 16 & 255;
-      arr[2] = v >>> 8 & 255;
-      arr[3] = v & 255;
-      arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
-      arr[5] = v & 255;
-      arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
-      arr[7] = v & 255;
-      arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
-      arr[9] = v & 255;
-      arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 1099511627776 & 255;
-      arr[11] = v / 4294967296 & 255;
-      arr[12] = v >>> 24 & 255;
-      arr[13] = v >>> 16 & 255;
-      arr[14] = v >>> 8 & 255;
-      arr[15] = v & 255;
-      return arr;
-    }
-    var _default = parse;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/parse.js
+function parse(uuid) {
+  if (!validate_default(uuid)) {
+    throw TypeError("Invalid UUID");
+  }
+  let v;
+  const arr = new Uint8Array(16);
+  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
+  arr[1] = v >>> 16 & 255;
+  arr[2] = v >>> 8 & 255;
+  arr[3] = v & 255;
+  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
+  arr[5] = v & 255;
+  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
+  arr[7] = v & 255;
+  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
+  arr[9] = v & 255;
+  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 1099511627776 & 255;
+  arr[11] = v / 4294967296 & 255;
+  arr[12] = v >>> 24 & 255;
+  arr[13] = v >>> 16 & 255;
+  arr[14] = v >>> 8 & 255;
+  arr[15] = v & 255;
+  return arr;
+}
+var parse_default;
+var init_parse = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/parse.js"() {
+    init_validate();
+    parse_default = parse;
   }
 });
 
-// node_modules/uuid/dist/v35.js
-var require_v35 = __commonJS({
-  "node_modules/uuid/dist/v35.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = _default;
-    exports2.URL = exports2.DNS = void 0;
-    var _stringify = _interopRequireDefault(require_stringify());
-    var _parse = _interopRequireDefault(require_parse());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/v35.js
+function stringToBytes(str) {
+  str = unescape(encodeURIComponent(str));
+  const bytes = [];
+  for (let i = 0; i < str.length; ++i) {
+    bytes.push(str.charCodeAt(i));
+  }
+  return bytes;
+}
+function v35_default(name, version2, hashfunc) {
+  function generateUUID(value, namespace, buf, offset) {
+    if (typeof value === "string") {
+      value = stringToBytes(value);
     }
-    function stringToBytes(str) {
-      str = unescape(encodeURIComponent(str));
-      const bytes = [];
-      for (let i = 0; i < str.length; ++i) {
-        bytes.push(str.charCodeAt(i));
-      }
-      return bytes;
+    if (typeof namespace === "string") {
+      namespace = parse_default(namespace);
     }
-    var DNS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
-    exports2.DNS = DNS;
-    var URL2 = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
-    exports2.URL = URL2;
-    function _default(name, version, hashfunc) {
-      function generateUUID(value, namespace, buf, offset) {
-        if (typeof value === "string") {
-          value = stringToBytes(value);
-        }
-        if (typeof namespace === "string") {
-          namespace = (0, _parse.default)(namespace);
-        }
-        if (namespace.length !== 16) {
-          throw TypeError("Namespace must be array-like (16 iterable integer values, 0-255)");
-        }
-        let bytes = new Uint8Array(16 + value.length);
-        bytes.set(namespace);
-        bytes.set(value, namespace.length);
-        bytes = hashfunc(bytes);
-        bytes[6] = bytes[6] & 15 | version;
-        bytes[8] = bytes[8] & 63 | 128;
-        if (buf) {
-          offset = offset || 0;
-          for (let i = 0; i < 16; ++i) {
-            buf[offset + i] = bytes[i];
-          }
-          return buf;
-        }
-        return (0, _stringify.default)(bytes);
-      }
-      try {
-        generateUUID.name = name;
-      } catch (err) {
-      }
-      generateUUID.DNS = DNS;
-      generateUUID.URL = URL2;
-      return generateUUID;
+    if (namespace.length !== 16) {
+      throw TypeError("Namespace must be array-like (16 iterable integer values, 0-255)");
     }
+    let bytes = new Uint8Array(16 + value.length);
+    bytes.set(namespace);
+    bytes.set(value, namespace.length);
+    bytes = hashfunc(bytes);
+    bytes[6] = bytes[6] & 15 | version2;
+    bytes[8] = bytes[8] & 63 | 128;
+    if (buf) {
+      offset = offset || 0;
+      for (let i = 0; i < 16; ++i) {
+        buf[offset + i] = bytes[i];
+      }
+      return buf;
+    }
+    return stringify_default(bytes);
+  }
+  try {
+    generateUUID.name = name;
+  } catch (err) {
+  }
+  generateUUID.DNS = DNS;
+  generateUUID.URL = URL2;
+  return generateUUID;
+}
+var DNS, URL2;
+var init_v35 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/v35.js"() {
+    init_stringify();
+    init_parse();
+    DNS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+    URL2 = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
   }
 });
 
-// node_modules/uuid/dist/md5.js
-var require_md5 = __commonJS({
-  "node_modules/uuid/dist/md5.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _crypto = _interopRequireDefault(require("crypto"));
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    function md5(bytes) {
-      if (Array.isArray(bytes)) {
-        bytes = Buffer.from(bytes);
-      } else if (typeof bytes === "string") {
-        bytes = Buffer.from(bytes, "utf8");
-      }
-      return _crypto.default.createHash("md5").update(bytes).digest();
-    }
-    var _default = md5;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/md5.js
+function md5(bytes) {
+  if (Array.isArray(bytes)) {
+    bytes = Buffer.from(bytes);
+  } else if (typeof bytes === "string") {
+    bytes = Buffer.from(bytes, "utf8");
+  }
+  return import_crypto2.default.createHash("md5").update(bytes).digest();
+}
+var import_crypto2, md5_default;
+var init_md5 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/md5.js"() {
+    import_crypto2 = __toESM(require("crypto"));
+    md5_default = md5;
   }
 });
 
-// node_modules/uuid/dist/v3.js
-var require_v3 = __commonJS({
-  "node_modules/uuid/dist/v3.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _v = _interopRequireDefault(require_v35());
-    var _md = _interopRequireDefault(require_md5());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    var v3 = (0, _v.default)("v3", 48, _md.default);
-    var _default = v3;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/v3.js
+var v3, v3_default;
+var init_v3 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/v3.js"() {
+    init_v35();
+    init_md5();
+    v3 = v35_default("v3", 48, md5_default);
+    v3_default = v3;
   }
 });
 
-// node_modules/uuid/dist/v4.js
-var require_v4 = __commonJS({
-  "node_modules/uuid/dist/v4.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _rng = _interopRequireDefault(require_rng());
-    var _stringify = _interopRequireDefault(require_stringify());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/v4.js
+function v4(options, buf, offset) {
+  options = options || {};
+  const rnds = options.random || (options.rng || rng)();
+  rnds[6] = rnds[6] & 15 | 64;
+  rnds[8] = rnds[8] & 63 | 128;
+  if (buf) {
+    offset = offset || 0;
+    for (let i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
     }
-    function v4(options, buf, offset) {
-      options = options || {};
-      const rnds = options.random || (options.rng || _rng.default)();
-      rnds[6] = rnds[6] & 15 | 64;
-      rnds[8] = rnds[8] & 63 | 128;
-      if (buf) {
-        offset = offset || 0;
-        for (let i = 0; i < 16; ++i) {
-          buf[offset + i] = rnds[i];
-        }
-        return buf;
-      }
-      return (0, _stringify.default)(rnds);
-    }
-    var _default = v4;
-    exports2.default = _default;
+    return buf;
+  }
+  return stringify_default(rnds);
+}
+var v4_default;
+var init_v4 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/v4.js"() {
+    init_rng();
+    init_stringify();
+    v4_default = v4;
   }
 });
 
-// node_modules/uuid/dist/sha1.js
-var require_sha1 = __commonJS({
-  "node_modules/uuid/dist/sha1.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _crypto = _interopRequireDefault(require("crypto"));
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    function sha1(bytes) {
-      if (Array.isArray(bytes)) {
-        bytes = Buffer.from(bytes);
-      } else if (typeof bytes === "string") {
-        bytes = Buffer.from(bytes, "utf8");
-      }
-      return _crypto.default.createHash("sha1").update(bytes).digest();
-    }
-    var _default = sha1;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/sha1.js
+function sha1(bytes) {
+  if (Array.isArray(bytes)) {
+    bytes = Buffer.from(bytes);
+  } else if (typeof bytes === "string") {
+    bytes = Buffer.from(bytes, "utf8");
+  }
+  return import_crypto3.default.createHash("sha1").update(bytes).digest();
+}
+var import_crypto3, sha1_default;
+var init_sha1 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/sha1.js"() {
+    import_crypto3 = __toESM(require("crypto"));
+    sha1_default = sha1;
   }
 });
 
-// node_modules/uuid/dist/v5.js
-var require_v5 = __commonJS({
-  "node_modules/uuid/dist/v5.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _v = _interopRequireDefault(require_v35());
-    var _sha = _interopRequireDefault(require_sha1());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    var v5 = (0, _v.default)("v5", 80, _sha.default);
-    var _default = v5;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/v5.js
+var v5, v5_default;
+var init_v5 = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/v5.js"() {
+    init_v35();
+    init_sha1();
+    v5 = v35_default("v5", 80, sha1_default);
+    v5_default = v5;
   }
 });
 
-// node_modules/uuid/dist/nil.js
-var require_nil = __commonJS({
-  "node_modules/uuid/dist/nil.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _default = "00000000-0000-0000-0000-000000000000";
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/nil.js
+var nil_default;
+var init_nil = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/nil.js"() {
+    nil_default = "00000000-0000-0000-0000-000000000000";
   }
 });
 
-// node_modules/uuid/dist/version.js
-var require_version = __commonJS({
-  "node_modules/uuid/dist/version.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    exports2.default = void 0;
-    var _validate = _interopRequireDefault(require_validate());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
-    function version(uuid) {
-      if (!(0, _validate.default)(uuid)) {
-        throw TypeError("Invalid UUID");
-      }
-      return parseInt(uuid.substr(14, 1), 16);
-    }
-    var _default = version;
-    exports2.default = _default;
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/version.js
+function version(uuid) {
+  if (!validate_default(uuid)) {
+    throw TypeError("Invalid UUID");
+  }
+  return parseInt(uuid.substr(14, 1), 16);
+}
+var version_default;
+var init_version = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/version.js"() {
+    init_validate();
+    version_default = version;
   }
 });
 
-// node_modules/uuid/dist/index.js
-var require_dist = __commonJS({
-  "node_modules/uuid/dist/index.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", {
-      value: true
-    });
-    Object.defineProperty(exports2, "v1", {
-      enumerable: true,
-      get: function() {
-        return _v.default;
-      }
-    });
-    Object.defineProperty(exports2, "v3", {
-      enumerable: true,
-      get: function() {
-        return _v2.default;
-      }
-    });
-    Object.defineProperty(exports2, "v4", {
-      enumerable: true,
-      get: function() {
-        return _v3.default;
-      }
-    });
-    Object.defineProperty(exports2, "v5", {
-      enumerable: true,
-      get: function() {
-        return _v4.default;
-      }
-    });
-    Object.defineProperty(exports2, "NIL", {
-      enumerable: true,
-      get: function() {
-        return _nil.default;
-      }
-    });
-    Object.defineProperty(exports2, "version", {
-      enumerable: true,
-      get: function() {
-        return _version.default;
-      }
-    });
-    Object.defineProperty(exports2, "validate", {
-      enumerable: true,
-      get: function() {
-        return _validate.default;
-      }
-    });
-    Object.defineProperty(exports2, "stringify", {
-      enumerable: true,
-      get: function() {
-        return _stringify.default;
-      }
-    });
-    Object.defineProperty(exports2, "parse", {
-      enumerable: true,
-      get: function() {
-        return _parse.default;
-      }
-    });
-    var _v = _interopRequireDefault(require_v1());
-    var _v2 = _interopRequireDefault(require_v3());
-    var _v3 = _interopRequireDefault(require_v4());
-    var _v4 = _interopRequireDefault(require_v5());
-    var _nil = _interopRequireDefault(require_nil());
-    var _version = _interopRequireDefault(require_version());
-    var _validate = _interopRequireDefault(require_validate());
-    var _stringify = _interopRequireDefault(require_stringify());
-    var _parse = _interopRequireDefault(require_parse());
-    function _interopRequireDefault(obj) {
-      return obj && obj.__esModule ? obj : { default: obj };
-    }
+// node_modules/@actions/core/node_modules/uuid/dist/esm-node/index.js
+var esm_node_exports = {};
+__export(esm_node_exports, {
+  NIL: () => nil_default,
+  parse: () => parse_default,
+  stringify: () => stringify_default,
+  v1: () => v1_default,
+  v3: () => v3_default,
+  v4: () => v4_default,
+  v5: () => v5_default,
+  validate: () => validate_default,
+  version: () => version_default
+});
+var init_esm_node = __esm({
+  "node_modules/@actions/core/node_modules/uuid/dist/esm-node/index.js"() {
+    init_v1();
+    init_v3();
+    init_v4();
+    init_v5();
+    init_nil();
+    init_version();
+    init_validate();
+    init_stringify();
+    init_parse();
   }
 });
 
@@ -8124,7 +11869,7 @@ var require_file_command = __commonJS({
     exports2.prepareKeyValueMessage = exports2.issueFileCommand = void 0;
     var fs = __importStar(require("fs"));
     var os = __importStar(require("os"));
-    var uuid_1 = require_dist();
+    var uuid_1 = (init_esm_node(), __toCommonJS(esm_node_exports));
     var utils_1 = require_utils3();
     function issueFileCommand(command, message) {
       const filePath = process.env[`GITHUB_${command}`];
@@ -8333,7 +12078,10 @@ var require_tunnel = __commonJS({
         connectReq.removeAllListeners();
         socket.removeAllListeners();
         if (res.statusCode !== 200) {
-          debug("tunneling socket could not be established, statusCode=%d", res.statusCode);
+          debug(
+            "tunneling socket could not be established, statusCode=%d",
+            res.statusCode
+          );
           socket.destroy();
           var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
           error.code = "ECONNRESET";
@@ -8356,7 +12104,11 @@ var require_tunnel = __commonJS({
       }
       function onError(cause) {
         connectReq.removeAllListeners();
-        debug("tunneling socket could not be established, cause=%s\n", cause.message, cause.stack);
+        debug(
+          "tunneling socket could not be established, cause=%s\n",
+          cause.message,
+          cause.stack
+        );
         var error = new Error("tunneling socket could not be established, cause=" + cause.message);
         error.code = "ECONNRESET";
         options.request.emit("error", error);
@@ -8675,6 +12427,10 @@ var require_lib2 = __commonJS({
           return this.request(verb, requestUrl, stream, additionalHeaders);
         });
       }
+      /**
+       * Gets a typed object from an endpoint
+       * Be aware that not found returns a null.  Other errors (4xx, 5xx) reject the promise
+       */
       getJson(requestUrl, additionalHeaders = {}) {
         return __awaiter2(this, void 0, void 0, function* () {
           additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
@@ -8709,6 +12465,11 @@ var require_lib2 = __commonJS({
           return this._processResponse(res, this.requestOptions);
         });
       }
+      /**
+       * Makes a raw http request.
+       * All other methods such as get, post, patch, and request ultimately call this.
+       * Prefer get, del, post and patch
+       */
       request(verb, requestUrl, data, headers) {
         return __awaiter2(this, void 0, void 0, function* () {
           if (this._disposed) {
@@ -8769,12 +12530,20 @@ var require_lib2 = __commonJS({
           return response;
         });
       }
+      /**
+       * Needs to be called if keepAlive is set to true in request options.
+       */
       dispose() {
         if (this._agent) {
           this._agent.destroy();
         }
         this._disposed = true;
       }
+      /**
+       * Raw request.
+       * @param info
+       * @param data
+       */
       requestRaw(info, data) {
         return __awaiter2(this, void 0, void 0, function* () {
           return new Promise((resolve, reject) => {
@@ -8791,6 +12560,12 @@ var require_lib2 = __commonJS({
           });
         });
       }
+      /**
+       * Raw request with callback.
+       * @param info
+       * @param data
+       * @param onResult
+       */
       requestRawWithCallback(info, data, onResult) {
         if (typeof data === "string") {
           if (!info.options.headers) {
@@ -8834,6 +12609,11 @@ var require_lib2 = __commonJS({
           req.end();
         }
       }
+      /**
+       * Gets an http agent. This function is useful when you need an http agent that handles
+       * routing through a proxy server - depending upon the url and proxy environment variables.
+       * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
+       */
       getAgent(serverUrl) {
         const parsedUrl = new URL(serverUrl);
         return this._getAgent(parsedUrl);
@@ -9036,6 +12816,7 @@ var require_auth = __commonJS({
         }
         options.headers["Authorization"] = `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`;
       }
+      // This handler cannot handle 401
       canHandleAuthentication() {
         return false;
       }
@@ -9050,12 +12831,15 @@ var require_auth = __commonJS({
       constructor(token) {
         this.token = token;
       }
+      // currently implements pre-authorization
+      // TODO: support preAuth = false where it hooks on 401
       prepareRequest(options) {
         if (!options.headers) {
           throw Error("The request has no headers");
         }
         options.headers["Authorization"] = `Bearer ${this.token}`;
       }
+      // This handler cannot handle 401
       canHandleAuthentication() {
         return false;
       }
@@ -9070,12 +12854,15 @@ var require_auth = __commonJS({
       constructor(token) {
         this.token = token;
       }
+      // currently implements pre-authorization
+      // TODO: support preAuth = false where it hooks on 401
       prepareRequest(options) {
         if (!options.headers) {
           throw Error("The request has no headers");
         }
         options.headers["Authorization"] = `Basic ${Buffer.from(`PAT:${this.token}`).toString("base64")}`;
       }
+      // This handler cannot handle 401
       canHandleAuthentication() {
         return false;
       }
@@ -9229,6 +13016,12 @@ var require_summary = __commonJS({
       constructor() {
         this._buffer = "";
       }
+      /**
+       * Finds the summary file path from the environment, rejects if env var is not found or file does not exist
+       * Also checks r/w permissions.
+       *
+       * @returns step summary file path
+       */
       filePath() {
         return __awaiter2(this, void 0, void 0, function* () {
           if (this._filePath) {
@@ -9247,6 +13040,15 @@ var require_summary = __commonJS({
           return this._filePath;
         });
       }
+      /**
+       * Wraps content in an HTML tag, adding any HTML attributes
+       *
+       * @param {string} tag HTML tag to wrap
+       * @param {string | null} content content within the tag
+       * @param {[attribute: string]: string} attrs key-value list of HTML attributes to add
+       *
+       * @returns {string} content wrapped in HTML element
+       */
       wrap(tag, content, attrs = {}) {
         const htmlAttrs = Object.entries(attrs).map(([key, value]) => ` ${key}="${value}"`).join("");
         if (!content) {
@@ -9254,6 +13056,13 @@ var require_summary = __commonJS({
         }
         return `<${tag}${htmlAttrs}>${content}</${tag}>`;
       }
+      /**
+       * Writes text in the buffer to the summary buffer file and empties buffer. Will append by default.
+       *
+       * @param {SummaryWriteOptions} [options] (optional) options for write operation
+       *
+       * @returns {Promise<Summary>} summary instance
+       */
       write(options) {
         return __awaiter2(this, void 0, void 0, function* () {
           const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
@@ -9263,39 +13072,95 @@ var require_summary = __commonJS({
           return this.emptyBuffer();
         });
       }
+      /**
+       * Clears the summary buffer and wipes the summary file
+       *
+       * @returns {Summary} summary instance
+       */
       clear() {
         return __awaiter2(this, void 0, void 0, function* () {
           return this.emptyBuffer().write({ overwrite: true });
         });
       }
+      /**
+       * Returns the current summary buffer as a string
+       *
+       * @returns {string} string of summary buffer
+       */
       stringify() {
         return this._buffer;
       }
+      /**
+       * If the summary buffer is empty
+       *
+       * @returns {boolen} true if the buffer is empty
+       */
       isEmptyBuffer() {
         return this._buffer.length === 0;
       }
+      /**
+       * Resets the summary buffer without writing to summary file
+       *
+       * @returns {Summary} summary instance
+       */
       emptyBuffer() {
         this._buffer = "";
         return this;
       }
+      /**
+       * Adds raw text to the summary buffer
+       *
+       * @param {string} text content to add
+       * @param {boolean} [addEOL=false] (optional) append an EOL to the raw text (default: false)
+       *
+       * @returns {Summary} summary instance
+       */
       addRaw(text, addEOL = false) {
         this._buffer += text;
         return addEOL ? this.addEOL() : this;
       }
+      /**
+       * Adds the operating system-specific end-of-line marker to the buffer
+       *
+       * @returns {Summary} summary instance
+       */
       addEOL() {
         return this.addRaw(os_1.EOL);
       }
+      /**
+       * Adds an HTML codeblock to the summary buffer
+       *
+       * @param {string} code content to render within fenced code block
+       * @param {string} lang (optional) language to syntax highlight code
+       *
+       * @returns {Summary} summary instance
+       */
       addCodeBlock(code, lang) {
         const attrs = Object.assign({}, lang && { lang });
         const element = this.wrap("pre", this.wrap("code", code), attrs);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML list to the summary buffer
+       *
+       * @param {string[]} items list of items to render
+       * @param {boolean} [ordered=false] (optional) if the rendered list should be ordered or not (default: false)
+       *
+       * @returns {Summary} summary instance
+       */
       addList(items, ordered = false) {
         const tag = ordered ? "ol" : "ul";
         const listItems = items.map((item) => this.wrap("li", item)).join("");
         const element = this.wrap(tag, listItems);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML table to the summary buffer
+       *
+       * @param {SummaryTableCell[]} rows table rows
+       *
+       * @returns {Summary} summary instance
+       */
       addTable(rows) {
         const tableBody = rows.map((row) => {
           const cells = row.map((cell) => {
@@ -9312,35 +13177,86 @@ var require_summary = __commonJS({
         const element = this.wrap("table", tableBody);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds a collapsable HTML details element to the summary buffer
+       *
+       * @param {string} label text for the closed state
+       * @param {string} content collapsable content
+       *
+       * @returns {Summary} summary instance
+       */
       addDetails(label, content) {
         const element = this.wrap("details", this.wrap("summary", label) + content);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML image tag to the summary buffer
+       *
+       * @param {string} src path to the image you to embed
+       * @param {string} alt text description of the image
+       * @param {SummaryImageOptions} options (optional) addition image attributes
+       *
+       * @returns {Summary} summary instance
+       */
       addImage(src, alt, options) {
         const { width, height } = options || {};
         const attrs = Object.assign(Object.assign({}, width && { width }), height && { height });
         const element = this.wrap("img", null, Object.assign({ src, alt }, attrs));
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML section heading element
+       *
+       * @param {string} text heading text
+       * @param {number | string} [level=1] (optional) the heading level, default: 1
+       *
+       * @returns {Summary} summary instance
+       */
       addHeading(text, level) {
         const tag = `h${level}`;
         const allowedTag = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(tag) ? tag : "h1";
         const element = this.wrap(allowedTag, text);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML thematic break (<hr>) to the summary buffer
+       *
+       * @returns {Summary} summary instance
+       */
       addSeparator() {
         const element = this.wrap("hr", null);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML line break (<br>) to the summary buffer
+       *
+       * @returns {Summary} summary instance
+       */
       addBreak() {
         const element = this.wrap("br", null);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML blockquote to the summary buffer
+       *
+       * @param {string} text quote text
+       * @param {string} cite (optional) citation url
+       *
+       * @returns {Summary} summary instance
+       */
       addQuote(text, cite) {
         const attrs = Object.assign({}, cite && { cite });
         const element = this.wrap("blockquote", text, attrs);
         return this.addRaw(element).addEOL();
       }
+      /**
+       * Adds an HTML anchor tag to the summary buffer
+       *
+       * @param {string} text link text/content
+       * @param {string} href hyperlink
+       *
+       * @returns {Summary} summary instance
+       */
       addLink(text, href) {
         const element = this.wrap("a", text, { href });
         return this.addRaw(element).addEOL();
@@ -9632,7 +13548,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
 });
 
 // node_modules/js-yaml/lib/common.js
-var require_common2 = __commonJS({
+var require_common = __commonJS({
   "node_modules/js-yaml/lib/common.js"(exports2, module2) {
     "use strict";
     function isNothing(subject) {
@@ -9720,7 +13636,7 @@ var require_exception = __commonJS({
 var require_snippet = __commonJS({
   "node_modules/js-yaml/lib/snippet.js"(exports2, module2) {
     "use strict";
-    var common = require_common2();
+    var common = require_common();
     function getLine(buffer, lineStart, lineEnd, position, maxLineLength) {
       var head = "";
       var tail = "";
@@ -9736,6 +13652,7 @@ var require_snippet = __commonJS({
       return {
         str: head + buffer.slice(lineStart, lineEnd).replace(/\t/g, "\u2192") + tail,
         pos: position - lineStart + head.length
+        // relative position
       };
     }
     function padStart(string, max) {
@@ -9773,7 +13690,13 @@ var require_snippet = __commonJS({
       for (i = 1; i <= options.linesBefore; i++) {
         if (foundLineNo - i < 0)
           break;
-        line = getLine(mark.buffer, lineStarts[foundLineNo - i], lineEnds[foundLineNo - i], mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo - i]), maxLineLength);
+        line = getLine(
+          mark.buffer,
+          lineStarts[foundLineNo - i],
+          lineEnds[foundLineNo - i],
+          mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo - i]),
+          maxLineLength
+        );
         result = common.repeat(" ", options.indent) + padStart((mark.line - i + 1).toString(), lineNoLength) + " | " + line.str + "\n" + result;
       }
       line = getLine(mark.buffer, lineStarts[foundLineNo], lineEnds[foundLineNo], mark.position, maxLineLength);
@@ -9782,7 +13705,13 @@ var require_snippet = __commonJS({
       for (i = 1; i <= options.linesAfter; i++) {
         if (foundLineNo + i >= lineEnds.length)
           break;
-        line = getLine(mark.buffer, lineStarts[foundLineNo + i], lineEnds[foundLineNo + i], mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo + i]), maxLineLength);
+        line = getLine(
+          mark.buffer,
+          lineStarts[foundLineNo + i],
+          lineEnds[foundLineNo + i],
+          mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo + i]),
+          maxLineLength
+        );
         result += common.repeat(" ", options.indent) + padStart((mark.line + i + 1).toString(), lineNoLength) + " | " + line.str + "\n";
       }
       return result.replace(/\n$/, "");
@@ -10089,7 +14018,7 @@ var require_bool = __commonJS({
 var require_int = __commonJS({
   "node_modules/js-yaml/lib/type/int.js"(exports2, module2) {
     "use strict";
-    var common = require_common2();
+    var common = require_common();
     var Type = require_type();
     function isHexCode(c) {
       return 48 <= c && c <= 57 || 65 <= c && c <= 70 || 97 <= c && c <= 102;
@@ -10208,6 +14137,7 @@ var require_int = __commonJS({
         decimal: function(obj) {
           return obj.toString(10);
         },
+        /* eslint-disable max-len */
         hexadecimal: function(obj) {
           return obj >= 0 ? "0x" + obj.toString(16).toUpperCase() : "-0x" + obj.toString(16).toUpperCase().slice(1);
         }
@@ -10227,13 +14157,18 @@ var require_int = __commonJS({
 var require_float = __commonJS({
   "node_modules/js-yaml/lib/type/float.js"(exports2, module2) {
     "use strict";
-    var common = require_common2();
+    var common = require_common();
     var Type = require_type();
-    var YAML_FLOAT_PATTERN = new RegExp("^(?:[-+]?(?:[0-9][0-9_]*)(?:\\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?|\\.[0-9_]+(?:[eE][-+]?[0-9]+)?|[-+]?\\.(?:inf|Inf|INF)|\\.(?:nan|NaN|NAN))$");
+    var YAML_FLOAT_PATTERN = new RegExp(
+      // 2.5e4, 2.5 and integers
+      "^(?:[-+]?(?:[0-9][0-9_]*)(?:\\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?|\\.[0-9_]+(?:[eE][-+]?[0-9]+)?|[-+]?\\.(?:inf|Inf|INF)|\\.(?:nan|NaN|NAN))$"
+    );
     function resolveYamlFloat(data) {
       if (data === null)
         return false;
-      if (!YAML_FLOAT_PATTERN.test(data) || data[data.length - 1] === "_") {
+      if (!YAML_FLOAT_PATTERN.test(data) || // Quick hack to not allow integers end with `_`
+      // Probably should update regexp & check speed
+      data[data.length - 1] === "_") {
         return false;
       }
       return true;
@@ -10330,8 +14265,12 @@ var require_timestamp = __commonJS({
   "node_modules/js-yaml/lib/type/timestamp.js"(exports2, module2) {
     "use strict";
     var Type = require_type();
-    var YAML_DATE_REGEXP = new RegExp("^([0-9][0-9][0-9][0-9])-([0-9][0-9])-([0-9][0-9])$");
-    var YAML_TIMESTAMP_REGEXP = new RegExp("^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)(?:[Tt]|[ \\t]+)([0-9][0-9]?):([0-9][0-9]):([0-9][0-9])(?:\\.([0-9]*))?(?:[ \\t]*(Z|([-+])([0-9][0-9]?)(?::([0-9][0-9]))?))?$");
+    var YAML_DATE_REGEXP = new RegExp(
+      "^([0-9][0-9][0-9][0-9])-([0-9][0-9])-([0-9][0-9])$"
+    );
+    var YAML_TIMESTAMP_REGEXP = new RegExp(
+      "^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)(?:[Tt]|[ \\t]+)([0-9][0-9]?):([0-9][0-9]):([0-9][0-9])(?:\\.([0-9]*))?(?:[ \\t]*(Z|([-+])([0-9][0-9]?)(?::([0-9][0-9]))?))?$"
+    );
     function resolveYamlTimestamp(data) {
       if (data === null)
         return false;
@@ -10628,7 +14567,7 @@ var require_default = __commonJS({
 var require_loader = __commonJS({
   "node_modules/js-yaml/lib/loader.js"(exports2, module2) {
     "use strict";
-    var common = require_common2();
+    var common = require_common();
     var YAMLException = require_exception();
     var makeSnippet = require_snippet();
     var DEFAULT_SCHEMA = require_default();
@@ -10696,7 +14635,10 @@ var require_loader = __commonJS({
       if (c <= 65535) {
         return String.fromCharCode(c);
       }
-      return String.fromCharCode((c - 65536 >> 10) + 55296, (c - 65536 & 1023) + 56320);
+      return String.fromCharCode(
+        (c - 65536 >> 10) + 55296,
+        (c - 65536 & 1023) + 56320
+      );
     }
     var simpleEscapeCheck = new Array(256);
     var simpleEscapeMap = new Array(256);
@@ -10727,6 +14669,7 @@ var require_loader = __commonJS({
       var mark = {
         name: state.filename,
         buffer: state.input.slice(0, -1),
+        // omit trailing \0
         position: state.position,
         line: state.line,
         column: state.position - state.lineStart
@@ -11792,7 +15735,7 @@ var require_loader = __commonJS({
 var require_dumper = __commonJS({
   "node_modules/js-yaml/lib/dumper.js"(exports2, module2) {
     "use strict";
-    var common = require_common2();
+    var common = require_common();
     var YAMLException = require_exception();
     var DEFAULT_SCHEMA = require_default();
     var _toString = Object.prototype.toString;
@@ -11960,7 +15903,13 @@ var require_dumper = __commonJS({
     function isPlainSafe(c, prev, inblock) {
       var cIsNsCharOrWhitespace = isNsCharOrWhitespace(c);
       var cIsNsChar = cIsNsCharOrWhitespace && !isWhitespace(c);
-      return (inblock ? cIsNsCharOrWhitespace : cIsNsCharOrWhitespace && c !== CHAR_COMMA && c !== CHAR_LEFT_SQUARE_BRACKET && c !== CHAR_RIGHT_SQUARE_BRACKET && c !== CHAR_LEFT_CURLY_BRACKET && c !== CHAR_RIGHT_CURLY_BRACKET) && c !== CHAR_SHARP && !(prev === CHAR_COLON && !cIsNsChar) || isNsCharOrWhitespace(prev) && !isWhitespace(prev) && c === CHAR_SHARP || prev === CHAR_COLON && cIsNsChar;
+      return (
+        // ns-plain-safe
+        (inblock ? (
+          // c = flow-in
+          cIsNsCharOrWhitespace
+        ) : cIsNsCharOrWhitespace && c !== CHAR_COMMA && c !== CHAR_LEFT_SQUARE_BRACKET && c !== CHAR_RIGHT_SQUARE_BRACKET && c !== CHAR_LEFT_CURLY_BRACKET && c !== CHAR_RIGHT_CURLY_BRACKET) && c !== CHAR_SHARP && !(prev === CHAR_COLON && !cIsNsChar) || isNsCharOrWhitespace(prev) && !isWhitespace(prev) && c === CHAR_SHARP || prev === CHAR_COLON && cIsNsChar
+      );
     }
     function isPlainSafeFirst(c) {
       return isPrintable(c) && c !== CHAR_BOM && !isWhitespace(c) && c !== CHAR_MINUS && c !== CHAR_QUESTION && c !== CHAR_COLON && c !== CHAR_COMMA && c !== CHAR_LEFT_SQUARE_BRACKET && c !== CHAR_RIGHT_SQUARE_BRACKET && c !== CHAR_LEFT_CURLY_BRACKET && c !== CHAR_RIGHT_CURLY_BRACKET && c !== CHAR_SHARP && c !== CHAR_AMPERSAND && c !== CHAR_ASTERISK && c !== CHAR_EXCLAMATION && c !== CHAR_VERTICAL_LINE && c !== CHAR_EQUALS && c !== CHAR_GREATER_THAN && c !== CHAR_SINGLE_QUOTE && c !== CHAR_DOUBLE_QUOTE && c !== CHAR_PERCENT && c !== CHAR_COMMERCIAL_AT && c !== CHAR_GRAVE_ACCENT;
@@ -12011,7 +15960,8 @@ var require_dumper = __commonJS({
           if (char === CHAR_LINE_FEED) {
             hasLineBreak = true;
             if (shouldTrackWidth) {
-              hasFoldableLine = hasFoldableLine || i - previousLineBreak - 1 > lineWidth && string[previousLineBreak + 1] !== " ";
+              hasFoldableLine = hasFoldableLine || // Foldable line = too long, and not more-indented.
+              i - previousLineBreak - 1 > lineWidth && string[previousLineBreak + 1] !== " ";
               previousLineBreak = i;
             }
           } else if (!isPrintable(char)) {
@@ -12052,7 +16002,16 @@ var require_dumper = __commonJS({
         function testAmbiguity(string2) {
           return testImplicitResolving(state, string2);
         }
-        switch (chooseScalarStyle(string, singleLineOnly, state.indent, lineWidth, testAmbiguity, state.quotingType, state.forceQuotes && !iskey, inblock)) {
+        switch (chooseScalarStyle(
+          string,
+          singleLineOnly,
+          state.indent,
+          lineWidth,
+          testAmbiguity,
+          state.quotingType,
+          state.forceQuotes && !iskey,
+          inblock
+        )) {
           case STYLE_PLAIN:
             return string;
           case STYLE_SINGLE:
@@ -12349,7 +16308,9 @@ var require_dumper = __commonJS({
           throw new YAMLException("unacceptable kind of an object to dump " + type);
         }
         if (state.tag !== null && state.tag !== "?") {
-          tagStr = encodeURI(state.tag[0] === "!" ? state.tag.slice(1) : state.tag).replace(/!/g, "%21");
+          tagStr = encodeURI(
+            state.tag[0] === "!" ? state.tag.slice(1) : state.tag
+          ).replace(/!/g, "%21");
           if (state.tag[0] === "!") {
             tagStr = "!" + tagStr;
           } else if (tagStr.slice(0, 18) === "tag:yaml.org,2002:") {
@@ -12507,6 +16468,1695 @@ var require_YamlParser = __commonJS({
   }
 });
 
+// node_modules/fs-extra/lib/fs/index.js
+var require_fs2 = __commonJS({
+  "node_modules/fs-extra/lib/fs/index.js"(exports2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    var fs = require_graceful_fs();
+    var api = [
+      "access",
+      "appendFile",
+      "chmod",
+      "chown",
+      "close",
+      "copyFile",
+      "fchmod",
+      "fchown",
+      "fdatasync",
+      "fstat",
+      "fsync",
+      "ftruncate",
+      "futimes",
+      "lchmod",
+      "lchown",
+      "link",
+      "lstat",
+      "mkdir",
+      "mkdtemp",
+      "open",
+      "opendir",
+      "readdir",
+      "readFile",
+      "readlink",
+      "realpath",
+      "rename",
+      "rm",
+      "rmdir",
+      "stat",
+      "symlink",
+      "truncate",
+      "unlink",
+      "utimes",
+      "writeFile"
+    ].filter((key) => {
+      return typeof fs[key] === "function";
+    });
+    Object.assign(exports2, fs);
+    api.forEach((method) => {
+      exports2[method] = u(fs[method]);
+    });
+    exports2.exists = function(filename, callback) {
+      if (typeof callback === "function") {
+        return fs.exists(filename, callback);
+      }
+      return new Promise((resolve) => {
+        return fs.exists(filename, resolve);
+      });
+    };
+    exports2.read = function(fd, buffer, offset, length, position, callback) {
+      if (typeof callback === "function") {
+        return fs.read(fd, buffer, offset, length, position, callback);
+      }
+      return new Promise((resolve, reject) => {
+        fs.read(fd, buffer, offset, length, position, (err, bytesRead, buffer2) => {
+          if (err)
+            return reject(err);
+          resolve({ bytesRead, buffer: buffer2 });
+        });
+      });
+    };
+    exports2.write = function(fd, buffer, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs.write(fd, buffer, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs.write(fd, buffer, ...args, (err, bytesWritten, buffer2) => {
+          if (err)
+            return reject(err);
+          resolve({ bytesWritten, buffer: buffer2 });
+        });
+      });
+    };
+    if (typeof fs.writev === "function") {
+      exports2.writev = function(fd, buffers, ...args) {
+        if (typeof args[args.length - 1] === "function") {
+          return fs.writev(fd, buffers, ...args);
+        }
+        return new Promise((resolve, reject) => {
+          fs.writev(fd, buffers, ...args, (err, bytesWritten, buffers2) => {
+            if (err)
+              return reject(err);
+            resolve({ bytesWritten, buffers: buffers2 });
+          });
+        });
+      };
+    }
+    if (typeof fs.realpath.native === "function") {
+      exports2.realpath.native = u(fs.realpath.native);
+    } else {
+      process.emitWarning(
+        "fs.realpath.native is not a function. Is fs being monkey-patched?",
+        "Warning",
+        "fs-extra-WARN0003"
+      );
+    }
+  }
+});
+
+// node_modules/fs-extra/lib/mkdirs/utils.js
+var require_utils4 = __commonJS({
+  "node_modules/fs-extra/lib/mkdirs/utils.js"(exports2, module2) {
+    "use strict";
+    var path = require("path");
+    module2.exports.checkPath = function checkPath(pth) {
+      if (process.platform === "win32") {
+        const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path.parse(pth).root, ""));
+        if (pathHasInvalidWinCharacters) {
+          const error = new Error(`Path contains invalid characters: ${pth}`);
+          error.code = "EINVAL";
+          throw error;
+        }
+      }
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/mkdirs/make-dir.js
+var require_make_dir2 = __commonJS({
+  "node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
+    "use strict";
+    var fs = require_fs2();
+    var { checkPath } = require_utils4();
+    var getMode = (options) => {
+      const defaults = { mode: 511 };
+      if (typeof options === "number")
+        return options;
+      return { ...defaults, ...options }.mode;
+    };
+    module2.exports.makeDir = async (dir, options) => {
+      checkPath(dir);
+      return fs.mkdir(dir, {
+        mode: getMode(options),
+        recursive: true
+      });
+    };
+    module2.exports.makeDirSync = (dir, options) => {
+      checkPath(dir);
+      return fs.mkdirSync(dir, {
+        mode: getMode(options),
+        recursive: true
+      });
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/mkdirs/index.js
+var require_mkdirs2 = __commonJS({
+  "node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromPromise;
+    var { makeDir: _makeDir, makeDirSync } = require_make_dir2();
+    var makeDir = u(_makeDir);
+    module2.exports = {
+      mkdirs: makeDir,
+      mkdirsSync: makeDirSync,
+      // alias
+      mkdirp: makeDir,
+      mkdirpSync: makeDirSync,
+      ensureDir: makeDir,
+      ensureDirSync: makeDirSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/path-exists/index.js
+var require_path_exists2 = __commonJS({
+  "node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromPromise;
+    var fs = require_fs2();
+    function pathExists(path) {
+      return fs.access(path).then(() => true).catch(() => false);
+    }
+    module2.exports = {
+      pathExists: u(pathExists),
+      pathExistsSync: fs.existsSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/util/utimes.js
+var require_utimes2 = __commonJS({
+  "node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    function utimesMillis(path, atime, mtime, callback) {
+      fs.open(path, "r+", (err, fd) => {
+        if (err)
+          return callback(err);
+        fs.futimes(fd, atime, mtime, (futimesErr) => {
+          fs.close(fd, (closeErr) => {
+            if (callback)
+              callback(futimesErr || closeErr);
+          });
+        });
+      });
+    }
+    function utimesMillisSync(path, atime, mtime) {
+      const fd = fs.openSync(path, "r+");
+      fs.futimesSync(fd, atime, mtime);
+      return fs.closeSync(fd);
+    }
+    module2.exports = {
+      utimesMillis,
+      utimesMillisSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/util/stat.js
+var require_stat2 = __commonJS({
+  "node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
+    "use strict";
+    var fs = require_fs2();
+    var path = require("path");
+    var util = require("util");
+    function getStats(src, dest, opts) {
+      const statFunc = opts.dereference ? (file) => fs.stat(file, { bigint: true }) : (file) => fs.lstat(file, { bigint: true });
+      return Promise.all([
+        statFunc(src),
+        statFunc(dest).catch((err) => {
+          if (err.code === "ENOENT")
+            return null;
+          throw err;
+        })
+      ]).then(([srcStat, destStat]) => ({ srcStat, destStat }));
+    }
+    function getStatsSync(src, dest, opts) {
+      let destStat;
+      const statFunc = opts.dereference ? (file) => fs.statSync(file, { bigint: true }) : (file) => fs.lstatSync(file, { bigint: true });
+      const srcStat = statFunc(src);
+      try {
+        destStat = statFunc(dest);
+      } catch (err) {
+        if (err.code === "ENOENT")
+          return { srcStat, destStat: null };
+        throw err;
+      }
+      return { srcStat, destStat };
+    }
+    function checkPaths(src, dest, funcName, opts, cb) {
+      util.callbackify(getStats)(src, dest, opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { srcStat, destStat } = stats;
+        if (destStat) {
+          if (areIdentical(srcStat, destStat)) {
+            const srcBaseName = path.basename(src);
+            const destBaseName = path.basename(dest);
+            if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
+              return cb(null, { srcStat, destStat, isChangingCase: true });
+            }
+            return cb(new Error("Source and destination must not be the same."));
+          }
+          if (srcStat.isDirectory() && !destStat.isDirectory()) {
+            return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`));
+          }
+          if (!srcStat.isDirectory() && destStat.isDirectory()) {
+            return cb(new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`));
+          }
+        }
+        if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
+          return cb(new Error(errMsg(src, dest, funcName)));
+        }
+        return cb(null, { srcStat, destStat });
+      });
+    }
+    function checkPathsSync(src, dest, funcName, opts) {
+      const { srcStat, destStat } = getStatsSync(src, dest, opts);
+      if (destStat) {
+        if (areIdentical(srcStat, destStat)) {
+          const srcBaseName = path.basename(src);
+          const destBaseName = path.basename(dest);
+          if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
+            return { srcStat, destStat, isChangingCase: true };
+          }
+          throw new Error("Source and destination must not be the same.");
+        }
+        if (srcStat.isDirectory() && !destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`);
+        }
+        if (!srcStat.isDirectory() && destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`);
+        }
+      }
+      if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
+        throw new Error(errMsg(src, dest, funcName));
+      }
+      return { srcStat, destStat };
+    }
+    function checkParentPaths(src, srcStat, dest, funcName, cb) {
+      const srcParent = path.resolve(path.dirname(src));
+      const destParent = path.resolve(path.dirname(dest));
+      if (destParent === srcParent || destParent === path.parse(destParent).root)
+        return cb();
+      fs.stat(destParent, { bigint: true }, (err, destStat) => {
+        if (err) {
+          if (err.code === "ENOENT")
+            return cb();
+          return cb(err);
+        }
+        if (areIdentical(srcStat, destStat)) {
+          return cb(new Error(errMsg(src, dest, funcName)));
+        }
+        return checkParentPaths(src, srcStat, destParent, funcName, cb);
+      });
+    }
+    function checkParentPathsSync(src, srcStat, dest, funcName) {
+      const srcParent = path.resolve(path.dirname(src));
+      const destParent = path.resolve(path.dirname(dest));
+      if (destParent === srcParent || destParent === path.parse(destParent).root)
+        return;
+      let destStat;
+      try {
+        destStat = fs.statSync(destParent, { bigint: true });
+      } catch (err) {
+        if (err.code === "ENOENT")
+          return;
+        throw err;
+      }
+      if (areIdentical(srcStat, destStat)) {
+        throw new Error(errMsg(src, dest, funcName));
+      }
+      return checkParentPathsSync(src, srcStat, destParent, funcName);
+    }
+    function areIdentical(srcStat, destStat) {
+      return destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev;
+    }
+    function isSrcSubdir(src, dest) {
+      const srcArr = path.resolve(src).split(path.sep).filter((i) => i);
+      const destArr = path.resolve(dest).split(path.sep).filter((i) => i);
+      return srcArr.reduce((acc, cur, i) => acc && destArr[i] === cur, true);
+    }
+    function errMsg(src, dest, funcName) {
+      return `Cannot ${funcName} '${src}' to a subdirectory of itself, '${dest}'.`;
+    }
+    module2.exports = {
+      checkPaths,
+      checkPathsSync,
+      checkParentPaths,
+      checkParentPathsSync,
+      isSrcSubdir,
+      areIdentical
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/copy/copy.js
+var require_copy3 = __commonJS({
+  "node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    var path = require("path");
+    var mkdirs = require_mkdirs2().mkdirs;
+    var pathExists = require_path_exists2().pathExists;
+    var utimesMillis = require_utimes2().utimesMillis;
+    var stat = require_stat2();
+    function copy(src, dest, opts, cb) {
+      if (typeof opts === "function" && !cb) {
+        cb = opts;
+        opts = {};
+      } else if (typeof opts === "function") {
+        opts = { filter: opts };
+      }
+      cb = cb || function() {
+      };
+      opts = opts || {};
+      opts.clobber = "clobber" in opts ? !!opts.clobber : true;
+      opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
+      if (opts.preserveTimestamps && process.arch === "ia32") {
+        process.emitWarning(
+          "Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269",
+          "Warning",
+          "fs-extra-WARN0001"
+        );
+      }
+      stat.checkPaths(src, dest, "copy", opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { srcStat, destStat } = stats;
+        stat.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
+          if (err2)
+            return cb(err2);
+          if (opts.filter)
+            return handleFilter(checkParentDir, destStat, src, dest, opts, cb);
+          return checkParentDir(destStat, src, dest, opts, cb);
+        });
+      });
+    }
+    function checkParentDir(destStat, src, dest, opts, cb) {
+      const destParent = path.dirname(dest);
+      pathExists(destParent, (err, dirExists) => {
+        if (err)
+          return cb(err);
+        if (dirExists)
+          return getStats(destStat, src, dest, opts, cb);
+        mkdirs(destParent, (err2) => {
+          if (err2)
+            return cb(err2);
+          return getStats(destStat, src, dest, opts, cb);
+        });
+      });
+    }
+    function handleFilter(onInclude, destStat, src, dest, opts, cb) {
+      Promise.resolve(opts.filter(src, dest)).then((include) => {
+        if (include)
+          return onInclude(destStat, src, dest, opts, cb);
+        return cb();
+      }, (error) => cb(error));
+    }
+    function startCopy(destStat, src, dest, opts, cb) {
+      if (opts.filter)
+        return handleFilter(getStats, destStat, src, dest, opts, cb);
+      return getStats(destStat, src, dest, opts, cb);
+    }
+    function getStats(destStat, src, dest, opts, cb) {
+      const stat2 = opts.dereference ? fs.stat : fs.lstat;
+      stat2(src, (err, srcStat) => {
+        if (err)
+          return cb(err);
+        if (srcStat.isDirectory())
+          return onDir(srcStat, destStat, src, dest, opts, cb);
+        else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice())
+          return onFile(srcStat, destStat, src, dest, opts, cb);
+        else if (srcStat.isSymbolicLink())
+          return onLink(destStat, src, dest, opts, cb);
+        else if (srcStat.isSocket())
+          return cb(new Error(`Cannot copy a socket file: ${src}`));
+        else if (srcStat.isFIFO())
+          return cb(new Error(`Cannot copy a FIFO pipe: ${src}`));
+        return cb(new Error(`Unknown file: ${src}`));
+      });
+    }
+    function onFile(srcStat, destStat, src, dest, opts, cb) {
+      if (!destStat)
+        return copyFile(srcStat, src, dest, opts, cb);
+      return mayCopyFile(srcStat, src, dest, opts, cb);
+    }
+    function mayCopyFile(srcStat, src, dest, opts, cb) {
+      if (opts.overwrite) {
+        fs.unlink(dest, (err) => {
+          if (err)
+            return cb(err);
+          return copyFile(srcStat, src, dest, opts, cb);
+        });
+      } else if (opts.errorOnExist) {
+        return cb(new Error(`'${dest}' already exists`));
+      } else
+        return cb();
+    }
+    function copyFile(srcStat, src, dest, opts, cb) {
+      fs.copyFile(src, dest, (err) => {
+        if (err)
+          return cb(err);
+        if (opts.preserveTimestamps)
+          return handleTimestampsAndMode(srcStat.mode, src, dest, cb);
+        return setDestMode(dest, srcStat.mode, cb);
+      });
+    }
+    function handleTimestampsAndMode(srcMode, src, dest, cb) {
+      if (fileIsNotWritable(srcMode)) {
+        return makeFileWritable(dest, srcMode, (err) => {
+          if (err)
+            return cb(err);
+          return setDestTimestampsAndMode(srcMode, src, dest, cb);
+        });
+      }
+      return setDestTimestampsAndMode(srcMode, src, dest, cb);
+    }
+    function fileIsNotWritable(srcMode) {
+      return (srcMode & 128) === 0;
+    }
+    function makeFileWritable(dest, srcMode, cb) {
+      return setDestMode(dest, srcMode | 128, cb);
+    }
+    function setDestTimestampsAndMode(srcMode, src, dest, cb) {
+      setDestTimestamps(src, dest, (err) => {
+        if (err)
+          return cb(err);
+        return setDestMode(dest, srcMode, cb);
+      });
+    }
+    function setDestMode(dest, srcMode, cb) {
+      return fs.chmod(dest, srcMode, cb);
+    }
+    function setDestTimestamps(src, dest, cb) {
+      fs.stat(src, (err, updatedSrcStat) => {
+        if (err)
+          return cb(err);
+        return utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime, cb);
+      });
+    }
+    function onDir(srcStat, destStat, src, dest, opts, cb) {
+      if (!destStat)
+        return mkDirAndCopy(srcStat.mode, src, dest, opts, cb);
+      return copyDir(src, dest, opts, cb);
+    }
+    function mkDirAndCopy(srcMode, src, dest, opts, cb) {
+      fs.mkdir(dest, (err) => {
+        if (err)
+          return cb(err);
+        copyDir(src, dest, opts, (err2) => {
+          if (err2)
+            return cb(err2);
+          return setDestMode(dest, srcMode, cb);
+        });
+      });
+    }
+    function copyDir(src, dest, opts, cb) {
+      fs.readdir(src, (err, items) => {
+        if (err)
+          return cb(err);
+        return copyDirItems(items, src, dest, opts, cb);
+      });
+    }
+    function copyDirItems(items, src, dest, opts, cb) {
+      const item = items.pop();
+      if (!item)
+        return cb();
+      return copyDirItem(items, item, src, dest, opts, cb);
+    }
+    function copyDirItem(items, item, src, dest, opts, cb) {
+      const srcItem = path.join(src, item);
+      const destItem = path.join(dest, item);
+      stat.checkPaths(srcItem, destItem, "copy", opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { destStat } = stats;
+        startCopy(destStat, srcItem, destItem, opts, (err2) => {
+          if (err2)
+            return cb(err2);
+          return copyDirItems(items, src, dest, opts, cb);
+        });
+      });
+    }
+    function onLink(destStat, src, dest, opts, cb) {
+      fs.readlink(src, (err, resolvedSrc) => {
+        if (err)
+          return cb(err);
+        if (opts.dereference) {
+          resolvedSrc = path.resolve(process.cwd(), resolvedSrc);
+        }
+        if (!destStat) {
+          return fs.symlink(resolvedSrc, dest, cb);
+        } else {
+          fs.readlink(dest, (err2, resolvedDest) => {
+            if (err2) {
+              if (err2.code === "EINVAL" || err2.code === "UNKNOWN")
+                return fs.symlink(resolvedSrc, dest, cb);
+              return cb(err2);
+            }
+            if (opts.dereference) {
+              resolvedDest = path.resolve(process.cwd(), resolvedDest);
+            }
+            if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
+              return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
+            }
+            if (destStat.isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+              return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
+            }
+            return copyLink(resolvedSrc, dest, cb);
+          });
+        }
+      });
+    }
+    function copyLink(resolvedSrc, dest, cb) {
+      fs.unlink(dest, (err) => {
+        if (err)
+          return cb(err);
+        return fs.symlink(resolvedSrc, dest, cb);
+      });
+    }
+    module2.exports = copy;
+  }
+});
+
+// node_modules/fs-extra/lib/copy/copy-sync.js
+var require_copy_sync2 = __commonJS({
+  "node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    var path = require("path");
+    var mkdirsSync = require_mkdirs2().mkdirsSync;
+    var utimesMillisSync = require_utimes2().utimesMillisSync;
+    var stat = require_stat2();
+    function copySync(src, dest, opts) {
+      if (typeof opts === "function") {
+        opts = { filter: opts };
+      }
+      opts = opts || {};
+      opts.clobber = "clobber" in opts ? !!opts.clobber : true;
+      opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
+      if (opts.preserveTimestamps && process.arch === "ia32") {
+        process.emitWarning(
+          "Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269",
+          "Warning",
+          "fs-extra-WARN0002"
+        );
+      }
+      const { srcStat, destStat } = stat.checkPathsSync(src, dest, "copy", opts);
+      stat.checkParentPathsSync(src, srcStat, dest, "copy");
+      return handleFilterAndCopy(destStat, src, dest, opts);
+    }
+    function handleFilterAndCopy(destStat, src, dest, opts) {
+      if (opts.filter && !opts.filter(src, dest))
+        return;
+      const destParent = path.dirname(dest);
+      if (!fs.existsSync(destParent))
+        mkdirsSync(destParent);
+      return getStats(destStat, src, dest, opts);
+    }
+    function startCopy(destStat, src, dest, opts) {
+      if (opts.filter && !opts.filter(src, dest))
+        return;
+      return getStats(destStat, src, dest, opts);
+    }
+    function getStats(destStat, src, dest, opts) {
+      const statSync = opts.dereference ? fs.statSync : fs.lstatSync;
+      const srcStat = statSync(src);
+      if (srcStat.isDirectory())
+        return onDir(srcStat, destStat, src, dest, opts);
+      else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice())
+        return onFile(srcStat, destStat, src, dest, opts);
+      else if (srcStat.isSymbolicLink())
+        return onLink(destStat, src, dest, opts);
+      else if (srcStat.isSocket())
+        throw new Error(`Cannot copy a socket file: ${src}`);
+      else if (srcStat.isFIFO())
+        throw new Error(`Cannot copy a FIFO pipe: ${src}`);
+      throw new Error(`Unknown file: ${src}`);
+    }
+    function onFile(srcStat, destStat, src, dest, opts) {
+      if (!destStat)
+        return copyFile(srcStat, src, dest, opts);
+      return mayCopyFile(srcStat, src, dest, opts);
+    }
+    function mayCopyFile(srcStat, src, dest, opts) {
+      if (opts.overwrite) {
+        fs.unlinkSync(dest);
+        return copyFile(srcStat, src, dest, opts);
+      } else if (opts.errorOnExist) {
+        throw new Error(`'${dest}' already exists`);
+      }
+    }
+    function copyFile(srcStat, src, dest, opts) {
+      fs.copyFileSync(src, dest);
+      if (opts.preserveTimestamps)
+        handleTimestamps(srcStat.mode, src, dest);
+      return setDestMode(dest, srcStat.mode);
+    }
+    function handleTimestamps(srcMode, src, dest) {
+      if (fileIsNotWritable(srcMode))
+        makeFileWritable(dest, srcMode);
+      return setDestTimestamps(src, dest);
+    }
+    function fileIsNotWritable(srcMode) {
+      return (srcMode & 128) === 0;
+    }
+    function makeFileWritable(dest, srcMode) {
+      return setDestMode(dest, srcMode | 128);
+    }
+    function setDestMode(dest, srcMode) {
+      return fs.chmodSync(dest, srcMode);
+    }
+    function setDestTimestamps(src, dest) {
+      const updatedSrcStat = fs.statSync(src);
+      return utimesMillisSync(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
+    }
+    function onDir(srcStat, destStat, src, dest, opts) {
+      if (!destStat)
+        return mkDirAndCopy(srcStat.mode, src, dest, opts);
+      return copyDir(src, dest, opts);
+    }
+    function mkDirAndCopy(srcMode, src, dest, opts) {
+      fs.mkdirSync(dest);
+      copyDir(src, dest, opts);
+      return setDestMode(dest, srcMode);
+    }
+    function copyDir(src, dest, opts) {
+      fs.readdirSync(src).forEach((item) => copyDirItem(item, src, dest, opts));
+    }
+    function copyDirItem(item, src, dest, opts) {
+      const srcItem = path.join(src, item);
+      const destItem = path.join(dest, item);
+      const { destStat } = stat.checkPathsSync(srcItem, destItem, "copy", opts);
+      return startCopy(destStat, srcItem, destItem, opts);
+    }
+    function onLink(destStat, src, dest, opts) {
+      let resolvedSrc = fs.readlinkSync(src);
+      if (opts.dereference) {
+        resolvedSrc = path.resolve(process.cwd(), resolvedSrc);
+      }
+      if (!destStat) {
+        return fs.symlinkSync(resolvedSrc, dest);
+      } else {
+        let resolvedDest;
+        try {
+          resolvedDest = fs.readlinkSync(dest);
+        } catch (err) {
+          if (err.code === "EINVAL" || err.code === "UNKNOWN")
+            return fs.symlinkSync(resolvedSrc, dest);
+          throw err;
+        }
+        if (opts.dereference) {
+          resolvedDest = path.resolve(process.cwd(), resolvedDest);
+        }
+        if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
+          throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
+        }
+        if (fs.statSync(dest).isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+          throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
+        }
+        return copyLink(resolvedSrc, dest);
+      }
+    }
+    function copyLink(resolvedSrc, dest) {
+      fs.unlinkSync(dest);
+      return fs.symlinkSync(resolvedSrc, dest);
+    }
+    module2.exports = copySync;
+  }
+});
+
+// node_modules/fs-extra/lib/copy/index.js
+var require_copy4 = __commonJS({
+  "node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    module2.exports = {
+      copy: u(require_copy3()),
+      copySync: require_copy_sync2()
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/remove/rimraf.js
+var require_rimraf = __commonJS({
+  "node_modules/fs-extra/lib/remove/rimraf.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    var path = require("path");
+    var assert = require("assert");
+    var isWindows = process.platform === "win32";
+    function defaults(options) {
+      const methods = [
+        "unlink",
+        "chmod",
+        "stat",
+        "lstat",
+        "rmdir",
+        "readdir"
+      ];
+      methods.forEach((m) => {
+        options[m] = options[m] || fs[m];
+        m = m + "Sync";
+        options[m] = options[m] || fs[m];
+      });
+      options.maxBusyTries = options.maxBusyTries || 3;
+    }
+    function rimraf(p, options, cb) {
+      let busyTries = 0;
+      if (typeof options === "function") {
+        cb = options;
+        options = {};
+      }
+      assert(p, "rimraf: missing path");
+      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
+      assert.strictEqual(typeof cb, "function", "rimraf: callback function required");
+      assert(options, "rimraf: invalid options argument provided");
+      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
+      defaults(options);
+      rimraf_(p, options, function CB(er) {
+        if (er) {
+          if ((er.code === "EBUSY" || er.code === "ENOTEMPTY" || er.code === "EPERM") && busyTries < options.maxBusyTries) {
+            busyTries++;
+            const time = busyTries * 100;
+            return setTimeout(() => rimraf_(p, options, CB), time);
+          }
+          if (er.code === "ENOENT")
+            er = null;
+        }
+        cb(er);
+      });
+    }
+    function rimraf_(p, options, cb) {
+      assert(p);
+      assert(options);
+      assert(typeof cb === "function");
+      options.lstat(p, (er, st) => {
+        if (er && er.code === "ENOENT") {
+          return cb(null);
+        }
+        if (er && er.code === "EPERM" && isWindows) {
+          return fixWinEPERM(p, options, er, cb);
+        }
+        if (st && st.isDirectory()) {
+          return rmdir(p, options, er, cb);
+        }
+        options.unlink(p, (er2) => {
+          if (er2) {
+            if (er2.code === "ENOENT") {
+              return cb(null);
+            }
+            if (er2.code === "EPERM") {
+              return isWindows ? fixWinEPERM(p, options, er2, cb) : rmdir(p, options, er2, cb);
+            }
+            if (er2.code === "EISDIR") {
+              return rmdir(p, options, er2, cb);
+            }
+          }
+          return cb(er2);
+        });
+      });
+    }
+    function fixWinEPERM(p, options, er, cb) {
+      assert(p);
+      assert(options);
+      assert(typeof cb === "function");
+      options.chmod(p, 438, (er2) => {
+        if (er2) {
+          cb(er2.code === "ENOENT" ? null : er);
+        } else {
+          options.stat(p, (er3, stats) => {
+            if (er3) {
+              cb(er3.code === "ENOENT" ? null : er);
+            } else if (stats.isDirectory()) {
+              rmdir(p, options, er, cb);
+            } else {
+              options.unlink(p, cb);
+            }
+          });
+        }
+      });
+    }
+    function fixWinEPERMSync(p, options, er) {
+      let stats;
+      assert(p);
+      assert(options);
+      try {
+        options.chmodSync(p, 438);
+      } catch (er2) {
+        if (er2.code === "ENOENT") {
+          return;
+        } else {
+          throw er;
+        }
+      }
+      try {
+        stats = options.statSync(p);
+      } catch (er3) {
+        if (er3.code === "ENOENT") {
+          return;
+        } else {
+          throw er;
+        }
+      }
+      if (stats.isDirectory()) {
+        rmdirSync(p, options, er);
+      } else {
+        options.unlinkSync(p);
+      }
+    }
+    function rmdir(p, options, originalEr, cb) {
+      assert(p);
+      assert(options);
+      assert(typeof cb === "function");
+      options.rmdir(p, (er) => {
+        if (er && (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM")) {
+          rmkids(p, options, cb);
+        } else if (er && er.code === "ENOTDIR") {
+          cb(originalEr);
+        } else {
+          cb(er);
+        }
+      });
+    }
+    function rmkids(p, options, cb) {
+      assert(p);
+      assert(options);
+      assert(typeof cb === "function");
+      options.readdir(p, (er, files) => {
+        if (er)
+          return cb(er);
+        let n = files.length;
+        let errState;
+        if (n === 0)
+          return options.rmdir(p, cb);
+        files.forEach((f) => {
+          rimraf(path.join(p, f), options, (er2) => {
+            if (errState) {
+              return;
+            }
+            if (er2)
+              return cb(errState = er2);
+            if (--n === 0) {
+              options.rmdir(p, cb);
+            }
+          });
+        });
+      });
+    }
+    function rimrafSync(p, options) {
+      let st;
+      options = options || {};
+      defaults(options);
+      assert(p, "rimraf: missing path");
+      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
+      assert(options, "rimraf: missing options");
+      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
+      try {
+        st = options.lstatSync(p);
+      } catch (er) {
+        if (er.code === "ENOENT") {
+          return;
+        }
+        if (er.code === "EPERM" && isWindows) {
+          fixWinEPERMSync(p, options, er);
+        }
+      }
+      try {
+        if (st && st.isDirectory()) {
+          rmdirSync(p, options, null);
+        } else {
+          options.unlinkSync(p);
+        }
+      } catch (er) {
+        if (er.code === "ENOENT") {
+          return;
+        } else if (er.code === "EPERM") {
+          return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er);
+        } else if (er.code !== "EISDIR") {
+          throw er;
+        }
+        rmdirSync(p, options, er);
+      }
+    }
+    function rmdirSync(p, options, originalEr) {
+      assert(p);
+      assert(options);
+      try {
+        options.rmdirSync(p);
+      } catch (er) {
+        if (er.code === "ENOTDIR") {
+          throw originalEr;
+        } else if (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM") {
+          rmkidsSync(p, options);
+        } else if (er.code !== "ENOENT") {
+          throw er;
+        }
+      }
+    }
+    function rmkidsSync(p, options) {
+      assert(p);
+      assert(options);
+      options.readdirSync(p).forEach((f) => rimrafSync(path.join(p, f), options));
+      if (isWindows) {
+        const startTime = Date.now();
+        do {
+          try {
+            const ret = options.rmdirSync(p, options);
+            return ret;
+          } catch {
+          }
+        } while (Date.now() - startTime < 500);
+      } else {
+        const ret = options.rmdirSync(p, options);
+        return ret;
+      }
+    }
+    module2.exports = rimraf;
+    rimraf.sync = rimrafSync;
+  }
+});
+
+// node_modules/fs-extra/lib/remove/index.js
+var require_remove2 = __commonJS({
+  "node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    var u = require_universalify().fromCallback;
+    var rimraf = require_rimraf();
+    function remove(path, callback) {
+      if (fs.rm)
+        return fs.rm(path, { recursive: true, force: true }, callback);
+      rimraf(path, callback);
+    }
+    function removeSync(path) {
+      if (fs.rmSync)
+        return fs.rmSync(path, { recursive: true, force: true });
+      rimraf.sync(path);
+    }
+    module2.exports = {
+      remove: u(remove),
+      removeSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/empty/index.js
+var require_empty2 = __commonJS({
+  "node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromPromise;
+    var fs = require_fs2();
+    var path = require("path");
+    var mkdir = require_mkdirs2();
+    var remove = require_remove2();
+    var emptyDir = u(async function emptyDir2(dir) {
+      let items;
+      try {
+        items = await fs.readdir(dir);
+      } catch {
+        return mkdir.mkdirs(dir);
+      }
+      return Promise.all(items.map((item) => remove.remove(path.join(dir, item))));
+    });
+    function emptyDirSync(dir) {
+      let items;
+      try {
+        items = fs.readdirSync(dir);
+      } catch {
+        return mkdir.mkdirsSync(dir);
+      }
+      items.forEach((item) => {
+        item = path.join(dir, item);
+        remove.removeSync(item);
+      });
+    }
+    module2.exports = {
+      emptyDirSync,
+      emptydirSync: emptyDirSync,
+      emptyDir,
+      emptydir: emptyDir
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/ensure/file.js
+var require_file2 = __commonJS({
+  "node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    var path = require("path");
+    var fs = require_graceful_fs();
+    var mkdir = require_mkdirs2();
+    function createFile(file, callback) {
+      function makeFile() {
+        fs.writeFile(file, "", (err) => {
+          if (err)
+            return callback(err);
+          callback();
+        });
+      }
+      fs.stat(file, (err, stats) => {
+        if (!err && stats.isFile())
+          return callback();
+        const dir = path.dirname(file);
+        fs.stat(dir, (err2, stats2) => {
+          if (err2) {
+            if (err2.code === "ENOENT") {
+              return mkdir.mkdirs(dir, (err3) => {
+                if (err3)
+                  return callback(err3);
+                makeFile();
+              });
+            }
+            return callback(err2);
+          }
+          if (stats2.isDirectory())
+            makeFile();
+          else {
+            fs.readdir(dir, (err3) => {
+              if (err3)
+                return callback(err3);
+            });
+          }
+        });
+      });
+    }
+    function createFileSync(file) {
+      let stats;
+      try {
+        stats = fs.statSync(file);
+      } catch {
+      }
+      if (stats && stats.isFile())
+        return;
+      const dir = path.dirname(file);
+      try {
+        if (!fs.statSync(dir).isDirectory()) {
+          fs.readdirSync(dir);
+        }
+      } catch (err) {
+        if (err && err.code === "ENOENT")
+          mkdir.mkdirsSync(dir);
+        else
+          throw err;
+      }
+      fs.writeFileSync(file, "");
+    }
+    module2.exports = {
+      createFile: u(createFile),
+      createFileSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/ensure/link.js
+var require_link2 = __commonJS({
+  "node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    var path = require("path");
+    var fs = require_graceful_fs();
+    var mkdir = require_mkdirs2();
+    var pathExists = require_path_exists2().pathExists;
+    var { areIdentical } = require_stat2();
+    function createLink(srcpath, dstpath, callback) {
+      function makeLink(srcpath2, dstpath2) {
+        fs.link(srcpath2, dstpath2, (err) => {
+          if (err)
+            return callback(err);
+          callback(null);
+        });
+      }
+      fs.lstat(dstpath, (_, dstStat) => {
+        fs.lstat(srcpath, (err, srcStat) => {
+          if (err) {
+            err.message = err.message.replace("lstat", "ensureLink");
+            return callback(err);
+          }
+          if (dstStat && areIdentical(srcStat, dstStat))
+            return callback(null);
+          const dir = path.dirname(dstpath);
+          pathExists(dir, (err2, dirExists) => {
+            if (err2)
+              return callback(err2);
+            if (dirExists)
+              return makeLink(srcpath, dstpath);
+            mkdir.mkdirs(dir, (err3) => {
+              if (err3)
+                return callback(err3);
+              makeLink(srcpath, dstpath);
+            });
+          });
+        });
+      });
+    }
+    function createLinkSync(srcpath, dstpath) {
+      let dstStat;
+      try {
+        dstStat = fs.lstatSync(dstpath);
+      } catch {
+      }
+      try {
+        const srcStat = fs.lstatSync(srcpath);
+        if (dstStat && areIdentical(srcStat, dstStat))
+          return;
+      } catch (err) {
+        err.message = err.message.replace("lstat", "ensureLink");
+        throw err;
+      }
+      const dir = path.dirname(dstpath);
+      const dirExists = fs.existsSync(dir);
+      if (dirExists)
+        return fs.linkSync(srcpath, dstpath);
+      mkdir.mkdirsSync(dir);
+      return fs.linkSync(srcpath, dstpath);
+    }
+    module2.exports = {
+      createLink: u(createLink),
+      createLinkSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/ensure/symlink-paths.js
+var require_symlink_paths2 = __commonJS({
+  "node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
+    "use strict";
+    var path = require("path");
+    var fs = require_graceful_fs();
+    var pathExists = require_path_exists2().pathExists;
+    function symlinkPaths(srcpath, dstpath, callback) {
+      if (path.isAbsolute(srcpath)) {
+        return fs.lstat(srcpath, (err) => {
+          if (err) {
+            err.message = err.message.replace("lstat", "ensureSymlink");
+            return callback(err);
+          }
+          return callback(null, {
+            toCwd: srcpath,
+            toDst: srcpath
+          });
+        });
+      } else {
+        const dstdir = path.dirname(dstpath);
+        const relativeToDst = path.join(dstdir, srcpath);
+        return pathExists(relativeToDst, (err, exists) => {
+          if (err)
+            return callback(err);
+          if (exists) {
+            return callback(null, {
+              toCwd: relativeToDst,
+              toDst: srcpath
+            });
+          } else {
+            return fs.lstat(srcpath, (err2) => {
+              if (err2) {
+                err2.message = err2.message.replace("lstat", "ensureSymlink");
+                return callback(err2);
+              }
+              return callback(null, {
+                toCwd: srcpath,
+                toDst: path.relative(dstdir, srcpath)
+              });
+            });
+          }
+        });
+      }
+    }
+    function symlinkPathsSync(srcpath, dstpath) {
+      let exists;
+      if (path.isAbsolute(srcpath)) {
+        exists = fs.existsSync(srcpath);
+        if (!exists)
+          throw new Error("absolute srcpath does not exist");
+        return {
+          toCwd: srcpath,
+          toDst: srcpath
+        };
+      } else {
+        const dstdir = path.dirname(dstpath);
+        const relativeToDst = path.join(dstdir, srcpath);
+        exists = fs.existsSync(relativeToDst);
+        if (exists) {
+          return {
+            toCwd: relativeToDst,
+            toDst: srcpath
+          };
+        } else {
+          exists = fs.existsSync(srcpath);
+          if (!exists)
+            throw new Error("relative srcpath does not exist");
+          return {
+            toCwd: srcpath,
+            toDst: path.relative(dstdir, srcpath)
+          };
+        }
+      }
+    }
+    module2.exports = {
+      symlinkPaths,
+      symlinkPathsSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/ensure/symlink-type.js
+var require_symlink_type2 = __commonJS({
+  "node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    function symlinkType(srcpath, type, callback) {
+      callback = typeof type === "function" ? type : callback;
+      type = typeof type === "function" ? false : type;
+      if (type)
+        return callback(null, type);
+      fs.lstat(srcpath, (err, stats) => {
+        if (err)
+          return callback(null, "file");
+        type = stats && stats.isDirectory() ? "dir" : "file";
+        callback(null, type);
+      });
+    }
+    function symlinkTypeSync(srcpath, type) {
+      let stats;
+      if (type)
+        return type;
+      try {
+        stats = fs.lstatSync(srcpath);
+      } catch {
+        return "file";
+      }
+      return stats && stats.isDirectory() ? "dir" : "file";
+    }
+    module2.exports = {
+      symlinkType,
+      symlinkTypeSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/ensure/symlink.js
+var require_symlink2 = __commonJS({
+  "node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    var path = require("path");
+    var fs = require_fs2();
+    var _mkdirs = require_mkdirs2();
+    var mkdirs = _mkdirs.mkdirs;
+    var mkdirsSync = _mkdirs.mkdirsSync;
+    var _symlinkPaths = require_symlink_paths2();
+    var symlinkPaths = _symlinkPaths.symlinkPaths;
+    var symlinkPathsSync = _symlinkPaths.symlinkPathsSync;
+    var _symlinkType = require_symlink_type2();
+    var symlinkType = _symlinkType.symlinkType;
+    var symlinkTypeSync = _symlinkType.symlinkTypeSync;
+    var pathExists = require_path_exists2().pathExists;
+    var { areIdentical } = require_stat2();
+    function createSymlink(srcpath, dstpath, type, callback) {
+      callback = typeof type === "function" ? type : callback;
+      type = typeof type === "function" ? false : type;
+      fs.lstat(dstpath, (err, stats) => {
+        if (!err && stats.isSymbolicLink()) {
+          Promise.all([
+            fs.stat(srcpath),
+            fs.stat(dstpath)
+          ]).then(([srcStat, dstStat]) => {
+            if (areIdentical(srcStat, dstStat))
+              return callback(null);
+            _createSymlink(srcpath, dstpath, type, callback);
+          });
+        } else
+          _createSymlink(srcpath, dstpath, type, callback);
+      });
+    }
+    function _createSymlink(srcpath, dstpath, type, callback) {
+      symlinkPaths(srcpath, dstpath, (err, relative) => {
+        if (err)
+          return callback(err);
+        srcpath = relative.toDst;
+        symlinkType(relative.toCwd, type, (err2, type2) => {
+          if (err2)
+            return callback(err2);
+          const dir = path.dirname(dstpath);
+          pathExists(dir, (err3, dirExists) => {
+            if (err3)
+              return callback(err3);
+            if (dirExists)
+              return fs.symlink(srcpath, dstpath, type2, callback);
+            mkdirs(dir, (err4) => {
+              if (err4)
+                return callback(err4);
+              fs.symlink(srcpath, dstpath, type2, callback);
+            });
+          });
+        });
+      });
+    }
+    function createSymlinkSync(srcpath, dstpath, type) {
+      let stats;
+      try {
+        stats = fs.lstatSync(dstpath);
+      } catch {
+      }
+      if (stats && stats.isSymbolicLink()) {
+        const srcStat = fs.statSync(srcpath);
+        const dstStat = fs.statSync(dstpath);
+        if (areIdentical(srcStat, dstStat))
+          return;
+      }
+      const relative = symlinkPathsSync(srcpath, dstpath);
+      srcpath = relative.toDst;
+      type = symlinkTypeSync(relative.toCwd, type);
+      const dir = path.dirname(dstpath);
+      const exists = fs.existsSync(dir);
+      if (exists)
+        return fs.symlinkSync(srcpath, dstpath, type);
+      mkdirsSync(dir);
+      return fs.symlinkSync(srcpath, dstpath, type);
+    }
+    module2.exports = {
+      createSymlink: u(createSymlink),
+      createSymlinkSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/ensure/index.js
+var require_ensure2 = __commonJS({
+  "node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
+    "use strict";
+    var { createFile, createFileSync } = require_file2();
+    var { createLink, createLinkSync } = require_link2();
+    var { createSymlink, createSymlinkSync } = require_symlink2();
+    module2.exports = {
+      // file
+      createFile,
+      createFileSync,
+      ensureFile: createFile,
+      ensureFileSync: createFileSync,
+      // link
+      createLink,
+      createLinkSync,
+      ensureLink: createLink,
+      ensureLinkSync: createLinkSync,
+      // symlink
+      createSymlink,
+      createSymlinkSync,
+      ensureSymlink: createSymlink,
+      ensureSymlinkSync: createSymlinkSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/json/jsonfile.js
+var require_jsonfile3 = __commonJS({
+  "node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
+    "use strict";
+    var jsonFile = require_jsonfile();
+    module2.exports = {
+      // jsonfile exports
+      readJson: jsonFile.readFile,
+      readJsonSync: jsonFile.readFileSync,
+      writeJson: jsonFile.writeFile,
+      writeJsonSync: jsonFile.writeFileSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/output-file/index.js
+var require_output_file2 = __commonJS({
+  "node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    var fs = require_graceful_fs();
+    var path = require("path");
+    var mkdir = require_mkdirs2();
+    var pathExists = require_path_exists2().pathExists;
+    function outputFile(file, data, encoding, callback) {
+      if (typeof encoding === "function") {
+        callback = encoding;
+        encoding = "utf8";
+      }
+      const dir = path.dirname(file);
+      pathExists(dir, (err, itDoes) => {
+        if (err)
+          return callback(err);
+        if (itDoes)
+          return fs.writeFile(file, data, encoding, callback);
+        mkdir.mkdirs(dir, (err2) => {
+          if (err2)
+            return callback(err2);
+          fs.writeFile(file, data, encoding, callback);
+        });
+      });
+    }
+    function outputFileSync(file, ...args) {
+      const dir = path.dirname(file);
+      if (fs.existsSync(dir)) {
+        return fs.writeFileSync(file, ...args);
+      }
+      mkdir.mkdirsSync(dir);
+      fs.writeFileSync(file, ...args);
+    }
+    module2.exports = {
+      outputFile: u(outputFile),
+      outputFileSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/json/output-json.js
+var require_output_json2 = __commonJS({
+  "node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
+    "use strict";
+    var { stringify: stringify2 } = require_utils2();
+    var { outputFile } = require_output_file2();
+    async function outputJson(file, data, options = {}) {
+      const str = stringify2(data, options);
+      await outputFile(file, str, options);
+    }
+    module2.exports = outputJson;
+  }
+});
+
+// node_modules/fs-extra/lib/json/output-json-sync.js
+var require_output_json_sync2 = __commonJS({
+  "node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
+    "use strict";
+    var { stringify: stringify2 } = require_utils2();
+    var { outputFileSync } = require_output_file2();
+    function outputJsonSync(file, data, options) {
+      const str = stringify2(data, options);
+      outputFileSync(file, str, options);
+    }
+    module2.exports = outputJsonSync;
+  }
+});
+
+// node_modules/fs-extra/lib/json/index.js
+var require_json3 = __commonJS({
+  "node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromPromise;
+    var jsonFile = require_jsonfile3();
+    jsonFile.outputJson = u(require_output_json2());
+    jsonFile.outputJsonSync = require_output_json_sync2();
+    jsonFile.outputJSON = jsonFile.outputJson;
+    jsonFile.outputJSONSync = jsonFile.outputJsonSync;
+    jsonFile.writeJSON = jsonFile.writeJson;
+    jsonFile.writeJSONSync = jsonFile.writeJsonSync;
+    jsonFile.readJSON = jsonFile.readJson;
+    jsonFile.readJSONSync = jsonFile.readJsonSync;
+    module2.exports = jsonFile;
+  }
+});
+
+// node_modules/fs-extra/lib/move/move.js
+var require_move3 = __commonJS({
+  "node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    var path = require("path");
+    var copy = require_copy4().copy;
+    var remove = require_remove2().remove;
+    var mkdirp = require_mkdirs2().mkdirp;
+    var pathExists = require_path_exists2().pathExists;
+    var stat = require_stat2();
+    function move(src, dest, opts, cb) {
+      if (typeof opts === "function") {
+        cb = opts;
+        opts = {};
+      }
+      opts = opts || {};
+      const overwrite = opts.overwrite || opts.clobber || false;
+      stat.checkPaths(src, dest, "move", opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { srcStat, isChangingCase = false } = stats;
+        stat.checkParentPaths(src, srcStat, dest, "move", (err2) => {
+          if (err2)
+            return cb(err2);
+          if (isParentRoot(dest))
+            return doRename(src, dest, overwrite, isChangingCase, cb);
+          mkdirp(path.dirname(dest), (err3) => {
+            if (err3)
+              return cb(err3);
+            return doRename(src, dest, overwrite, isChangingCase, cb);
+          });
+        });
+      });
+    }
+    function isParentRoot(dest) {
+      const parent = path.dirname(dest);
+      const parsedPath = path.parse(parent);
+      return parsedPath.root === parent;
+    }
+    function doRename(src, dest, overwrite, isChangingCase, cb) {
+      if (isChangingCase)
+        return rename(src, dest, overwrite, cb);
+      if (overwrite) {
+        return remove(dest, (err) => {
+          if (err)
+            return cb(err);
+          return rename(src, dest, overwrite, cb);
+        });
+      }
+      pathExists(dest, (err, destExists) => {
+        if (err)
+          return cb(err);
+        if (destExists)
+          return cb(new Error("dest already exists."));
+        return rename(src, dest, overwrite, cb);
+      });
+    }
+    function rename(src, dest, overwrite, cb) {
+      fs.rename(src, dest, (err) => {
+        if (!err)
+          return cb();
+        if (err.code !== "EXDEV")
+          return cb(err);
+        return moveAcrossDevice(src, dest, overwrite, cb);
+      });
+    }
+    function moveAcrossDevice(src, dest, overwrite, cb) {
+      const opts = {
+        overwrite,
+        errorOnExist: true
+      };
+      copy(src, dest, opts, (err) => {
+        if (err)
+          return cb(err);
+        return remove(src, cb);
+      });
+    }
+    module2.exports = move;
+  }
+});
+
+// node_modules/fs-extra/lib/move/move-sync.js
+var require_move_sync2 = __commonJS({
+  "node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
+    "use strict";
+    var fs = require_graceful_fs();
+    var path = require("path");
+    var copySync = require_copy4().copySync;
+    var removeSync = require_remove2().removeSync;
+    var mkdirpSync = require_mkdirs2().mkdirpSync;
+    var stat = require_stat2();
+    function moveSync(src, dest, opts) {
+      opts = opts || {};
+      const overwrite = opts.overwrite || opts.clobber || false;
+      const { srcStat, isChangingCase = false } = stat.checkPathsSync(src, dest, "move", opts);
+      stat.checkParentPathsSync(src, srcStat, dest, "move");
+      if (!isParentRoot(dest))
+        mkdirpSync(path.dirname(dest));
+      return doRename(src, dest, overwrite, isChangingCase);
+    }
+    function isParentRoot(dest) {
+      const parent = path.dirname(dest);
+      const parsedPath = path.parse(parent);
+      return parsedPath.root === parent;
+    }
+    function doRename(src, dest, overwrite, isChangingCase) {
+      if (isChangingCase)
+        return rename(src, dest, overwrite);
+      if (overwrite) {
+        removeSync(dest);
+        return rename(src, dest, overwrite);
+      }
+      if (fs.existsSync(dest))
+        throw new Error("dest already exists.");
+      return rename(src, dest, overwrite);
+    }
+    function rename(src, dest, overwrite) {
+      try {
+        fs.renameSync(src, dest);
+      } catch (err) {
+        if (err.code !== "EXDEV")
+          throw err;
+        return moveAcrossDevice(src, dest, overwrite);
+      }
+    }
+    function moveAcrossDevice(src, dest, overwrite) {
+      const opts = {
+        overwrite,
+        errorOnExist: true
+      };
+      copySync(src, dest, opts);
+      return removeSync(src);
+    }
+    module2.exports = moveSync;
+  }
+});
+
+// node_modules/fs-extra/lib/move/index.js
+var require_move4 = __commonJS({
+  "node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
+    "use strict";
+    var u = require_universalify().fromCallback;
+    module2.exports = {
+      move: u(require_move3()),
+      moveSync: require_move_sync2()
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/index.js
+var require_lib3 = __commonJS({
+  "node_modules/fs-extra/lib/index.js"(exports2, module2) {
+    "use strict";
+    module2.exports = {
+      // Export promiseified graceful-fs:
+      ...require_fs2(),
+      // Export extra methods:
+      ...require_copy4(),
+      ...require_empty2(),
+      ...require_ensure2(),
+      ...require_json3(),
+      ...require_mkdirs2(),
+      ...require_move4(),
+      ...require_output_file2(),
+      ...require_path_exists2(),
+      ...require_remove2()
+    };
+  }
+});
+
 // node_modules/traverse/index.js
 var require_traverse = __commonJS({
   "node_modules/traverse/index.js"(exports2, module2) {
@@ -12558,7 +18208,9 @@ var require_traverse = __commonJS({
     };
     Traverse.prototype.deepEqual = function(obj) {
       if (arguments.length !== 1) {
-        throw new Error("deepEqual requires exactly one object to compare against");
+        throw new Error(
+          "deepEqual requires exactly one object to compare against"
+        );
       }
       var equal = true;
       var node = obj;
@@ -12855,7 +18507,7 @@ var require_chainsaw = __commonJS({
         var r = builder.call(s.handlers, s);
         if (r !== void 0)
           s.handlers = r;
-        if (typeof saw.step !== "undefined") {
+        if ("undefined" !== typeof saw.step) {
           s.record();
         }
         cb.apply(s.chain(), args);
@@ -13066,7 +18718,7 @@ var require_buffers = __commonJS({
       return this.buffers[pos.buf].set(pos.offset, b);
     };
     Buffers.prototype.indexOf = function(needle, offset) {
-      if (typeof needle === "string") {
+      if ("string" === typeof needle) {
         needle = new Buffer(needle);
       } else if (needle instanceof Buffer) {
       } else {
@@ -13308,10 +18960,16 @@ var require_binary2 = __commonJS({
             if (pos !== -1) {
               pending = null;
               if (offset != null) {
-                vars.set(name, buffers.slice(offset, offset + taken + i));
+                vars.set(
+                  name,
+                  buffers.slice(offset, offset + taken + i)
+                );
                 offset += taken + i + search.length;
               } else {
-                vars.set(name, buffers.slice(0, taken + i));
+                vars.set(
+                  name,
+                  buffers.slice(0, taken + i)
+                );
                 buffers.splice(0, taken + i + search.length);
               }
               next();
@@ -13353,7 +19011,7 @@ var require_binary2 = __commonJS({
       });
       return stream;
     };
-    exports2.parse = function parse(buffer) {
+    exports2.parse = function parse2(buffer) {
       var self = words(function(bytes, cb) {
         return function(name) {
           if (offset + bytes <= buffer.length) {
@@ -14257,7 +19915,8 @@ var require_mkdirp = __commonJS({
       }
       if (!made)
         made = null;
-      var cb = f || function() {
+      var cb = f || /* istanbul ignore next */
+      function() {
       };
       p = path.resolve(p);
       xfs.mkdir(p, mode, function(er) {
@@ -14551,6 +20210,277 @@ var require_upload_specification = __commonJS({
   }
 });
 
+// node_modules/fs.realpath/old.js
+var require_old = __commonJS({
+  "node_modules/fs.realpath/old.js"(exports2) {
+    var pathModule = require("path");
+    var isWindows = process.platform === "win32";
+    var fs = require("fs");
+    var DEBUG = process.env.NODE_DEBUG && /fs/.test(process.env.NODE_DEBUG);
+    function rethrow() {
+      var callback;
+      if (DEBUG) {
+        var backtrace = new Error();
+        callback = debugCallback;
+      } else
+        callback = missingCallback;
+      return callback;
+      function debugCallback(err) {
+        if (err) {
+          backtrace.message = err.message;
+          err = backtrace;
+          missingCallback(err);
+        }
+      }
+      function missingCallback(err) {
+        if (err) {
+          if (process.throwDeprecation)
+            throw err;
+          else if (!process.noDeprecation) {
+            var msg = "fs: missing callback " + (err.stack || err.message);
+            if (process.traceDeprecation)
+              console.trace(msg);
+            else
+              console.error(msg);
+          }
+        }
+      }
+    }
+    function maybeCallback(cb) {
+      return typeof cb === "function" ? cb : rethrow();
+    }
+    var normalize = pathModule.normalize;
+    if (isWindows) {
+      nextPartRe = /(.*?)(?:[\/\\]+|$)/g;
+    } else {
+      nextPartRe = /(.*?)(?:[\/]+|$)/g;
+    }
+    var nextPartRe;
+    if (isWindows) {
+      splitRootRe = /^(?:[a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/][^\\\/]+)?[\\\/]*/;
+    } else {
+      splitRootRe = /^[\/]*/;
+    }
+    var splitRootRe;
+    exports2.realpathSync = function realpathSync(p, cache) {
+      p = pathModule.resolve(p);
+      if (cache && Object.prototype.hasOwnProperty.call(cache, p)) {
+        return cache[p];
+      }
+      var original = p, seenLinks = {}, knownHard = {};
+      var pos;
+      var current;
+      var base;
+      var previous;
+      start();
+      function start() {
+        var m = splitRootRe.exec(p);
+        pos = m[0].length;
+        current = m[0];
+        base = m[0];
+        previous = "";
+        if (isWindows && !knownHard[base]) {
+          fs.lstatSync(base);
+          knownHard[base] = true;
+        }
+      }
+      while (pos < p.length) {
+        nextPartRe.lastIndex = pos;
+        var result = nextPartRe.exec(p);
+        previous = current;
+        current += result[0];
+        base = previous + result[1];
+        pos = nextPartRe.lastIndex;
+        if (knownHard[base] || cache && cache[base] === base) {
+          continue;
+        }
+        var resolvedLink;
+        if (cache && Object.prototype.hasOwnProperty.call(cache, base)) {
+          resolvedLink = cache[base];
+        } else {
+          var stat = fs.lstatSync(base);
+          if (!stat.isSymbolicLink()) {
+            knownHard[base] = true;
+            if (cache)
+              cache[base] = base;
+            continue;
+          }
+          var linkTarget = null;
+          if (!isWindows) {
+            var id = stat.dev.toString(32) + ":" + stat.ino.toString(32);
+            if (seenLinks.hasOwnProperty(id)) {
+              linkTarget = seenLinks[id];
+            }
+          }
+          if (linkTarget === null) {
+            fs.statSync(base);
+            linkTarget = fs.readlinkSync(base);
+          }
+          resolvedLink = pathModule.resolve(previous, linkTarget);
+          if (cache)
+            cache[base] = resolvedLink;
+          if (!isWindows)
+            seenLinks[id] = linkTarget;
+        }
+        p = pathModule.resolve(resolvedLink, p.slice(pos));
+        start();
+      }
+      if (cache)
+        cache[original] = p;
+      return p;
+    };
+    exports2.realpath = function realpath(p, cache, cb) {
+      if (typeof cb !== "function") {
+        cb = maybeCallback(cache);
+        cache = null;
+      }
+      p = pathModule.resolve(p);
+      if (cache && Object.prototype.hasOwnProperty.call(cache, p)) {
+        return process.nextTick(cb.bind(null, null, cache[p]));
+      }
+      var original = p, seenLinks = {}, knownHard = {};
+      var pos;
+      var current;
+      var base;
+      var previous;
+      start();
+      function start() {
+        var m = splitRootRe.exec(p);
+        pos = m[0].length;
+        current = m[0];
+        base = m[0];
+        previous = "";
+        if (isWindows && !knownHard[base]) {
+          fs.lstat(base, function(err) {
+            if (err)
+              return cb(err);
+            knownHard[base] = true;
+            LOOP();
+          });
+        } else {
+          process.nextTick(LOOP);
+        }
+      }
+      function LOOP() {
+        if (pos >= p.length) {
+          if (cache)
+            cache[original] = p;
+          return cb(null, p);
+        }
+        nextPartRe.lastIndex = pos;
+        var result = nextPartRe.exec(p);
+        previous = current;
+        current += result[0];
+        base = previous + result[1];
+        pos = nextPartRe.lastIndex;
+        if (knownHard[base] || cache && cache[base] === base) {
+          return process.nextTick(LOOP);
+        }
+        if (cache && Object.prototype.hasOwnProperty.call(cache, base)) {
+          return gotResolvedLink(cache[base]);
+        }
+        return fs.lstat(base, gotStat);
+      }
+      function gotStat(err, stat) {
+        if (err)
+          return cb(err);
+        if (!stat.isSymbolicLink()) {
+          knownHard[base] = true;
+          if (cache)
+            cache[base] = base;
+          return process.nextTick(LOOP);
+        }
+        if (!isWindows) {
+          var id = stat.dev.toString(32) + ":" + stat.ino.toString(32);
+          if (seenLinks.hasOwnProperty(id)) {
+            return gotTarget(null, seenLinks[id], base);
+          }
+        }
+        fs.stat(base, function(err2) {
+          if (err2)
+            return cb(err2);
+          fs.readlink(base, function(err3, target) {
+            if (!isWindows)
+              seenLinks[id] = target;
+            gotTarget(err3, target);
+          });
+        });
+      }
+      function gotTarget(err, target, base2) {
+        if (err)
+          return cb(err);
+        var resolvedLink = pathModule.resolve(previous, target);
+        if (cache)
+          cache[base2] = resolvedLink;
+        gotResolvedLink(resolvedLink);
+      }
+      function gotResolvedLink(resolvedLink) {
+        p = pathModule.resolve(resolvedLink, p.slice(pos));
+        start();
+      }
+    };
+  }
+});
+
+// node_modules/fs.realpath/index.js
+var require_fs3 = __commonJS({
+  "node_modules/fs.realpath/index.js"(exports2, module2) {
+    module2.exports = realpath;
+    realpath.realpath = realpath;
+    realpath.sync = realpathSync;
+    realpath.realpathSync = realpathSync;
+    realpath.monkeypatch = monkeypatch;
+    realpath.unmonkeypatch = unmonkeypatch;
+    var fs = require("fs");
+    var origRealpath = fs.realpath;
+    var origRealpathSync = fs.realpathSync;
+    var version2 = process.version;
+    var ok = /^v[0-5]\./.test(version2);
+    var old = require_old();
+    function newError(er) {
+      return er && er.syscall === "realpath" && (er.code === "ELOOP" || er.code === "ENOMEM" || er.code === "ENAMETOOLONG");
+    }
+    function realpath(p, cache, cb) {
+      if (ok) {
+        return origRealpath(p, cache, cb);
+      }
+      if (typeof cache === "function") {
+        cb = cache;
+        cache = null;
+      }
+      origRealpath(p, cache, function(er, result) {
+        if (newError(er)) {
+          old.realpath(p, cache, cb);
+        } else {
+          cb(er, result);
+        }
+      });
+    }
+    function realpathSync(p, cache) {
+      if (ok) {
+        return origRealpathSync(p, cache);
+      }
+      try {
+        return origRealpathSync(p, cache);
+      } catch (er) {
+        if (newError(er)) {
+          return old.realpathSync(p, cache);
+        } else {
+          throw er;
+        }
+      }
+    }
+    function monkeypatch() {
+      fs.realpath = realpath;
+      fs.realpathSync = realpathSync;
+    }
+    function unmonkeypatch() {
+      fs.realpath = origRealpath;
+      fs.realpathSync = origRealpathSync;
+    }
+  }
+});
+
 // node_modules/concat-map/index.js
 var require_concat_map = __commonJS({
   "node_modules/concat-map/index.js"(exports2, module2) {
@@ -14717,7 +20647,7 @@ var require_brace_expansion2 = __commonJS({
 });
 
 // node_modules/minimatch/minimatch.js
-var require_minimatch2 = __commonJS({
+var require_minimatch = __commonJS({
   "node_modules/minimatch/minimatch.js"(exports2, module2) {
     module2.exports = minimatch;
     minimatch.Minimatch = Minimatch;
@@ -14912,9 +20842,9 @@ var require_minimatch2 = __commonJS({
         throw new TypeError("pattern is too long");
       }
     };
-    Minimatch.prototype.parse = parse;
+    Minimatch.prototype.parse = parse2;
     var SUBPARSE = {};
-    function parse(pattern, isSub) {
+    function parse2(pattern, isSub) {
       assertValidPattern(pattern);
       var options = this.options;
       if (pattern === "**") {
@@ -15231,7 +21161,10 @@ var require_minimatch2 = __commonJS({
     };
     Minimatch.prototype.matchOne = function(file, pattern, partial) {
       var options = this.options;
-      this.debug("matchOne", { "this": this, file, pattern });
+      this.debug(
+        "matchOne",
+        { "this": this, file, pattern }
+      );
       this.debug("matchOne", file.length, pattern.length);
       for (var fi = 0, pi = 0, fl = file.length, pl = pattern.length; fi < fl && pi < pl; fi++, pi++) {
         this.debug("matchOne loop");
@@ -15303,6 +21236,53 @@ var require_minimatch2 = __commonJS({
   }
 });
 
+// node_modules/inherits/inherits_browser.js
+var require_inherits_browser = __commonJS({
+  "node_modules/inherits/inherits_browser.js"(exports2, module2) {
+    if (typeof Object.create === "function") {
+      module2.exports = function inherits(ctor, superCtor) {
+        if (superCtor) {
+          ctor.super_ = superCtor;
+          ctor.prototype = Object.create(superCtor.prototype, {
+            constructor: {
+              value: ctor,
+              enumerable: false,
+              writable: true,
+              configurable: true
+            }
+          });
+        }
+      };
+    } else {
+      module2.exports = function inherits(ctor, superCtor) {
+        if (superCtor) {
+          ctor.super_ = superCtor;
+          var TempCtor = function() {
+          };
+          TempCtor.prototype = superCtor.prototype;
+          ctor.prototype = new TempCtor();
+          ctor.prototype.constructor = ctor;
+        }
+      };
+    }
+  }
+});
+
+// node_modules/inherits/inherits.js
+var require_inherits = __commonJS({
+  "node_modules/inherits/inherits.js"(exports2, module2) {
+    try {
+      util = require("util");
+      if (typeof util.inherits !== "function")
+        throw "";
+      module2.exports = util.inherits;
+    } catch (e) {
+      module2.exports = require_inherits_browser();
+    }
+    var util;
+  }
+});
+
 // node_modules/path-is-absolute/index.js
 var require_path_is_absolute = __commonJS({
   "node_modules/path-is-absolute/index.js"(exports2, module2) {
@@ -15323,9 +21303,9 @@ var require_path_is_absolute = __commonJS({
   }
 });
 
-// node_modules/glob/common.js
-var require_common3 = __commonJS({
-  "node_modules/glob/common.js"(exports2) {
+// node_modules/rimraf/node_modules/glob/common.js
+var require_common2 = __commonJS({
+  "node_modules/rimraf/node_modules/glob/common.js"(exports2) {
     exports2.setopts = setopts;
     exports2.ownProp = ownProp;
     exports2.makeAbs = makeAbs;
@@ -15338,7 +21318,7 @@ var require_common3 = __commonJS({
     }
     var fs = require("fs");
     var path = require("path");
-    var minimatch = require_minimatch2();
+    var minimatch = require_minimatch();
     var isAbsolute = require_path_is_absolute();
     var Minimatch = minimatch.Minimatch;
     function alphasort(a, b) {
@@ -15366,7 +21346,7 @@ var require_common3 = __commonJS({
     function setopts(self, pattern, options) {
       if (!options)
         options = {};
-      if (options.matchBase && pattern.indexOf("/") === -1) {
+      if (options.matchBase && -1 === pattern.indexOf("/")) {
         if (options.noglobstar) {
           throw new Error("base matching requires globstar");
         }
@@ -15415,6 +21395,7 @@ var require_common3 = __commonJS({
       self.nomount = !!options.nomount;
       options.nonegate = true;
       options.nocomment = true;
+      options.allowWindowsEscape = false;
       self.minimatch = new Minimatch(pattern, options);
       self.options = self.minimatch.options;
     }
@@ -15516,20 +21497,20 @@ var require_common3 = __commonJS({
   }
 });
 
-// node_modules/glob/sync.js
-var require_sync2 = __commonJS({
-  "node_modules/glob/sync.js"(exports2, module2) {
+// node_modules/rimraf/node_modules/glob/sync.js
+var require_sync = __commonJS({
+  "node_modules/rimraf/node_modules/glob/sync.js"(exports2, module2) {
     module2.exports = globSync;
     globSync.GlobSync = GlobSync;
-    var rp = require_fs();
-    var minimatch = require_minimatch2();
+    var rp = require_fs3();
+    var minimatch = require_minimatch();
     var Minimatch = minimatch.Minimatch;
     var Glob = require_glob2().Glob;
     var util = require("util");
     var path = require("path");
     var assert = require("assert");
     var isAbsolute = require_path_is_absolute();
-    var common = require_common3();
+    var common = require_common2();
     var setopts = common.setopts;
     var ownProp = common.ownProp;
     var childrenIgnored = common.childrenIgnored;
@@ -15557,7 +21538,7 @@ var require_sync2 = __commonJS({
       this._finish();
     }
     GlobSync.prototype._finish = function() {
-      assert(this instanceof GlobSync);
+      assert.ok(this instanceof GlobSync);
       if (this.realpath) {
         var self = this;
         this.matches.forEach(function(matchset, index) {
@@ -15579,7 +21560,7 @@ var require_sync2 = __commonJS({
       common.finish(this);
     };
     GlobSync.prototype._process = function(pattern, index, inGlobStar) {
-      assert(this instanceof GlobSync);
+      assert.ok(this instanceof GlobSync);
       var n = 0;
       while (typeof pattern[n] === "string") {
         n++;
@@ -15600,7 +21581,9 @@ var require_sync2 = __commonJS({
       var read;
       if (prefix === null)
         read = ".";
-      else if (isAbsolute(prefix) || isAbsolute(pattern.join("/"))) {
+      else if (isAbsolute(prefix) || isAbsolute(pattern.map(function(p) {
+        return typeof p === "string" ? p : "[*]";
+      }).join("/"))) {
         if (!prefix || !isAbsolute(prefix))
           prefix = "/" + prefix;
         read = prefix;
@@ -15866,20 +21849,143 @@ var require_sync2 = __commonJS({
   }
 });
 
-// node_modules/glob/glob.js
+// node_modules/wrappy/wrappy.js
+var require_wrappy = __commonJS({
+  "node_modules/wrappy/wrappy.js"(exports2, module2) {
+    module2.exports = wrappy;
+    function wrappy(fn, cb) {
+      if (fn && cb)
+        return wrappy(fn)(cb);
+      if (typeof fn !== "function")
+        throw new TypeError("need wrapper function");
+      Object.keys(fn).forEach(function(k) {
+        wrapper[k] = fn[k];
+      });
+      return wrapper;
+      function wrapper() {
+        var args = new Array(arguments.length);
+        for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i];
+        }
+        var ret = fn.apply(this, args);
+        var cb2 = args[args.length - 1];
+        if (typeof ret === "function" && ret !== cb2) {
+          Object.keys(cb2).forEach(function(k) {
+            ret[k] = cb2[k];
+          });
+        }
+        return ret;
+      }
+    }
+  }
+});
+
+// node_modules/once/once.js
+var require_once = __commonJS({
+  "node_modules/once/once.js"(exports2, module2) {
+    var wrappy = require_wrappy();
+    module2.exports = wrappy(once);
+    module2.exports.strict = wrappy(onceStrict);
+    once.proto = once(function() {
+      Object.defineProperty(Function.prototype, "once", {
+        value: function() {
+          return once(this);
+        },
+        configurable: true
+      });
+      Object.defineProperty(Function.prototype, "onceStrict", {
+        value: function() {
+          return onceStrict(this);
+        },
+        configurable: true
+      });
+    });
+    function once(fn) {
+      var f = function() {
+        if (f.called)
+          return f.value;
+        f.called = true;
+        return f.value = fn.apply(this, arguments);
+      };
+      f.called = false;
+      return f;
+    }
+    function onceStrict(fn) {
+      var f = function() {
+        if (f.called)
+          throw new Error(f.onceError);
+        f.called = true;
+        return f.value = fn.apply(this, arguments);
+      };
+      var name = fn.name || "Function wrapped with `once`";
+      f.onceError = name + " shouldn't be called more than once";
+      f.called = false;
+      return f;
+    }
+  }
+});
+
+// node_modules/inflight/inflight.js
+var require_inflight = __commonJS({
+  "node_modules/inflight/inflight.js"(exports2, module2) {
+    var wrappy = require_wrappy();
+    var reqs = /* @__PURE__ */ Object.create(null);
+    var once = require_once();
+    module2.exports = wrappy(inflight);
+    function inflight(key, cb) {
+      if (reqs[key]) {
+        reqs[key].push(cb);
+        return null;
+      } else {
+        reqs[key] = [cb];
+        return makeres(key);
+      }
+    }
+    function makeres(key) {
+      return once(function RES() {
+        var cbs = reqs[key];
+        var len = cbs.length;
+        var args = slice(arguments);
+        try {
+          for (var i = 0; i < len; i++) {
+            cbs[i].apply(null, args);
+          }
+        } finally {
+          if (cbs.length > len) {
+            cbs.splice(0, len);
+            process.nextTick(function() {
+              RES.apply(null, args);
+            });
+          } else {
+            delete reqs[key];
+          }
+        }
+      });
+    }
+    function slice(args) {
+      var length = args.length;
+      var array = [];
+      for (var i = 0; i < length; i++)
+        array[i] = args[i];
+      return array;
+    }
+  }
+});
+
+// node_modules/rimraf/node_modules/glob/glob.js
 var require_glob2 = __commonJS({
-  "node_modules/glob/glob.js"(exports2, module2) {
+  "node_modules/rimraf/node_modules/glob/glob.js"(exports2, module2) {
     module2.exports = glob;
-    var rp = require_fs();
-    var minimatch = require_minimatch2();
+    var rp = require_fs3();
+    var minimatch = require_minimatch();
     var Minimatch = minimatch.Minimatch;
     var inherits = require_inherits();
     var EE = require("events").EventEmitter;
     var path = require("path");
     var assert = require("assert");
     var isAbsolute = require_path_is_absolute();
-    var globSync = require_sync2();
-    var common = require_common3();
+    var globSync = require_sync();
+    var common = require_common2();
     var setopts = common.setopts;
     var ownProp = common.ownProp;
     var inflight = require_inflight();
@@ -16099,7 +22205,9 @@ var require_glob2 = __commonJS({
       var read;
       if (prefix === null)
         read = ".";
-      else if (isAbsolute(prefix) || isAbsolute(pattern.join("/"))) {
+      else if (isAbsolute(prefix) || isAbsolute(pattern.map(function(p) {
+        return typeof p === "string" ? p : "[*]";
+      }).join("/"))) {
         if (!prefix || !isAbsolute(prefix))
           prefix = "/" + prefix;
         read = prefix;
@@ -16706,7 +22814,7 @@ var require_tmp = __commonJS({
     var fs = require("fs");
     var os = require("os");
     var path = require("path");
-    var crypto = require("crypto");
+    var crypto4 = require("crypto");
     var _c = { fs: fs.constants, os: os.constants };
     var rimraf = require_rimraf2();
     var RANDOM_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -16897,9 +23005,9 @@ var require_tmp = __commonJS({
     function _randomChars(howMany) {
       let value = [], rnd = null;
       try {
-        rnd = crypto.randomBytes(howMany);
+        rnd = crypto4.randomBytes(howMany);
       } catch (e) {
-        rnd = crypto.pseudoRandomBytes(howMany);
+        rnd = crypto4.pseudoRandomBytes(howMany);
       }
       for (var i = 0; i < howMany; i++) {
         value.push(RANDOM_CHARS[rnd[i] % RANDOM_CHARS.length]);
@@ -17037,7 +23145,12 @@ var require_tmp_promise = __commonJS({
     var { promisify } = require("util");
     var tmp = require_tmp();
     module2.exports.fileSync = tmp.fileSync;
-    var fileWithOptions = promisify((options, cb) => tmp.file(options, (err, path, fd, cleanup) => err ? cb(err) : cb(void 0, { path, fd, cleanup: promisify(cleanup) })));
+    var fileWithOptions = promisify(
+      (options, cb) => tmp.file(
+        options,
+        (err, path, fd, cleanup) => err ? cb(err) : cb(void 0, { path, fd, cleanup: promisify(cleanup) })
+      )
+    );
     module2.exports.file = async (options) => fileWithOptions(options);
     module2.exports.withFile = async function withFile(fn, options) {
       const { path, fd, cleanup } = await module2.exports.file(options);
@@ -17048,7 +23161,12 @@ var require_tmp_promise = __commonJS({
       }
     };
     module2.exports.dirSync = tmp.dirSync;
-    var dirWithOptions = promisify((options, cb) => tmp.dir(options, (err, path, cleanup) => err ? cb(err) : cb(void 0, { path, cleanup: promisify(cleanup) })));
+    var dirWithOptions = promisify(
+      (options, cb) => tmp.dir(
+        options,
+        (err, path, cleanup) => err ? cb(err) : cb(void 0, { path, cleanup: promisify(cleanup) })
+      )
+    );
     module2.exports.dir = async (options) => dirWithOptions(options);
     module2.exports.withDir = async function withDir(fn, options) {
       const { path, cleanup } = await module2.exports.dir(options);
@@ -17432,7 +23550,7 @@ var require_crc64 = __commonJS({
 });
 
 // node_modules/@actions/artifact/lib/internal/utils.js
-var require_utils4 = __commonJS({
+var require_utils5 = __commonJS({
   "node_modules/@actions/artifact/lib/internal/utils.js"(exports2) {
     "use strict";
     var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
@@ -17522,6 +23640,7 @@ var require_utils4 = __commonJS({
         http_client_1.HttpCodes.ServiceUnavailable,
         http_client_1.HttpCodes.TooManyRequests,
         413
+        // Payload Too Large
       ];
       return retryableStatusCodes.includes(statusCode);
     }
@@ -17674,13 +23793,13 @@ Header Information: ${JSON.stringify(response.message.headers, void 0, 2)}
       return __awaiter2(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
           const crc64 = new crc64_1.default();
-          const md5 = crypto_1.default.createHash("md5");
+          const md52 = crypto_1.default.createHash("md5");
           stream.on("data", (data) => {
             crc64.update(data);
-            md5.update(data);
+            md52.update(data);
           }).on("end", () => resolve({
             crc64: crc64.digest("base64"),
-            md5: md5.digest("base64")
+            md5: md52.digest("base64")
           })).on("error", reject);
         });
       });
@@ -17714,6 +23833,7 @@ var require_status_reporter = __commonJS({
           core_1.info(`Total file count: ${this.totalNumberOfFilesToProcess} ---- Processed file #${this.processedCount} (${percentage.slice(0, percentage.indexOf(".") + 2)}%)`);
         }, this.displayFrequencyInMilliseconds);
       }
+      // if there is a large file that is being uploaded in chunks, this is used to display extra information about the status of the upload
       updateLargeFileStatus(fileName, chunkStartIndex, chunkEndIndex, totalUploadFileSize) {
         const percentage = this.formatPercentage(chunkEndIndex, totalUploadFileSize);
         core_1.info(`Uploaded ${fileName} (${percentage.slice(0, percentage.indexOf(".") + 2)}%) bytes ${chunkStartIndex}:${chunkEndIndex}`);
@@ -17740,7 +23860,7 @@ var require_http_manager = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.HttpManager = void 0;
-    var utils_1 = require_utils4();
+    var utils_1 = require_utils5();
     var HttpManager = class {
       constructor(clientCount, userAgent) {
         if (clientCount < 1) {
@@ -17752,6 +23872,8 @@ var require_http_manager = __commonJS({
       getClient(index) {
         return this.clients[index];
       }
+      // client disposal is necessary if a keep-alive connection is used to properly close the connection
+      // for more information see: https://github.com/actions/http-client/blob/04e5ad73cd3fd1f5610a32116b0759eddf6570d2/index.ts#L292
       disposeAndReplaceClient(index) {
         this.clients[index].dispose();
         this.clients[index] = utils_1.createHttpClient(this.userAgent);
@@ -17976,7 +24098,7 @@ var require_requestUtils = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.retryHttpClientRequest = exports2.retry = void 0;
-    var utils_1 = require_utils4();
+    var utils_1 = require_utils5();
     var core2 = __importStar(require_core());
     var config_variables_1 = require_config_variables();
     function retry(name, operation, customErrorMessages, maxAttempts) {
@@ -18098,7 +24220,7 @@ var require_upload_http_client = __commonJS({
     var core2 = __importStar(require_core());
     var tmp = __importStar(require_tmp_promise());
     var stream = __importStar(require("stream"));
-    var utils_1 = require_utils4();
+    var utils_1 = require_utils5();
     var config_variables_1 = require_config_variables();
     var util_1 = require("util");
     var url_1 = require("url");
@@ -18114,6 +24236,11 @@ var require_upload_http_client = __commonJS({
         this.uploadHttpManager = new http_manager_1.HttpManager(config_variables_1.getUploadFileConcurrency(), "@actions/artifact-upload");
         this.statusReporter = new status_reporter_1.StatusReporter(1e4);
       }
+      /**
+       * Creates a file container for the new artifact in the remote blob storage/file service
+       * @param {string} artifactName Name of the artifact being created
+       * @returns The response from the Artifact Service if the file container was successfully created
+       */
       createArtifactInFileContainer(artifactName, options) {
         return __awaiter2(this, void 0, void 0, function* () {
           const parameters = {
@@ -18145,6 +24272,12 @@ var require_upload_http_client = __commonJS({
           return JSON.parse(body);
         });
       }
+      /**
+       * Concurrently upload all of the files in chunks
+       * @param {string} uploadUrl Base Url for the artifact that was created
+       * @param {SearchResult[]} filesToUpload A list of information about the files being uploaded
+       * @returns The size of all the files uploaded in bytes
+       */
       uploadArtifactToFileContainer(uploadUrl, filesToUpload, options) {
         return __awaiter2(this, void 0, void 0, function* () {
           const FILE_CONCURRENCY = config_variables_1.getUploadFileConcurrency();
@@ -18211,6 +24344,13 @@ var require_upload_http_client = __commonJS({
           };
         });
       }
+      /**
+       * Asynchronously uploads a file. The file is compressed and uploaded using GZip if it is determined to save space.
+       * If the upload file is bigger than the max chunk size it will be uploaded via multiple calls
+       * @param {number} httpClientIndex The index of the httpClient that is being used to make all of the calls
+       * @param {UploadFileParameters} parameters Information about the file that needs to be uploaded
+       * @returns The size of the file that was uploaded in bytes along with any failed uploads
+       */
       uploadFileAsync(httpClientIndex, parameters) {
         return __awaiter2(this, void 0, void 0, function* () {
           const fileStat = yield stat(parameters.file);
@@ -18299,6 +24439,19 @@ var require_upload_http_client = __commonJS({
           }
         });
       }
+      /**
+       * Uploads a chunk of an individual file to the specified resourceUrl. If the upload fails and the status code
+       * indicates a retryable status, we try to upload the chunk as well
+       * @param {number} httpClientIndex The index of the httpClient being used to make all the necessary calls
+       * @param {string} resourceUrl Url of the resource that the chunk will be uploaded to
+       * @param {NodeJS.ReadableStream} openStream Stream of the file that will be uploaded
+       * @param {number} start Starting byte index of file that the chunk belongs to
+       * @param {number} end Ending byte index of file that the chunk belongs to
+       * @param {number} uploadFileSize Total size of the file in bytes that is being uploaded
+       * @param {boolean} isGzip Denotes if we are uploading a Gzip compressed stream
+       * @param {number} totalFileSize Original total size of the file that is being uploaded
+       * @returns if the chunk was successfully uploaded
+       */
       uploadChunk(httpClientIndex, resourceUrl, openStream, start, end, uploadFileSize, isGzip, totalFileSize) {
         return __awaiter2(this, void 0, void 0, function* () {
           const digest = yield utils_1.digestForStream(openStream());
@@ -18364,6 +24517,10 @@ var require_upload_http_client = __commonJS({
           return false;
         });
       }
+      /**
+       * Updates the size of the artifact from -1 which was initially set when the container was first created for the artifact.
+       * Updating the size indicates that we are done uploading all the contents of the artifact
+       */
       patchArtifactSize(size, artifactName) {
         return __awaiter2(this, void 0, void 0, function* () {
           const resourceUrl = new url_1.URL(utils_1.getArtifactUrl());
@@ -18455,7 +24612,7 @@ var require_download_http_client = __commonJS({
     var fs = __importStar(require("fs"));
     var core2 = __importStar(require_core());
     var zlib = __importStar(require("zlib"));
-    var utils_1 = require_utils4();
+    var utils_1 = require_utils5();
     var url_1 = require("url");
     var status_reporter_1 = require_status_reporter();
     var perf_hooks_1 = require("perf_hooks");
@@ -18467,6 +24624,9 @@ var require_download_http_client = __commonJS({
         this.downloadHttpManager = new http_manager_1.HttpManager(config_variables_1.getDownloadFileConcurrency(), "@actions/artifact-download");
         this.statusReporter = new status_reporter_1.StatusReporter(1e3);
       }
+      /**
+       * Gets a list of all artifacts that are in a specific container
+       */
       listArtifacts() {
         return __awaiter2(this, void 0, void 0, function* () {
           const artifactUrl = utils_1.getArtifactUrl();
@@ -18479,6 +24639,11 @@ var require_download_http_client = __commonJS({
           return JSON.parse(body);
         });
       }
+      /**
+       * Fetches a set of container items that describe the contents of an artifact
+       * @param artifactName the name of the artifact
+       * @param containerUrl the artifact container URL for the run
+       */
       getContainerItems(artifactName, containerUrl) {
         return __awaiter2(this, void 0, void 0, function* () {
           const resourceUrl = new url_1.URL(containerUrl);
@@ -18492,6 +24657,10 @@ var require_download_http_client = __commonJS({
           return JSON.parse(body);
         });
       }
+      /**
+       * Concurrently downloads all the files that are part of an artifact
+       * @param downloadItems information about what items to download and where to save them
+       */
       downloadSingleArtifact(downloadItems) {
         return __awaiter2(this, void 0, void 0, function* () {
           const DOWNLOAD_CONCURRENCY = config_variables_1.getDownloadFileConcurrency();
@@ -18521,6 +24690,12 @@ var require_download_http_client = __commonJS({
           });
         });
       }
+      /**
+       * Downloads an individual file
+       * @param httpClientIndex the index of the http client that is used to make all of the calls
+       * @param artifactLocation origin location where a file will be downloaded from
+       * @param downloadPath destination location for the file being downloaded
+       */
       downloadIndividualFile(httpClientIndex, artifactLocation, downloadPath) {
         return __awaiter2(this, void 0, void 0, function* () {
           let retryCount = 0;
@@ -18604,6 +24779,12 @@ var require_download_http_client = __commonJS({
           }
         });
       }
+      /**
+       * Pipes the response from downloading an individual file to the appropriate destination stream while decoding gzip content if necessary
+       * @param response the http response received when downloading a file
+       * @param destinationStream the stream where the file should be written to
+       * @param isGzip a boolean denoting if the content is compressed using gzip and if we need to decode it
+       */
       pipeResponseToFile(response, destinationStream, isGzip) {
         return __awaiter2(this, void 0, void 0, function* () {
           yield new Promise((resolve, reject) => {
@@ -18776,16 +24957,22 @@ var require_artifact_client = __commonJS({
     var core2 = __importStar(require_core());
     var upload_specification_1 = require_upload_specification();
     var upload_http_client_1 = require_upload_http_client();
-    var utils_1 = require_utils4();
+    var utils_1 = require_utils5();
     var path_and_artifact_name_validation_1 = require_path_and_artifact_name_validation();
     var download_http_client_1 = require_download_http_client();
     var download_specification_1 = require_download_specification();
     var config_variables_1 = require_config_variables();
     var path_1 = require("path");
     var DefaultArtifactClient = class {
+      /**
+       * Constructs a DefaultArtifactClient
+       */
       static create() {
         return new DefaultArtifactClient();
       }
+      /**
+       * Uploads an artifact
+       */
       uploadArtifact(name, files, rootDirectory, options) {
         return __awaiter2(this, void 0, void 0, function* () {
           core2.info(`Starting artifact upload
@@ -18968,7 +25155,7 @@ var require_ActionsHost = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ActionsHost = void 0;
-    var fs = require_lib();
+    var fs = require_lib3();
     var path = require("path");
     var os = require("os");
     var unzip = require_unzip();
@@ -19022,6 +25209,7 @@ var require_ActionsHost = __commonJS({
           }
         });
       }
+      // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
       getOutputDirectory() {
         let baseOutDir;
         if (process.env.RUNNER_TEMP) {
@@ -19071,6 +25259,7 @@ var require_getCredentials = __commonJS({
         tenantId: getInput("tenant-id"),
         cloudInstance: getInput("cloud"),
         scheme: ""
+        // no MgtIdentity support for Actions yet
       };
       const isCcValid = isClientCredentialsValid(clientCredentials);
       if (isUpValid && isCcValid) {
@@ -19189,56 +25378,56 @@ var require_package = __commonJS({
         url: "https://github.com/microsoft/powerplatform-actions.git"
       },
       devDependencies: {
-        "@types/async": "^3.2.7",
-        "@types/chai": "^4.3.4",
+        "@types/async": "^3.2.20",
+        "@types/chai": "^4.3.5",
         "@types/fancy-log": "^2.0.0",
         "@types/fs-extra": "^9.0.12",
-        "@types/glob": "^7.1.4",
+        "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.3",
-        "@types/mocha": "^9.1.0",
-        "@types/node": "^14.14.35",
-        "@types/sinon": "^9.0.11",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "^20.2.1",
+        "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.9",
         "@types/unzip-stream": "^0.3.1",
-        "@types/uuid": "^8.3.0",
+        "@types/uuid": "^9.0.1",
         "@types/yargs": "^17.0.24",
-        "@typescript-eslint/eslint-plugin": "^5.57.1",
-        "@typescript-eslint/parser": "^5.15.0",
-        async: "^3.2.0",
+        "@typescript-eslint/eslint-plugin": "^5.59.6",
+        "@typescript-eslint/parser": "^5.59.6",
+        async: "^3.2.4",
         chai: "^4.3.7",
-        dotenv: "^8.2.0",
-        esbuild: "^0.14.10",
+        dotenv: "^16.0.3",
+        esbuild: "^0.17.19",
         eslint: "^8.11.0",
         "fancy-log": "^2.0.0",
-        glob: "^7.2.0",
+        glob: "^10.2.5",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
         "gulp-eslint": "^6.0.0",
         "gulp-mocha": "^8.0.0",
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
-        mocha: "^9.2.0",
-        "node-fetch": "^2.6.7",
-        postcss: "^8.4.6",
-        "ps-list": "^7.2.0",
-        rewiremock: "^3.14.3",
-        sinon: "^9.2.4",
+        mocha: "^10.2.0",
+        "node-fetch": "^3.3.1",
+        postcss: "^8.4.23",
+        "ps-list": "^8.1.1",
+        rewiremock: "^3.14.5",
+        sinon: "^15.1.0",
         "sinon-chai": "^3.5.0",
-        "ts-node": "^10.0.0",
+        "ts-node": "^10.9.1",
         "ts-sinon": "^2.0.1",
-        typescript: "^4.3.5",
+        typescript: "^5.0.4",
         "unzip-stream": "^0.3.1",
-        winston: "^3.3.3",
-        yargs: "^17.7.1"
+        winston: "^3.8.2",
+        yargs: "^17.7.2"
       },
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.92",
-        "date-fns": "^2.22.1",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.93",
+        "date-fns": "^2.30.0",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
-        uuid: "^8.3.2"
+        uuid: "^9.0.0"
       }
     };
   }
@@ -19329,10 +25518,14 @@ function main() {
   });
 }
 exports.main = main;
-/*!
- * Tmp
- *
- * Copyright (c) 2011-2017 KARASZI Istvan <github@spam.raszi.hu>
- *
- * MIT Licensed
- */
+/*! Bundled license information:
+
+tmp/lib/tmp.js:
+  (*!
+   * Tmp
+   *
+   * Copyright (c) 2011-2017 KARASZI Istvan <github@spam.raszi.hu>
+   *
+   * MIT Licensed
+   *)
+*/
