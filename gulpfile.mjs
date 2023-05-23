@@ -20,6 +20,7 @@ import path from'path';
 import pslist from 'ps-list';
 import unzip from 'unzip-stream';
 import { glob } from 'glob';
+import { fileURLToPath } from 'url';
 import util from 'util';
 
 import childProcess from 'child_process';
@@ -40,6 +41,9 @@ const feedPAT = argv.feedPAT || process.env['AZ_DevOps_Read_PAT'];
 
 // list actions (by their name) that are not to be added to the release (test or pre-release actions):
 const skippedActionYamls = [ 'data', 'install-application' ];
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function clean() {
     (await pslist())
