@@ -62,7 +62,7 @@
   "dependencies": {
     "@actions/artifact": "^1.1.1",
     "@actions/core": "^1.10.0",
-    "@microsoft/powerplatform-cli-wrapper": "^0.1.93",
+    "@microsoft/powerplatform-cli-wrapper": "^0.1.94",
     "date-fns": "^2.30.0",
     "fs-extra": "^10.0.0",
     "js-yaml": "^4.1",
