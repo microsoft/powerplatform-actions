@@ -6,13 +6,14 @@ import getCredentials from "../../lib/auth/getCredentials";
 import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from "../../lib/runnerParameters";
 import { EnvIdVariableName } from "../../host/OutputVariables";
+import { ActionsHost } from '../../lib/host/ActionsHost';
 
 (async () => {
     core.startGroup('who-am-i:');
     const result = await whoAmI({
         credentials: getCredentials(),
         environmentUrl: getEnvironmentUrl(),
-    }, runnerParameters
+    }, runnerParameters, new ActionsHost()
     );
 
     core.setOutput(EnvIdVariableName, result.environmentId);
