@@ -2782,7 +2782,7 @@ var require_exportSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -2851,7 +2851,7 @@ var require_whoAmI = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -2936,7 +2936,7 @@ var require_importSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -3006,7 +3006,7 @@ var require_upgradeSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -3076,7 +3076,7 @@ var require_deleteEnvironment = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -3147,7 +3147,7 @@ var require_backupEnvironment = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -5624,7 +5624,7 @@ var require_checkSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -5751,7 +5751,7 @@ var require_publishSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -5837,12 +5837,12 @@ var require_deployPackage = __commonJS({
           throw error;
         } finally {
           if (fs.pathExistsSync(logFile)) {
-            artifactStore.upload("DeployPackageLogs", [logFile]);
+            yield artifactStore.upload("DeployPackageLogs", [logFile]);
           }
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -5919,7 +5919,7 @@ var require_createEnvironment = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6014,7 +6014,7 @@ var require_restoreEnvironment = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6082,7 +6082,7 @@ var require_deleteSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6177,7 +6177,7 @@ var require_packSolution = __commonJS({
           throw error;
         } finally {
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6249,7 +6249,7 @@ var require_unpackSolution = __commonJS({
           throw error;
         } finally {
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6332,7 +6332,7 @@ var require_resetEnvironment = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6412,7 +6412,7 @@ var require_copyEnvironment = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6482,7 +6482,7 @@ var require_uploadPaportal = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6554,7 +6554,7 @@ var require_downloadPaportal = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6625,7 +6625,7 @@ var require_cloneSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6697,7 +6697,7 @@ var require_updateVersionSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6766,7 +6766,7 @@ var require_onlineVersionSolution = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6841,7 +6841,7 @@ var require_installApplication = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6913,7 +6913,7 @@ var require_assignUser = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -6986,7 +6986,7 @@ var require_addSolutionComponent = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log(`The Clear Authentication Result: ${clearAuthResult}`);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7062,7 +7062,7 @@ var require_dataExport = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7136,7 +7136,7 @@ var require_dataImport = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7210,7 +7210,7 @@ var require_assignGroup = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7278,7 +7278,7 @@ var require_virtualAgentsStatus = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7350,7 +7350,7 @@ var require_installCatalog = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7419,7 +7419,7 @@ var require_catalogStatus = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7494,7 +7494,7 @@ var require_submitCatalog = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("The Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -7567,7 +7567,7 @@ var require_pipelineDeploy = __commonJS({
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
           logger.log("Clear Authentication Result: " + clearAuthResult);
           if (fs.pathExistsSync(pacLogs)) {
-            host.getArtifactStore().upload("PacLogs", [pacLogs]);
+            yield host.getArtifactStore().upload("PacLogs", [pacLogs]);
           }
         }
       });
@@ -21224,7 +21224,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.96",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.98",
         "date-fns": "^2.30.0",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
