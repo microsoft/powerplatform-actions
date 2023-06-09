@@ -2482,6 +2482,7 @@ var require_exportSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var path = require("path");
     function exportSolution(parameters, runnerParameters, host) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
       return __awaiter2(this, void 0, void 0, function* () {
         function resolveFolder(folder) {
           if (!folder || typeof folder !== "string")
@@ -2502,37 +2503,37 @@ var require_exportSolution = __commonJS({
           validator.pushInput(pacArgs, "--async", parameters.async);
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
           const includeArgs = [];
-          if (validator.getInput(parameters.autoNumberSettings) === "true") {
+          if (((_a = validator.getInput(parameters.autoNumberSettings)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             includeArgs.push("autonumbering");
           }
-          if (validator.getInput(parameters.calenderSettings) === "true") {
+          if (((_b = validator.getInput(parameters.calenderSettings)) === null || _b === void 0 ? void 0 : _b.toLowerCase()) === "true") {
             includeArgs.push("calendar");
           }
-          if (validator.getInput(parameters.customizationSettings) === "true") {
+          if (((_c = validator.getInput(parameters.customizationSettings)) === null || _c === void 0 ? void 0 : _c.toLowerCase()) === "true") {
             includeArgs.push("customization");
           }
-          if (validator.getInput(parameters.emailTrackingSettings) === "true") {
+          if (((_d = validator.getInput(parameters.emailTrackingSettings)) === null || _d === void 0 ? void 0 : _d.toLowerCase()) === "true") {
             includeArgs.push("emailtracking");
           }
-          if (validator.getInput(parameters.externalApplicationSettings) === "true") {
+          if (((_e = validator.getInput(parameters.externalApplicationSettings)) === null || _e === void 0 ? void 0 : _e.toLowerCase()) === "true") {
             includeArgs.push("externalapplications");
           }
-          if (validator.getInput(parameters.generalSettings) === "true") {
+          if (((_f = validator.getInput(parameters.generalSettings)) === null || _f === void 0 ? void 0 : _f.toLowerCase()) === "true") {
             includeArgs.push("general");
           }
-          if (validator.getInput(parameters.isvConfig) === "true") {
+          if (((_g = validator.getInput(parameters.isvConfig)) === null || _g === void 0 ? void 0 : _g.toLowerCase()) === "true") {
             includeArgs.push("isvconfig");
           }
-          if (validator.getInput(parameters.marketingSettings) === "true") {
+          if (((_h = validator.getInput(parameters.marketingSettings)) === null || _h === void 0 ? void 0 : _h.toLowerCase()) === "true") {
             includeArgs.push("marketing");
           }
-          if (validator.getInput(parameters.outlookSynchronizationSettings) === "true") {
+          if (((_j = validator.getInput(parameters.outlookSynchronizationSettings)) === null || _j === void 0 ? void 0 : _j.toLowerCase()) === "true") {
             includeArgs.push("outlooksynchronization");
           }
-          if (validator.getInput(parameters.relationshipRoles) === "true") {
+          if (((_k = validator.getInput(parameters.relationshipRoles)) === null || _k === void 0 ? void 0 : _k.toLowerCase()) === "true") {
             includeArgs.push("relationshiproles");
           }
-          if (validator.getInput(parameters.sales) === "true") {
+          if (((_l = validator.getInput(parameters.sales)) === null || _l === void 0 ? void 0 : _l.toLowerCase()) === "true") {
             includeArgs.push("sales");
           }
           if (includeArgs.length > 0) {
@@ -2655,6 +2656,7 @@ var require_importSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var path = require("path");
     function importSolution(parameters, runnerParameters, host) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         function resolveFolder(folder) {
           if (!folder || typeof folder !== "string")
@@ -2677,7 +2679,7 @@ var require_importSolution = __commonJS({
           validator.pushInput(pacArgs, "--convert-to-managed", parameters.convertToManaged);
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
           validator.pushInput(pacArgs, "--activate-plugins", parameters.activatePlugins);
-          if (validator.getInput(parameters.useDeploymentSettingsFile) === "true") {
+          if (((_a = validator.getInput(parameters.useDeploymentSettingsFile)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--settings-file", parameters.deploymentSettingsFile);
           }
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
@@ -7649,6 +7651,7 @@ var require_checkSolution = __commonJS({
     var authenticate_1 = require_authenticate();
     var fs_extra_1 = require_lib2();
     function checkSolution(parameters, runnerParameters, host) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
@@ -7665,10 +7668,15 @@ var require_checkSolution = __commonJS({
           level = validator.getInput(parameters.errorLevel);
           threshold = validator.getInput(parameters.errorThreshold);
         }
-        const failOnAnalysisError = validator.getInput(parameters.failOnAnalysisError) === "true";
+        const failOnAnalysisError = ((_a = validator.getInput(parameters.failOnAnalysisError)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true";
         let ruleLevelOverrideFile;
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          let authenticateResult;
+          if (validator.getInput(parameters.saveResults) !== "true") {
+            authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          } else {
+            authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          }
           logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "check"];
           if (validator.getInput(parameters.fileLocation) === "sasUriFile") {
@@ -7726,7 +7734,7 @@ var require_checkSolution = __commonJS({
             try {
               (0, fs_extra_1.rmSync)(ruleLevelOverrideFile);
               (0, fs_extra_1.rmdirSync)(path.dirname(ruleLevelOverrideFile));
-            } catch (_a) {
+            } catch (_b) {
             }
           }
           const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
@@ -8065,6 +8073,7 @@ var require_restoreEnvironment = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var createEnvironment_1 = require_createEnvironment();
     function restoreEnvironment(parameters, runnerParameters, host) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
@@ -8080,7 +8089,7 @@ var require_restoreEnvironment = __commonJS({
           validator.pushInput(pacArgs, "--source-id", parameters.sourceEnvironmentId);
           validator.pushInput(pacArgs, "--target-id", parameters.targetEnvironmentId);
           validator.pushInput(pacArgs, "--name", parameters.targetEnvironmentName);
-          if (validator.getInput(parameters.restoreLatestBackup) === "true") {
+          if (((_a = validator.getInput(parameters.restoreLatestBackup)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             pacArgs.push("--selected-backup", "latest");
           } else if (parameters.backupDateTime) {
             validator.pushInput(pacArgs, "--selected-backup", parameters.backupDateTime);
@@ -8292,6 +8301,7 @@ var require_unpackSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var solutionPackagingBase_1 = require_solutionPackagingBase();
     function unpackSolution(parameters, runnerParameters, host) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
@@ -8299,7 +8309,7 @@ var require_unpackSolution = __commonJS({
           const pacArgs = ["solution", "unpack"];
           const validator = new InputValidator_1.InputValidator(host);
           (0, solutionPackagingBase_1.setSolutionPackagingCommonArgs)(parameters, runnerParameters, validator, pacArgs);
-          if (parameters.overwriteFiles && validator.getInput(parameters.overwriteFiles) === "true") {
+          if (parameters.overwriteFiles && ((_a = validator.getInput(parameters.overwriteFiles)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             pacArgs.push("--allowDelete");
             pacArgs.push("true");
             pacArgs.push("--allowWrite");
@@ -8358,6 +8368,7 @@ var require_resetEnvironment = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var createEnvironment_1 = require_createEnvironment();
     function resetEnvironment(parameters, runnerParameters, host) {
+      var _a, _b;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
@@ -8373,10 +8384,10 @@ var require_resetEnvironment = __commonJS({
           validator.pushInput(pacArgs, "--currency", parameters.currency);
           validator.pushInput(pacArgs, "--purpose", parameters.purpose);
           validator.pushInput(pacArgs, "--templates", parameters.templates);
-          if (validator.getInput(parameters.overrideDomainName) === "true") {
+          if (((_a = validator.getInput(parameters.overrideDomainName)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--domain", parameters.domainName);
           }
-          if (validator.getInput(parameters.overrideFriendlyName) === "true") {
+          if (((_b = validator.getInput(parameters.overrideFriendlyName)) === null || _b === void 0 ? void 0 : _b.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--name", parameters.friendlyEnvironmentName);
           }
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
@@ -8435,6 +8446,7 @@ var require_copyEnvironment = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var createEnvironment_1 = require_createEnvironment();
     function copyEnvironment(parameters, runnerParameters, host) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
@@ -8449,7 +8461,7 @@ var require_copyEnvironment = __commonJS({
           validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
           validator.pushInput(pacArgs, "--source-id", parameters.sourceEnvironmentId);
           validator.pushInput(pacArgs, "--target-id", parameters.targetEnvironmentId);
-          if (validator.getInput(parameters.overrideFriendlyName) === "true") {
+          if (((_a = validator.getInput(parameters.overrideFriendlyName)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--name", parameters.friendlyTargetEnvironmentName);
           }
           validator.pushInput(pacArgs, "--type", parameters.copyType);
@@ -8967,6 +8979,7 @@ var require_addSolutionComponent = __commonJS({
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function addSolutionComponent(parameters, runnerParameters, host) {
+      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
@@ -8978,7 +8991,7 @@ var require_addSolutionComponent = __commonJS({
           inputValidator.pushInput(pacArgs, "--solutionUniqueName", parameters.solutionName);
           inputValidator.pushInput(pacArgs, "--component", parameters.component);
           inputValidator.pushInput(pacArgs, "--componentType", parameters.componentType);
-          if (parameters.addRequiredComponents && inputValidator.getInput(parameters.addRequiredComponents) === "true") {
+          if (parameters.addRequiredComponents && ((_a = inputValidator.getInput(parameters.addRequiredComponents)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             inputValidator.pushInput(pacArgs, "--AddRequiredComponents", parameters.addRequiredComponents);
           }
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
@@ -9463,6 +9476,73 @@ var require_submitCatalog = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/pipelineDeploy.js
+var require_pipelineDeploy = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/pipelineDeploy.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.pipelineDeploy = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function pipelineDeploy(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        const pacArgs = ["pipeline", "deploy"];
+        const validator = new InputValidator_1.InputValidator(host);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          validator.pushInput(pacArgs, "--solutionName", parameters.solutionName);
+          validator.pushInput(pacArgs, "--stageId", parameters.stageId);
+          validator.pushInput(pacArgs, "--environment", parameters.deploymentEnvironment);
+          validator.pushInput(pacArgs, "--currentVersion", parameters.currentVersion);
+          validator.pushInput(pacArgs, "--newVersion", parameters.newVersion);
+          validator.pushInput(pacArgs, "--wait", parameters.waitForCompletion);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.pipelineDeploy = pipelineDeploy;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -9519,6 +9599,7 @@ var require_actions = __commonJS({
     __exportStar(require_installCatalog(), exports2);
     __exportStar(require_catalogStatus(), exports2);
     __exportStar(require_submitCatalog(), exports2);
+    __exportStar(require_pipelineDeploy(), exports2);
   }
 });
 
@@ -20896,7 +20977,7 @@ var require_package = __commonJS({
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.94",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.100",
         "date-fns": "^2.30.0",
         "fs-extra": "^10.0.0",
         "js-yaml": "^4.1",
