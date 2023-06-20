@@ -37,7 +37,7 @@ inputs:
     required: true
 
   verbose:
-    description: 'Output more diagnostic information during data import/export.'
+    description: 'Output more diagnostic information.'
     required: false
     
 runs:
