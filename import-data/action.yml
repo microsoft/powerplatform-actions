@@ -36,6 +36,10 @@ inputs:
     description: 'File name for data zip file, or folder with data-schema.xml & data.xml, to be imported.'
     required: true
 
+  verbose:
+    description: 'Output more diagnostic information during data import/export.'
+    required: false
+    
 runs:
   using: 'node16'
   main: '../dist/actions/import-data/index.js'
