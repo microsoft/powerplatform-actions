@@ -40,6 +40,10 @@ inputs:
     description: 'File name and path for data zip file. Default: data.zip.'
     required: true
 
+  verbose:
+    description: 'Output more diagnostic information.'
+    required: false
+    
   overwrite:
     description: 'Allow overwrite output data file if it already exists.'
     required: false
