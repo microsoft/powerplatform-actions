@@ -74,7 +74,7 @@ const currDir = process.cwd();
     core.info(`creating branch for solution: ${branchName}...`);
 
     fs.emptyDirSync(solutionTargetFolder);
-    fs.copySync(solutionFolder, solutionTargetFolder, { recursive: true });
+    fs.copySync(solutionFolder, solutionTargetFolder);
     await git.run(['add', solutionTargetFolder]);
     await git.run(['status', '--branch', '--short']);
 
