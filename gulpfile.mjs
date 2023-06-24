@@ -8,7 +8,7 @@ dotenv.config();
 
 import gulp from 'gulp';
 import esbuild from 'esbuild';
-import eslint from 'gulp-eslint';
+import eslint from 'gulp-eslint-new';
 import mocha from 'gulp-mocha';
 import sourcemaps from 'gulp-sourcemaps';
 import ts from 'gulp-typescript';
@@ -141,10 +141,7 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
 function lint() {
     return gulp
         .src('src/**/*.ts')
-        .pipe(eslint({
-                formatter: 'verbose',
-                configuration: '.eslintrc.js'
-            }))
+        .pipe(eslint())
         .pipe(eslint.format());
 }
 
