@@ -16,14 +16,16 @@ import ts from 'gulp-typescript';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
 import log from 'fancy-log';
-import path from'path';
+import os from 'node:os';
+import path from 'node:path';
 import pslist from 'ps-list';
 import unzip from 'unzip-stream';
 import { glob } from 'glob';
 import { fileURLToPath } from 'url';
 import util from 'util';
 
-import childProcess from 'child_process';
+import commandExists from 'command-exists';
+import childProcess from 'node:child_process';
 const exec = util.promisify(childProcess.exec);
 
 import yargs from 'yargs';
@@ -67,6 +69,47 @@ function compile() {
 }
 
 async function nugetInstall(nugetSource, packageName, version, targetDir) {
+    const fetchBody = await nugetFetch(nugetSource, packageName, version);
+
+    log.info(`Extracting into folder: ${targetDir}`);
+    return new Promise((resolve, reject) => {
+        fetchBody.pipe(unzip.Extract({ path: targetDir }))
+            .on('close', () => {
+                resolve();
+            }).on('error', err => {
+                reject(err);
+            })
+    });
+}
+
+async function dotnetInstall(nugetSource, packageName, version, targetDir) {
+    const fetchBody = await nugetFetch(nugetSource, packageName, version);
+
+    return new Promise((resolve, reject) => {
+        // Save the file to a temp directory for `dotnet tool install` to consume
+        const nugetTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pac-nuget-'));
+        const fileWritePath = path.join(nugetTempDir, `${packageName}.${version}.nupkg`);
+        await fetchBody.pipe(fs.createWriteStream(fileWritePath));  // WIP - listen to close event?
+
+        if (!commandExists.sync('dotnet')) {
+            reject('dotnet command not found. Please install dotnet 6.0+ SDK.');
+            return;
+        }
+
+        const install = childProcess.spawnSync(
+            "dotnet",
+            ["tool", "install", packageName, "--tool-path", targetDir, "--add-source", nugetTempDir, "--version", version],
+            {encoding: "utf-8"});
+        if (install.status !== 0) {
+            reject(`dotnet tool install failed\n stdout: ${install.stdout}\n stderr: ${install.stderr}`);
+            return;
+        }
+
+        resolve();
+    });
+}
+
+async function nugetFetch(nugetSource, packageName, version) {
     // https://docs.microsoft.com/en-us/nuget/api/package-base-address-resource
     const feeds = {
         'nuget.org': {
@@ -127,15 +170,7 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
         throw new Error(`Cannot download ${res.url}, status: ${res.statusText} (${res.status}), body: ${body ? body.toString('ascii') : 'null'}`);
     }
 
-    log.info(`Extracting into folder: ${targetDir}`);
-    return new Promise((resolve, reject) => {
-        res.body.pipe(unzip.Extract({ path: targetDir }))
-            .on('close', () => {
-                resolve();
-            }).on('error', err => {
-                reject(err);
-            })
-    });
+    return res.body;
 }
 
 function lint() {
@@ -207,7 +242,7 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.23.4';
+const cliVersion = '1.24.3';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
@@ -240,8 +275,7 @@ async function nugetInstallPortalPackages() {
 }
 
 async function nugetInstallLinux() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
-    await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
+    await dotnetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Tool', cliVersion, path.resolve(outdir, 'pac_linux'));
 }
 
 async function nugetInstallWindows() {
@@ -279,6 +313,7 @@ const updateDist = gulp.series(
 
 export {
     clean,
+    restore,
     compile,
     recompile,
     lint,
