@@ -968,12 +968,12 @@ var require_lib = __commonJS({
     var RetryableHttpVerbs = ["OPTIONS", "GET", "DELETE", "HEAD"];
     var ExponentialBackoffCeiling = 10;
     var ExponentialBackoffTimeSlice = 5;
-    var HttpClientError = class extends Error {
+    var HttpClientError = class _HttpClientError extends Error {
       constructor(message, statusCode) {
         super(message);
         this.name = "HttpClientError";
         this.statusCode = statusCode;
-        Object.setPrototypeOf(this, HttpClientError.prototype);
+        Object.setPrototypeOf(this, _HttpClientError.prototype);
       }
     };
     exports2.HttpClientError = HttpClientError;
@@ -1564,13 +1564,13 @@ var require_oidc_utils = __commonJS({
     var http_client_1 = require_lib();
     var auth_1 = require_auth();
     var core_1 = require_core();
-    var OidcClient = class {
+    var OidcClient = class _OidcClient {
       static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
           allowRetries: allowRetry,
           maxRetries: maxRetry
         };
-        return new http_client_1.HttpClient("actions/oidc-client", [new auth_1.BearerCredentialHandler(OidcClient.getRequestToken())], requestOptions);
+        return new http_client_1.HttpClient("actions/oidc-client", [new auth_1.BearerCredentialHandler(_OidcClient.getRequestToken())], requestOptions);
       }
       static getRequestToken() {
         const token = process.env["ACTIONS_ID_TOKEN_REQUEST_TOKEN"];
@@ -1589,7 +1589,7 @@ var require_oidc_utils = __commonJS({
       static getCall(id_token_url) {
         var _a;
         return __awaiter2(this, void 0, void 0, function* () {
-          const httpclient = OidcClient.createHttpClient();
+          const httpclient = _OidcClient.createHttpClient();
           const res = yield httpclient.getJson(id_token_url).catch((error) => {
             throw new Error(`Failed to get ID Token. 
  
@@ -1607,13 +1607,13 @@ var require_oidc_utils = __commonJS({
       static getIDToken(audience) {
         return __awaiter2(this, void 0, void 0, function* () {
           try {
-            let id_token_url = OidcClient.getIDTokenUrl();
+            let id_token_url = _OidcClient.getIDTokenUrl();
             if (audience) {
               const encodedAudience = encodeURIComponent(audience);
               id_token_url = `${id_token_url}&audience=${encodedAudience}`;
             }
             core_1.debug(`ID token url is ${id_token_url}`);
-            const id_token = yield OidcClient.getCall(id_token_url);
+            const id_token = yield _OidcClient.getCall(id_token_url);
             core_1.setSecret(id_token);
             return id_token;
           } catch (error) {
@@ -2301,51 +2301,51 @@ var require_package = __commonJS({
         "@types/async": "^3.2.20",
         "@types/chai": "^4.3.5",
         "@types/fancy-log": "^2.0.0",
-        "@types/fs-extra": "^9.0.12",
+        "@types/fs-extra": "^11.0.1",
         "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.3",
         "@types/mocha": "^10.0.1",
-        "@types/node": "^20.2.1",
+        "@types/node": "^20.4.1",
         "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.9",
         "@types/unzip-stream": "^0.3.1",
-        "@types/uuid": "^9.0.1",
+        "@types/uuid": "^9.0.2",
         "@types/yargs": "^17.0.24",
-        "@typescript-eslint/eslint-plugin": "^5.59.6",
-        "@typescript-eslint/parser": "^5.59.6",
+        "@typescript-eslint/eslint-plugin": "^5.61.0",
+        "@typescript-eslint/parser": "^5.62.0",
         async: "^3.2.4",
         chai: "^4.3.7",
-        dotenv: "^16.0.3",
-        esbuild: "^0.17.19",
-        eslint: "^8.11.0",
+        dotenv: "^16.3.1",
+        esbuild: "^0.18.11",
+        eslint: "^8.44.0",
         "fancy-log": "^2.0.0",
-        glob: "^10.2.5",
+        glob: "^10.3.1",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
-        "gulp-eslint": "^6.0.0",
+        "gulp-eslint-new": "^1.8.2",
         "gulp-mocha": "^8.0.0",
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^10.2.0",
         "node-fetch": "^3.3.1",
-        postcss: "^8.4.23",
+        postcss: "^8.4.25",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
-        sinon: "^15.1.0",
+        sinon: "^15.2.0",
         "sinon-chai": "^3.5.0",
         "ts-node": "^10.9.1",
         "ts-sinon": "^2.0.1",
-        typescript: "^5.0.4",
+        typescript: "^5.1.6",
         "unzip-stream": "^0.3.1",
-        winston: "^3.8.2",
+        winston: "^3.9.0",
         yargs: "^17.7.2"
       },
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.100",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.103",
         "date-fns": "^2.30.0",
-        "fs-extra": "^10.0.0",
+        "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
         uuid: "^9.0.0"
       }
@@ -16268,7 +16268,7 @@ var require_polyfills = __commonJS({
             var start = Date.now();
             var backoff = 0;
             fs$rename(from, to, function CB(er) {
-              if (er && (er.code === "EACCES" || er.code === "EPERM") && Date.now() - start < 6e4) {
+              if (er && (er.code === "EACCES" || er.code === "EPERM" || er.code === "EBUSY") && Date.now() - start < 6e4) {
                 setTimeout(function() {
                   fs2.stat(to, function(stater, st) {
                     if (stater && stater.code === "ENOENT")
@@ -17082,20 +17082,30 @@ var require_fs = __commonJS({
         });
       });
     };
-    if (typeof fs2.writev === "function") {
-      exports2.writev = function(fd, buffers, ...args) {
-        if (typeof args[args.length - 1] === "function") {
-          return fs2.writev(fd, buffers, ...args);
-        }
-        return new Promise((resolve, reject) => {
-          fs2.writev(fd, buffers, ...args, (err, bytesWritten, buffers2) => {
-            if (err)
-              return reject(err);
-            resolve({ bytesWritten, buffers: buffers2 });
-          });
+    exports2.readv = function(fd, buffers, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs2.readv(fd, buffers, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs2.readv(fd, buffers, ...args, (err, bytesRead, buffers2) => {
+          if (err)
+            return reject(err);
+          resolve({ bytesRead, buffers: buffers2 });
         });
-      };
-    }
+      });
+    };
+    exports2.writev = function(fd, buffers, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs2.writev(fd, buffers, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs2.writev(fd, buffers, ...args, (err, bytesWritten, buffers2) => {
+          if (err)
+            return reject(err);
+          resolve({ bytesWritten, buffers: buffers2 });
+        });
+      });
+    };
     if (typeof fs2.realpath.native === "function") {
       exports2.realpath.native = u(fs2.realpath.native);
     } else {
@@ -17393,9 +17403,13 @@ var require_copy = __commonJS({
         stat.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
           if (err2)
             return cb(err2);
-          if (opts.filter)
-            return handleFilter(checkParentDir, destStat, src, dest, opts, cb);
-          return checkParentDir(destStat, src, dest, opts, cb);
+          runFilter(src, dest, opts, (err3, include) => {
+            if (err3)
+              return cb(err3);
+            if (!include)
+              return cb();
+            checkParentDir(destStat, src, dest, opts, cb);
+          });
         });
       });
     }
@@ -17413,17 +17427,10 @@ var require_copy = __commonJS({
         });
       });
     }
-    function handleFilter(onInclude, destStat, src, dest, opts, cb) {
-      Promise.resolve(opts.filter(src, dest)).then((include) => {
-        if (include)
-          return onInclude(destStat, src, dest, opts, cb);
-        return cb();
-      }, (error) => cb(error));
-    }
-    function startCopy(destStat, src, dest, opts, cb) {
-      if (opts.filter)
-        return handleFilter(getStats, destStat, src, dest, opts, cb);
-      return getStats(destStat, src, dest, opts, cb);
+    function runFilter(src, dest, opts, cb) {
+      if (!opts.filter)
+        return cb(null, true);
+      Promise.resolve(opts.filter(src, dest)).then((include) => cb(null, include), (error) => cb(error));
     }
     function getStats(destStat, src, dest, opts, cb) {
       const stat2 = opts.dereference ? fs2.stat : fs2.lstat;
@@ -17534,14 +17541,20 @@ var require_copy = __commonJS({
     function copyDirItem(items, item, src, dest, opts, cb) {
       const srcItem = path2.join(src, item);
       const destItem = path2.join(dest, item);
-      stat.checkPaths(srcItem, destItem, "copy", opts, (err, stats) => {
+      runFilter(srcItem, destItem, opts, (err, include) => {
         if (err)
           return cb(err);
-        const { destStat } = stats;
-        startCopy(destStat, srcItem, destItem, opts, (err2) => {
+        if (!include)
+          return copyDirItems(items, src, dest, opts, cb);
+        stat.checkPaths(srcItem, destItem, "copy", opts, (err2, stats) => {
           if (err2)
             return cb(err2);
-          return copyDirItems(items, src, dest, opts, cb);
+          const { destStat } = stats;
+          getStats(destStat, srcItem, destItem, opts, (err3) => {
+            if (err3)
+              return cb(err3);
+            return copyDirItems(items, src, dest, opts, cb);
+          });
         });
       });
     }
@@ -17567,7 +17580,7 @@ var require_copy = __commonJS({
             if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
               return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
             }
-            if (destStat.isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+            if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
               return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
             }
             return copyLink(resolvedSrc, dest, cb);
@@ -17611,19 +17624,11 @@ var require_copy_sync = __commonJS({
       }
       const { srcStat, destStat } = stat.checkPathsSync(src, dest, "copy", opts);
       stat.checkParentPathsSync(src, srcStat, dest, "copy");
-      return handleFilterAndCopy(destStat, src, dest, opts);
-    }
-    function handleFilterAndCopy(destStat, src, dest, opts) {
       if (opts.filter && !opts.filter(src, dest))
         return;
       const destParent = path2.dirname(dest);
       if (!fs2.existsSync(destParent))
         mkdirsSync(destParent);
-      return getStats(destStat, src, dest, opts);
-    }
-    function startCopy(destStat, src, dest, opts) {
-      if (opts.filter && !opts.filter(src, dest))
-        return;
       return getStats(destStat, src, dest, opts);
     }
     function getStats(destStat, src, dest, opts) {
@@ -17694,8 +17699,10 @@ var require_copy_sync = __commonJS({
     function copyDirItem(item, src, dest, opts) {
       const srcItem = path2.join(src, item);
       const destItem = path2.join(dest, item);
+      if (opts.filter && !opts.filter(srcItem, destItem))
+        return;
       const { destStat } = stat.checkPathsSync(srcItem, destItem, "copy", opts);
-      return startCopy(destStat, srcItem, destItem, opts);
+      return getStats(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
       let resolvedSrc = fs2.readlinkSync(src);
@@ -17719,7 +17726,7 @@ var require_copy_sync = __commonJS({
         if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
           throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
         }
-        if (fs2.statSync(dest).isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
         return copyLink(resolvedSrc, dest);
@@ -17745,261 +17752,17 @@ var require_copy2 = __commonJS({
   }
 });
 
-// node_modules/fs-extra/lib/remove/rimraf.js
-var require_rimraf = __commonJS({
-  "node_modules/fs-extra/lib/remove/rimraf.js"(exports2, module2) {
-    "use strict";
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var assert = require("assert");
-    var isWindows = process.platform === "win32";
-    function defaults(options) {
-      const methods = [
-        "unlink",
-        "chmod",
-        "stat",
-        "lstat",
-        "rmdir",
-        "readdir"
-      ];
-      methods.forEach((m) => {
-        options[m] = options[m] || fs2[m];
-        m = m + "Sync";
-        options[m] = options[m] || fs2[m];
-      });
-      options.maxBusyTries = options.maxBusyTries || 3;
-    }
-    function rimraf(p, options, cb) {
-      let busyTries = 0;
-      if (typeof options === "function") {
-        cb = options;
-        options = {};
-      }
-      assert(p, "rimraf: missing path");
-      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
-      assert.strictEqual(typeof cb, "function", "rimraf: callback function required");
-      assert(options, "rimraf: invalid options argument provided");
-      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
-      defaults(options);
-      rimraf_(p, options, function CB(er) {
-        if (er) {
-          if ((er.code === "EBUSY" || er.code === "ENOTEMPTY" || er.code === "EPERM") && busyTries < options.maxBusyTries) {
-            busyTries++;
-            const time = busyTries * 100;
-            return setTimeout(() => rimraf_(p, options, CB), time);
-          }
-          if (er.code === "ENOENT")
-            er = null;
-        }
-        cb(er);
-      });
-    }
-    function rimraf_(p, options, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.lstat(p, (er, st) => {
-        if (er && er.code === "ENOENT") {
-          return cb(null);
-        }
-        if (er && er.code === "EPERM" && isWindows) {
-          return fixWinEPERM(p, options, er, cb);
-        }
-        if (st && st.isDirectory()) {
-          return rmdir(p, options, er, cb);
-        }
-        options.unlink(p, (er2) => {
-          if (er2) {
-            if (er2.code === "ENOENT") {
-              return cb(null);
-            }
-            if (er2.code === "EPERM") {
-              return isWindows ? fixWinEPERM(p, options, er2, cb) : rmdir(p, options, er2, cb);
-            }
-            if (er2.code === "EISDIR") {
-              return rmdir(p, options, er2, cb);
-            }
-          }
-          return cb(er2);
-        });
-      });
-    }
-    function fixWinEPERM(p, options, er, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.chmod(p, 438, (er2) => {
-        if (er2) {
-          cb(er2.code === "ENOENT" ? null : er);
-        } else {
-          options.stat(p, (er3, stats) => {
-            if (er3) {
-              cb(er3.code === "ENOENT" ? null : er);
-            } else if (stats.isDirectory()) {
-              rmdir(p, options, er, cb);
-            } else {
-              options.unlink(p, cb);
-            }
-          });
-        }
-      });
-    }
-    function fixWinEPERMSync(p, options, er) {
-      let stats;
-      assert(p);
-      assert(options);
-      try {
-        options.chmodSync(p, 438);
-      } catch (er2) {
-        if (er2.code === "ENOENT") {
-          return;
-        } else {
-          throw er;
-        }
-      }
-      try {
-        stats = options.statSync(p);
-      } catch (er3) {
-        if (er3.code === "ENOENT") {
-          return;
-        } else {
-          throw er;
-        }
-      }
-      if (stats.isDirectory()) {
-        rmdirSync(p, options, er);
-      } else {
-        options.unlinkSync(p);
-      }
-    }
-    function rmdir(p, options, originalEr, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.rmdir(p, (er) => {
-        if (er && (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM")) {
-          rmkids(p, options, cb);
-        } else if (er && er.code === "ENOTDIR") {
-          cb(originalEr);
-        } else {
-          cb(er);
-        }
-      });
-    }
-    function rmkids(p, options, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.readdir(p, (er, files) => {
-        if (er)
-          return cb(er);
-        let n = files.length;
-        let errState;
-        if (n === 0)
-          return options.rmdir(p, cb);
-        files.forEach((f) => {
-          rimraf(path2.join(p, f), options, (er2) => {
-            if (errState) {
-              return;
-            }
-            if (er2)
-              return cb(errState = er2);
-            if (--n === 0) {
-              options.rmdir(p, cb);
-            }
-          });
-        });
-      });
-    }
-    function rimrafSync(p, options) {
-      let st;
-      options = options || {};
-      defaults(options);
-      assert(p, "rimraf: missing path");
-      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
-      assert(options, "rimraf: missing options");
-      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
-      try {
-        st = options.lstatSync(p);
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return;
-        }
-        if (er.code === "EPERM" && isWindows) {
-          fixWinEPERMSync(p, options, er);
-        }
-      }
-      try {
-        if (st && st.isDirectory()) {
-          rmdirSync(p, options, null);
-        } else {
-          options.unlinkSync(p);
-        }
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return;
-        } else if (er.code === "EPERM") {
-          return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er);
-        } else if (er.code !== "EISDIR") {
-          throw er;
-        }
-        rmdirSync(p, options, er);
-      }
-    }
-    function rmdirSync(p, options, originalEr) {
-      assert(p);
-      assert(options);
-      try {
-        options.rmdirSync(p);
-      } catch (er) {
-        if (er.code === "ENOTDIR") {
-          throw originalEr;
-        } else if (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM") {
-          rmkidsSync(p, options);
-        } else if (er.code !== "ENOENT") {
-          throw er;
-        }
-      }
-    }
-    function rmkidsSync(p, options) {
-      assert(p);
-      assert(options);
-      options.readdirSync(p).forEach((f) => rimrafSync(path2.join(p, f), options));
-      if (isWindows) {
-        const startTime = Date.now();
-        do {
-          try {
-            const ret = options.rmdirSync(p, options);
-            return ret;
-          } catch {
-          }
-        } while (Date.now() - startTime < 500);
-      } else {
-        const ret = options.rmdirSync(p, options);
-        return ret;
-      }
-    }
-    module2.exports = rimraf;
-    rimraf.sync = rimrafSync;
-  }
-});
-
 // node_modules/fs-extra/lib/remove/index.js
 var require_remove = __commonJS({
   "node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
     "use strict";
     var fs2 = require_graceful_fs();
     var u = require_universalify().fromCallback;
-    var rimraf = require_rimraf();
     function remove(path2, callback) {
-      if (fs2.rm)
-        return fs2.rm(path2, { recursive: true, force: true }, callback);
-      rimraf(path2, callback);
+      fs2.rm(path2, { recursive: true, force: true }, callback);
     }
     function removeSync(path2) {
-      if (fs2.rmSync)
-        return fs2.rmSync(path2, { recursive: true, force: true });
-      rimraf.sync(path2);
+      fs2.rmSync(path2, { recursive: true, force: true });
     }
     module2.exports = {
       remove: u(remove),
@@ -18680,7 +18443,8 @@ var require_move = __commonJS({
     function moveAcrossDevice(src, dest, overwrite, cb) {
       const opts = {
         overwrite,
-        errorOnExist: true
+        errorOnExist: true,
+        preserveTimestamps: true
       };
       copy(src, dest, opts, (err) => {
         if (err)
@@ -18739,7 +18503,8 @@ var require_move_sync = __commonJS({
     function moveAcrossDevice(src, dest, overwrite) {
       const opts = {
         overwrite,
-        errorOnExist: true
+        errorOnExist: true,
+        preserveTimestamps: true
       };
       copySync(src, dest, opts);
       return removeSync(src);
@@ -18868,7 +18633,7 @@ var currDir = process.cwd();
   yield git.run(["checkout", "-B", branchName]);
   core.info(`creating branch for solution: ${branchName}...`);
   fs.emptyDirSync(solutionTargetFolder);
-  fs.copySync(solutionFolder, solutionTargetFolder, { recursive: true });
+  fs.copySync(solutionFolder, solutionTargetFolder);
   yield git.run(["add", solutionTargetFolder]);
   yield git.run(["status", "--branch", "--short"]);
   core.startGroup(`... commit solution into ${branchName} and push to ${repoUrl}`);

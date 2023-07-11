@@ -3166,7 +3166,7 @@ var require_polyfills = __commonJS({
             var start = Date.now();
             var backoff = 0;
             fs$rename(from, to, function CB(er) {
-              if (er && (er.code === "EACCES" || er.code === "EPERM") && Date.now() - start < 6e4) {
+              if (er && (er.code === "EACCES" || er.code === "EPERM" || er.code === "EBUSY") && Date.now() - start < 6e4) {
                 setTimeout(function() {
                   fs.stat(to, function(stater, st) {
                     if (stater && stater.code === "ENOENT")
@@ -3900,9 +3900,9 @@ var require_graceful_fs = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/fs/index.js
+// node_modules/fs-extra/lib/fs/index.js
 var require_fs2 = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/fs/index.js"(exports2) {
+  "node_modules/fs-extra/lib/fs/index.js"(exports2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs = require_graceful_fs();
@@ -4016,9 +4016,9 @@ var require_fs2 = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/utils.js
+// node_modules/fs-extra/lib/mkdirs/utils.js
 var require_utils = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/utils.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/mkdirs/utils.js"(exports2, module2) {
     "use strict";
     var path = require("path");
     module2.exports.checkPath = function checkPath(pth) {
@@ -4034,9 +4034,9 @@ var require_utils = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/make-dir.js
+// node_modules/fs-extra/lib/mkdirs/make-dir.js
 var require_make_dir = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
     "use strict";
     var fs = require_fs2();
     var { checkPath } = require_utils();
@@ -4063,9 +4063,9 @@ var require_make_dir = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/index.js
+// node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var { makeDir: _makeDir, makeDirSync } = require_make_dir();
@@ -4082,9 +4082,9 @@ var require_mkdirs = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/path-exists/index.js
+// node_modules/fs-extra/lib/path-exists/index.js
 var require_path_exists = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs = require_fs2();
@@ -4098,9 +4098,9 @@ var require_path_exists = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/utimes.js
+// node_modules/fs-extra/lib/util/utimes.js
 var require_utimes = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     function utimesMillis(path, atime, mtime, callback) {
@@ -4127,9 +4127,9 @@ var require_utimes = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/stat.js
+// node_modules/fs-extra/lib/util/stat.js
 var require_stat = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
     "use strict";
     var fs = require_fs2();
     var path = require("path");
@@ -4265,9 +4265,9 @@ var require_stat = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy.js
+// node_modules/fs-extra/lib/copy/copy.js
 var require_copy = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -4497,9 +4497,9 @@ var require_copy = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy-sync.js
+// node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -4638,9 +4638,9 @@ var require_copy_sync = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/index.js
+// node_modules/fs-extra/lib/copy/index.js
 var require_copy2 = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     module2.exports = {
@@ -4650,9 +4650,9 @@ var require_copy2 = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/remove/index.js
+// node_modules/fs-extra/lib/remove/index.js
 var require_remove = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var u = require_universalify().fromCallback;
@@ -4669,9 +4669,9 @@ var require_remove = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/empty/index.js
+// node_modules/fs-extra/lib/empty/index.js
 var require_empty = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs = require_fs2();
@@ -4708,9 +4708,9 @@ var require_empty = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/file.js
+// node_modules/fs-extra/lib/ensure/file.js
 var require_file = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var path = require("path");
@@ -4778,9 +4778,9 @@ var require_file = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/link.js
+// node_modules/fs-extra/lib/ensure/link.js
 var require_link = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var path = require("path");
@@ -4847,9 +4847,9 @@ var require_link = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-paths.js
+// node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
     "use strict";
     var path = require("path");
     var fs = require_graceful_fs();
@@ -4929,9 +4929,9 @@ var require_symlink_paths = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-type.js
+// node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     function symlinkType(srcpath, type, callback) {
@@ -4964,9 +4964,9 @@ var require_symlink_type = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink.js
+// node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var path = require("path");
@@ -5051,9 +5051,9 @@ var require_symlink = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/index.js
+// node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
     "use strict";
     var { createFile, createFileSync } = require_file();
     var { createLink, createLinkSync } = require_link();
@@ -5168,9 +5168,9 @@ var require_jsonfile = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/jsonfile.js
+// node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile2 = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
     "use strict";
     var jsonFile = require_jsonfile();
     module2.exports = {
@@ -5183,9 +5183,9 @@ var require_jsonfile2 = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/output-file/index.js
+// node_modules/fs-extra/lib/output-file/index.js
 var require_output_file = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs = require_graceful_fs();
@@ -5225,9 +5225,9 @@ var require_output_file = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json.js
+// node_modules/fs-extra/lib/json/output-json.js
 var require_output_json = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
     "use strict";
     var { stringify: stringify2 } = require_utils2();
     var { outputFile } = require_output_file();
@@ -5239,9 +5239,9 @@ var require_output_json = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json-sync.js
+// node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
     "use strict";
     var { stringify: stringify2 } = require_utils2();
     var { outputFileSync } = require_output_file();
@@ -5253,9 +5253,9 @@ var require_output_json_sync = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/index.js
+// node_modules/fs-extra/lib/json/index.js
 var require_json = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var jsonFile = require_jsonfile2();
@@ -5271,9 +5271,9 @@ var require_json = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move.js
+// node_modules/fs-extra/lib/move/move.js
 var require_move = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -5354,9 +5354,9 @@ var require_move = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move-sync.js
+// node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
     "use strict";
     var fs = require_graceful_fs();
     var path = require("path");
@@ -5411,9 +5411,9 @@ var require_move_sync = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/index.js
+// node_modules/fs-extra/lib/move/index.js
 var require_move2 = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromCallback;
     module2.exports = {
@@ -5423,9 +5423,9 @@ var require_move2 = __commonJS({
   }
 });
 
-// node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/index.js
+// node_modules/fs-extra/lib/index.js
 var require_lib = __commonJS({
-  "node_modules/@microsoft/powerplatform-cli-wrapper/node_modules/fs-extra/lib/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/index.js"(exports2, module2) {
     "use strict";
     module2.exports = {
       // Export promiseified graceful-fs:
@@ -8372,12 +8372,12 @@ var require_lib2 = __commonJS({
     var RetryableHttpVerbs = ["OPTIONS", "GET", "DELETE", "HEAD"];
     var ExponentialBackoffCeiling = 10;
     var ExponentialBackoffTimeSlice = 5;
-    var HttpClientError = class extends Error {
+    var HttpClientError = class _HttpClientError extends Error {
       constructor(message, statusCode) {
         super(message);
         this.name = "HttpClientError";
         this.statusCode = statusCode;
-        Object.setPrototypeOf(this, HttpClientError.prototype);
+        Object.setPrototypeOf(this, _HttpClientError.prototype);
       }
     };
     exports2.HttpClientError = HttpClientError;
@@ -8968,13 +8968,13 @@ var require_oidc_utils = __commonJS({
     var http_client_1 = require_lib2();
     var auth_1 = require_auth();
     var core_1 = require_core();
-    var OidcClient = class {
+    var OidcClient = class _OidcClient {
       static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
           allowRetries: allowRetry,
           maxRetries: maxRetry
         };
-        return new http_client_1.HttpClient("actions/oidc-client", [new auth_1.BearerCredentialHandler(OidcClient.getRequestToken())], requestOptions);
+        return new http_client_1.HttpClient("actions/oidc-client", [new auth_1.BearerCredentialHandler(_OidcClient.getRequestToken())], requestOptions);
       }
       static getRequestToken() {
         const token = process.env["ACTIONS_ID_TOKEN_REQUEST_TOKEN"];
@@ -8993,7 +8993,7 @@ var require_oidc_utils = __commonJS({
       static getCall(id_token_url) {
         var _a;
         return __awaiter2(this, void 0, void 0, function* () {
-          const httpclient = OidcClient.createHttpClient();
+          const httpclient = _OidcClient.createHttpClient();
           const res = yield httpclient.getJson(id_token_url).catch((error) => {
             throw new Error(`Failed to get ID Token. 
  
@@ -9011,13 +9011,13 @@ var require_oidc_utils = __commonJS({
       static getIDToken(audience) {
         return __awaiter2(this, void 0, void 0, function* () {
           try {
-            let id_token_url = OidcClient.getIDTokenUrl();
+            let id_token_url = _OidcClient.getIDTokenUrl();
             if (audience) {
               const encodedAudience = encodeURIComponent(audience);
               id_token_url = `${id_token_url}&audience=${encodedAudience}`;
             }
             core_1.debug(`ID token url is ${id_token_url}`);
-            const id_token = yield OidcClient.getCall(id_token_url);
+            const id_token = yield _OidcClient.getCall(id_token_url);
             core_1.setSecret(id_token);
             return id_token;
           } catch (error) {
@@ -9746,51 +9746,51 @@ var require_package = __commonJS({
         "@types/async": "^3.2.20",
         "@types/chai": "^4.3.5",
         "@types/fancy-log": "^2.0.0",
-        "@types/fs-extra": "^9.0.12",
+        "@types/fs-extra": "^11.0.1",
         "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.3",
         "@types/mocha": "^10.0.1",
-        "@types/node": "^20.2.1",
+        "@types/node": "^20.4.1",
         "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.9",
         "@types/unzip-stream": "^0.3.1",
-        "@types/uuid": "^9.0.1",
+        "@types/uuid": "^9.0.2",
         "@types/yargs": "^17.0.24",
-        "@typescript-eslint/eslint-plugin": "^5.59.6",
-        "@typescript-eslint/parser": "^5.59.6",
+        "@typescript-eslint/eslint-plugin": "^5.61.0",
+        "@typescript-eslint/parser": "^5.62.0",
         async: "^3.2.4",
         chai: "^4.3.7",
-        dotenv: "^16.0.3",
-        esbuild: "^0.17.19",
-        eslint: "^8.11.0",
+        dotenv: "^16.3.1",
+        esbuild: "^0.18.11",
+        eslint: "^8.44.0",
         "fancy-log": "^2.0.0",
-        glob: "^10.2.5",
+        glob: "^10.3.1",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
-        "gulp-eslint": "^6.0.0",
+        "gulp-eslint-new": "^1.8.2",
         "gulp-mocha": "^8.0.0",
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^10.2.0",
         "node-fetch": "^3.3.1",
-        postcss: "^8.4.23",
+        postcss: "^8.4.25",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
-        sinon: "^15.1.0",
+        sinon: "^15.2.0",
         "sinon-chai": "^3.5.0",
         "ts-node": "^10.9.1",
         "ts-sinon": "^2.0.1",
-        typescript: "^5.0.4",
+        typescript: "^5.1.6",
         "unzip-stream": "^0.3.1",
-        winston: "^3.8.2",
+        winston: "^3.9.0",
         yargs: "^17.7.2"
       },
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.100",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.103",
         "date-fns": "^2.30.0",
-        "fs-extra": "^10.0.0",
+        "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
         uuid: "^9.0.0"
       }
