@@ -2079,7 +2079,7 @@
       },
       {
         "name": "predict",
-        "help": "AI Builder models in the current environment.",
+        "help": "Sends text or prompt to AI Model",
         "arguments": [
           {
             "name": "--model-id",

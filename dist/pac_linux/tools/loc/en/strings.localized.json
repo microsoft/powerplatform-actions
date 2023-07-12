@@ -1048,6 +1048,7 @@
   "CopilotModelIdArgumentHelp" : "AI Builder model Id",
   "CopilotPromptArgumentHelp" : "Prompt to send to AI Model",
   "CopilotTextArgumentHelp" : "Text to send to AI Model",
+  "CopilotPredictHelp" : "Sends text or prompt to AI Model",
   "SkipAuditDataArgumentHelp" : "Switch indicating whether audit data should be skipped",
   "SolutionImportSkipLowerVersionArgumentHelp" : "Skip solution import if same or higher version is present in current environment.",
   "SolutionImportCheckingSolutionVersionOnline" : "Checking '{0}' solution version online",
