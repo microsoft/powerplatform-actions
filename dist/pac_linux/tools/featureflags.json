@@ -56,7 +56,7 @@
   "moduleData": "on",
   "verbSolutionSync": "on",
   "verbListTemplates": "on",
-  "verbCreateServicePrincipal": "off",
+  "verbCreateServicePrincipal": "on",
   "modulePipeline": "on",
   "moduleVirtualAgent": "on",
   "warningMessageForPAPortalSiteVisibility": "on",
@@ -67,5 +67,8 @@
   "verbVirtualAgentStatusPolling": "on",
   "moduleCatalog": "on",
   "moduleTests": "off",
-  "windowsSingleSignon": "on"
+  "windowsSingleSignon": "on",
+  "moduleCopilot": "on",
+  "connectionReferenceImportSettings": "on",
+  "verbAdminSetGovernanceConfig": "off"
 }
