@@ -56,7 +56,7 @@
     "ts-sinon": "^2.0.1",
     "typescript": "^5.1.6",
     "unzip-stream": "^0.3.1",
-    "winston": "^3.9.0",
+    "winston": "^3.10.0",
     "yargs": "^17.7.2"
   },
   "dependencies": {
