@@ -39,8 +39,8 @@ describe("update online solution version test", () => {
     onlineVersionSolutionStub.should.have.been.calledWithExactly({
       credentials: credentials,
       environmentUrl: environmentUrl,
-      name: { name: 'name', required: false, defaultValue: undefined },
-      version: { name: 'version', required: false, defaultValue: undefined },
+      name: { name: 'name', required: true, defaultValue: undefined },
+      version: { name: 'version', required: true, defaultValue: undefined },
     }, runnerParameters, new ActionsHost());
   });
 });
