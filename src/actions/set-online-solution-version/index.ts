@@ -16,9 +16,9 @@ import { runnerParameters } from "../../lib/runnerParameters";
 
 export async function main(): Promise<void> {
     try {
-        core.startGroup('update-online-solution-version:');
+        core.startGroup('set-online-solution-version:');
         const taskParser = new YamlParser();
-        const parameterMap = taskParser.getHostParameterEntries('update-online-solution-version');
+        const parameterMap = taskParser.getHostParameterEntries('set-online-solution-version');
 
         await onlineVersionSolution({
             credentials: getCredentials(),

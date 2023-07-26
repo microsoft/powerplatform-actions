@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-name: 'update-online-solution-version'
-description: 'Power Platform Update Online Solution Version'
+name: 'set-online-solution-version'
+description: 'Power Platform Set Online Solution Version'
 inputs:
   name:
     description: 'Name of the solution'
@@ -13,5 +13,5 @@ inputs:
 
 runs:
   using: 'node16'
-  main: '../dist/actions/update-online-solution-version/index.js'
-  # main: '../out/actions/update-online-solution-version/index.js'
+  main: '../dist/actions/set-online-solution-version/index.js'
+  # main: '../out/actions/set-online-solution-version/index.js'

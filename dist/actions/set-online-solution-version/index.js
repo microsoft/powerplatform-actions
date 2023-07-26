@@ -19384,7 +19384,7 @@ var require_runnerParameters = __commonJS({
   }
 });
 
-// out/actions/update-online-solution-version/index.js
+// out/actions/set-online-solution-version/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve) {
@@ -19429,9 +19429,9 @@ var runnerParameters_1 = require_runnerParameters();
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
     try {
-      core.startGroup("update-online-solution-version:");
+      core.startGroup("set-online-solution-version:");
       const taskParser = new YamlParser_1.YamlParser();
-      const parameterMap = taskParser.getHostParameterEntries("update-online-solution-version");
+      const parameterMap = taskParser.getHostParameterEntries("set-online-solution-version");
       yield (0, actions_1.onlineVersionSolution)({
         credentials: (0, getCredentials_1.default)(),
         environmentUrl: (0, getEnvironmentUrl_1.default)(),
