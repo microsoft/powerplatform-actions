@@ -1,0 +1,9 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'action-install'
+description: 'Power Platform Actions Install'
+
+runs:
+  using: 'node16'
+  main: '../dist/actions/action-install/index.js'
+
