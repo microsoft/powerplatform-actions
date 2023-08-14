@@ -21,9 +21,9 @@ import { runnerParameters } from '../../lib/runnerParameters';
 export async function main(): Promise<void> {
     // const taskParser = new YamlParser();
     // const actionsHost = new ActionsHost();
-    // const parameterMap = taskParser.getHostParameterEntries('action-install');
+    // const parameterMap = taskParser.getHostParameterEntries('actions-install');
 
-    core.startGroup('action-install:');
+    core.startGroup('actions-install:');
 
     if (os.platform() === 'win32') {
         // Download net48 zip
