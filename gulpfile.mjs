@@ -166,9 +166,9 @@ function binplace(compName, relativePath) {
 
 async function dist() {
     fs.emptyDirSync(distdir);
-    binplace('pac CLI', path.join('pac', 'tools'));
-    binplace('pac CLI', path.join('pac_linux', 'tools'));
-    await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
+    // binplace('pac CLI', path.join('pac', 'tools'));
+    // binplace('pac CLI', path.join('pac_linux', 'tools'));
+    // await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
 
     glob.sync('**/action.yml', {
             cwd: __dirname
