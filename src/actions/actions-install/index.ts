@@ -20,26 +20,33 @@ import { runnerParameters } from '../../lib/runnerParameters';
 export async function main(): Promise<void> {
     const packageVersion = '1.25.5';
     core.startGroup('actions-install:');
+    core.info(`Installing pac ${packageVersion}...`);
 
     if (os.platform() === 'win32') {
         const packageName = 'Microsoft.PowerApps.CLI';
+        core.info(`Installing PAC package ${packageName}.${packageVersion} via nuget.exe`);
 
         const installDir = resolve(runnerParameters.runnersDir);
+        core.debug(`Installing to ${installDir}`);
 
         await exec.getExecOutput('nuget', ['install', packageName,
             '-Version', packageVersion,
             '-OutputDirectory', installDir]);
         // Nuget.exe installs to [PackageName].[PackageVersion], but we need this to be 'pac' to match
         // the cli-wrapper logic.
-        await fs.rename(resolve(installDir, packageName + '.' + packageVersion), resolve(installDir, 'pac'));
+        const original = resolve(installDir, packageName + '.' + packageVersion);
+        const target = resolve(installDir, 'pac');
+        core.debug(`Renaming ${original} to ${target}`);
+        await fs.rename(original, target);
 
     } else {
+        const packageName = 'Microsoft.PowerApps.CLI.Tool';
         const installDir = resolve(runnerParameters.runnersDir, 'pac_linux', 'tools');
+        core.info(`Installing PAC package ${packageName}.${packageVersion} via dotnet tool install`);
 
-        await exec.getExecOutput('dotnet', ['tool', 'install', 'Microsoft.PowerApps.CLI.Tool',
+        await exec.getExecOutput('dotnet', ['tool', 'install', packageName,
             '--version', packageVersion,
             '--tool-path', installDir]);
-
     }
     core.endGroup();
 }
