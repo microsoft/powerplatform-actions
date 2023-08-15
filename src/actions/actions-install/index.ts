@@ -31,7 +31,9 @@ export async function main(): Promise<void> {
 
         await exec.getExecOutput('nuget', ['install', packageName,
             '-Version', packageVersion,
+            '-DependencyVersion', 'ignore', // There are no dependencies, so don't waste that time checking
             '-OutputDirectory', installDir]);
+
         // Nuget.exe installs to [PackageName].[PackageVersion], but we need this to be 'pac' to match
         // the cli-wrapper logic.
         const original = resolve(installDir, packageName + '.' + packageVersion);

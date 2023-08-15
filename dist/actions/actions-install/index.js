@@ -3451,6 +3451,8 @@ function main() {
         packageName,
         "-Version",
         packageVersion,
+        "-DependencyVersion",
+        "ignore",
         "-OutputDirectory",
         installDir
       ]);
