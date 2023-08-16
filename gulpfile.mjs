@@ -57,6 +57,7 @@ async function clean() {
 }
 
 function compile() {
+    fs.copyFileSync('src/pacPackageInfo.json', path.resolve(outdir, 'pacPackageInfo.json'));
     const tsProj = ts.createProject(tsConfigFile);
     return gulp
         .src('src/**/*.ts')
