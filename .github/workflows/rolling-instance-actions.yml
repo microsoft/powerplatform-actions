@@ -33,6 +33,10 @@ jobs:
       with:
         lfs: true
 
+    - name: Install PAC
+      uses: ./actions-install
+      id: actions-install
+
     - name: Test create-source-environment action with appId-clientSecret
       uses: ./create-environment
       id: create-source-environment
