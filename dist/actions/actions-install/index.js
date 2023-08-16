@@ -3288,117 +3288,16 @@ var require_actionLogger = __commonJS({
   }
 });
 
-// package.json
-var require_package = __commonJS({
-  "package.json"(exports2, module2) {
-    module2.exports = {
-      name: "@microsoft/powerplatform-actions",
-      version: "0.1.0",
-      description: "Github Action for Power Platform",
-      main: "index.js",
-      scripts: {
-        clean: "scorch",
-        build: "node node_modules/gulp/bin/gulp.js",
-        test: "node node_modules/gulp/bin/gulp.js test",
-        ci: "node node_modules/gulp/bin/gulp.js ci",
-        "update-dist": "node node_modules/gulp/bin/gulp.js updateDist"
-      },
-      author: "PowerApps-ISV-Tools",
-      license: "MIT",
-      repository: {
-        type: "git",
-        url: "https://github.com/microsoft/powerplatform-actions.git"
-      },
-      devDependencies: {
-        "@types/async": "^3.2.20",
-        "@types/chai": "^4.3.5",
-        "@types/fancy-log": "^2.0.0",
-        "@types/fs-extra": "^11.0.1",
-        "@types/glob": "^8.1.0",
-        "@types/js-yaml": "^4.0.3",
-        "@types/mocha": "^10.0.1",
-        "@types/node": "^20.4.8",
-        "@types/sinon": "^10.0.15",
-        "@types/sinon-chai": "^3.2.9",
-        "@types/unzip-stream": "^0.3.1",
-        "@types/uuid": "^9.0.2",
-        "@types/yargs": "^17.0.24",
-        "@typescript-eslint/eslint-plugin": "^5.61.0",
-        "@typescript-eslint/parser": "^5.62.0",
-        async: "^3.2.4",
-        chai: "^4.3.7",
-        dotenv: "^16.3.1",
-        esbuild: "^0.18.11",
-        eslint: "^8.44.0",
-        "fancy-log": "^2.0.0",
-        glob: "^10.3.1",
-        "glob-parent": "^6.0.2",
-        gulp: "^4.0.2",
-        "gulp-eslint-new": "^1.8.3",
-        "gulp-mocha": "^8.0.0",
-        "gulp-sourcemaps": "^3.0.0",
-        "gulp-typescript": "^6.0.0-alpha.1",
-        mocha: "^10.2.0",
-        "node-fetch": "^3.3.1",
-        postcss: "^8.4.25",
-        "ps-list": "^8.1.1",
-        rewiremock: "^3.14.5",
-        sinon: "^15.2.0",
-        "sinon-chai": "^3.5.0",
-        "ts-node": "^10.9.1",
-        "ts-sinon": "^2.0.1",
-        typescript: "^5.1.6",
-        "unzip-stream": "^0.3.1",
-        winston: "^3.10.0",
-        yargs: "^17.7.2"
-      },
-      dependencies: {
-        "@actions/artifact": "^1.1.1",
-        "@actions/core": "^1.10.0",
-        "@actions/exec": "^1.1.1",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.103",
-        "date-fns": "^2.30.0",
-        "fs-extra": "^11.1.1",
-        "js-yaml": "^4.1",
-        uuid: "^9.0.0"
-      }
-    };
-  }
-});
-
-// out/lib/runnerParameters.js
-var require_runnerParameters = __commonJS({
-  "out/lib/runnerParameters.js"(exports2) {
+// out/lib/pacInstallInfo.js
+var require_pacInstallInfo = __commonJS({
+  "out/lib/pacInstallInfo.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
-    var process_1 = require("process");
-    var actionLogger_12 = require_actionLogger();
-    var getExePath_12 = require_getExePath();
-    var EnvVarPrefix = "POWERPLATFORMTOOLS_";
-    var PacInstalledEnvVarName = `${EnvVarPrefix}PACINSTALLED`;
-    exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
-    function getAutomationAgent() {
-      const jsonPackage = require_package();
-      const productName = jsonPackage.name.split("/")[1];
-      return productName + "/" + jsonPackage.version;
-    }
-    exports2.getAutomationAgent = getAutomationAgent;
-    var ActionsRunnerParameters = class {
-      constructor() {
-        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)();
-        this.logger = new actionLogger_12.ActionLogger();
-        this.agent = getAutomationAgent();
-      }
-      get runnersDir() {
-        if (process.env[PacInstalledEnvVarName] !== "true") {
-          throw new Error(`PAC is not installed. Please run the actions-install action first.`);
-        }
-        return (0, getExePath_12.default)();
-      }
-    };
-    var runnerParameters = new ActionsRunnerParameters();
-    exports2.runnerParameters = runnerParameters;
+    exports2.PacInstalledEnvVarName = exports2.PacDotnetToolName = exports2.PacPackageName = exports2.PacPackageVersion = void 0;
+    exports2.PacPackageVersion = "1.25.5";
+    exports2.PacPackageName = "Microsoft.PowerApps.CLI";
+    exports2.PacDotnetToolName = "Microsoft.PowerApps.CLI.Tool";
+    exports2.PacInstalledEnvVarName = "POWERPLATFORMTOOLS_PACINSTALLED";
   }
 });
 
@@ -3439,7 +3338,7 @@ var node_path_1 = require("node:path");
 var fs = require("node:fs/promises");
 var getExePath_1 = require_getExePath();
 var actionLogger_1 = require_actionLogger();
-var runnerParameters_1 = require_runnerParameters();
+var pacInstallInfo_js_1 = require_pacInstallInfo();
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
@@ -3451,50 +3350,57 @@ var runnerParameters_1 = require_runnerParameters();
 });
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
-    const packageVersion = "1.25.5";
+    const packageVersion = pacInstallInfo_js_1.PacPackageVersion;
     core.startGroup("actions-install:");
     core.info(`Installing pac ${packageVersion}...`);
-    if (process.env[runnerParameters_1.PacInstalledEnvVarName] === "true") {
+    if (process.env[pacInstallInfo_js_1.PacInstalledEnvVarName] === "true") {
       core.warning("PAC is already installed. Skipping installation.");
       core.endGroup();
       return;
     }
     const runnersDir = (0, getExePath_1.default)();
     if (os.platform() === "win32") {
-      const packageName = "Microsoft.PowerApps.CLI";
-      core.info(`Installing PAC package ${packageName}.${packageVersion} via nuget.exe`);
-      const installDir = (0, node_path_1.resolve)(runnersDir);
-      core.debug(`Installing to ${installDir}`);
-      yield exec.getExecOutput("nuget", [
-        "install",
-        packageName,
-        "-Version",
-        packageVersion,
-        "-DependencyVersion",
-        "ignore",
-        "-OutputDirectory",
-        installDir
-      ]);
-      const original = (0, node_path_1.resolve)(installDir, packageName + "." + packageVersion);
-      const target = (0, node_path_1.resolve)(installDir, "pac");
-      core.debug(`Renaming ${original} to ${target}`);
-      yield fs.rename(original, target);
+      const installDir = (0, node_path_1.resolve)(runnersDir, "pac");
+      yield nugetInstall(pacInstallInfo_js_1.PacPackageName, packageVersion, installDir);
     } else {
-      const packageName = "Microsoft.PowerApps.CLI.Tool";
       const installDir = (0, node_path_1.resolve)(runnersDir, "pac_linux", "tools");
-      core.info(`Installing PAC package ${packageName}.${packageVersion} via dotnet tool install`);
-      yield exec.getExecOutput("dotnet", [
-        "tool",
-        "install",
-        packageName,
-        "--version",
-        packageVersion,
-        "--tool-path",
-        installDir
-      ]);
+      yield dotnetInstall(pacInstallInfo_js_1.PacDotnetToolName, packageVersion, installDir);
     }
-    core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
+    core.exportVariable(pacInstallInfo_js_1.PacInstalledEnvVarName, "true");
     core.endGroup();
   });
 }
 exports.main = main;
+function nugetInstall(packageName, packageVersion, installDir) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Installing PAC package ${packageName}.${packageVersion} via nuget.exe`);
+    core.debug(`Installing to ${installDir}`);
+    const outputDirectory = (0, node_path_1.dirname)(installDir);
+    yield exec.getExecOutput("nuget", [
+      "install",
+      packageName,
+      "-Version",
+      packageVersion,
+      "-DependencyVersion",
+      "ignore",
+      "-OutputDirectory",
+      outputDirectory
+    ]);
+    core.debug(`Renaming ${outputDirectory} to ${installDir}`);
+    yield fs.rename(outputDirectory, installDir);
+  });
+}
+function dotnetInstall(packageName, packageVersion, installDir) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Installing PAC package ${pacInstallInfo_js_1.PacDotnetToolName}.${packageVersion} via dotnet tool install`);
+    yield exec.getExecOutput("dotnet", [
+      "tool",
+      "install",
+      packageName,
+      "--version",
+      packageVersion,
+      "--tool-path",
+      installDir
+    ]);
+  });
+}

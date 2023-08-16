@@ -2276,6 +2276,19 @@ var require_actionLogger = __commonJS({
   }
 });
 
+// out/lib/pacInstallInfo.js
+var require_pacInstallInfo = __commonJS({
+  "out/lib/pacInstallInfo.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.PacInstalledEnvVarName = exports2.PacDotnetToolName = exports2.PacPackageName = exports2.PacPackageVersion = void 0;
+    exports2.PacPackageVersion = "1.25.5";
+    exports2.PacPackageName = "Microsoft.PowerApps.CLI";
+    exports2.PacDotnetToolName = "Microsoft.PowerApps.CLI.Tool";
+    exports2.PacInstalledEnvVarName = "POWERPLATFORMTOOLS_PACINSTALLED";
+  }
+});
+
 // package.json
 var require_package = __commonJS({
   "package.json"(exports2, module2) {
@@ -2363,9 +2376,10 @@ var require_runnerParameters = __commonJS({
     var process_12 = require("process");
     var actionLogger_1 = require_actionLogger();
     var getExePath_1 = require_getExePath();
-    var EnvVarPrefix = "POWERPLATFORMTOOLS_";
-    var PacInstalledEnvVarName = `${EnvVarPrefix}PACINSTALLED`;
-    exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
+    var pacInstallInfo_1 = require_pacInstallInfo();
+    Object.defineProperty(exports2, "PacInstalledEnvVarName", { enumerable: true, get: function() {
+      return pacInstallInfo_1.PacInstalledEnvVarName;
+    } });
     function getAutomationAgent() {
       const jsonPackage = require_package();
       const productName = jsonPackage.name.split("/")[1];
@@ -2379,7 +2393,7 @@ var require_runnerParameters = __commonJS({
         this.agent = getAutomationAgent();
       }
       get runnersDir() {
-        if (process.env[PacInstalledEnvVarName] !== "true") {
+        if (process.env[pacInstallInfo_1.PacInstalledEnvVarName] !== "true") {
           throw new Error(`PAC is not installed. Please run the actions-install action first.`);
         }
         return (0, getExePath_1.default)();
