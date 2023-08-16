@@ -58,8 +58,9 @@ async function nugetInstall(packageName: string, packageVersion: string, install
 
     // Nuget.exe installs to [PackageName].[PackageVersion], but we need this to be 'pac' to match
     // the cli-wrapper logic.
-    core.debug(`Renaming ${outputDirectory} to ${installDir}`);
-    await fs.rename(outputDirectory, installDir);
+    const initialInstallDirectory = resolve(outputDirectory, packageName + '.' + packageVersion);
+    core.debug(`Renaming ${initialInstallDirectory} to ${installDir}`);
+    await fs.rename(initialInstallDirectory, installDir);
 }
 
 async function dotnetInstall(packageName: string, packageVersion: string, installDir: string): Promise<void> {

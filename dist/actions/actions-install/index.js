@@ -3499,8 +3499,9 @@ function nugetInstall(packageName, packageVersion, installDir) {
       "-OutputDirectory",
       outputDirectory
     ]);
-    core.debug(`Renaming ${outputDirectory} to ${installDir}`);
-    yield fs.rename(outputDirectory, installDir);
+    const initialInstallDirectory = (0, node_path_1.resolve)(outputDirectory, packageName + "." + packageVersion);
+    core.debug(`Renaming ${initialInstallDirectory} to ${installDir}`);
+    yield fs.rename(initialInstallDirectory, installDir);
   });
 }
 function dotnetInstall(packageName, packageVersion, installDir) {
