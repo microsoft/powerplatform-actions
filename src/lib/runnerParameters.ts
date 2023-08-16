@@ -2,9 +2,7 @@ import { Logger, RunnerParameters } from "@microsoft/powerplatform-cli-wrapper";
 import { cwd } from "process";
 import { ActionLogger } from "./actionLogger";
 import getExePath from "./getExePath";
-
-const EnvVarPrefix = 'POWERPLATFORMTOOLS_';
-const PacInstalledEnvVarName = `${EnvVarPrefix}PACINSTALLED`;
+import { PacInstalledEnvVarName } from "./pacInstallInfo";
 
 function getAutomationAgent(): string {
     // eslint-disable-next-line @typescript-eslint/no-var-requires

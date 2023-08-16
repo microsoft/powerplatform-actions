@@ -207,7 +207,9 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.25.2';
+// Also update src/lib/pacInstallInfo.ts verion
+// TODO - source Gulp and Runtime version from same file
+const cliVersion = '1.25.5';
 
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
