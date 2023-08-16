@@ -7,7 +7,8 @@ import { dirname, resolve } from 'node:path';
 import * as fs from 'node:fs/promises';
 import getExePath from '../../lib/getExePath';
 import { ActionLogger } from '../../lib/actionLogger';
-import { PacDotnetToolName, PacInstalledEnvVarName, PacPackageName, PacPackageVersion } from '../../lib/pacInstallInfo.js';
+import * as PacInfo from "../../pacPackageInfo.json";
+import { PacInstalledEnvVarName } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
@@ -20,7 +21,7 @@ import { PacDotnetToolName, PacInstalledEnvVarName, PacPackageName, PacPackageVe
 });
 
 export async function main(): Promise<void> {
-    const packageVersion = PacPackageVersion;
+    const packageVersion = PacInfo.PacPackageVersion;
     core.startGroup('actions-install:');
     core.info(`Installing pac ${packageVersion}...`);
 
@@ -34,10 +35,10 @@ export async function main(): Promise<void> {
 
     if (os.platform() === 'win32') {
         const installDir = resolve(runnersDir, 'pac');
-        await nugetInstall(PacPackageName, packageVersion, installDir);
+        await nugetInstall(PacInfo.PacPackageName, packageVersion, installDir);
     } else {
         const installDir = resolve(runnersDir, 'pac_linux', 'tools');
-        await dotnetInstall(PacDotnetToolName, packageVersion, installDir);
+        await dotnetInstall(PacInfo.DotnetToolName, packageVersion, installDir);
     }
 
     core.exportVariable(PacInstalledEnvVarName, 'true');
@@ -45,7 +46,7 @@ export async function main(): Promise<void> {
 }
 
 async function nugetInstall(packageName: string, packageVersion: string, installDir: string): Promise<void> {
-    core.info(`Installing PAC package ${packageName}.${packageVersion} via nuget.exe`);
+    core.info(`Installing ${packageName}.${packageVersion} via nuget.exe`);
     core.debug(`Installing to ${installDir}`);
 
     const outputDirectory = dirname(installDir);
@@ -62,7 +63,7 @@ async function nugetInstall(packageName: string, packageVersion: string, install
 }
 
 async function dotnetInstall(packageName: string, packageVersion: string, installDir: string): Promise<void> {
-    core.info(`Installing PAC package ${PacDotnetToolName}.${packageVersion} via dotnet tool install`);
+    core.info(`Installing ${packageName}.${packageVersion} via dotnet tool install`);
 
     await exec.getExecOutput('dotnet', ['tool', 'install', packageName,
         '--version', packageVersion,
