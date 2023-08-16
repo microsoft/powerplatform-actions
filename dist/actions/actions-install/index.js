@@ -3231,6 +3231,33 @@ var require_exec = __commonJS({
   }
 });
 
+// out/lib/getExePath.js
+var require_getExePath = __commonJS({
+  "out/lib/getExePath.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    var path_1 = require("path");
+    function getExePath(...relativePath) {
+      const currentDirectory = (0, path_1.resolve)(__dirname);
+      const parentDir = (0, path_1.dirname)(currentDirectory);
+      let outDirRoot;
+      switch ((0, path_1.basename)(parentDir)) {
+        case "actions":
+          outDirRoot = (0, path_1.resolve)((0, path_1.dirname)(parentDir));
+          break;
+        case "src":
+        case "out":
+          outDirRoot = (0, path_1.resolve)(parentDir, "..", "out");
+          break;
+        default:
+          throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${path_1.dirname}`);
+      }
+      return (0, path_1.resolve)(outDirRoot, ...relativePath);
+    }
+    exports2.default = getExePath;
+  }
+});
+
 // out/lib/actionLogger.js
 var require_actionLogger = __commonJS({
   "out/lib/actionLogger.js"(exports2) {
@@ -3258,33 +3285,6 @@ var require_actionLogger = __commonJS({
       }
     };
     exports2.ActionLogger = ActionLogger;
-  }
-});
-
-// out/lib/getExePath.js
-var require_getExePath = __commonJS({
-  "out/lib/getExePath.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var path_1 = require("path");
-    function getExePath(...relativePath) {
-      const currentDirectory = (0, path_1.resolve)(__dirname);
-      const parentDir = (0, path_1.dirname)(currentDirectory);
-      let outDirRoot;
-      switch ((0, path_1.basename)(parentDir)) {
-        case "actions":
-          outDirRoot = (0, path_1.resolve)((0, path_1.dirname)(parentDir));
-          break;
-        case "src":
-        case "out":
-          outDirRoot = (0, path_1.resolve)(parentDir, "..", "out");
-          break;
-        default:
-          throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${path_1.dirname}`);
-      }
-      return (0, path_1.resolve)(outDirRoot, ...relativePath);
-    }
-    exports2.default = getExePath;
   }
 });
 
@@ -3371,22 +3371,33 @@ var require_runnerParameters = __commonJS({
   "out/lib/runnerParameters.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getAutomationAgent = exports2.runnerParameters = void 0;
+    exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
     var process_1 = require("process");
-    var actionLogger_1 = require_actionLogger();
-    var getExePath_1 = require_getExePath();
+    var actionLogger_12 = require_actionLogger();
+    var getExePath_12 = require_getExePath();
+    var EnvVarPrefix = "POWERPLATFORMTOOLS_";
+    var PacInstalledEnvVarName = `${EnvVarPrefix}PACINSTALLED`;
+    exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
     function getAutomationAgent() {
       const jsonPackage = require_package();
       const productName = jsonPackage.name.split("/")[1];
       return productName + "/" + jsonPackage.version;
     }
     exports2.getAutomationAgent = getAutomationAgent;
-    var runnerParameters = {
-      runnersDir: (0, getExePath_1.default)(),
-      workingDir: process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)(),
-      logger: new actionLogger_1.ActionLogger(),
-      agent: getAutomationAgent()
+    var ActionsRunnerParameters = class {
+      constructor() {
+        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)();
+        this.logger = new actionLogger_12.ActionLogger();
+        this.agent = getAutomationAgent();
+      }
+      get runnersDir() {
+        if (process.env[PacInstalledEnvVarName] !== "true") {
+          throw new Error(`PAC is not installed. Please run the actions-install action first.`);
+        }
+        return (0, getExePath_12.default)();
+      }
     };
+    var runnerParameters = new ActionsRunnerParameters();
     exports2.runnerParameters = runnerParameters;
   }
 });
@@ -3426,13 +3437,15 @@ var exec = require_exec();
 var os = require("node:os");
 var node_path_1 = require("node:path");
 var fs = require("node:fs/promises");
+var getExePath_1 = require_getExePath();
+var actionLogger_1 = require_actionLogger();
 var runnerParameters_1 = require_runnerParameters();
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
   }
 }))().catch((error) => {
-  const logger = runnerParameters_1.runnerParameters.logger;
+  const logger = new actionLogger_1.ActionLogger();
   logger.error(`failed: ${error}`);
   core.endGroup();
 });
@@ -3441,10 +3454,16 @@ function main() {
     const packageVersion = "1.25.5";
     core.startGroup("actions-install:");
     core.info(`Installing pac ${packageVersion}...`);
+    if (process.env[runnerParameters_1.PacInstalledEnvVarName] === "true") {
+      core.warning("PAC is already installed. Skipping installation.");
+      core.endGroup();
+      return;
+    }
+    const runnersDir = (0, getExePath_1.default)();
     if (os.platform() === "win32") {
       const packageName = "Microsoft.PowerApps.CLI";
       core.info(`Installing PAC package ${packageName}.${packageVersion} via nuget.exe`);
-      const installDir = (0, node_path_1.resolve)(runnerParameters_1.runnerParameters.runnersDir);
+      const installDir = (0, node_path_1.resolve)(runnersDir);
       core.debug(`Installing to ${installDir}`);
       yield exec.getExecOutput("nuget", [
         "install",
@@ -3462,7 +3481,7 @@ function main() {
       yield fs.rename(original, target);
     } else {
       const packageName = "Microsoft.PowerApps.CLI.Tool";
-      const installDir = (0, node_path_1.resolve)(runnerParameters_1.runnerParameters.runnersDir, "pac_linux", "tools");
+      const installDir = (0, node_path_1.resolve)(runnersDir, "pac_linux", "tools");
       core.info(`Installing PAC package ${packageName}.${packageVersion} via dotnet tool install`);
       yield exec.getExecOutput("dotnet", [
         "tool",
@@ -3474,6 +3493,7 @@ function main() {
         installDir
       ]);
     }
+    core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
     core.endGroup();
   });
 }

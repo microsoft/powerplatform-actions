@@ -5,14 +5,16 @@ import * as exec from '@actions/exec';
 import * as os from "node:os";
 import { resolve } from 'node:path';
 import * as fs from 'node:fs/promises';
-import { runnerParameters } from '../../lib/runnerParameters';
+import getExePath from '../../lib/getExePath';
+import { ActionLogger } from '../../lib/actionLogger';
+import { PacInstalledEnvVarName } from '../../lib/runnerParameters';
 
 (async () => {
     if (process.env.GITHUB_ACTIONS) {
         await main();
     }
 })().catch(error => {
-    const logger = runnerParameters.logger;
+    const logger = new ActionLogger();
     logger.error(`failed: ${error}`);
     core.endGroup();
 });
@@ -22,11 +24,19 @@ export async function main(): Promise<void> {
     core.startGroup('actions-install:');
     core.info(`Installing pac ${packageVersion}...`);
 
+    if (process.env[PacInstalledEnvVarName] === 'true') {
+        core.warning('PAC is already installed. Skipping installation.');
+        core.endGroup();
+        return;
+    }
+
+    const runnersDir = getExePath();
+
     if (os.platform() === 'win32') {
         const packageName = 'Microsoft.PowerApps.CLI';
         core.info(`Installing PAC package ${packageName}.${packageVersion} via nuget.exe`);
 
-        const installDir = resolve(runnerParameters.runnersDir);
+        const installDir = resolve(runnersDir);
         core.debug(`Installing to ${installDir}`);
 
         await exec.getExecOutput('nuget', ['install', packageName,
@@ -43,12 +53,14 @@ export async function main(): Promise<void> {
 
     } else {
         const packageName = 'Microsoft.PowerApps.CLI.Tool';
-        const installDir = resolve(runnerParameters.runnersDir, 'pac_linux', 'tools');
+        const installDir = resolve(runnersDir, 'pac_linux', 'tools');
         core.info(`Installing PAC package ${packageName}.${packageVersion} via dotnet tool install`);
 
         await exec.getExecOutput('dotnet', ['tool', 'install', packageName,
             '--version', packageVersion,
             '--tool-path', installDir]);
     }
+
+    core.exportVariable(PacInstalledEnvVarName, 'true');
     core.endGroup();
 }

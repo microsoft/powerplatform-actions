@@ -2359,22 +2359,33 @@ var require_runnerParameters = __commonJS({
   "out/lib/runnerParameters.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getAutomationAgent = exports2.runnerParameters = void 0;
+    exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
     var process_12 = require("process");
     var actionLogger_1 = require_actionLogger();
     var getExePath_1 = require_getExePath();
+    var EnvVarPrefix = "POWERPLATFORMTOOLS_";
+    var PacInstalledEnvVarName = `${EnvVarPrefix}PACINSTALLED`;
+    exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
     function getAutomationAgent() {
       const jsonPackage = require_package();
       const productName = jsonPackage.name.split("/")[1];
       return productName + "/" + jsonPackage.version;
     }
     exports2.getAutomationAgent = getAutomationAgent;
-    var runnerParameters = {
-      runnersDir: (0, getExePath_1.default)(),
-      workingDir: process.env["GITHUB_WORKSPACE"] || (0, process_12.cwd)(),
-      logger: new actionLogger_1.ActionLogger(),
-      agent: getAutomationAgent()
+    var ActionsRunnerParameters = class {
+      constructor() {
+        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, process_12.cwd)();
+        this.logger = new actionLogger_1.ActionLogger();
+        this.agent = getAutomationAgent();
+      }
+      get runnersDir() {
+        if (process.env[PacInstalledEnvVarName] !== "true") {
+          throw new Error(`PAC is not installed. Please run the actions-install action first.`);
+        }
+        return (0, getExePath_1.default)();
+      }
     };
+    var runnerParameters = new ActionsRunnerParameters();
     exports2.runnerParameters = runnerParameters;
   }
 });
