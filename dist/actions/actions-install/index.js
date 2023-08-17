@@ -3463,8 +3463,9 @@ var runnerParameters_1 = require_runnerParameters();
 });
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
-    const packageVersion = PacInfo.PacPackageVersion;
     core.startGroup("actions-install:");
+    const versionArg = core.getInput("pac-version-override", { required: false, trimWhitespace: true });
+    const packageVersion = versionArg || PacInfo.PacPackageVersion;
     core.info(`Installing pac ${packageVersion}...`);
     if (process.env[runnerParameters_1.PacInstalledEnvVarName] === "true") {
       core.warning("PAC is already installed. Skipping installation.");

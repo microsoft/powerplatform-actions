@@ -21,8 +21,10 @@ import { PacInstalledEnvVarName } from '../../lib/runnerParameters';
 });
 
 export async function main(): Promise<void> {
-    const packageVersion = PacInfo.PacPackageVersion;
     core.startGroup('actions-install:');
+    const versionArg = core.getInput('pac-version-override', { required: false, trimWhitespace: true });
+    const packageVersion = versionArg || PacInfo.PacPackageVersion;
+
     core.info(`Installing pac ${packageVersion}...`);
 
     if (process.env[PacInstalledEnvVarName] === 'true') {
