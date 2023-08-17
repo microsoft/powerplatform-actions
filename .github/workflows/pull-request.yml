@@ -42,14 +42,9 @@ jobs:
       env:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
 
-    - name: Check Execute Permissions
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        if [ ! -x dist/pac_linux/tools/pac ]
-        then
-            echo "dist/pac_linux/tools/pac is not executable.  See \"Refreshing actions in dist folder\" in README.md" 1>&2
-            exit 1
-        fi
+    - name: Install PAC
+      uses: ./actions-install
+      id: actions-install
 
     - name: Test create-environment action with username/password
       uses: ./create-environment

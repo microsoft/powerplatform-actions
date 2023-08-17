@@ -1,0 +1,13 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+name: 'actions-install'
+description: 'Power Platform Actions Install'
+inputs:
+  pac-version-override:
+    description: 'Override the version of PAC installed for Actions. Note that this may break other actions if the PAC and Action arguments do not align.'
+    required: false
+
+runs:
+  using: 'node16'
+  main: '../dist/actions/actions-install/index.js'
+

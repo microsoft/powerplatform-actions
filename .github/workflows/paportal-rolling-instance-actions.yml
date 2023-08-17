@@ -53,6 +53,10 @@ jobs:
     - name: Download CDSStarterPortal package from portal authenticated feed
       run: gulp fetchPortalPackage --feedPAT ${{ secrets.OneCRM_DevOps_Read_PAT }}
 
+    - name: Install PAC
+      uses: ./actions-install
+      id: actions-install
+
     - name: Create a PA Portal test env
       uses: ./create-environment
       id: create-paportal-environment

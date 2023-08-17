@@ -33,6 +33,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const tsConfigFile = './tsconfig.json';
 const tsconfig = require(tsConfigFile);
+const PacInfo = require('./src/pacPackageInfo.json');
 
 const outdir = path.resolve(tsconfig.compilerOptions.outDir);
 const distdir = path.resolve('./dist');
@@ -56,6 +57,7 @@ async function clean() {
 }
 
 function compile() {
+    fs.copyFileSync('src/pacPackageInfo.json', path.resolve(outdir, 'pacPackageInfo.json'));
     const tsProj = ts.createProject(tsConfigFile);
     return gulp
         .src('src/**/*.ts')
@@ -155,20 +157,8 @@ function test() {
         .pipe(eslint.format());
 }
 
-function binplace(compName, relativePath) {
-    const targetDir = path.resolve(distdir, relativePath);
-    log.info(`Copying ${compName} to ${targetDir}...`);
-    fs.emptyDirSync(targetDir);
-    fs.copySync(path.resolve(outdir, relativePath), targetDir, {
-        filter: (src) => path.extname(src) !== '.pdb'
-    });
-}
-
 async function dist() {
     fs.emptyDirSync(distdir);
-    binplace('pac CLI', path.join('pac', 'tools'));
-    binplace('pac CLI', path.join('pac_linux', 'tools'));
-    await setExecuteFlag(path.resolve(distdir, 'pac_linux', 'tools', 'pac'), true);
 
     glob.sync('**/action.yml', {
             cwd: __dirname
@@ -207,8 +197,6 @@ async function addDistToIndex() {
     console.log(`stderr: ${res.stderr}`);
 }
 
-const cliVersion = '1.25.2';
-
 async function nugetInstallPortalPackages() {
     const packageName = "CDSStarterPortal"
     const packageNameToImport = `Adxstudio.${packageName}`
@@ -240,12 +228,12 @@ async function nugetInstallPortalPackages() {
 }
 
 async function nugetInstallLinux() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI.Core.linux-x64', cliVersion, path.resolve(outdir, 'pac_linux'));
+    await nugetInstall('CAP_ISVExp_Tools_Stable', PacInfo.LegacyLinuxPackage, PacInfo.PacPackageVersion, path.resolve(outdir, 'pac_linux'));
     await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
 }
 
 async function nugetInstallWindows() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', 'Microsoft.PowerApps.CLI', cliVersion, path.resolve(outdir, 'pac'));
+    await nugetInstall('CAP_ISVExp_Tools_Stable', PacInfo.PacPackageName, PacInfo.PacPackageVersion, path.resolve(outdir, 'pac'));
 }
 
 async function restore() {

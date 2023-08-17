@@ -19311,7 +19311,7 @@ var require_package = __commonJS({
         "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.3",
         "@types/mocha": "^10.0.1",
-        "@types/node": "^20.4.1",
+        "@types/node": "^20.4.8",
         "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.9",
         "@types/unzip-stream": "^0.3.1",
@@ -19328,7 +19328,7 @@ var require_package = __commonJS({
         glob: "^10.3.1",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
-        "gulp-eslint-new": "^1.8.2",
+        "gulp-eslint-new": "^1.8.3",
         "gulp-mocha": "^8.0.0",
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
@@ -19343,12 +19343,13 @@ var require_package = __commonJS({
         "ts-sinon": "^2.0.1",
         typescript: "^5.1.6",
         "unzip-stream": "^0.3.1",
-        winston: "^3.9.0",
+        winston: "^3.10.0",
         yargs: "^17.7.2"
       },
       dependencies: {
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
+        "@actions/exec": "^1.1.1",
         "@microsoft/powerplatform-cli-wrapper": "^0.1.103",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
@@ -19364,22 +19365,32 @@ var require_runnerParameters = __commonJS({
   "out/lib/runnerParameters.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getAutomationAgent = exports2.runnerParameters = void 0;
+    exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
     var process_1 = require("process");
     var actionLogger_1 = require_actionLogger();
     var getExePath_1 = require_getExePath();
+    var PacInstalledEnvVarName = "POWERPLATFORMTOOLS_PACINSTALLED";
+    exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
     function getAutomationAgent() {
       const jsonPackage = require_package();
       const productName = jsonPackage.name.split("/")[1];
       return productName + "/" + jsonPackage.version;
     }
     exports2.getAutomationAgent = getAutomationAgent;
-    var runnerParameters = {
-      runnersDir: (0, getExePath_1.default)(),
-      workingDir: process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)(),
-      logger: new actionLogger_1.ActionLogger(),
-      agent: getAutomationAgent()
+    var ActionsRunnerParameters = class {
+      constructor() {
+        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)();
+        this.logger = new actionLogger_1.ActionLogger();
+        this.agent = getAutomationAgent();
+      }
+      get runnersDir() {
+        if (process.env[PacInstalledEnvVarName] !== "true") {
+          throw new Error(`PAC is not installed. Please run the actions-install action first.`);
+        }
+        return (0, getExePath_1.default)();
+      }
     };
+    var runnerParameters = new ActionsRunnerParameters();
     exports2.runnerParameters = runnerParameters;
   }
 });

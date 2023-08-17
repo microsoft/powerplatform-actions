@@ -8,7 +8,8 @@
 
     "strict": true,
     "strictPropertyInitialization": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "resolveJsonModule": true
   },
   "exclude": [
     "node_modules"
