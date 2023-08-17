@@ -40,6 +40,7 @@ describe("publish solution test", () => {
       environmentUrl: environmentUrl,
       async: { name: 'run-asynchronously', required: false, defaultValue: 'false' },
       maxAsyncWaitTimeInMin: { name: 'max-async-wait-time', required: false, defaultValue: '60' },
+      logToConsole: false,
     }, runnerParameters, new ActionsHost);
   });
 });

@@ -40,6 +40,7 @@ describe("delete solution test", () => {
       credentials: credentials,
       environmentUrl: environmentUrl,
       name: { name: 'solution-name', required: true, defaultValue: undefined },
+      logToConsole: false,
     }, runnerParameters, new ActionsHost());
   });
 });

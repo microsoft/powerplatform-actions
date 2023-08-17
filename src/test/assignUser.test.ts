@@ -40,6 +40,7 @@ describe("assign-user tests", () => {
             role: { name: 'role', required: true, defaultValue: undefined },
             applicationUser: { name: 'application-user', required: false, defaultValue: 'false' },
             businessUnit: { name: 'business-unit', required: false, defaultValue: undefined },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

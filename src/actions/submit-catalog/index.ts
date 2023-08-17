@@ -27,7 +27,8 @@ export async function main (): Promise<void> {
         packageSolutionZipFile: parameterMap['package-solution-zip-file'],
         solutionZip: parameterMap['solution-zip'],
         packageZip: parameterMap['package-zip'],
-        pollStatus: parameterMap['poll-status']
+        pollStatus: parameterMap['poll-status'],
+        logToConsole: false,
      }, runnerParameters, new ActionsHost());
      core.endGroup();
 }

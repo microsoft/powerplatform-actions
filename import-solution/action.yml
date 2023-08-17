@@ -89,6 +89,11 @@ inputs:
     required: false
     default: 'false'
 
+  skip-lower-version:
+    description: 'Skip solution import if same or higher version is present in current environment.'
+    required: false
+    default: 'false'
+
 runs:
   using: 'node16'
   main: '../dist/actions/import-solution/index.js'

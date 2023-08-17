@@ -25,6 +25,7 @@ export async function main(): Promise<void> {
             environmentUrl: getEnvironmentUrl(),
             async: parameterMap['run-asynchronously'],
             maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
+            logToConsole: false,
         }, runnerParameters, new ActionsHost);
         core.endGroup();
     } catch (error) {

@@ -42,7 +42,8 @@ describe("submit-catalog tests", () => {
             packageSolutionZipFile: { name: 'package-solution-zip-file', required: false, defaultValue: 'ExistingPackage' },
             solutionZip: { name: 'solution-zip', required: false, defaultValue: undefined },
             packageZip: { name: 'package-zip', required: false, defaultValue: undefined },
-            pollStatus: { name: 'poll-status', required: false, defaultValue: 'false' }
+            pollStatus: { name: 'poll-status', required: false, defaultValue: 'false' },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

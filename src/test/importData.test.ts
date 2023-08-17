@@ -36,7 +36,8 @@ describe("import-data tests", () => {
             credentials: credentials,
             environmentUrl: mockEnvironmentUrl,
             dataFile: { name: 'data-file', required: true, defaultValue: undefined },
-            verbose: { name: 'verbose', required: false, defaultValue: false }
+            verbose: { name: 'verbose', required: false, defaultValue: false },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

@@ -51,7 +51,8 @@ describe("check solution test", () => {
       errorLevel: { name: "errorLevel", required: false, defaultValue: "HighIssueCount" },
       errorThreshold: { name: "errorThreshold", required: false, defaultValue: "0" },
       filesExcluded: { name: "filesExcluded", required: false, defaultValue: ""},
-      saveResults: { name: "saveResults", required: false, defaultValue: false}
+      saveResults: { name: "saveResults", required: false, defaultValue: false},
+      logToConsole: false,
     }, runnerParameters, new ActionsHost('PowerAppsChecker'));
   });
 });

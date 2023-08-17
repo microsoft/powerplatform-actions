@@ -28,6 +28,7 @@ export async function main(): Promise<void> {
             patchVersion: parameterMap['patch-version'],
             strategy: parameterMap['strategy'],
             fileName: parameterMap['tracker-file'],
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {

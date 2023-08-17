@@ -30,6 +30,7 @@ export async function main(): Promise<void> {
         role: parameterMap['role'],
         applicationUser: parameterMap['application-user'],
         businessUnit: parameterMap['business-unit'],
+        logToConsole: false,
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 }

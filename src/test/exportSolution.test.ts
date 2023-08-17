@@ -52,6 +52,7 @@ describe("export-solution tests", () => {
             relationshipRoles: { name: 'export-relationship-roles', required: false, defaultValue: 'false' },
             sales: { name: 'export-sales', required: false, defaultValue: 'false' },
             overwrite: { name: 'overwrite', required: false, defaultValue: 'false' },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

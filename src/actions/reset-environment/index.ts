@@ -35,6 +35,7 @@ export async function main(): Promise<void> {
         domainName: parameterMap['domain-name'],
         overrideFriendlyName: parameterMap['override-friendly-name'],
         friendlyEnvironmentName: parameterMap['friendly-name'],
+        logToConsole: false,
     }, runnerParameters, new ActionsHost());
 
     core.endGroup();

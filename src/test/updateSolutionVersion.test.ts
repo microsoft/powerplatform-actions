@@ -44,6 +44,7 @@ describe("update version solution test", () => {
       patchVersion: { name: 'patch-version', required: false, defaultValue: undefined },
       strategy: { name: 'strategy', required: false, defaultValue: undefined },
       fileName: { name: 'tracker-file', required: false, defaultValue: undefined },
+      logToConsole: false,
     }, runnerParameters, new ActionsHost());
   });
 });

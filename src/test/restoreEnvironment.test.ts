@@ -44,6 +44,7 @@ describe("restore-environment tests", () => {
             restoreLatestBackup: { name: 'latest-backup', required: false, defaultValue: 'true' },
             backupDateTime: { name: 'selected-backup', required: false, defaultValue: undefined },
             targetEnvironmentName: { name: 'friendly-name', required: false, defaultValue: undefined },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

@@ -25,6 +25,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         outputDirectory: parameterMap['target-folder'],
         async: parameterMap['async'],
         maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
+        logToConsole: false,
     }, runnerParameters, actionsHost);
 
     core.endGroup();

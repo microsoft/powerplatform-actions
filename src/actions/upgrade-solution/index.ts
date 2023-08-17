@@ -26,6 +26,7 @@ export async function main(): Promise<void> {
             name: parameterMap["solution-name"],
             async: parameterMap["async"],
             maxAsyncWaitTimeInMin: parameterMap["max-async-wait-time"],
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {

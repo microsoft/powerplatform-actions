@@ -30,7 +30,8 @@ import { runnerParameters } from '../../lib/runnerParameters';
         errorLevel: createEntry("errorLevel", "HighIssueCount"),
         errorThreshold: createEntry("errorThreshold", "0"),
         filesExcluded: createEntry("filesExcluded", ""),
-        saveResults: createEntry("saveResults", false)
+        saveResults: createEntry("saveResults", false),
+        logToConsole: false,
     }, runnerParameters, new ActionsHost('PowerAppsChecker'));
     core.endGroup();
 })().catch(error => {

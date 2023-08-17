@@ -38,7 +38,8 @@ describe("delete-environment tests", () => {
             credentials: credentials,
             environmentUrl: { name: 'environment-url', required: false, defaultValue: undefined },
             environment: { name: 'environment', required: false, defaultValue: undefined },
-            environmentId: { name: 'environment-id', required: false, defaultValue: undefined }
+            environmentId: { name: 'environment-id', required: false, defaultValue: undefined },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });
