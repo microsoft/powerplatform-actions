@@ -129,6 +129,10 @@ jobs:
       with:
         lfs: true
 
+    - name: Install PAC
+      uses: ./actions-install
+      id: actions-install
+
     - name: Test paportal-download action with username/password
       uses: ./download-paportal
       with:
