@@ -39,6 +39,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         relationshipRoles: parameterMap['export-relationship-roles'],
         sales: parameterMap['export-sales'],
         overwrite: parameterMap['overwrite'],
+        logToConsole: false,
     }, runnerParameters, actionsHost);
 
     core.endGroup();

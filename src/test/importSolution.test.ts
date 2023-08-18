@@ -45,8 +45,10 @@ describe("import-solution tests", () => {
             forceOverwrite: { name: 'force-overwrite', required: false, defaultValue: 'true' },
             publishChanges: { name: 'publish-changes', required: false, defaultValue: 'false' },
             skipDependencyCheck: { name: 'skip-dependency-check', required: false, defaultValue: 'false' },
+            skipLowerVersion: { name: 'skip-lower-version', required: false, defaultValue: 'false' },
             convertToManaged: { name: 'convert-to-managed', required: false, defaultValue: 'false' },
-            activatePlugins: { name: 'activate-plugins', required: false, defaultValue: 'true' }
+            activatePlugins: { name: 'activate-plugins', required: false, defaultValue: 'true' },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

@@ -42,6 +42,7 @@ describe("upgrade solution test", () => {
       name: { name: 'solution-name', required: true, defaultValue: undefined },
       async: { name: 'async', required: false, defaultValue: undefined },
       maxAsyncWaitTimeInMin: { name: 'max-async-wait-time', required: false, defaultValue: undefined },
+      logToConsole: false,
     }, runnerParameters, new ActionsHost());
   });
 });

@@ -30,7 +30,8 @@ export async function main(): Promise<void> {
         targetEnvironment: parameterMap['target-env'],
         copyType: parameterMap['copy-type'],
         overrideFriendlyName: parameterMap['override-friendly-name'],
-        friendlyTargetEnvironmentName: parameterMap['friendly-name']
+        friendlyTargetEnvironmentName: parameterMap['friendly-name'],
+        logToConsole: false,
       }, runnerParameters, new ActionsHost());
     core.endGroup();
 }

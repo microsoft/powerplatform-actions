@@ -27,7 +27,8 @@ import { runnerParameters } from '../../lib/runnerParameters';
             name: "verbose",
             required: false,
             defaultValue: false
-        }
+        },
+        logToConsole: false,
     }, runnerParameters, actionsHost);
 
     core.endGroup();

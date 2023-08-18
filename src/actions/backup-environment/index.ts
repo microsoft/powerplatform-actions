@@ -28,6 +28,7 @@ export async function main(): Promise<void> {
         environment: parameterMap['environment'],
         environmentUrl: parameterMap['environment-url'],
         backupLabel: parameterMap['backup-label'],
+        logToConsole: false,
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 }

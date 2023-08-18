@@ -29,6 +29,7 @@ export async function main(): Promise<void> {
             credentials: getCredentials(),
             environment: parameterMap['environment'],
             applicationListFile: parameterMap['application-list'],
+            logToConsole: false,
         }, runnerParameters, actionsHost);
         core.endGroup();
     } catch (error) {

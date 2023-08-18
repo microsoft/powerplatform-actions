@@ -24,7 +24,8 @@ export async function main (): Promise<void> {
         credentials: getCredentials(),
         environmentUrl: getEnvironmentUrl(),
         trackingId: parameterMap['tracking-id'],
-        requestType: parameterMap['type']
+        requestType: parameterMap['type'],
+        logToConsole: false,
      }, runnerParameters, new ActionsHost());
      core.endGroup();
 }

@@ -42,7 +42,8 @@ describe("install-catalog tests", () => {
             targetEnvironmentUrl: { name: 'target-url', required: true, defaultValue: undefined },
             settings: { name: 'settings', required: false, defaultValue: undefined },
             targetVersion: { name: 'target-version', required: false, defaultValue: undefined },
-            pollStatus: { name: 'poll-status', required: false, defaultValue: 'false' }
+            pollStatus: { name: 'poll-status', required: false, defaultValue: 'false' },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

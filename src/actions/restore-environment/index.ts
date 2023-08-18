@@ -31,6 +31,7 @@ export async function main(): Promise<void> {
         restoreLatestBackup: parameterMap['latest-backup'],
         backupDateTime: parameterMap['selected-backup'],
         targetEnvironmentName: parameterMap['friendly-name'],
+        logToConsole: false,
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 }

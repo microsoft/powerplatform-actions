@@ -41,6 +41,7 @@ describe("set online solution version test", () => {
       environmentUrl: environmentUrl,
       name: { name: 'name', required: true, defaultValue: undefined },
       version: { name: 'version', required: true, defaultValue: undefined },
+      logToConsole: false,
     }, runnerParameters, new ActionsHost());
   });
 });

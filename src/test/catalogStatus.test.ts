@@ -39,7 +39,8 @@ describe("catalog-status tests", () => {
             credentials: credentials,
             environmentUrl: mockEnvironmentUrl,
             trackingId: { name: 'tracking-id', required: true, defaultValue: undefined },
-            requestType: { name: 'type', required: true, defaultValue: undefined }
+            requestType: { name: 'type', required: true, defaultValue: undefined },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

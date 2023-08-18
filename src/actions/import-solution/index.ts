@@ -32,7 +32,9 @@ import { runnerParameters } from '../../lib/runnerParameters';
         publishChanges: parameterMap['publish-changes'],
         skipDependencyCheck: parameterMap['skip-dependency-check'],
         convertToManaged: parameterMap['convert-to-managed'],
-        activatePlugins: parameterMap['activate-plugins']
+        activatePlugins: parameterMap['activate-plugins'],
+        skipLowerVersion: parameterMap['skip-lower-version'],
+        logToConsole: false,
     }, runnerParameters, new ActionsHost());
 
     core.endGroup();

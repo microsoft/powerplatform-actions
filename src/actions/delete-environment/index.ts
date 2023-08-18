@@ -26,7 +26,8 @@ export async function main(): Promise<void> {
         credentials: getCredentials(),
         environmentUrl: parameterMap['environment-url'],
         environment: parameterMap['environment'],
-        environmentId: parameterMap['environment-id']
+        environmentId: parameterMap['environment-id'],
+        logToConsole: false,
     }, runnerParameters, new ActionsHost());
     core.info('environment deleted');
     core.endGroup();

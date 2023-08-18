@@ -42,6 +42,7 @@ describe("assign-group tests", () => {
             teamType: { name: 'team-type', required: true, defaultValue: undefined },
             membershipType: { name: 'membership-type', required: true, defaultValue: undefined },
             businessUnit: { name: 'business-unit', required: false, defaultValue: undefined },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

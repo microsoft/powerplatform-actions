@@ -27,7 +27,8 @@ export async function main (): Promise<void> {
         targetEnvironmentUrl: parameterMap['target-url'],
         settings: parameterMap['settings'],
         targetVersion: parameterMap['target-version'],
-        pollStatus: parameterMap['poll-status']
+        pollStatus: parameterMap['poll-status'],
+        logToConsole: false,
      }, runnerParameters, new ActionsHost());
      core.endGroup();
 }

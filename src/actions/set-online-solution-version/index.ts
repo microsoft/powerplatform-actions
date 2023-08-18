@@ -25,6 +25,7 @@ export async function main(): Promise<void> {
             environmentUrl: getEnvironmentUrl(),
             name: parameterMap['name'],
             version: parameterMap['version'],
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {

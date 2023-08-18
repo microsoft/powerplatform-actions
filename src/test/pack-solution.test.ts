@@ -49,7 +49,8 @@ describe("pack solution test", () => {
             useLcid: { name: 'use-lcid', required: false, defaultValue: 'false' },
             useUnmanagedFileForManaged: { name: 'use-unmanaged-file-for-missing-managed', required: false, defaultValue: 'false' },
             disablePluginRemap: { name: 'disable-plugin-remap', required: false, defaultValue: 'false' },
-            processCanvasApps: { name: 'process-canvas-apps', required: false, defaultValue: undefined}
+            processCanvasApps: { name: 'process-canvas-apps', required: false, defaultValue: undefined},
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

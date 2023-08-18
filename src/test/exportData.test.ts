@@ -38,7 +38,8 @@ describe("export-data tests", () => {
             schemaFile: { name: 'schema-file', required: true, defaultValue: undefined },
             dataFile: { name: 'data-file', required: true, defaultValue: undefined },
             overwrite: { name: 'overwrite', required: false, defaultValue: undefined },
-            verbose: { name: 'verbose', required: false, defaultValue: false }
+            verbose: { name: 'verbose', required: false, defaultValue: false },
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
 });

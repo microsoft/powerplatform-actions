@@ -11,6 +11,7 @@ import {
 } from "@microsoft/powerplatform-cli-wrapper";
 import * as core from '@actions/core';
 import { EnvIdVariableName } from "../host/OutputVariables";
+import { ActionsHost } from "../lib/host/ActionsHost";
 
 should();
 use(sinonChai);
@@ -59,7 +60,8 @@ describe("WhoAmI tests", () => {
         whoAmIStub.should.have.been.calledWithExactly({
             credentials: credentials,
             environmentUrl: environmentUrl,
-        }, runnerParameters);
+            logToConsole: false,
+        }, runnerParameters, new ActionsHost());
 
         coreSetOutputSpy.should.have.been.calledOnceWith(EnvIdVariableName, mockEnvironmentIdReturn);
     });

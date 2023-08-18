@@ -28,6 +28,7 @@ export async function main (): Promise<void> {
         teamType: parameterMap['team-type'],
         membershipType: parameterMap['membership-type'],
         businessUnit: parameterMap['business-unit'],
+        logToConsole: false,
      }, runnerParameters, new ActionsHost());
      core.endGroup();
 }

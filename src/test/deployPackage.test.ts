@@ -41,6 +41,7 @@ describe("deploy package test", () => {
       environmentUrl: environmentUrl,
       packagePath: { name: 'package', required: true, defaultValue: undefined },
       settings: { name: 'settings', required: false, defaultValue: undefined },
+      logToConsole: false,
     }, runnerParameters, new ActionsHost('DeployPackage'));
   });
 });

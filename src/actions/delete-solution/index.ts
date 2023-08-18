@@ -23,7 +23,8 @@ export async function main(): Promise<void> {
         await deleteSolution({
             credentials: getCredentials(),
             environmentUrl: getEnvironmentUrl(),
-            name: parameterMap["solution-name"]
+            name: parameterMap["solution-name"],
+            logToConsole: false,
         }, runnerParameters, new ActionsHost());
         core.endGroup();
     } catch (error) {
