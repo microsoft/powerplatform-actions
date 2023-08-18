@@ -3495,8 +3495,7 @@ function nugetInstall(packageName, packageVersion, installDir) {
     core.info(`Installing ${packageName}.${packageVersion} via nuget.exe`);
     core.debug(`Installing to ${installDir}`);
     const outputDirectory = (0, node_path_1.dirname)(installDir);
-    yield io.which("fakemcdoesntexist", true);
-    yield io.which("nuget", true);
+    yield checkForInstallationTool("nuget");
     yield exec.getExecOutput("nuget", [
       "install",
       packageName,
@@ -3515,7 +3514,7 @@ function nugetInstall(packageName, packageVersion, installDir) {
 function dotnetInstall(packageName, packageVersion, installDir) {
   return __awaiter(this, void 0, void 0, function* () {
     core.info(`Installing ${packageName}.${packageVersion} via dotnet tool install`);
-    yield io.which("dotnet", true);
+    yield checkForInstallationTool("dotnet");
     yield exec.getExecOutput("dotnet", [
       "tool",
       "install",
@@ -3525,5 +3524,14 @@ function dotnetInstall(packageName, packageVersion, installDir) {
       "--tool-path",
       installDir
     ]);
+  });
+}
+function checkForInstallationTool(toolName) {
+  return __awaiter(this, void 0, void 0, function* () {
+    try {
+      yield io.which(toolName, true);
+    } catch (error) {
+      throw new Error(`Runner does not have prerequisite "${toolName}" installed, as it was not found in the PATH.`);
+    }
   });
 }
