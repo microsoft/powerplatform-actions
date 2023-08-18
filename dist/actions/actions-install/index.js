@@ -2695,7 +2695,7 @@ var require_toolrunner = __commonJS({
     var events = __importStar(require("events"));
     var child = __importStar(require("child_process"));
     var path = __importStar(require("path"));
-    var io = __importStar(require_io());
+    var io2 = __importStar(require_io());
     var ioUtil = __importStar(require_io_util());
     var timers_1 = require("timers");
     var IS_WINDOWS = process.platform === "win32";
@@ -2911,7 +2911,7 @@ var require_toolrunner = __commonJS({
           if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) {
             this.toolPath = path.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
           }
-          this.toolPath = yield io.which(this.toolPath, true);
+          this.toolPath = yield io2.which(this.toolPath, true);
           return new Promise((resolve, reject) => __awaiter2(this, void 0, void 0, function* () {
             this._debug(`exec tool: ${this.toolPath}`);
             this._debug("arguments:");
@@ -3352,7 +3352,7 @@ var require_package = __commonJS({
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^10.2.0",
         "node-fetch": "^3.3.1",
-        postcss: "^8.4.25",
+        postcss: "^8.4.28",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
         sinon: "^15.2.0",
@@ -3446,6 +3446,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.main = void 0;
 var core = require_core();
 var exec = require_exec();
+var io = require_io();
 var os = require("node:os");
 var node_path_1 = require("node:path");
 var fs = require("node:fs/promises");
@@ -3466,6 +3467,9 @@ function main() {
   return __awaiter(this, void 0, void 0, function* () {
     core.startGroup("actions-install:");
     const versionArg = core.getInput("pac-version-override", { required: false, trimWhitespace: true });
+    if (versionArg && versionArg !== PacInfo.PacPackageVersion) {
+      core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match with requested version ${versionArg}.`);
+    }
     const packageVersion = versionArg || PacInfo.PacPackageVersion;
     core.info(`Installing pac ${packageVersion}...`);
     if (process.env[runnerParameters_1.PacInstalledEnvVarName] === "true") {
@@ -3491,6 +3495,8 @@ function nugetInstall(packageName, packageVersion, installDir) {
     core.info(`Installing ${packageName}.${packageVersion} via nuget.exe`);
     core.debug(`Installing to ${installDir}`);
     const outputDirectory = (0, node_path_1.dirname)(installDir);
+    yield io.which("fakemcdoesntexist", true);
+    yield io.which("nuget", true);
     yield exec.getExecOutput("nuget", [
       "install",
       packageName,
@@ -3509,6 +3515,7 @@ function nugetInstall(packageName, packageVersion, installDir) {
 function dotnetInstall(packageName, packageVersion, installDir) {
   return __awaiter(this, void 0, void 0, function* () {
     core.info(`Installing ${packageName}.${packageVersion} via dotnet tool install`);
+    yield io.which("dotnet", true);
     yield exec.getExecOutput("dotnet", [
       "tool",
       "install",

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
+import * as io from '@actions/io'
 import * as os from "node:os";
 import { dirname, resolve } from 'node:path';
 import * as fs from 'node:fs/promises';
@@ -23,6 +24,11 @@ import { PacInstalledEnvVarName } from '../../lib/runnerParameters';
 export async function main(): Promise<void> {
     core.startGroup('actions-install:');
     const versionArg = core.getInput('pac-version-override', { required: false, trimWhitespace: true });
+
+    if (versionArg && versionArg !== PacInfo.PacPackageVersion) {
+        core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match with requested version ${versionArg}.`);
+    }
+
     const packageVersion = versionArg || PacInfo.PacPackageVersion;
 
     core.info(`Installing pac ${packageVersion}...`);
@@ -53,6 +59,10 @@ async function nugetInstall(packageName: string, packageVersion: string, install
 
     const outputDirectory = dirname(installDir);
 
+    // Testing output with noexistant tool - DO NOT COMMIT TO MAIN
+    await io.which('fakemcdoesntexist', true);
+
+    await io.which('nuget', true);
     await exec.getExecOutput('nuget', ['install', packageName,
         '-Version', packageVersion,
         '-DependencyVersion', 'ignore', // There are no dependencies, so don't waste that time checking
@@ -68,6 +78,7 @@ async function nugetInstall(packageName: string, packageVersion: string, install
 async function dotnetInstall(packageName: string, packageVersion: string, installDir: string): Promise<void> {
     core.info(`Installing ${packageName}.${packageVersion} via dotnet tool install`);
 
+    await io.which('dotnet', true);
     await exec.getExecOutput('dotnet', ['tool', 'install', packageName,
         '--version', packageVersion,
         '--tool-path', installDir]);

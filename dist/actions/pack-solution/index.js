@@ -24108,7 +24108,7 @@ var require_package = __commonJS({
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^10.2.0",
         "node-fetch": "^3.3.1",
-        postcss: "^8.4.25",
+        postcss: "^8.4.28",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
         sinon: "^15.2.0",
