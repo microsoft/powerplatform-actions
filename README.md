@@ -16,8 +16,11 @@ jobs:
     runs-on: windows-latest   # alternate runner OS is: ubuntu-latest
 
     steps:
+    - name: Install Power Platform Tools
+      uses: microsoft/powerplatform-actions/actions-install@v1
+
     - name: Export Solution
-      uses: microsoft/powerplatform-actions/export-solution@v0
+      uses: microsoft/powerplatform-actions/export-solution@v1
       with:
         environment-url: 'https://myenv.crm.dynamics.com'
         user-name: 'me@myenv.onmicrosoft.com'
@@ -27,7 +30,7 @@ jobs:
         working-directory: 'out'
 
     - name: Unpack Solution
-      uses: microsoft/powerplatform-actions/unpack-solution@v0
+      uses: microsoft/powerplatform-actions/unpack-solution@v1
       with:
         solution-file: 'out/aSolution1.zip'
         solution-folder: 'out/solutions/solution one'
@@ -35,14 +38,14 @@ jobs:
         overwrite-files: true
 
     - name: Publish Solution
-      uses: microsoft/powerplatform-actions/publish-solution@v0
+      uses: microsoft/powerplatform-actions/publish-solution@v1
       with:
         environment-url: 'https://myenv.crm.dynamics.com'
         user-name: 'me@myenv.onmicrosoft.com'
         password-secret: ${{ secrets.MYPASSWORD }}
 
     - name: Prepare solution changes for check-in into source control
-      uses: microsoft/powerplatform-actions/branch-solution@v0
+      uses: microsoft/powerplatform-actions/branch-solution@v1
       with:
         solution-folder: 'out/solutions/solution one'
         solution-target-folder: 'src/solutions/solution1'
