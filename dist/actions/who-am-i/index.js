@@ -10861,15 +10861,12 @@ var require_updateVersionSolution = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.updateVersionSolution = void 0;
     var InputValidator_1 = require_InputValidator();
-    var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function updateVersionSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
-          logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--buildversion", parameters.buildVersion);
@@ -10884,9 +10881,6 @@ var require_updateVersionSolution = __commonJS({
         } catch (error) {
           logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
-        } finally {
-          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
-          logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
     }
@@ -11770,6 +11764,76 @@ var require_updateOrgSettings = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/setGovernanceConfig.js
+var require_setGovernanceConfig = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/setGovernanceConfig.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.setGovernanceConfig = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function setGovernanceConfig(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        const pacArgs = ["admin", "set-governance-config"];
+        const validator = new InputValidator_1.InputValidator(host);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          validator.pushInput(pacArgs, "--environment", parameters.environment);
+          validator.pushInput(pacArgs, "--protection-level", parameters.protectionLevel);
+          validator.pushInput(pacArgs, "--disable-group-sharing", parameters.disableGroupSharing);
+          validator.pushInput(pacArgs, "--exclude-analysis", parameters.excludeAnalysis);
+          validator.pushInput(pacArgs, "--include-insights", parameters.includeInsights);
+          validator.pushInput(pacArgs, "--limit-sharing-mode", parameters.limitSharingMode);
+          validator.pushInput(pacArgs, "--max-limit-user-sharing", parameters.maxLimitUserSharing);
+          validator.pushInput(pacArgs, "--solution-checker-mode", parameters.solutionCheckerMode);
+          validator.pushCommon(pacArgs, parameters);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("SetGovernanceConfig Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.setGovernanceConfig = setGovernanceConfig;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -11828,6 +11892,7 @@ var require_actions = __commonJS({
     __exportStar(require_submitCatalog(), exports2);
     __exportStar(require_pipelineDeploy(), exports2);
     __exportStar(require_updateOrgSettings(), exports2);
+    __exportStar(require_setGovernanceConfig(), exports2);
   }
 });
 
@@ -14184,7 +14249,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.110",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.113",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",

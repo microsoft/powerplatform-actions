@@ -13027,15 +13027,12 @@ var require_updateVersionSolution = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.updateVersionSolution = void 0;
     var InputValidator_1 = require_InputValidator();
-    var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function updateVersionSolution(parameters, runnerParameters, host) {
       return __awaiter2(this, void 0, void 0, function* () {
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
-          const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
-          logger.log("The Authentication Result: " + authenticateResult);
           const pacArgs = ["solution", "version"];
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--buildversion", parameters.buildVersion);
@@ -13050,9 +13047,6 @@ var require_updateVersionSolution = __commonJS({
         } catch (error) {
           logger.error(`failed: ${error instanceof Error ? error.message : error}`);
           throw error;
-        } finally {
-          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
-          logger.log("The Clear Authentication Result: " + clearAuthResult);
         }
       });
     }
@@ -13936,6 +13930,76 @@ var require_updateOrgSettings = __commonJS({
   }
 });
 
+// node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/setGovernanceConfig.js
+var require_setGovernanceConfig = __commonJS({
+  "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/setGovernanceConfig.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.setGovernanceConfig = void 0;
+    var InputValidator_1 = require_InputValidator();
+    var authenticate_1 = require_authenticate();
+    var createPacRunner_1 = require_createPacRunner();
+    function setGovernanceConfig(parameters, runnerParameters, host) {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const logger = runnerParameters.logger;
+        const pac = (0, createPacRunner_1.default)(runnerParameters);
+        const pacArgs = ["admin", "set-governance-config"];
+        const validator = new InputValidator_1.InputValidator(host);
+        try {
+          const authenticateResult = yield (0, authenticate_1.authenticateAdmin)(pac, parameters.credentials, logger);
+          logger.log("The Authentication Result: " + authenticateResult);
+          validator.pushInput(pacArgs, "--environment", parameters.environment);
+          validator.pushInput(pacArgs, "--protection-level", parameters.protectionLevel);
+          validator.pushInput(pacArgs, "--disable-group-sharing", parameters.disableGroupSharing);
+          validator.pushInput(pacArgs, "--exclude-analysis", parameters.excludeAnalysis);
+          validator.pushInput(pacArgs, "--include-insights", parameters.includeInsights);
+          validator.pushInput(pacArgs, "--limit-sharing-mode", parameters.limitSharingMode);
+          validator.pushInput(pacArgs, "--max-limit-user-sharing", parameters.maxLimitUserSharing);
+          validator.pushInput(pacArgs, "--solution-checker-mode", parameters.solutionCheckerMode);
+          validator.pushCommon(pacArgs, parameters);
+          logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
+          const pacResult = yield pac(...pacArgs);
+          logger.log("SetGovernanceConfig Action Result: " + pacResult);
+        } catch (error) {
+          logger.error(`failed: ${error instanceof Error ? error.message : error}`);
+          throw error;
+        } finally {
+          const clearAuthResult = yield (0, authenticate_1.clearAuthentication)(pac);
+          logger.log("The Clear Authentication Result: " + clearAuthResult);
+        }
+      });
+    }
+    exports2.setGovernanceConfig = setGovernanceConfig;
+  }
+});
+
 // node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js
 var require_actions = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/index.js"(exports2) {
@@ -13994,6 +14058,7 @@ var require_actions = __commonJS({
     __exportStar(require_submitCatalog(), exports2);
     __exportStar(require_pipelineDeploy(), exports2);
     __exportStar(require_updateOrgSettings(), exports2);
+    __exportStar(require_setGovernanceConfig(), exports2);
   }
 });
 
@@ -23999,67 +24064,6 @@ var require_ActionsHost = __commonJS({
   }
 });
 
-// out/lib/auth/getCredentials.js
-var require_getCredentials = __commonJS({
-  "out/lib/auth/getCredentials.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var core_1 = require_core();
-    function getCredentials() {
-      const usernamePassword = {
-        username: getInput("user-name"),
-        password: getInput("password-secret"),
-        encodePassword: true,
-        cloudInstance: getInput("cloud")
-      };
-      const isUpValid = isUsernamePasswordValid(usernamePassword);
-      const clientCredentials = {
-        appId: getInput("app-id"),
-        clientSecret: getInput("client-secret"),
-        encodeSecret: true,
-        tenantId: getInput("tenant-id"),
-        cloudInstance: getInput("cloud"),
-        scheme: ""
-        // no MgtIdentity support for Actions yet
-      };
-      const isCcValid = isClientCredentialsValid(clientCredentials);
-      if (isUpValid && isCcValid) {
-        throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
-      }
-      if (isUpValid) {
-        return usernamePassword;
-      }
-      if (isCcValid) {
-        return clientCredentials;
-      }
-      throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
-    }
-    exports2.default = getCredentials;
-    function getInput(name) {
-      return (0, core_1.getInput)(name, { required: false });
-    }
-    function isUsernamePasswordValid(usernamePassword) {
-      return !!usernamePassword.username && !!usernamePassword.password;
-    }
-    function isClientCredentialsValid(clientCredentials) {
-      return !!clientCredentials.appId && !!clientCredentials.clientSecret && !!clientCredentials.tenantId;
-    }
-  }
-});
-
-// out/lib/auth/getEnvironmentUrl.js
-var require_getEnvironmentUrl = __commonJS({
-  "out/lib/auth/getEnvironmentUrl.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var core_1 = require_core();
-    function getEnvironmentUrl() {
-      return (0, core_1.getInput)("environment-url", { required: false });
-    }
-    exports2.default = getEnvironmentUrl;
-  }
-});
-
 // out/lib/actionLogger.js
 var require_actionLogger = __commonJS({
   "out/lib/actionLogger.js"(exports2) {
@@ -24186,7 +24190,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.110",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.113",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
@@ -24265,8 +24269,6 @@ var core = require_core();
 var actions_1 = require_actions();
 var YamlParser_1 = require_YamlParser();
 var ActionsHost_1 = require_ActionsHost();
-var getCredentials_1 = require_getCredentials();
-var getEnvironmentUrl_1 = require_getEnvironmentUrl();
 var runnerParameters_1 = require_runnerParameters();
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
@@ -24280,8 +24282,6 @@ function main() {
       const taskParser = new YamlParser_1.YamlParser();
       const parameterMap = taskParser.getHostParameterEntries("update-solution-version");
       yield (0, actions_1.updateVersionSolution)({
-        credentials: (0, getCredentials_1.default)(),
-        environmentUrl: (0, getEnvironmentUrl_1.default)(),
         buildVersion: parameterMap["build-version"],
         revisionVersion: parameterMap["revision-version"],
         patchVersion: parameterMap["patch-version"],
