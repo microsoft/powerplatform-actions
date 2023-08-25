@@ -4,8 +4,6 @@ import * as core from '@actions/core';
 import { updateVersionSolution } from "@microsoft/powerplatform-cli-wrapper/dist/actions";
 import { YamlParser } from '../../lib/parser/YamlParser';
 import { ActionsHost } from '../../lib/host/ActionsHost';
-import getCredentials from "../../lib/auth/getCredentials";
-import getEnvironmentUrl from "../../lib/auth/getEnvironmentUrl";
 import { runnerParameters } from "../../lib/runnerParameters";
 
 (async () => {
@@ -21,8 +19,6 @@ export async function main(): Promise<void> {
         const parameterMap = taskParser.getHostParameterEntries('update-solution-version');
 
         await updateVersionSolution({
-            credentials: getCredentials(),
-            environmentUrl: getEnvironmentUrl(),
             buildVersion: parameterMap['build-version'],
             revisionVersion: parameterMap['revision-version'],
             patchVersion: parameterMap['patch-version'],
