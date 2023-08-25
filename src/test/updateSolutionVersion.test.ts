@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import { should, use } from "chai";
-import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import rewiremock from "./rewiremock";
 import { fake, stub } from "sinon";
