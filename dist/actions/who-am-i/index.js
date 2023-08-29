@@ -14248,6 +14248,7 @@ var require_package = __commonJS({
         "@actions/artifact": "^1.1.1",
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
+        "@actions/github": "^5.1.1",
         "@actions/io": "^1.1.3",
         "@microsoft/powerplatform-cli-wrapper": "^0.1.113",
         "date-fns": "^2.30.0",

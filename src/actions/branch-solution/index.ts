@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import * as core from '@actions/core';
+import * as github from '@actions/github'
 import { ActionLogger, getInputAsBool, getWorkingDirectory, GitRunner } from '../../lib';
 import { format } from 'date-fns';
 import fs = require('fs-extra');
@@ -38,6 +39,11 @@ core.info(`branch solution: stage branch for folder: ${solutionFolder} into bran
 
 const currDir = process.cwd();
 
+core.info('Printing actor information prior to async execute');
+core.info(`github.context.actor: ${github.context.actor}`);
+core.info(`github.context.eventName: ${github.context.eventName}`);
+core.info(`process.env.GITHUB_ACTOR: ${process.env.GITHUB_ACTOR}`);
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 (async () => {
     process.chdir(stagingDir);
@@ -47,6 +53,12 @@ const currDir = process.cwd();
     //  this action runs as part of a GH workflow which runs e.g. a PR in a detached branch
     //  hence a simple "just branch off" won't work and negatively impact the rest of the workflow
     //  Approach: create a shallow clone of the solution target repo in a staging subfolder
+
+    core.info('Printing actor information WITHIN async execute');
+    core.info(`github.context.actor: ${github.context.actor}`);
+    core.info(`github.context.eventName: ${github.context.eventName}`);
+    core.info(`process.env.GITHUB_ACTOR: ${process.env.GITHUB_ACTOR}`);
+
     await git.run(['init']);
     await git.run(['remote', 'add', 'origin', repoUrl]);
     await git.run(['config', '--local', 'user.email', "bot@Ah6cCGKjYf.onmicrosoft.com"]);
