@@ -24185,7 +24185,7 @@ core.info(`process.env.GITHUB_ACTOR: ${process.env.GITHUB_ACTOR}`);
   core.info(`process.env.GITHUB_ACTOR: ${process.env.GITHUB_ACTOR}`);
   yield git.run(["init"]);
   yield git.run(["remote", "add", "origin", repoUrl]);
-  yield git.run(["config", "--local", "user.email", "bot@Ah6cCGKjYf.onmicrosoft.com"]);
+  yield git.run(["config", "--local", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"]);
   yield git.run(["config", "--local", "user.name", `${(_a = process.env.GITHUB_ACTOR) !== null && _a !== void 0 ? _a : "branch-solution-bot"}`]);
   yield git.run(["config", "--local", "http.https://github.com/.extraheader", `AUTHORIZATION: basic ${Buffer.from(`PAT:${repoToken}`).toString("base64")}`]);
   yield git.run(["fetch", "--no-tags", "--prune", "--depth=1", "origin"]);

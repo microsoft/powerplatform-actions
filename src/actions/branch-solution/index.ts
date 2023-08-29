@@ -61,7 +61,7 @@ core.info(`process.env.GITHUB_ACTOR: ${process.env.GITHUB_ACTOR}`);
 
     await git.run(['init']);
     await git.run(['remote', 'add', 'origin', repoUrl]);
-    await git.run(['config', '--local', 'user.email', "bot@Ah6cCGKjYf.onmicrosoft.com"]);
+    await git.run(['config', '--local', 'user.email', "41898282+github-actions[bot]@users.noreply.github.com"]);
     await git.run(['config', '--local', 'user.name', `${process.env.GITHUB_ACTOR ?? 'branch-solution-bot'}`]);
     await git.run(['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${Buffer.from(`PAT:${repoToken}`).toString('base64')}`]);
     await git.run(['fetch', '--no-tags', '--prune', '--depth=1', 'origin']);
