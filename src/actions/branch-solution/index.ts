@@ -23,6 +23,13 @@ if (!repoUrl) {
 }
 const repoToken = core.getInput('repo-token', { required: true });
 
+const gitUser = process.env.GITHUB_ACTOR ?? 'branch-solution-bot'; //core.getInput('git-user-name', { required: false });
+const gitEmail = (process.env.GITHUB_ACTOR && process.env.GITHUB_ACTOR_ID)
+    ? `${process.env.GITHUB_ACTOR_ID}+${process.env.GITHUB_ACTOR}@users.noreply.github.com`
+    : '41898282+github-actions[bot]@users.noreply.github.com';
+
+//core.getInput('git-user-email', { required: false });
+
 const branchNameCand = core.getInput('branch-name', { required: false })
 const branchName = (!branchNameCand)
     ? `${path.basename(solutionTargetFolder) || 'branch'}-${format(Date.now(), 'yyyyMMdd-HHmm')}`
@@ -61,8 +68,8 @@ core.info(`process.env.GITHUB_ACTOR: ${process.env.GITHUB_ACTOR}`);
 
     await git.run(['init']);
     await git.run(['remote', 'add', 'origin', repoUrl]);
-    await git.run(['config', '--local', 'user.email', "41898282+github-actions[bot]@users.noreply.github.com"]);
-    await git.run(['config', '--local', 'user.name', `${process.env.GITHUB_ACTOR ?? 'branch-solution-bot'}`]);
+    await git.run(['config', '--local', 'user.email', gitEmail]);
+    await git.run(['config', '--local', 'user.name', gitUser]);
     await git.run(['config', '--local', 'http.https://github.com/.extraheader', `AUTHORIZATION: basic ${Buffer.from(`PAT:${repoToken}`).toString('base64')}`]);
     await git.run(['fetch', '--no-tags', '--prune', '--depth=1', 'origin']);
     const remotes = await git.run(['remote', 'show', 'origin']);
