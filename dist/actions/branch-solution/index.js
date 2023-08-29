@@ -1587,7 +1587,7 @@ var require_oidc_utils = __commonJS({
         return runtimeUrl;
       }
       static getCall(id_token_url) {
-        var _a;
+        var _a2;
         return __awaiter2(this, void 0, void 0, function* () {
           const httpclient = _OidcClient.createHttpClient();
           const res = yield httpclient.getJson(id_token_url).catch((error) => {
@@ -1597,7 +1597,7 @@ var require_oidc_utils = __commonJS({
  
         Error Message: ${error.result.message}`);
           });
-          const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
+          const id_token = (_a2 = res.result) === null || _a2 === void 0 ? void 0 : _a2.value;
           if (!id_token) {
             throw new Error("Response json body do not have ID Token field");
           }
@@ -1685,7 +1685,7 @@ var require_summary = __commonJS({
           }
           try {
             yield access(pathFromEnv, fs_1.constants.R_OK | fs_1.constants.W_OK);
-          } catch (_a) {
+          } catch (_a2) {
             throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
           }
           this._filePath = pathFromEnv;
@@ -2469,7 +2469,7 @@ var require_exeRunner = __commonJS({
         });
       }
       runSync(args) {
-        var _a;
+        var _a2;
         this.logger.info(`exe: ${this._exePath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
         const proc = (0, child_process_1.spawnSync)(this._exePath, args, {
           cwd: this.workingDir,
@@ -2482,7 +2482,7 @@ var require_exeRunner = __commonJS({
         } else {
           const allOutput = proc.stderr.toString().concat(proc.stdout.toString());
           this.logger.error(`error: ${proc.status}: ${allOutput}`);
-          throw new RunnerError((_a = proc.status) !== null && _a !== void 0 ? _a : 99999, allOutput);
+          throw new RunnerError((_a2 = proc.status) !== null && _a2 !== void 0 ? _a2 : 99999, allOutput);
         }
       }
     };
@@ -16415,7 +16415,7 @@ var require_polyfills = __commonJS({
             return ret;
           };
         } else if (fs3.futimes) {
-          fs3.lutimes = function(_a, _b, _c, cb) {
+          fs3.lutimes = function(_a2, _b, _c, cb) {
             if (cb)
               process.nextTick(cb);
           };
@@ -18586,6 +18586,7 @@ var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P,
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 var core = require_core();
 var lib_1 = require_lib2();
@@ -18606,6 +18607,8 @@ if (!repoUrl) {
   repoUrl = url[0].trim();
 }
 var repoToken = core.getInput("repo-token", { required: true });
+var gitUser = (_a = process.env.GITHUB_ACTOR) !== null && _a !== void 0 ? _a : "branch-solution-bot";
+var gitEmail = process.env.GITHUB_ACTOR && process.env.GITHUB_ACTOR_ID ? `${process.env.GITHUB_ACTOR_ID}+${process.env.GITHUB_ACTOR}@users.noreply.github.com` : "41898282+github-actions[bot]@users.noreply.github.com";
 var branchNameCand = core.getInput("branch-name", { required: false });
 var branchName = !branchNameCand ? `${path.basename(solutionTargetFolder) || "branch"}-${(0, date_fns_1.format)(Date.now(), "yyyyMMdd-HHmm")}` : branchNameCand;
 var allowEmpty = (0, lib_1.getInputAsBool)("allow-empty-commit", false, false);
@@ -18616,14 +18619,13 @@ fs.emptyDirSync(stagingDir);
 core.info(`branch solution: stage branch for folder: ${solutionFolder} into branch ${branchName}`);
 var currDir = process.cwd();
 (() => __awaiter(void 0, void 0, void 0, function* () {
-  var _a;
   process.chdir(stagingDir);
   core.startGroup("... prepare staging branch");
   const git = new lib_1.GitRunner(stagingDir, logger);
   yield git.run(["init"]);
   yield git.run(["remote", "add", "origin", repoUrl]);
-  yield git.run(["config", "--local", "user.email", "bot@Ah6cCGKjYf.onmicrosoft.com"]);
-  yield git.run(["config", "--local", "user.name", `${(_a = process.env.GITHUB_ACTOR) !== null && _a !== void 0 ? _a : "branch-solution-bot"}`]);
+  yield git.run(["config", "--local", "user.email", gitEmail]);
+  yield git.run(["config", "--local", "user.name", gitUser]);
   yield git.run(["config", "--local", "http.https://github.com/.extraheader", `AUTHORIZATION: basic ${Buffer.from(`PAT:${repoToken}`).toString("base64")}`]);
   yield git.run(["fetch", "--no-tags", "--prune", "--depth=1", "origin"]);
   const remotes = yield git.run(["remote", "show", "origin"]);

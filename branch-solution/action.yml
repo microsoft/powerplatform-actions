@@ -17,7 +17,7 @@ inputs:
 
   repo-token:
     description: 'Token to git repo. Do NOT checkin token, instead use secrets.GITHUB_TOKEN or create a GitHub secret and reference it here; see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
-    required: false
+    required: true
 
   branch-name:
     description: 'Branch base name to hold the commited solution; if none given, action will form one like: "<basename-of-solution-target-folder>-<yyyyMMDD-HHmm"'
