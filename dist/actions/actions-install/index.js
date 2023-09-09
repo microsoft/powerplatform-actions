@@ -3541,25 +3541,12 @@ function nugetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeedU
     core.info(`Installing ${packageName}.${packageVersion} via nuget.exe`);
     yield checkForInstallationTool("nuget");
     const toolpath = yield fs.mkdtemp(path.join(os.tmpdir(), "powerplatform-actions-"));
-    let wroteNugetConfig = false;
+    let nugetConfigFile = void 0;
     try {
       if (nugetFeedOverride && nugetFeedOverride !== "https://api.nuget.org/v3/index.json") {
-        core.info(`Adding nuget feed ${nugetFeedOverride} to nuget sources`);
-        yield exec.getExecOutput("nuget", [
-          "sources",
-          "add",
-          "-name",
-          "pacNugetFeed",
-          "-source",
-          nugetFeedOverride,
-          "-username",
-          nugetFeedUsername,
-          "-password",
-          nugetFeedPassword
-        ]);
-        wroteNugetConfig = true;
+        nugetConfigFile = yield createNugetConfigViaNuget(toolpath, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword);
       }
-      yield exec.getExecOutput("nuget", [
+      const installArgs = [
         "install",
         packageName,
         "-Version",
@@ -3569,13 +3556,15 @@ function nugetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeedU
         "-NonInteractive",
         "-OutputDirectory",
         toolpath
-      ]);
+      ];
+      nugetConfigFile && installArgs.push("-ConfigFile", nugetConfigFile);
+      yield exec.getExecOutput("nuget", installArgs);
       const pacPath = (0, node_path_1.resolve)(toolpath, packageName + "." + packageVersion, "tools", "pac.exe");
       core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
       core.exportVariable(runnerParameters_1.PacPathEnvVarName, pacPath);
     } finally {
-      if (wroteNugetConfig) {
-        yield exec.getExecOutput("nuget", ["sources", "remove", "-name", "pacNugetFeed"]);
+      if (nugetConfigFile) {
+        yield fs.rm(nugetConfigFile);
       }
     }
   });
@@ -3585,28 +3574,50 @@ function dotnetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeed
     core.info(`Installing ${packageName}.${packageVersion} via dotnet tool install`);
     yield checkForInstallationTool("dotnet");
     const toolpath = yield fs.mkdtemp(path.join(os.tmpdir(), "powerplatform-actions-"));
-    let wroteNugetConfig = false;
+    let nugetConfigFile = void 0;
     try {
       if (nugetFeedOverride && nugetFeedOverride !== "https://api.nuget.org/v3/index.json") {
-        core.info(`Adding nuget feed ${nugetFeedOverride} to dotnet nuget sources`);
-        const nugetSourceArgs = ["nuget", "add", "source", nugetFeedOverride, "--name", "pacNugetFeed"];
-        nugetFeedUsername && nugetSourceArgs.push("--username", nugetFeedUsername);
-        nugetFeedPassword && nugetSourceArgs.push("--password", nugetFeedPassword);
-        if (os.platform() !== "win32") {
-          nugetSourceArgs.push("--store-password-in-clear-text");
-        }
-        yield exec.getExecOutput("dotnet", nugetSourceArgs);
-        wroteNugetConfig = true;
+        nugetConfigFile = yield createNugetConfigViaDotnet(toolpath, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword);
       }
-      yield exec.getExecOutput("dotnet", ["tool", "install", packageName, "--version", packageVersion, "--tool-path", toolpath]);
+      const installArgs = ["tool", "install", packageName, "--version", packageVersion, "--tool-path", toolpath];
+      nugetConfigFile && installArgs.push("--configfile", nugetConfigFile);
+      yield exec.getExecOutput("dotnet", installArgs);
       core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
       core.exportVariable(runnerParameters_1.PacPathEnvVarName, path.join(toolpath, os.platform() === "win32" ? "pac.exe" : "pac"));
       core.info(`pac installed to ${process.env[runnerParameters_1.PacPathEnvVarName]}`);
     } finally {
-      if (wroteNugetConfig) {
-        yield exec.getExecOutput("dotnet", ["nuget", "remove", "source", "pacNugetFeed"]);
+      if (nugetConfigFile) {
+        yield fs.rm(nugetConfigFile);
       }
     }
+  });
+}
+function createNugetConfigViaNuget(toolDirectory, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Adding nuget feed ${nugetFeedOverride} to nuget sources`);
+    const filename = path.resolve(toolDirectory, "nuget.config");
+    yield fs.writeFile(filename, `<?xml version="1.0" encoding="utf-8"?><configuration></configuration>`);
+    const configArgs = ["sources", "add", "-name", "pacNugetFeed", "-source", nugetFeedOverride, `-ConfigFile`, filename];
+    nugetFeedUsername && configArgs.push("-username", nugetFeedUsername);
+    nugetFeedPassword && configArgs.push("-password", nugetFeedPassword);
+    yield exec.getExecOutput("nuget", configArgs);
+    return filename;
+  });
+}
+function createNugetConfigViaDotnet(toolDirectory, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Adding nuget feed ${nugetFeedOverride} to dotnet nuget sources`);
+    const filename = path.resolve(toolDirectory, "nuget.config");
+    yield exec.getExecOutput("dotnet", ["new", "nugetconfig", "-o", toolDirectory]);
+    yield exec.getExecOutput("dotnet", ["nuget", "remove", "source", "nuget", "--configfile", filename]);
+    const nugetSourceArgs = ["nuget", "add", "source", nugetFeedOverride, "--name", "pacNugetFeed", "--configfile", filename];
+    nugetFeedUsername && nugetSourceArgs.push("--username", nugetFeedUsername);
+    nugetFeedPassword && nugetSourceArgs.push("--password", nugetFeedPassword);
+    if (os.platform() !== "win32") {
+      nugetSourceArgs.push("--store-password-in-clear-text");
+    }
+    yield exec.getExecOutput("dotnet", nugetSourceArgs);
+    return filename;
   });
 }
 function checkForInstallationTool(toolName) {

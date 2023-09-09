@@ -109,31 +109,28 @@ async function nugetInstall(packageName: string, packageVersion: string, nugetFe
     await checkForInstallationTool('nuget');
 
     const toolpath = await fs.mkdtemp(path.join(os.tmpdir(), 'powerplatform-actions-'));
-    let wroteNugetConfig = false;
+    let nugetConfigFile: string | undefined = undefined;
 
     try {
         if (nugetFeedOverride && nugetFeedOverride !== 'https://api.nuget.org/v3/index.json') {
-            core.info(`Adding nuget feed ${nugetFeedOverride} to nuget sources`);
-
-            await exec.getExecOutput('nuget', ['sources', 'add', '-name', 'pacNugetFeed', '-source', nugetFeedOverride,
-                '-username', nugetFeedUsername, '-password', nugetFeedPassword]);
-
-            wroteNugetConfig = true;
+            nugetConfigFile = await createNugetConfigViaNuget(toolpath, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword);
         }
 
-        await exec.getExecOutput('nuget', ['install', packageName,
+        const installArgs = ['install', packageName,
             '-Version', packageVersion,
             '-DependencyVersion', 'ignore', // There are no dependencies, so don't waste that time checking
             '-NonInteractive',
-            '-OutputDirectory', toolpath]);
+            '-OutputDirectory', toolpath];
+        nugetConfigFile && installArgs.push('-ConfigFile', nugetConfigFile);
+
+        await exec.getExecOutput('nuget', installArgs);
 
         const pacPath = resolve(toolpath, packageName + '.' + packageVersion, 'tools', 'pac.exe');
         core.exportVariable(PacInstalledEnvVarName, 'true');
         core.exportVariable(PacPathEnvVarName, pacPath);
     } finally {
-        if (wroteNugetConfig) {
-            // Clean up the nuget config we wrote
-            await exec.getExecOutput('nuget', ['sources', 'remove', '-name', 'pacNugetFeed']);
+        if (nugetConfigFile) {
+            await fs.rm(nugetConfigFile);
         }
     }
 }
@@ -144,37 +141,62 @@ async function dotnetInstall(packageName: string, packageVersion: string, nugetF
     await checkForInstallationTool('dotnet');
 
     const toolpath = await fs.mkdtemp(path.join(os.tmpdir(), 'powerplatform-actions-'));
-    let wroteNugetConfig = false;
+    let nugetConfigFile: string | undefined = undefined;
 
     try {
         if (nugetFeedOverride && nugetFeedOverride !== 'https://api.nuget.org/v3/index.json') {
-            core.info(`Adding nuget feed ${nugetFeedOverride} to dotnet nuget sources`);
-
-            const nugetSourceArgs = ['nuget', 'add', 'source', nugetFeedOverride, '--name', 'pacNugetFeed' ];
-            nugetFeedUsername && nugetSourceArgs.push('--username', nugetFeedUsername);
-            nugetFeedPassword && nugetSourceArgs.push('--password', nugetFeedPassword);
-            if (os.platform() !== 'win32') {
-                // Encrypted credentials are not supported on Linux or macOS
-                nugetSourceArgs.push('--store-password-in-clear-text');
-            }
-
-            await exec.getExecOutput('dotnet', nugetSourceArgs);
-
-            wroteNugetConfig = true;
+            nugetConfigFile = await createNugetConfigViaDotnet(toolpath, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword);
         }
 
-        await exec.getExecOutput('dotnet',
-            ['tool', 'install', packageName, '--version', packageVersion, '--tool-path', toolpath]);
+        const installArgs = ['tool', 'install', packageName, '--version', packageVersion, '--tool-path', toolpath];
+        nugetConfigFile && installArgs.push('--configfile', nugetConfigFile);
+        await exec.getExecOutput('dotnet', installArgs);
 
         core.exportVariable(PacInstalledEnvVarName, 'true');
         core.exportVariable(PacPathEnvVarName, path.join(toolpath, os.platform() === 'win32' ? 'pac.exe' : 'pac'));
         core.info(`pac installed to ${process.env[PacPathEnvVarName]}`);
     } finally {
-        if (wroteNugetConfig) {
+        if (nugetConfigFile) {
             // Clean up the nuget config we wrote, as Linux and macOS don't support encrypted credentials,
-            await exec.getExecOutput('dotnet', ['nuget', 'remove', 'source', 'pacNugetFeed']);
+            await fs.rm(nugetConfigFile);
         }
     }
+}
+
+async function createNugetConfigViaNuget(toolDirectory: string, nugetFeedOverride: string, nugetFeedUsername: string, nugetFeedPassword: string): Promise<string> {
+    core.info(`Adding nuget feed ${nugetFeedOverride} to nuget sources`);
+
+    const filename = path.resolve(toolDirectory, 'nuget.config');
+    await fs.writeFile(filename, `<?xml version="1.0" encoding="utf-8"?><configuration></configuration>`);
+
+    const configArgs = ['sources', 'add', '-name', 'pacNugetFeed', '-source', nugetFeedOverride, `-ConfigFile`, filename];
+    nugetFeedUsername && configArgs.push('-username', nugetFeedUsername);
+    nugetFeedPassword && configArgs.push('-password', nugetFeedPassword);
+
+    await exec.getExecOutput('nuget', configArgs);
+
+    return filename;
+}
+
+async function createNugetConfigViaDotnet(toolDirectory: string, nugetFeedOverride: string, nugetFeedUsername: string, nugetFeedPassword: string): Promise<string> {
+    core.info(`Adding nuget feed ${nugetFeedOverride} to dotnet nuget sources`);
+
+    const filename = path.resolve(toolDirectory, 'nuget.config');
+    await exec.getExecOutput('dotnet', ['new', 'nugetconfig', '-o', toolDirectory]);
+    await exec.getExecOutput('dotnet', ['nuget', 'remove', 'source', 'nuget', '--configfile', filename]);
+
+    const nugetSourceArgs = ['nuget', 'add', 'source', nugetFeedOverride, '--name', 'pacNugetFeed', '--configfile', filename ];
+    nugetFeedUsername && nugetSourceArgs.push('--username', nugetFeedUsername);
+    nugetFeedPassword && nugetSourceArgs.push('--password', nugetFeedPassword);
+
+    if (os.platform() !== 'win32') {
+        // Encrypted credentials are not supported on Linux or macOS.  Clean up file in Finally block.
+        nugetSourceArgs.push('--store-password-in-clear-text');
+    }
+
+    await exec.getExecOutput('dotnet', nugetSourceArgs);
+
+    return filename;
 }
 
 async function checkForInstallationTool(toolName: string): Promise<void> {
