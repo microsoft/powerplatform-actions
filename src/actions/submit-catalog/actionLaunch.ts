@@ -6,7 +6,7 @@ import { main } from './index';
 
 process.env['INPUT_ENVIRONMENT-URL'] = new URL(process.env['PA_BT_ORG_URL'] ?? 'https://contoso.crm.dynamics.com').href;
 process.env['INPUT_USER-NAME'] = process.env['PA_BT_ORG_USER'] ?? 'ppdevautomation@ppdevtools.onmicrosoft.com';
-// process.env['INPUT_APP-ID'] = process.env['PA_BT_ORG_SPN_ID'] ?? '8a7729e0-2b71-4919-a89a-c789d0a9720a';
+// process.env['INPUT_APP-ID'] = process.env['PA_BT_ORG_SPN_ID'] ?? '8e2da2df-60cc-4aef-8676-71cdb789ddf7';
 // process.env['INPUT_CLIENT-SECRET'] = process.env['PA_BT_ORG_SPNKEY'] ?? "expectSpnKeyFromEnvVariable";
 // process.env['INPUT_TENANT-ID'] = process.env['PA_BT_ORG_SPN_TENANT_ID'] ?? '3041a058-5110-495a-a575-b2a5571d9eac';
 
