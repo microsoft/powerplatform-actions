@@ -279,8 +279,8 @@ var require_createPacRunner = __commonJS({
     var os_1 = require("os");
     var path_1 = require("path");
     var CommandRunner_1 = require_CommandRunner();
-    function createPacRunner({ workingDir, runnersDir, logger, agent }) {
-      return (0, CommandRunner_1.createCommandRunner)(workingDir, (0, os_1.platform)() === "win32" ? (0, path_1.resolve)(runnersDir, "pac", "tools", "pac.exe") : (0, path_1.resolve)(runnersDir, "pac_linux", "tools", "pac"), logger, agent, void 0);
+    function createPacRunner({ workingDir, runnersDir, pacPath, logger, agent }) {
+      return (0, CommandRunner_1.createCommandRunner)(workingDir, pacPath !== null && pacPath !== void 0 ? pacPath : (0, os_1.platform)() === "win32" ? (0, path_1.resolve)(runnersDir, "pac", "tools", "pac.exe") : (0, path_1.resolve)(runnersDir, "pac_linux", "tools", "pac"), logger, agent, void 0);
     }
     exports2.default = createPacRunner;
   }
@@ -10231,6 +10231,7 @@ var require_restoreEnvironment = __commonJS({
           validator.pushInput(pacArgs, "--target-id", parameters.targetEnvironmentId);
           validator.pushInput(pacArgs, "--name", parameters.targetEnvironmentName);
           validator.pushInput(pacArgs, "--skip-audit-data", parameters.skipAuditData);
+          validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTime);
           validator.pushCommon(pacArgs, parameters);
           if (((_a = validator.getInput(parameters.restoreLatestBackup)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             pacArgs.push("--selected-backup", "latest");
@@ -10608,6 +10609,7 @@ var require_copyEnvironment = __commonJS({
           validator.pushInput(pacArgs, "--source-id", parameters.sourceEnvironmentId);
           validator.pushInput(pacArgs, "--target-id", parameters.targetEnvironmentId);
           validator.pushInput(pacArgs, "--skip-audit-data", parameters.skipAuditData);
+          validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTime);
           if (((_a = validator.getInput(parameters.overrideFriendlyName)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--name", parameters.friendlyTargetEnvironmentName);
           }
@@ -24238,7 +24240,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.113",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.116",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
@@ -24253,12 +24255,14 @@ var require_runnerParameters = __commonJS({
   "out/lib/runnerParameters.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
-    var process_1 = require("process");
+    exports2.PacPathEnvVarName = exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
+    var node_process_1 = require("node:process");
     var actionLogger_1 = require_actionLogger();
     var getExePath_1 = require_getExePath();
     var PacInstalledEnvVarName = "POWERPLATFORMTOOLS_PACINSTALLED";
     exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
+    var PacPathEnvVarName = "POWERPLATFORMTOOLS_PACPATH";
+    exports2.PacPathEnvVarName = PacPathEnvVarName;
     function getAutomationAgent() {
       const jsonPackage = require_package();
       const productName = jsonPackage.name.split("/")[1];
@@ -24267,9 +24271,10 @@ var require_runnerParameters = __commonJS({
     exports2.getAutomationAgent = getAutomationAgent;
     var ActionsRunnerParameters = class {
       constructor() {
-        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)();
+        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, node_process_1.cwd)();
         this.logger = new actionLogger_1.ActionLogger();
         this.agent = getAutomationAgent();
+        this.pacPath = process.env[PacPathEnvVarName];
       }
       get runnersDir() {
         if (process.env[PacInstalledEnvVarName] !== "true") {

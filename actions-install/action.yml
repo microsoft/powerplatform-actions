@@ -1,10 +1,27 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 name: 'actions-install'
-description: 'Power Platform Actions Install'
+description: 'Power Platform Actions Install -- Installs the Power Platform CLI (pac) for use in other actions.  Pulls from nuget.org if arguments are not provided.'
 inputs:
+  nuget-feed-override:
+    description: 'Override the nuget feed used to pull the PAC package.  This can be a local folder containing pre-downloaded packages.  Defaults to nuget.org.'
+    required: false
+    # default: 'https://api.nuget.org/v3/index.json'
+
+  nuget-feed-username:
+    description: 'Optional username for feed provided in nuget-feed-override if it requires username + password authentication.'
+    required: false
+
+  nuget-feed-password:
+    description: 'Optional password for feed provided in nuget-feed-override if it requires username + password authentication.  Do NOT check in password, instead create a secret and reference it here with: see: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#using-encrypted-secrets-in-a-workflow'
+    required: false
+
   pac-version-override:
     description: 'Override the version of PAC installed for Actions. Note that this may break other actions if the PAC and Action arguments do not align.'
+    required: false
+
+  use-preinstalled-pac:
+    description: 'Path to a pac.exe (windows) or pac (linux/mac) already installed on the action runner.'
     required: false
 
 runs:

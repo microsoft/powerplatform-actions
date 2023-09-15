@@ -1954,7 +1954,7 @@ var require_path_utils = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.toPlatformPath = exports2.toWin32Path = exports2.toPosixPath = void 0;
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     function toPosixPath(pth) {
       return pth.replace(/[\\]/g, "/");
     }
@@ -1964,7 +1964,7 @@ var require_path_utils = __commonJS({
     }
     exports2.toWin32Path = toWin32Path;
     function toPlatformPath(pth) {
-      return pth.replace(/[/\\]/g, path.sep);
+      return pth.replace(/[/\\]/g, path2.sep);
     }
     exports2.toPlatformPath = toPlatformPath;
   }
@@ -2035,7 +2035,7 @@ var require_core = __commonJS({
     var file_command_1 = require_file_command();
     var utils_1 = require_utils();
     var os2 = __importStar(require("os"));
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var oidc_utils_1 = require_oidc_utils();
     var ExitCode;
     (function(ExitCode2) {
@@ -2063,7 +2063,7 @@ var require_core = __commonJS({
       } else {
         command_1.issueCommand("add-path", {}, inputPath);
       }
-      process.env["PATH"] = `${inputPath}${path.delimiter}${process.env["PATH"]}`;
+      process.env["PATH"] = `${inputPath}${path2.delimiter}${process.env["PATH"]}`;
     }
     exports2.addPath = addPath;
     function getInput(name, options) {
@@ -2262,7 +2262,7 @@ var require_io_util = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.getCmdPath = exports2.tryGetExecutablePath = exports2.isRooted = exports2.isDirectory = exports2.exists = exports2.READONLY = exports2.UV_FS_O_EXLOCK = exports2.IS_WINDOWS = exports2.unlink = exports2.symlink = exports2.stat = exports2.rmdir = exports2.rm = exports2.rename = exports2.readlink = exports2.readdir = exports2.open = exports2.mkdir = exports2.lstat = exports2.copyFile = exports2.chmod = void 0;
     var fs2 = __importStar(require("fs"));
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     _a = fs2.promises, exports2.chmod = _a.chmod, exports2.copyFile = _a.copyFile, exports2.lstat = _a.lstat, exports2.mkdir = _a.mkdir, exports2.open = _a.open, exports2.readdir = _a.readdir, exports2.readlink = _a.readlink, exports2.rename = _a.rename, exports2.rm = _a.rm, exports2.rmdir = _a.rmdir, exports2.stat = _a.stat, exports2.symlink = _a.symlink, exports2.unlink = _a.unlink;
     exports2.IS_WINDOWS = process.platform === "win32";
     exports2.UV_FS_O_EXLOCK = 268435456;
@@ -2311,7 +2311,7 @@ var require_io_util = __commonJS({
         }
         if (stats && stats.isFile()) {
           if (exports2.IS_WINDOWS) {
-            const upperExt = path.extname(filePath).toUpperCase();
+            const upperExt = path2.extname(filePath).toUpperCase();
             if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
               return filePath;
             }
@@ -2335,11 +2335,11 @@ var require_io_util = __commonJS({
           if (stats && stats.isFile()) {
             if (exports2.IS_WINDOWS) {
               try {
-                const directory = path.dirname(filePath);
-                const upperName = path.basename(filePath).toUpperCase();
+                const directory = path2.dirname(filePath);
+                const upperName = path2.basename(filePath).toUpperCase();
                 for (const actualName of yield exports2.readdir(directory)) {
                   if (upperName === actualName.toUpperCase()) {
-                    filePath = path.join(directory, actualName);
+                    filePath = path2.join(directory, actualName);
                     break;
                   }
                 }
@@ -2439,7 +2439,7 @@ var require_io = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.findInPath = exports2.which = exports2.mkdirP = exports2.rmRF = exports2.mv = exports2.cp = void 0;
     var assert_1 = require("assert");
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var ioUtil = __importStar(require_io_util());
     function cp(source, dest, options = {}) {
       return __awaiter2(this, void 0, void 0, function* () {
@@ -2448,7 +2448,7 @@ var require_io = __commonJS({
         if (destStat && destStat.isFile() && !force) {
           return;
         }
-        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path.join(dest, path.basename(source)) : dest;
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path2.join(dest, path2.basename(source)) : dest;
         if (!(yield ioUtil.exists(source))) {
           throw new Error(`no such file or directory: ${source}`);
         }
@@ -2460,7 +2460,7 @@ var require_io = __commonJS({
             yield cpDirRecursive(source, newDest, 0, force);
           }
         } else {
-          if (path.relative(source, newDest) === "") {
+          if (path2.relative(source, newDest) === "") {
             throw new Error(`'${newDest}' and '${source}' are the same file`);
           }
           yield copyFile(source, newDest, force);
@@ -2473,7 +2473,7 @@ var require_io = __commonJS({
         if (yield ioUtil.exists(dest)) {
           let destExists = true;
           if (yield ioUtil.isDirectory(dest)) {
-            dest = path.join(dest, path.basename(source));
+            dest = path2.join(dest, path2.basename(source));
             destExists = yield ioUtil.exists(dest);
           }
           if (destExists) {
@@ -2484,7 +2484,7 @@ var require_io = __commonJS({
             }
           }
         }
-        yield mkdirP(path.dirname(dest));
+        yield mkdirP(path2.dirname(dest));
         yield ioUtil.rename(source, dest);
       });
     }
@@ -2547,7 +2547,7 @@ var require_io = __commonJS({
         }
         const extensions = [];
         if (ioUtil.IS_WINDOWS && process.env["PATHEXT"]) {
-          for (const extension of process.env["PATHEXT"].split(path.delimiter)) {
+          for (const extension of process.env["PATHEXT"].split(path2.delimiter)) {
             if (extension) {
               extensions.push(extension);
             }
@@ -2560,12 +2560,12 @@ var require_io = __commonJS({
           }
           return [];
         }
-        if (tool.includes(path.sep)) {
+        if (tool.includes(path2.sep)) {
           return [];
         }
         const directories = [];
         if (process.env.PATH) {
-          for (const p of process.env.PATH.split(path.delimiter)) {
+          for (const p of process.env.PATH.split(path2.delimiter)) {
             if (p) {
               directories.push(p);
             }
@@ -2573,7 +2573,7 @@ var require_io = __commonJS({
         }
         const matches = [];
         for (const directory of directories) {
-          const filePath = yield ioUtil.tryGetExecutablePath(path.join(directory, tool), extensions);
+          const filePath = yield ioUtil.tryGetExecutablePath(path2.join(directory, tool), extensions);
           if (filePath) {
             matches.push(filePath);
           }
@@ -2694,7 +2694,7 @@ var require_toolrunner = __commonJS({
     var os2 = __importStar(require("os"));
     var events = __importStar(require("events"));
     var child = __importStar(require("child_process"));
-    var path = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var io2 = __importStar(require_io());
     var ioUtil = __importStar(require_io_util());
     var timers_1 = require("timers");
@@ -2909,7 +2909,7 @@ var require_toolrunner = __commonJS({
       exec() {
         return __awaiter2(this, void 0, void 0, function* () {
           if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) {
-            this.toolPath = path.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
+            this.toolPath = path2.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
           }
           this.toolPath = yield io2.which(this.toolPath, true);
           return new Promise((resolve, reject) => __awaiter2(this, void 0, void 0, function* () {
@@ -3231,33 +3231,6 @@ var require_exec = __commonJS({
   }
 });
 
-// out/lib/getExePath.js
-var require_getExePath = __commonJS({
-  "out/lib/getExePath.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var path_1 = require("path");
-    function getExePath(...relativePath) {
-      const currentDirectory = (0, path_1.resolve)(__dirname);
-      const parentDir = (0, path_1.dirname)(currentDirectory);
-      let outDirRoot;
-      switch ((0, path_1.basename)(parentDir)) {
-        case "actions":
-          outDirRoot = (0, path_1.resolve)((0, path_1.dirname)(parentDir));
-          break;
-        case "src":
-        case "out":
-          outDirRoot = (0, path_1.resolve)(parentDir, "..", "out");
-          break;
-        default:
-          throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${path_1.dirname}`);
-      }
-      return (0, path_1.resolve)(outDirRoot, ...relativePath);
-    }
-    exports2.default = getExePath;
-  }
-});
-
 // out/lib/actionLogger.js
 var require_actionLogger = __commonJS({
   "out/lib/actionLogger.js"(exports2) {
@@ -3297,6 +3270,33 @@ var require_pacPackageInfo = __commonJS({
       DotnetToolName: "Microsoft.PowerApps.CLI.Tool",
       PacPackageVersion: "1.26.5"
     };
+  }
+});
+
+// out/lib/getExePath.js
+var require_getExePath = __commonJS({
+  "out/lib/getExePath.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    var path_1 = require("path");
+    function getExePath(...relativePath) {
+      const currentDirectory = (0, path_1.resolve)(__dirname);
+      const parentDir = (0, path_1.dirname)(currentDirectory);
+      let outDirRoot;
+      switch ((0, path_1.basename)(parentDir)) {
+        case "actions":
+          outDirRoot = (0, path_1.resolve)((0, path_1.dirname)(parentDir));
+          break;
+        case "src":
+        case "out":
+          outDirRoot = (0, path_1.resolve)(parentDir, "..", "out");
+          break;
+        default:
+          throw Error(`ExeRunner: cannot resolve outDirRoot running from this location: ${path_1.dirname}`);
+      }
+      return (0, path_1.resolve)(outDirRoot, ...relativePath);
+    }
+    exports2.default = getExePath;
   }
 });
 
@@ -3369,7 +3369,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.113",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.116",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
@@ -3384,12 +3384,14 @@ var require_runnerParameters = __commonJS({
   "out/lib/runnerParameters.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
-    var process_1 = require("process");
+    exports2.PacPathEnvVarName = exports2.PacInstalledEnvVarName = exports2.getAutomationAgent = exports2.runnerParameters = void 0;
+    var node_process_1 = require("node:process");
     var actionLogger_12 = require_actionLogger();
-    var getExePath_12 = require_getExePath();
+    var getExePath_1 = require_getExePath();
     var PacInstalledEnvVarName = "POWERPLATFORMTOOLS_PACINSTALLED";
     exports2.PacInstalledEnvVarName = PacInstalledEnvVarName;
+    var PacPathEnvVarName = "POWERPLATFORMTOOLS_PACPATH";
+    exports2.PacPathEnvVarName = PacPathEnvVarName;
     function getAutomationAgent() {
       const jsonPackage = require_package();
       const productName = jsonPackage.name.split("/")[1];
@@ -3398,15 +3400,16 @@ var require_runnerParameters = __commonJS({
     exports2.getAutomationAgent = getAutomationAgent;
     var ActionsRunnerParameters = class {
       constructor() {
-        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, process_1.cwd)();
+        this.workingDir = process.env["GITHUB_WORKSPACE"] || (0, node_process_1.cwd)();
         this.logger = new actionLogger_12.ActionLogger();
         this.agent = getAutomationAgent();
+        this.pacPath = process.env[PacPathEnvVarName];
       }
       get runnersDir() {
         if (process.env[PacInstalledEnvVarName] !== "true") {
           throw new Error(`PAC is not installed. Please run the actions-install action first.`);
         }
-        return (0, getExePath_12.default)();
+        return (0, getExePath_1.default)();
       }
     };
     var runnerParameters = new ActionsRunnerParameters();
@@ -3450,10 +3453,22 @@ var io = require_io();
 var os = require("node:os");
 var node_path_1 = require("node:path");
 var fs = require("node:fs/promises");
-var getExePath_1 = require_getExePath();
+var path = require("node:path");
 var actionLogger_1 = require_actionLogger();
 var PacInfo = require_pacPackageInfo();
 var runnerParameters_1 = require_runnerParameters();
+var argName = {
+  versionOverride: "pac-version-override",
+  nugetFeedOverride: "nuget-feed-override",
+  nugetFeedUsername: "nuget-feed-username",
+  nugetFeedPassword: "nuget-feed-password",
+  localPacPath: "use-preinstalled-pac"
+};
+var MutuallyExclusiveArgsError = class extends Error {
+  constructor(argument1, argument2) {
+    super(`Cannot specify both ${argument1} and ${argument2}.`);
+  }
+};
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
@@ -3466,64 +3481,143 @@ var runnerParameters_1 = require_runnerParameters();
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
     core.startGroup("actions-install:");
-    const versionArg = core.getInput("pac-version-override", { required: false, trimWhitespace: true });
-    if (versionArg && versionArg !== PacInfo.PacPackageVersion) {
-      core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match with requested version ${versionArg}.`);
+    const args = {
+      versionOverride: core.getInput(argName.versionOverride, { required: false }),
+      nugetFeedOverride: core.getInput(argName.nugetFeedOverride, { required: false }),
+      nugetFeedUsername: core.getInput(argName.nugetFeedUsername, { required: false }),
+      nugetFeedPassword: core.getInput(argName.nugetFeedPassword, { required: false }),
+      localPacPath: core.getInput(argName.localPacPath, { required: false })
+    };
+    args.nugetFeedPassword && core.setSecret(args.nugetFeedPassword);
+    if (args.localPacPath && args.nugetFeedOverride)
+      throw new MutuallyExclusiveArgsError(argName.localPacPath, argName.nugetFeedOverride);
+    if (args.localPacPath && args.versionOverride)
+      throw new MutuallyExclusiveArgsError(argName.localPacPath, argName.versionOverride);
+    if (args.nugetFeedPassword && !args.nugetFeedOverride) {
+      throw new Error(`Do not provide Authentication args (${argName.nugetFeedPassword}) without providing a feed which requires authentication via ${argName.nugetFeedOverride}.`);
     }
-    const packageVersion = versionArg || PacInfo.PacPackageVersion;
-    core.info(`Installing pac ${packageVersion}...`);
+    if (args.nugetFeedPassword && !args.nugetFeedUsername || !args.nugetFeedPassword && args.nugetFeedUsername) {
+      throw new Error(`Cannot specify ${argName.nugetFeedPassword} or ${argName.nugetFeedUsername} without the other.`);
+    }
+    if (args.versionOverride && args.versionOverride !== PacInfo.PacPackageVersion) {
+      core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match with requested version ${args.versionOverride}.`);
+    }
     if (process.env[runnerParameters_1.PacInstalledEnvVarName] === "true") {
       core.warning("PAC is already installed. Skipping installation.");
       core.endGroup();
       return;
     }
-    const runnersDir = (0, getExePath_1.default)();
-    if (os.platform() === "win32") {
-      const installDir = (0, node_path_1.resolve)(runnersDir, "pac");
-      yield nugetInstall(PacInfo.PacPackageName, packageVersion, installDir);
+    const packageVersion = args.versionOverride || PacInfo.PacPackageVersion;
+    if (args.localPacPath) {
+      yield usingPreinstalledPac(args.localPacPath);
+    } else if (os.platform() === "win32") {
+      yield nugetInstall(PacInfo.PacPackageName, packageVersion, args.nugetFeedOverride, args.nugetFeedUsername, args.nugetFeedPassword);
     } else {
-      const installDir = (0, node_path_1.resolve)(runnersDir, "pac_linux", "tools");
-      yield dotnetInstall(PacInfo.DotnetToolName, packageVersion, installDir);
+      yield dotnetInstall(PacInfo.DotnetToolName, packageVersion, args.nugetFeedOverride, args.nugetFeedUsername, args.nugetFeedPassword);
     }
-    core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
     core.endGroup();
   });
 }
 exports.main = main;
-function nugetInstall(packageName, packageVersion, installDir) {
+function usingPreinstalledPac(localPacPath) {
   return __awaiter(this, void 0, void 0, function* () {
-    core.info(`Installing ${packageName}.${packageVersion} via nuget.exe`);
-    core.debug(`Installing to ${installDir}`);
-    const outputDirectory = (0, node_path_1.dirname)(installDir);
-    yield checkForInstallationTool("nuget");
-    yield exec.getExecOutput("nuget", [
-      "install",
-      packageName,
-      "-Version",
-      packageVersion,
-      "-DependencyVersion",
-      "ignore",
-      "-OutputDirectory",
-      outputDirectory
-    ]);
-    const initialInstallDirectory = (0, node_path_1.resolve)(outputDirectory, packageName + "." + packageVersion);
-    core.debug(`Renaming ${initialInstallDirectory} to ${installDir}`);
-    yield fs.rename(initialInstallDirectory, installDir);
+    const absolutePath = path.resolve(localPacPath);
+    core.info(`Using preinstalled pac from ${absolutePath}`);
+    yield fs.access(absolutePath, fs.constants.X_OK).catch(() => {
+      throw new Error(`The path ${absolutePath} does not exist or is not executable.`);
+    });
+    if (os.platform() === "win32" && !absolutePath.endsWith("pac.exe")) {
+      throw new Error(`The path ${absolutePath} does point at the expected 'pac.exe'.`);
+    } else if (os.platform() !== "win32" && !absolutePath.endsWith("pac")) {
+      throw new Error(`The path ${absolutePath} does point at the expected 'pac'.`);
+    }
+    core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
+    core.exportVariable(runnerParameters_1.PacPathEnvVarName, absolutePath);
+    core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match if preinstalled pac is a different version.`);
   });
 }
-function dotnetInstall(packageName, packageVersion, installDir) {
+function nugetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Installing ${packageName}.${packageVersion} via nuget.exe`);
+    yield checkForInstallationTool("nuget");
+    const toolpath = yield fs.mkdtemp(path.join(os.tmpdir(), "powerplatform-actions-"));
+    let nugetConfigFile = void 0;
+    try {
+      if (nugetFeedOverride && nugetFeedOverride !== "https://api.nuget.org/v3/index.json") {
+        nugetConfigFile = yield createNugetConfigViaNuget(toolpath, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword);
+      }
+      const installArgs = [
+        "install",
+        packageName,
+        "-Version",
+        packageVersion,
+        "-DependencyVersion",
+        "ignore",
+        "-NonInteractive",
+        "-OutputDirectory",
+        toolpath
+      ];
+      nugetConfigFile && installArgs.push("-ConfigFile", nugetConfigFile);
+      yield exec.getExecOutput("nuget", installArgs);
+      const pacPath = (0, node_path_1.resolve)(toolpath, packageName + "." + packageVersion, "tools", "pac.exe");
+      core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
+      core.exportVariable(runnerParameters_1.PacPathEnvVarName, pacPath);
+    } finally {
+      if (nugetConfigFile) {
+        yield fs.rm(nugetConfigFile);
+      }
+    }
+  });
+}
+function dotnetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword) {
   return __awaiter(this, void 0, void 0, function* () {
     core.info(`Installing ${packageName}.${packageVersion} via dotnet tool install`);
     yield checkForInstallationTool("dotnet");
-    yield exec.getExecOutput("dotnet", [
-      "tool",
-      "install",
-      packageName,
-      "--version",
-      packageVersion,
-      "--tool-path",
-      installDir
-    ]);
+    const toolpath = yield fs.mkdtemp(path.join(os.tmpdir(), "powerplatform-actions-"));
+    let nugetConfigFile = void 0;
+    try {
+      if (nugetFeedOverride && nugetFeedOverride !== "https://api.nuget.org/v3/index.json") {
+        nugetConfigFile = yield createNugetConfigViaDotnet(toolpath, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword);
+      }
+      const installArgs = ["tool", "install", packageName, "--version", packageVersion, "--tool-path", toolpath];
+      nugetConfigFile && installArgs.push("--configfile", nugetConfigFile);
+      yield exec.getExecOutput("dotnet", installArgs);
+      core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
+      core.exportVariable(runnerParameters_1.PacPathEnvVarName, path.join(toolpath, os.platform() === "win32" ? "pac.exe" : "pac"));
+      core.info(`pac installed to ${process.env[runnerParameters_1.PacPathEnvVarName]}`);
+    } finally {
+      if (nugetConfigFile) {
+        yield fs.rm(nugetConfigFile);
+      }
+    }
+  });
+}
+function createNugetConfigViaNuget(toolDirectory, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Adding nuget feed ${nugetFeedOverride} to nuget sources`);
+    const filename = path.resolve(toolDirectory, "nuget.config");
+    yield fs.writeFile(filename, `<?xml version="1.0" encoding="utf-8"?><configuration></configuration>`);
+    const configArgs = ["sources", "add", "-name", "pacNugetFeed", "-source", nugetFeedOverride, `-ConfigFile`, filename];
+    nugetFeedUsername && configArgs.push("-username", nugetFeedUsername);
+    nugetFeedPassword && configArgs.push("-password", nugetFeedPassword);
+    yield exec.getExecOutput("nuget", configArgs);
+    return filename;
+  });
+}
+function createNugetConfigViaDotnet(toolDirectory, nugetFeedOverride, nugetFeedUsername, nugetFeedPassword) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info(`Adding nuget feed ${nugetFeedOverride} to dotnet nuget sources`);
+    const filename = path.resolve(toolDirectory, "nuget.config");
+    yield exec.getExecOutput("dotnet", ["new", "nugetconfig", "-o", toolDirectory]);
+    yield exec.getExecOutput("dotnet", ["nuget", "remove", "source", "nuget", "--configfile", filename]);
+    const nugetSourceArgs = ["nuget", "add", "source", nugetFeedOverride, "--name", "pacNugetFeed", "--configfile", filename];
+    nugetFeedUsername && nugetSourceArgs.push("--username", nugetFeedUsername);
+    nugetFeedPassword && nugetSourceArgs.push("--password", nugetFeedPassword);
+    if (os.platform() !== "win32") {
+      nugetSourceArgs.push("--store-password-in-clear-text");
+    }
+    yield exec.getExecOutput("dotnet", nugetSourceArgs);
+    return filename;
   });
 }
 function checkForInstallationTool(toolName) {

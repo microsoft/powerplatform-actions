@@ -1,9 +1,10 @@
 import { Logger, RunnerParameters } from "@microsoft/powerplatform-cli-wrapper";
-import { cwd } from "process";
+import { cwd } from "node:process";
 import { ActionLogger } from "./actionLogger";
 import getExePath from "./getExePath";
 
 const PacInstalledEnvVarName = 'POWERPLATFORMTOOLS_PACINSTALLED';
+const PacPathEnvVarName = 'POWERPLATFORMTOOLS_PACPATH';
 
 function getAutomationAgent(): string {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -16,6 +17,7 @@ class ActionsRunnerParameters implements RunnerParameters {
     workingDir: string = process.env['GITHUB_WORKSPACE'] || cwd();
     logger: Logger = new ActionLogger();
     agent: string = getAutomationAgent();
+    pacPath?: string = process.env[PacPathEnvVarName];
 
     public get runnersDir(): string {
         if (process.env[PacInstalledEnvVarName] !== 'true') {
@@ -28,4 +30,4 @@ class ActionsRunnerParameters implements RunnerParameters {
 
 const runnerParameters: RunnerParameters = new ActionsRunnerParameters();
 
-export { runnerParameters, getAutomationAgent, PacInstalledEnvVarName };
+export { runnerParameters, getAutomationAgent, PacInstalledEnvVarName, PacPathEnvVarName };
