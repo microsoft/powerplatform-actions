@@ -27,7 +27,7 @@ jobs:
     env:
       RUNNER_DEBUG: 1
       WF_USERNAME: ppdevautomation@ppdevtools.onmicrosoft.com
-      WF_APPID: 8e2da2df-60cc-4aef-8676-71cdb789ddf7
+      WF_APPID: ddb0fc45-d55c-4fd6-af4a-152359bb4ebd
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
       PORTAL_WORKING_DIRECTORY: ./paportal-download
       PORTAL_MANIFEST_FILE_PATH: ./starter-portal/.portalconfig/*-manifest.yml
@@ -119,7 +119,7 @@ jobs:
     env:
       RUNNER_DEBUG: 1
       WF_USERNAME: ppdevautomation@ppdevtools.onmicrosoft.com
-      WF_APPID: 8e2da2df-60cc-4aef-8676-71cdb789ddf7
+      WF_APPID: ddb0fc45-d55c-4fd6-af4a-152359bb4ebd
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
       PORTAL_WORKING_DIRECTORY: ./paportal-download
       PORTAL_MANIFEST_FILE_PATH: ./starter-portal/.portalconfig/*-manifest.yml
