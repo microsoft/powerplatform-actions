@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@types/async": "^3.2.20",
-    "@types/chai": "^4.3.5",
+    "@types/chai": "^4.3.6",
     "@types/fancy-log": "^2.0.0",
     "@types/fs-extra": "^11.0.1",
     "@types/glob": "^8.1.0",
@@ -33,7 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.62.0",
     "async": "^3.2.4",
-    "chai": "^4.3.7",
+    "chai": "^4.3.8",
     "dotenv": "^16.3.1",
     "esbuild": "^0.19.3",
     "eslint": "^8.49.0",
