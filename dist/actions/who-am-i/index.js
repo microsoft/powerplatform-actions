@@ -6617,8 +6617,6 @@ var require_processor = __commonJS({
           let changed = false;
           while (typeof (p = pattern.pattern()) === "string" && (rest = pattern.rest())) {
             const c = t.resolve(p);
-            if (c.isUnknown() && p !== "..")
-              break;
             t = c;
             pattern = rest;
             changed = true;
@@ -6631,12 +6629,8 @@ var require_processor = __commonJS({
             this.hasWalkedCache.storeWalked(t, pattern);
           }
           if (typeof p === "string") {
-            if (!rest) {
-              const ifDir = p === ".." || p === "" || p === ".";
-              this.matches.add(t.resolve(p), absolute, ifDir);
-            } else {
-              this.subwalks.add(t, pattern);
-            }
+            const ifDir = p === ".." || p === "" || p === ".";
+            this.matches.add(t.resolve(p), absolute, ifDir);
             continue;
           } else if (p === minimatch_1.GLOBSTAR) {
             if (!t.isSymbolicLink() || this.follow || pattern.checkFollowGlobstar()) {
@@ -14222,10 +14216,10 @@ var require_package = __commonJS({
         async: "^3.2.4",
         chai: "^4.3.7",
         dotenv: "^16.3.1",
-        esbuild: "^0.18.11",
-        eslint: "^8.44.0",
+        esbuild: "^0.19.3",
+        eslint: "^8.49.0",
         "fancy-log": "^2.0.0",
-        glob: "^10.3.1",
+        glob: "^10.3.4",
         "glob-parent": "^6.0.2",
         gulp: "^4.0.2",
         "gulp-eslint-new": "^1.8.3",
@@ -14233,7 +14227,7 @@ var require_package = __commonJS({
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^10.2.0",
-        "node-fetch": "^3.3.1",
+        "node-fetch": "^3.3.2",
         postcss: "^8.4.28",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
