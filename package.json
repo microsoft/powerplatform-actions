@@ -47,7 +47,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "mocha": "^10.2.0",
     "node-fetch": "^3.3.2",
-    "postcss": "^8.4.28",
+    "postcss": "^8.4.31",
     "ps-list": "^8.1.1",
     "rewiremock": "^3.14.5",
     "sinon": "^15.2.0",
