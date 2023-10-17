@@ -38,7 +38,7 @@
     "esbuild": "^0.19.3",
     "eslint": "^8.49.0",
     "fancy-log": "^2.0.0",
-    "glob": "^10.3.4",
+    "glob": "^10.3.10",
     "glob-parent": "^6.0.2",
     "gulp": "^4.0.2",
     "gulp-eslint-new": "^1.8.3",
