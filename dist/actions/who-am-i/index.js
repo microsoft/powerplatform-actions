@@ -503,7 +503,7 @@ var require_importSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var path = require("path");
     function importSolution(parameters, runnerParameters, host) {
-      var _a;
+      var _a, _b, _c;
       return __awaiter2(this, void 0, void 0, function* () {
         function resolveFolder(folder) {
           if (!folder || typeof folder !== "string")
@@ -519,8 +519,6 @@ var require_importSolution = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--path", parameters.path, resolveFolder);
           validator.pushInput(pacArgs, "--async", parameters.async);
-          validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
-          validator.pushInput(pacArgs, "--stage-and-upgrade", parameters.stageAndUpgrade);
           validator.pushInput(pacArgs, "--force-overwrite", parameters.forceOverwrite);
           validator.pushInput(pacArgs, "--publish-changes", parameters.publishChanges);
           validator.pushInput(pacArgs, "--skip-dependency-check", parameters.skipDependencyCheck);
@@ -528,7 +526,13 @@ var require_importSolution = __commonJS({
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
           validator.pushInput(pacArgs, "--activate-plugins", parameters.activatePlugins);
           validator.pushInput(pacArgs, "--skip-lower-version", parameters.skipLowerVersion);
-          if (((_a = validator.getInput(parameters.useDeploymentSettingsFile)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
+          if (((_a = validator.getInput(parameters.importAsHolding)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
+            validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
+          }
+          if (((_b = validator.getInput(parameters.stageAndUpgrade)) === null || _b === void 0 ? void 0 : _b.toLowerCase()) === "true") {
+            validator.pushInput(pacArgs, "--stage-and-upgrade", parameters.stageAndUpgrade);
+          }
+          if (((_c = validator.getInput(parameters.useDeploymentSettingsFile)) === null || _c === void 0 ? void 0 : _c.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--settings-file", parameters.deploymentSettingsFile);
           }
           validator.pushCommon(pacArgs, parameters);
@@ -14252,7 +14256,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.117",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.118",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
