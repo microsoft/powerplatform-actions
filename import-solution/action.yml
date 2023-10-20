@@ -56,6 +56,11 @@ inputs:
     required: false
     default: 'false'
 
+  stage-and-upgrade:
+    description: 'Import the managed solution and immediately apply it as an upgrade.'
+    required: false
+    default: 'false'
+
   publish-changes:
     description: 'Publish your changes upon a successful import.'
     required: false

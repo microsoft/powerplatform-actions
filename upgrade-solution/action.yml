@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 name: 'upgrade-solution'
-description: 'Power Platform Upgrade Solution'
+description: 'Power Platform Upgrade Solution - Apply a pending upgrade for solution imported as holding.'
 inputs:
   environment-url:
     description: 'URL of Power Platform environment to connect with; e.g. "https://test-env.crm.dynamics.com"'

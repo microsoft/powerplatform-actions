@@ -28,6 +28,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         async: parameterMap['run-asynchronously'],
         maxAsyncWaitTimeInMin: parameterMap['max-async-wait-time'],
         importAsHolding: parameterMap['import-as-holding'],
+        stageAndUpgrade: parameterMap['stage-and-upgrade'],
         forceOverwrite: parameterMap['force-overwrite'],
         publishChanges: parameterMap['publish-changes'],
         skipDependencyCheck: parameterMap['skip-dependency-check'],

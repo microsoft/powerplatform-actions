@@ -2669,7 +2669,7 @@ var require_importSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var path = require("path");
     function importSolution(parameters, runnerParameters, host) {
-      var _a;
+      var _a, _b, _c;
       return __awaiter2(this, void 0, void 0, function* () {
         function resolveFolder(folder) {
           if (!folder || typeof folder !== "string")
@@ -2685,7 +2685,6 @@ var require_importSolution = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--path", parameters.path, resolveFolder);
           validator.pushInput(pacArgs, "--async", parameters.async);
-          validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
           validator.pushInput(pacArgs, "--force-overwrite", parameters.forceOverwrite);
           validator.pushInput(pacArgs, "--publish-changes", parameters.publishChanges);
           validator.pushInput(pacArgs, "--skip-dependency-check", parameters.skipDependencyCheck);
@@ -2693,7 +2692,13 @@ var require_importSolution = __commonJS({
           validator.pushInput(pacArgs, "--max-async-wait-time", parameters.maxAsyncWaitTimeInMin);
           validator.pushInput(pacArgs, "--activate-plugins", parameters.activatePlugins);
           validator.pushInput(pacArgs, "--skip-lower-version", parameters.skipLowerVersion);
-          if (((_a = validator.getInput(parameters.useDeploymentSettingsFile)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
+          if (((_a = validator.getInput(parameters.importAsHolding)) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "true") {
+            validator.pushInput(pacArgs, "--import-as-holding", parameters.importAsHolding);
+          }
+          if (((_b = validator.getInput(parameters.stageAndUpgrade)) === null || _b === void 0 ? void 0 : _b.toLowerCase()) === "true") {
+            validator.pushInput(pacArgs, "--stage-and-upgrade", parameters.stageAndUpgrade);
+          }
+          if (((_c = validator.getInput(parameters.useDeploymentSettingsFile)) === null || _c === void 0 ? void 0 : _c.toLowerCase()) === "true") {
             validator.pushInput(pacArgs, "--settings-file", parameters.deploymentSettingsFile);
           }
           validator.pushCommon(pacArgs, parameters);
@@ -8412,9 +8417,9 @@ var require_cjs4 = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/pattern.js
+// node_modules/glob/dist/commonjs/pattern.js
 var require_pattern = __commonJS({
-  "node_modules/glob/dist/cjs/src/pattern.js"(exports2) {
+  "node_modules/glob/dist/commonjs/pattern.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Pattern = void 0;
@@ -8586,9 +8591,9 @@ var require_pattern = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/ignore.js
+// node_modules/glob/dist/commonjs/ignore.js
 var require_ignore = __commonJS({
-  "node_modules/glob/dist/cjs/src/ignore.js"(exports2) {
+  "node_modules/glob/dist/commonjs/ignore.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Ignore = void 0;
@@ -8621,6 +8626,9 @@ var require_ignore = __commonJS({
           for (let i = 0; i < mm.set.length; i++) {
             const parsed = mm.set[i];
             const globParts = mm.globParts[i];
+            if (!parsed || !globParts) {
+              throw new Error("invalid pattern object");
+            }
             const p = new pattern_js_1.Pattern(parsed, globParts, 0, platform);
             const m = new minimatch_1.Minimatch(p.globString(), mmopts);
             const children = globParts[globParts.length - 1] === "**";
@@ -8662,7 +8670,7 @@ var require_ignore = __commonJS({
         }
         for (const m of this.absoluteChildren) {
           if (m.match(fullpath))
-            true;
+            return true;
         }
         return false;
       }
@@ -8671,9 +8679,9 @@ var require_ignore = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/processor.js
+// node_modules/glob/dist/commonjs/processor.js
 var require_processor = __commonJS({
-  "node_modules/glob/dist/cjs/src/processor.js"(exports2) {
+  "node_modules/glob/dist/commonjs/processor.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Processor = exports2.SubWalks = exports2.MatchRecord = exports2.HasWalkedCache = void 0;
@@ -8904,9 +8912,9 @@ var require_processor = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/walker.js
+// node_modules/glob/dist/commonjs/walker.js
 var require_walker = __commonJS({
-  "node_modules/glob/dist/cjs/src/walker.js"(exports2) {
+  "node_modules/glob/dist/commonjs/walker.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GlobStream = exports2.GlobWalker = exports2.GlobUtil = void 0;
@@ -9221,9 +9229,9 @@ var require_walker = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/glob.js
+// node_modules/glob/dist/commonjs/glob.js
 var require_glob = __commonJS({
-  "node_modules/glob/dist/cjs/src/glob.js"(exports2) {
+  "node_modules/glob/dist/commonjs/glob.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Glob = void 0;
@@ -9361,7 +9369,10 @@ var require_glob = __commonJS({
           return set;
         }, [[], []]);
         this.patterns = matchSet.map((set, i) => {
-          return new pattern_js_1.Pattern(set, globParts[i], 0, this.platform);
+          const g = globParts[i];
+          if (!g)
+            throw new Error("invalid pattern object");
+          return new pattern_js_1.Pattern(set, g, 0, this.platform);
         });
       }
       async walk() {
@@ -9425,9 +9436,9 @@ var require_glob = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/has-magic.js
+// node_modules/glob/dist/commonjs/has-magic.js
 var require_has_magic = __commonJS({
-  "node_modules/glob/dist/cjs/src/has-magic.js"(exports2) {
+  "node_modules/glob/dist/commonjs/has-magic.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.hasMagic = void 0;
@@ -9446,9 +9457,9 @@ var require_has_magic = __commonJS({
   }
 });
 
-// node_modules/glob/dist/cjs/src/index.js
-var require_src = __commonJS({
-  "node_modules/glob/dist/cjs/src/index.js"(exports2) {
+// node_modules/glob/dist/commonjs/index.js
+var require_commonjs = __commonJS({
+  "node_modules/glob/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.glob = exports2.hasMagic = exports2.Glob = exports2.unescape = exports2.escape = exports2.sync = exports2.iterate = exports2.iterateSync = exports2.stream = exports2.streamSync = exports2.globIterate = exports2.globIterateSync = exports2.globSync = exports2.globStream = exports2.globStreamSync = void 0;
@@ -11940,7 +11951,7 @@ var require_checkSolution = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkSolution = void 0;
-    var glob = require_src();
+    var glob = require_commonjs();
     var os = require("os");
     var path = require("path");
     var InputValidator_1 = require_InputValidator();
@@ -24205,7 +24216,7 @@ var require_package = __commonJS({
         "@types/fancy-log": "^2.0.0",
         "@types/fs-extra": "^11.0.1",
         "@types/glob": "^8.1.0",
-        "@types/js-yaml": "^4.0.3",
+        "@types/js-yaml": "^4.0.7",
         "@types/mocha": "^10.0.1",
         "@types/node": "^20.4.8",
         "@types/sinon": "^10.0.15",
@@ -24230,7 +24241,7 @@ var require_package = __commonJS({
         "gulp-typescript": "^6.0.0-alpha.1",
         mocha: "^10.2.0",
         "node-fetch": "^3.3.2",
-        postcss: "^8.4.28",
+        postcss: "^8.4.31",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
         sinon: "^15.2.0",
@@ -24247,7 +24258,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.116",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.118",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
