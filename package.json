@@ -17,7 +17,7 @@
     "url": "https://github.com/microsoft/powerplatform-actions.git"
   },
   "devDependencies": {
-    "@types/async": "^3.2.20",
+    "@types/async": "^3.2.22",
     "@types/chai": "^4.3.5",
     "@types/fancy-log": "^2.0.0",
     "@types/fs-extra": "^11.0.1",
