@@ -42,6 +42,7 @@ describe("import-solution tests", () => {
             async: { name: 'run-asynchronously', required: false, defaultValue: 'false' },
             maxAsyncWaitTimeInMin: { name: 'max-async-wait-time', required: false, defaultValue: '60' },
             importAsHolding: { name: 'import-as-holding', required: false, defaultValue: 'false' },
+            stageAndUpgrade: { name: 'stage-and-upgrade', required: false, defaultValue: 'false' },
             forceOverwrite: { name: 'force-overwrite', required: false, defaultValue: 'true' },
             publishChanges: { name: 'publish-changes', required: false, defaultValue: 'false' },
             skipDependencyCheck: { name: 'skip-dependency-check', required: false, defaultValue: 'false' },
