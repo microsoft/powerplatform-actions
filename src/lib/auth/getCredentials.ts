@@ -1,10 +1,12 @@
 import { getInput as coreGetInput } from "@actions/core";
 import {
     ClientCredentials,
+    FederatedCredentials,
     UsernamePassword,
+    AuthCredentials
 } from "@microsoft/powerplatform-cli-wrapper";
 
-export default function getCredentials(): UsernamePassword | ClientCredentials {
+export default function getCredentials(): AuthCredentials {
     const usernamePassword: UsernamePassword = {
         username: getInput("user-name"),
         password: getInput("password-secret"),
@@ -23,6 +25,15 @@ export default function getCredentials(): UsernamePassword | ClientCredentials {
     };
     const isCcValid = isClientCredentialsValid(clientCredentials);
 
+    const federatedCredentials: FederatedCredentials = {
+        tenantId: getInput("tenant-id"),
+        appId: getInput("app-id"),
+        cloudInstance: getInput("cloud"),
+        federationProvider: "GitHub",
+        scheme: 'WorkloadIdentityFederation'
+    }
+    const isFcValid = isFederatedCredentialsValid(federatedCredentials);
+
     if (isUpValid && isCcValid) {
         throw new Error(
             "Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow."
@@ -33,6 +44,9 @@ export default function getCredentials(): UsernamePassword | ClientCredentials {
     }
     if (isCcValid) {
         return clientCredentials;
+    }
+    if (isFcValid) {
+        return federatedCredentials;
     }
     throw new Error(
         "Must provide either username/password or app-id/client-secret/tenant-id for authentication!"
@@ -53,4 +67,8 @@ function isClientCredentialsValid(clientCredentials: ClientCredentials) {
         !!clientCredentials.clientSecret &&
         !!clientCredentials.tenantId
     );
+}
+
+function isFederatedCredentialsValid(federatedCredentials: FederatedCredentials) {
+    return !!federatedCredentials.appId && !!federatedCredentials.tenantId;
 }
