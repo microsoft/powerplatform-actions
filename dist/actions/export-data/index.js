@@ -131,10 +131,28 @@ var require_authenticate = __commonJS({
       return ["--url", url];
     }
     function addCredentials(credentials) {
-      return isUsernamePassword(credentials) ? addUsernamePassword(credentials) : addClientCredentials(credentials);
+      if (isUsernamePassword(credentials)) {
+        return addUsernamePassword(credentials);
+      } else if (isFederatedCredentials(credentials)) {
+        return addFederatedCredentials(credentials);
+      } else {
+        return addClientCredentials(credentials);
+      }
     }
     function isUsernamePassword(credentials) {
       return "username" in credentials;
+    }
+    function isFederatedCredentials(credentials) {
+      return "federationProvider" in credentials;
+    }
+    function addFederatedCredentials(parameters) {
+      return [
+        "--applicationId",
+        parameters.appId,
+        "--tenant",
+        parameters.tenantId,
+        parameters.federationProvider == "AzureDevOps" ? "--azureDevOpsFederated" : "--githubFederated"
+      ];
     }
     function addClientCredentials(parameters) {
       if (parameters.scheme == "ManagedServiceIdentity") {
@@ -324,8 +342,8 @@ var require_exportSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var path = require("path");
     function exportSolution(parameters, runnerParameters, host) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         function resolveFolder(folder) {
           if (!folder || typeof folder !== "string")
             return void 0;
@@ -435,8 +453,8 @@ var require_whoAmI = __commonJS({
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function whoAmI(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
@@ -503,8 +521,8 @@ var require_importSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var path = require("path");
     function importSolution(parameters, runnerParameters, host) {
-      var _a, _b, _c;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a, _b, _c;
         function resolveFolder(folder) {
           if (!folder || typeof folder !== "string")
             return void 0;
@@ -9793,8 +9811,8 @@ var require_checkSolution = __commonJS({
     var authenticate_1 = require_authenticate();
     var fs_extra_1 = require_lib();
     function checkSolution(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         const validator = new InputValidator_1.InputValidator(host);
@@ -10219,8 +10237,8 @@ var require_restoreEnvironment = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var createEnvironment_1 = require_createEnvironment();
     function restoreEnvironment(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
@@ -10452,8 +10470,8 @@ var require_unpackSolution = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var solutionPackagingBase_1 = require_solutionPackagingBase();
     function unpackSolution(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
@@ -10519,8 +10537,8 @@ var require_resetEnvironment = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var createEnvironment_1 = require_createEnvironment();
     function resetEnvironment(parameters, runnerParameters, host) {
-      var _a, _b;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a, _b;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
@@ -10598,8 +10616,8 @@ var require_copyEnvironment = __commonJS({
     var createPacRunner_1 = require_createPacRunner();
     var createEnvironment_1 = require_createEnvironment();
     function copyEnvironment(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         try {
@@ -11133,8 +11151,8 @@ var require_addSolutionComponent = __commonJS({
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     function addSolutionComponent(parameters, runnerParameters, host) {
-      var _a;
       return __awaiter2(this, void 0, void 0, function* () {
+        var _a;
         const logger = runnerParameters.logger;
         const pac = (0, createPacRunner_1.default)(runnerParameters);
         const pacArgs = ["solution", "add-solution-component"];
@@ -24108,6 +24126,14 @@ var require_getCredentials = __commonJS({
         // no MgtIdentity support for Actions yet
       };
       const isCcValid = isClientCredentialsValid(clientCredentials);
+      const federatedCredentials = {
+        tenantId: getInput("tenant-id"),
+        appId: getInput("app-id"),
+        cloudInstance: getInput("cloud"),
+        federationProvider: "GitHub",
+        scheme: "WorkloadIdentityFederation"
+      };
+      const isFcValid = isFederatedCredentialsValid(federatedCredentials);
       if (isUpValid && isCcValid) {
         throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
       }
@@ -24116,6 +24142,9 @@ var require_getCredentials = __commonJS({
       }
       if (isCcValid) {
         return clientCredentials;
+      }
+      if (isFcValid) {
+        return federatedCredentials;
       }
       throw new Error("Must provide either username/password or app-id/client-secret/tenant-id for authentication!");
     }
@@ -24128,6 +24157,9 @@ var require_getCredentials = __commonJS({
     }
     function isClientCredentialsValid(clientCredentials) {
       return !!clientCredentials.appId && !!clientCredentials.clientSecret && !!clientCredentials.tenantId;
+    }
+    function isFederatedCredentialsValid(federatedCredentials) {
+      return !!federatedCredentials.appId && !!federatedCredentials.tenantId;
     }
   }
 });
@@ -24211,8 +24243,8 @@ var require_package = __commonJS({
         url: "https://github.com/microsoft/powerplatform-actions.git"
       },
       devDependencies: {
-        "@types/async": "^3.2.20",
-        "@types/chai": "^4.3.5",
+        "@types/async": "^3.2.24",
+        "@types/chai": "^4.3.6",
         "@types/fancy-log": "^2.0.0",
         "@types/fs-extra": "^11.0.1",
         "@types/glob": "^8.1.0",
@@ -24224,10 +24256,10 @@ var require_package = __commonJS({
         "@types/unzip-stream": "^0.3.1",
         "@types/uuid": "^9.0.2",
         "@types/yargs": "^17.0.24",
-        "@typescript-eslint/eslint-plugin": "^5.61.0",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
         "@typescript-eslint/parser": "^5.62.0",
-        async: "^3.2.4",
-        chai: "^4.3.7",
+        async: "^3.2.5",
+        chai: "^4.3.8",
         dotenv: "^16.3.1",
         esbuild: "^0.19.3",
         eslint: "^8.49.0",
@@ -24258,7 +24290,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.0",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.118",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.119",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
