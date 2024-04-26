@@ -17040,8 +17040,8 @@ var require_getCredentials = __commonJS({
         scheme: "WorkloadIdentityFederation"
       };
       const isFcValid = isFederatedCredentialsValid(federatedCredentials);
-      if (isUpValid && isCcValid) {
-        throw new Error("Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow.");
+      if (isUpValid && (isCcValid || isFcValid)) {
+        throw new Error("Too many authentication parameters specified. Must pick either username/password, app-id/tenant-id with Federation Credentials, or app-id/client-secret/tenant-id for the authentication flow.");
       }
       if (isUpValid) {
         return usernamePassword;

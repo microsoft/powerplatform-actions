@@ -34,9 +34,9 @@ export default function getCredentials(): AuthCredentials {
     }
     const isFcValid = isFederatedCredentialsValid(federatedCredentials);
 
-    if (isUpValid && isCcValid) {
+    if (isUpValid && (isCcValid || isFcValid)) {
         throw new Error(
-            "Too many authentication parameters specified. Must pick either username/password or app-id/client-secret/tenant-id for the authentication flow."
+            "Too many authentication parameters specified. Must pick either username/password, app-id/tenant-id with Federation Credentials, or app-id/client-secret/tenant-id for the authentication flow."
         );
     }
     if (isUpValid) {
