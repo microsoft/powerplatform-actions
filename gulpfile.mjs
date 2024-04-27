@@ -228,12 +228,12 @@ async function nugetInstallPortalPackages() {
 }
 
 async function nugetInstallLinux() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', PacInfo.LegacyLinuxPackage, PacInfo.PacPackageVersion, path.resolve(outdir, 'pac_linux'));
+    await nugetInstall('nuget.org', PacInfo.LegacyLinuxPackage, PacInfo.PacPackageVersion, path.resolve(outdir, 'pac_linux'));
     await setExecuteFlag(path.resolve(outdir, 'pac_linux', 'tools', 'pac'));
 }
 
 async function nugetInstallWindows() {
-    await nugetInstall('CAP_ISVExp_Tools_Stable', PacInfo.PacPackageName, PacInfo.PacPackageVersion, path.resolve(outdir, 'pac'));
+    await nugetInstall('nuget.org', PacInfo.PacPackageName, PacInfo.PacPackageVersion, path.resolve(outdir, 'pac'));
 }
 
 async function restore() {
