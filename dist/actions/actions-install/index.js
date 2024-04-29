@@ -1595,7 +1595,7 @@ var require_oidc_utils = __commonJS({
  
         Error Code : ${error.statusCode}
  
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
           if (!id_token) {
@@ -3366,10 +3366,10 @@ var require_package = __commonJS({
       },
       dependencies: {
         "@actions/artifact": "^1.1.1",
-        "@actions/core": "^1.10.0",
+        "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.119",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.120",
         "date-fns": "^2.30.0",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1",
