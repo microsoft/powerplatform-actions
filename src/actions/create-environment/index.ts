@@ -32,6 +32,7 @@ export async function main(): Promise<void> {
         templates: parameterMap['templates'],
         domainName: parameterMap['domain'],
         teamId: parameterMap['team-id'],
+        securityGroupId: parameterMap['security-group-id'],
         logToConsole: false,
     }, runnerParameters, new ActionsHost());
 

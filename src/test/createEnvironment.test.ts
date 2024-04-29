@@ -48,6 +48,7 @@ describe("create-environment tests", () => {
             templates: { name: 'templates', required: false, defaultValue: undefined },
             domainName: { name: 'domain', required: false, defaultValue: undefined },
             teamId: {name:'team-id', required: false, defaultValue: undefined},
+            securityGroupId: {name:'security-group-id', required: false, defaultValue: undefined},
             logToConsole: false,
         }, runnerParameters, new ActionsHost());
     });
