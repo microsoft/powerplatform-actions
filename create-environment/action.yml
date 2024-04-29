@@ -64,6 +64,10 @@ inputs:
     description: 'The ID of the Microsoft Teams team to create the Power Apps environment in.'
     required: false
 
+  security-group-id:
+    description: 'Microsoft Entra ID Security Group ID to use when creating the environment.'
+    required: false
+
 outputs:
   environment-url:
     description: 'URL of the freshly created environment'
