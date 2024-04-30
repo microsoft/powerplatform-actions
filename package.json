@@ -22,7 +22,7 @@
     "@types/fancy-log": "^2.0.2",
     "@types/fs-extra": "^11.0.4",
     "@types/glob": "^8.1.0",
-    "@types/js-yaml": "^4.0.7",
+    "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.12.7",
     "@types/sinon": "^10.0.15",
