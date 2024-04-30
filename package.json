@@ -27,7 +27,7 @@
     "@types/node": "^20.12.7",
     "@types/sinon": "^10.0.15",
     "@types/sinon-chai": "^3.2.9",
-    "@types/unzip-stream": "^0.3.1",
+    "@types/unzip-stream": "^0.3.4",
     "@types/uuid": "^9.0.2",
     "@types/yargs": "^17.0.32",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -55,7 +55,7 @@
     "ts-node": "^10.9.2",
     "ts-sinon": "^2.0.1",
     "typescript": "^5.1.6",
-    "unzip-stream": "^0.3.1",
+    "unzip-stream": "^0.3.4",
     "winston": "^3.13.0",
     "yargs": "^17.7.2"
   },
