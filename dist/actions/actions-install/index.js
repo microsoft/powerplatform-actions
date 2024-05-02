@@ -1595,7 +1595,7 @@ var require_oidc_utils = __commonJS({
  
         Error Code : ${error.statusCode}
  
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
           if (!id_token) {
@@ -3324,56 +3324,56 @@ var require_package = __commonJS({
       devDependencies: {
         "@types/async": "^3.2.24",
         "@types/chai": "^4.3.6",
-        "@types/fancy-log": "^2.0.0",
-        "@types/fs-extra": "^11.0.1",
+        "@types/fancy-log": "^2.0.2",
+        "@types/fs-extra": "^11.0.4",
         "@types/glob": "^8.1.0",
-        "@types/js-yaml": "^4.0.7",
-        "@types/mocha": "^10.0.1",
-        "@types/node": "^20.4.8",
+        "@types/js-yaml": "^4.0.9",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^20.12.7",
         "@types/sinon": "^10.0.15",
-        "@types/sinon-chai": "^3.2.9",
-        "@types/unzip-stream": "^0.3.1",
-        "@types/uuid": "^9.0.2",
-        "@types/yargs": "^17.0.24",
+        "@types/sinon-chai": "^3.2.12",
+        "@types/unzip-stream": "^0.3.4",
+        "@types/uuid": "^9.0.8",
+        "@types/yargs": "^17.0.32",
         "@typescript-eslint/eslint-plugin": "^5.62.0",
         "@typescript-eslint/parser": "^5.62.0",
         async: "^3.2.5",
-        chai: "^4.3.8",
-        dotenv: "^16.3.1",
-        esbuild: "^0.19.3",
+        chai: "^4.4.1",
+        dotenv: "^16.4.5",
+        esbuild: "^0.20.2",
         eslint: "^8.49.0",
         "fancy-log": "^2.0.0",
-        glob: "^10.3.4",
+        glob: "^10.3.12",
         "glob-parent": "^6.0.2",
-        gulp: "^4.0.2",
-        "gulp-eslint-new": "^1.8.3",
+        gulp: "^5.0.0",
+        "gulp-eslint-new": "^2.0.0",
         "gulp-mocha": "^8.0.0",
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^6.0.0-alpha.1",
-        mocha: "^10.2.0",
+        mocha: "^10.4.0",
         "node-fetch": "^3.3.2",
-        postcss: "^8.4.31",
+        postcss: "^8.4.38",
         "ps-list": "^8.1.1",
         rewiremock: "^3.14.5",
         sinon: "^15.2.0",
         "sinon-chai": "^3.5.0",
-        "ts-node": "^10.9.1",
+        "ts-node": "^10.9.2",
         "ts-sinon": "^2.0.1",
         typescript: "^5.1.6",
-        "unzip-stream": "^0.3.1",
-        winston: "^3.10.0",
+        "unzip-stream": "^0.3.4",
+        winston: "^3.13.0",
         yargs: "^17.7.2"
       },
       dependencies: {
         "@actions/artifact": "^1.1.1",
-        "@actions/core": "^1.10.0",
+        "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.118",
-        "date-fns": "^2.30.0",
-        "fs-extra": "^11.1.1",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.121",
+        "date-fns": "^3.6.0",
+        "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
-        uuid: "^9.0.0"
+        uuid: "^9.0.1"
       }
     };
   }
