@@ -42,6 +42,10 @@ inputs:
     required: true
     default: 'Sandbox'
 
+  user:
+    description: 'Object ID or user principal name (UPN) of Microsoft Entra ID user to be assigned to the environment.'
+    required: false
+
   currency:
     description: 'The currency to use for the environment.'
     required: false
