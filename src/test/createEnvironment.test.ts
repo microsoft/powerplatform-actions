@@ -42,6 +42,7 @@ describe("create-environment tests", () => {
             credentials: credentials,
             environmentName: { name: 'name', required: true, defaultValue: undefined },
             environmentType: { name: 'type', required: true, defaultValue: 'Sandbox' },
+            user: { name: 'user', required: false, defaultValue: undefined },
             region: { name: 'region', required: true, defaultValue: 'unitedstates' },
             currency: { name: 'currency', required: false, defaultValue: 'USD' },
             language: { name: 'language', required: false, defaultValue: 'English (United States)' },
