@@ -36,6 +36,7 @@ describe("import-data tests", () => {
             credentials: credentials,
             environmentUrl: mockEnvironmentUrl,
             dataFile: { name: 'data-file', required: true, defaultValue: undefined },
+            connectionCount: { name: 'connection-count', required: false, defaultValue: undefined },
             verbose: { name: 'verbose', required: false, defaultValue: false },
             logToConsole: false,
         }, runnerParameters, new ActionsHost());
