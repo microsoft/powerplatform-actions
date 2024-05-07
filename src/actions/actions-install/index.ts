@@ -100,6 +100,7 @@ async function usingPreinstalledPac(localPacPath: string): Promise<void> {
 
     core.exportVariable(PacInstalledEnvVarName, 'true');
     core.exportVariable(PacPathEnvVarName, absolutePath);
+    core.addPath(absolutePath);
     core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match if preinstalled pac is a different version.`);
 }
 
@@ -128,6 +129,7 @@ async function nugetInstall(packageName: string, packageVersion: string, nugetFe
         const pacPath = resolve(toolpath, packageName + '.' + packageVersion, 'tools', 'pac.exe');
         core.exportVariable(PacInstalledEnvVarName, 'true');
         core.exportVariable(PacPathEnvVarName, pacPath);
+        core.addPath(pacPath);
     } finally {
         if (nugetConfigFile) {
             await fs.rm(nugetConfigFile);
@@ -153,7 +155,9 @@ async function dotnetInstall(packageName: string, packageVersion: string, nugetF
         await exec.getExecOutput('dotnet', installArgs);
 
         core.exportVariable(PacInstalledEnvVarName, 'true');
-        core.exportVariable(PacPathEnvVarName, path.join(toolpath, os.platform() === 'win32' ? 'pac.exe' : 'pac'));
+        const pacPath = path.join(toolpath, os.platform() === 'win32' ? 'pac.exe' : 'pac');
+        core.exportVariable(PacPathEnvVarName, pacPath);
+        core.addPath(pacPath);
         core.info(`pac installed to ${process.env[PacPathEnvVarName]}`);
     } finally {
         if (nugetConfigFile) {
