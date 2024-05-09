@@ -16,7 +16,17 @@ const argName = {
     nugetFeedOverride: 'nuget-feed-override',
     nugetFeedUsername: 'nuget-feed-username',
     nugetFeedPassword: 'nuget-feed-password',
-    localPacPath: 'use-preinstalled-pac'
+    localPacPath: 'use-preinstalled-pac',
+    addToolsToPath: 'add-tools-to-path'
+};
+
+let args: {
+    nugetFeedPassword: string;
+    localPacPath: string;
+    nugetFeedOverride: string;
+    versionOverride: string;
+    nugetFeedUsername: string;
+    addToolsToPath: boolean;
 };
 
 class MutuallyExclusiveArgsError extends Error {
@@ -38,11 +48,12 @@ class MutuallyExclusiveArgsError extends Error {
 export async function main(): Promise<void> {
     core.startGroup('actions-install:');
 
-    const args = {
+    args = {
         versionOverride: core.getInput(argName.versionOverride, { required: false }),
         nugetFeedOverride: core.getInput(argName.nugetFeedOverride, { required: false }),
         nugetFeedUsername: core.getInput(argName.nugetFeedUsername, { required: false }),
         nugetFeedPassword: core.getInput(argName.nugetFeedPassword, { required: false }),
+        addToolsToPath: core.getInput(argName.addToolsToPath, { required: false }) === 'true',
         localPacPath: core.getInput(argName.localPacPath, { required: false })
     };
 
@@ -83,6 +94,10 @@ export async function main(): Promise<void> {
     core.endGroup();
 }
 
+function removePacFromPath(path:string): string {
+    return path.replace(/(\/|\\)(pac.exe|pac)$/, '');
+}
+
 async function usingPreinstalledPac(localPacPath: string): Promise<void> {
     const absolutePath = path.resolve(localPacPath);
     core.info(`Using preinstalled pac from ${absolutePath}`)
@@ -100,7 +115,9 @@ async function usingPreinstalledPac(localPacPath: string): Promise<void> {
 
     core.exportVariable(PacInstalledEnvVarName, 'true');
     core.exportVariable(PacPathEnvVarName, absolutePath);
-    core.addPath(absolutePath);
+    if (args.addToolsToPath) {
+        core.addPath(removePacFromPath(absolutePath));
+    }
     core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match if preinstalled pac is a different version.`);
 }
 
@@ -126,10 +143,13 @@ async function nugetInstall(packageName: string, packageVersion: string, nugetFe
 
         await exec.getExecOutput('nuget', installArgs);
 
-        const pacPath = resolve(toolpath, packageName + '.' + packageVersion, 'tools', 'pac.exe');
+        const pacPathWithoutExecutable = resolve(toolpath, packageName + '.' + packageVersion, 'tools');
+        const pacPath = resolve(pacPathWithoutExecutable, 'pac.exe');
         core.exportVariable(PacInstalledEnvVarName, 'true');
         core.exportVariable(PacPathEnvVarName, pacPath);
-        core.addPath(pacPath);
+        if (args.addToolsToPath) {
+            core.addPath(pacPathWithoutExecutable);
+        }
     } finally {
         if (nugetConfigFile) {
             await fs.rm(nugetConfigFile);
@@ -157,7 +177,9 @@ async function dotnetInstall(packageName: string, packageVersion: string, nugetF
         core.exportVariable(PacInstalledEnvVarName, 'true');
         const pacPath = path.join(toolpath, os.platform() === 'win32' ? 'pac.exe' : 'pac');
         core.exportVariable(PacPathEnvVarName, pacPath);
-        core.addPath(pacPath);
+        if (args.addToolsToPath) {
+            core.addPath(removePacFromPath(toolpath));
+        }
         core.info(`pac installed to ${process.env[PacPathEnvVarName]}`);
     } finally {
         if (nugetConfigFile) {
@@ -189,7 +211,7 @@ async function createNugetConfigViaDotnet(toolDirectory: string, nugetFeedOverri
     await exec.getExecOutput('dotnet', ['new', 'nugetconfig', '-o', toolDirectory]);
     await exec.getExecOutput('dotnet', ['nuget', 'remove', 'source', 'nuget', '--configfile', filename]);
 
-    const nugetSourceArgs = ['nuget', 'add', 'source', nugetFeedOverride, '--name', 'pacNugetFeed', '--configfile', filename ];
+    const nugetSourceArgs = ['nuget', 'add', 'source', nugetFeedOverride, '--name', 'pacNugetFeed', '--configfile', filename];
     nugetFeedUsername && nugetSourceArgs.push('--username', nugetFeedUsername);
     nugetFeedPassword && nugetSourceArgs.push('--password', nugetFeedPassword);
 
