@@ -24,6 +24,10 @@ inputs:
     description: 'Path to a pac.exe (windows) or pac (linux/mac) already installed on the action runner.'
     required: false
 
+  add-tools-to-path:
+    description: 'Enables you to use pac cli from script tasks without needing to set up the path manually.'
+    required: false
+
 runs:
   using: 'node16'
   main: '../dist/actions/actions-install/index.js'
