@@ -821,13 +821,13 @@ var require_tunnel = __commonJS({
     var debug;
     if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
       debug = function() {
-        var args = Array.prototype.slice.call(arguments);
-        if (typeof args[0] === "string") {
-          args[0] = "TUNNEL: " + args[0];
+        var args2 = Array.prototype.slice.call(arguments);
+        if (typeof args2[0] === "string") {
+          args2[0] = "TUNNEL: " + args2[0];
         } else {
-          args.unshift("TUNNEL:");
+          args2.unshift("TUNNEL:");
         }
-        console.error.apply(console, args);
+        console.error.apply(console, args2);
       };
     } else {
       debug = function() {
@@ -2700,13 +2700,13 @@ var require_toolrunner = __commonJS({
     var timers_1 = require("timers");
     var IS_WINDOWS = process.platform === "win32";
     var ToolRunner = class extends events.EventEmitter {
-      constructor(toolPath, args, options) {
+      constructor(toolPath, args2, options) {
         super();
         if (!toolPath) {
           throw new Error("Parameter 'toolPath' cannot be null or empty.");
         }
         this.toolPath = toolPath;
-        this.args = args || [];
+        this.args = args2 || [];
         this.options = options || {};
       }
       _debug(message) {
@@ -2716,28 +2716,28 @@ var require_toolrunner = __commonJS({
       }
       _getCommandString(options, noPrefix) {
         const toolPath = this._getSpawnFileName();
-        const args = this._getSpawnArgs(options);
+        const args2 = this._getSpawnArgs(options);
         let cmd = noPrefix ? "" : "[command]";
         if (IS_WINDOWS) {
           if (this._isCmdFile()) {
             cmd += toolPath;
-            for (const a of args) {
+            for (const a of args2) {
               cmd += ` ${a}`;
             }
           } else if (options.windowsVerbatimArguments) {
             cmd += `"${toolPath}"`;
-            for (const a of args) {
+            for (const a of args2) {
               cmd += ` ${a}`;
             }
           } else {
             cmd += this._windowsQuoteCmdArg(toolPath);
-            for (const a of args) {
+            for (const a of args2) {
               cmd += ` ${this._windowsQuoteCmdArg(a)}`;
             }
           }
         } else {
           cmd += toolPath;
-          for (const a of args) {
+          for (const a of args2) {
             cmd += ` ${a}`;
           }
         }
@@ -3010,7 +3010,7 @@ var require_toolrunner = __commonJS({
     };
     exports2.ToolRunner = ToolRunner;
     function argStringToArray(argString) {
-      const args = [];
+      const args2 = [];
       let inQuotes = false;
       let escaped = false;
       let arg = "";
@@ -3041,7 +3041,7 @@ var require_toolrunner = __commonJS({
         }
         if (c === " " && !inQuotes) {
           if (arg.length > 0) {
-            args.push(arg);
+            args2.push(arg);
             arg = "";
           }
           continue;
@@ -3049,9 +3049,9 @@ var require_toolrunner = __commonJS({
         append(c);
       }
       if (arg.length > 0) {
-        args.push(arg.trim());
+        args2.push(arg.trim());
       }
-      return args;
+      return args2;
     }
     exports2.argStringToArray = argStringToArray;
     var ExecState = class _ExecState extends events.EventEmitter {
@@ -3182,20 +3182,20 @@ var require_exec = __commonJS({
     exports2.getExecOutput = exports2.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec2(commandLine, args, options) {
+    function exec2(commandLine, args2, options) {
       return __awaiter2(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
           throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
         }
         const toolPath = commandArgs[0];
-        args = commandArgs.slice(1).concat(args || []);
-        const runner = new tr.ToolRunner(toolPath, args, options);
+        args2 = commandArgs.slice(1).concat(args2 || []);
+        const runner = new tr.ToolRunner(toolPath, args2, options);
         return runner.exec();
       });
     }
     exports2.exec = exec2;
-    function getExecOutput(commandLine, args, options) {
+    function getExecOutput(commandLine, args2, options) {
       var _a, _b;
       return __awaiter2(this, void 0, void 0, function* () {
         let stdout = "";
@@ -3217,7 +3217,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec2(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec2(commandLine, args2, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -3239,22 +3239,22 @@ var require_actionLogger = __commonJS({
     exports2.ActionLogger = void 0;
     var core2 = require_core();
     var ActionLogger = class {
-      info(...args) {
-        core2.info(args.join());
+      info(...args2) {
+        core2.info(args2.join());
       }
-      warn(...args) {
-        core2.warning(args.join());
+      warn(...args2) {
+        core2.warning(args2.join());
       }
-      error(...args) {
-        const errorMessage = args.join();
+      error(...args2) {
+        const errorMessage = args2.join();
         core2.setFailed(errorMessage);
         core2.error(errorMessage);
       }
-      debug(...args) {
-        core2.debug(args.join());
+      debug(...args2) {
+        core2.debug(args2.join());
       }
-      log(...args) {
-        console.log(args.join());
+      log(...args2) {
+        console.log(args2.join());
       }
     };
     exports2.ActionLogger = ActionLogger;
@@ -3329,7 +3329,7 @@ var require_package = __commonJS({
         "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.9",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.12.7",
+        "@types/node": "^20.12.10",
         "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.12",
         "@types/unzip-stream": "^0.3.4",
@@ -3340,7 +3340,7 @@ var require_package = __commonJS({
         async: "^3.2.5",
         chai: "^4.4.1",
         dotenv: "^16.4.5",
-        esbuild: "^0.20.2",
+        esbuild: "^0.21.1",
         eslint: "^8.49.0",
         "fancy-log": "^2.0.0",
         glob: "^10.3.12",
@@ -3359,7 +3359,7 @@ var require_package = __commonJS({
         "sinon-chai": "^3.5.0",
         "ts-node": "^10.9.2",
         "ts-sinon": "^2.0.1",
-        typescript: "^5.1.6",
+        typescript: "^5.4.5",
         "unzip-stream": "^0.3.4",
         winston: "^3.13.0",
         yargs: "^17.7.2"
@@ -3369,7 +3369,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.121",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.122",
         "date-fns": "^3.6.0",
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
@@ -3462,8 +3462,10 @@ var argName = {
   nugetFeedOverride: "nuget-feed-override",
   nugetFeedUsername: "nuget-feed-username",
   nugetFeedPassword: "nuget-feed-password",
-  localPacPath: "use-preinstalled-pac"
+  localPacPath: "use-preinstalled-pac",
+  addToolsToPath: "add-tools-to-path"
 };
+var args;
 var MutuallyExclusiveArgsError = class extends Error {
   constructor(argument1, argument2) {
     super(`Cannot specify both ${argument1} and ${argument2}.`);
@@ -3481,11 +3483,12 @@ var MutuallyExclusiveArgsError = class extends Error {
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
     core.startGroup("actions-install:");
-    const args = {
+    args = {
       versionOverride: core.getInput(argName.versionOverride, { required: false }),
       nugetFeedOverride: core.getInput(argName.nugetFeedOverride, { required: false }),
       nugetFeedUsername: core.getInput(argName.nugetFeedUsername, { required: false }),
       nugetFeedPassword: core.getInput(argName.nugetFeedPassword, { required: false }),
+      addToolsToPath: core.getInput(argName.addToolsToPath, { required: false }) === "true",
       localPacPath: core.getInput(argName.localPacPath, { required: false })
     };
     args.nugetFeedPassword && core.setSecret(args.nugetFeedPassword);
@@ -3519,6 +3522,9 @@ function main() {
   });
 }
 exports.main = main;
+function removePacFromPath(path2) {
+  return path2.replace(/(\/|\\)(pac.exe|pac)$/, "");
+}
 function usingPreinstalledPac(localPacPath) {
   return __awaiter(this, void 0, void 0, function* () {
     const absolutePath = path.resolve(localPacPath);
@@ -3533,6 +3539,9 @@ function usingPreinstalledPac(localPacPath) {
     }
     core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
     core.exportVariable(runnerParameters_1.PacPathEnvVarName, absolutePath);
+    if (args.addToolsToPath) {
+      core.addPath(removePacFromPath(absolutePath));
+    }
     core.warning(`Actions built targetting PAC ${PacInfo.PacPackageVersion}, so Action and PAC parameters might not match if preinstalled pac is a different version.`);
   });
 }
@@ -3559,9 +3568,13 @@ function nugetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeedU
       ];
       nugetConfigFile && installArgs.push("-ConfigFile", nugetConfigFile);
       yield exec.getExecOutput("nuget", installArgs);
-      const pacPath = (0, node_path_1.resolve)(toolpath, packageName + "." + packageVersion, "tools", "pac.exe");
+      const pacPathWithoutExecutable = (0, node_path_1.resolve)(toolpath, packageName + "." + packageVersion, "tools");
+      const pacPath = (0, node_path_1.resolve)(pacPathWithoutExecutable, "pac.exe");
       core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
       core.exportVariable(runnerParameters_1.PacPathEnvVarName, pacPath);
+      if (args.addToolsToPath) {
+        core.addPath(pacPathWithoutExecutable);
+      }
     } finally {
       if (nugetConfigFile) {
         yield fs.rm(nugetConfigFile);
@@ -3583,7 +3596,11 @@ function dotnetInstall(packageName, packageVersion, nugetFeedOverride, nugetFeed
       nugetConfigFile && installArgs.push("--configfile", nugetConfigFile);
       yield exec.getExecOutput("dotnet", installArgs);
       core.exportVariable(runnerParameters_1.PacInstalledEnvVarName, "true");
-      core.exportVariable(runnerParameters_1.PacPathEnvVarName, path.join(toolpath, os.platform() === "win32" ? "pac.exe" : "pac"));
+      const pacPath = path.join(toolpath, os.platform() === "win32" ? "pac.exe" : "pac");
+      core.exportVariable(runnerParameters_1.PacPathEnvVarName, pacPath);
+      if (args.addToolsToPath) {
+        core.addPath(removePacFromPath(toolpath));
+      }
       core.info(`pac installed to ${process.env[runnerParameters_1.PacPathEnvVarName]}`);
     } finally {
       if (nugetConfigFile) {

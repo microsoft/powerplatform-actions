@@ -13350,6 +13350,7 @@ var require_dataImport = __commonJS({
           const authenticateResult = yield (0, authenticate_1.authenticateEnvironment)(pac, parameters.credentials, parameters.environmentUrl, logger);
           logger.log("The Authentication Result: " + authenticateResult);
           validator.pushInput(pacArgs, "--data", parameters.dataFile);
+          validator.pushInput(pacArgs, "--connection-count", parameters.connectionCount);
           validator.pushInput(pacArgs, "--verbose", parameters.verbose);
           validator.pushCommon(pacArgs, parameters);
           logger.log("Calling pac cli inputs: " + pacArgs.join(" "));
@@ -24116,7 +24117,7 @@ var require_package = __commonJS({
         "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.9",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.12.7",
+        "@types/node": "^20.12.10",
         "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.12",
         "@types/unzip-stream": "^0.3.4",
@@ -24127,7 +24128,7 @@ var require_package = __commonJS({
         async: "^3.2.5",
         chai: "^4.4.1",
         dotenv: "^16.4.5",
-        esbuild: "^0.20.2",
+        esbuild: "^0.21.1",
         eslint: "^8.49.0",
         "fancy-log": "^2.0.0",
         glob: "^10.3.12",
@@ -24146,7 +24147,7 @@ var require_package = __commonJS({
         "sinon-chai": "^3.5.0",
         "ts-node": "^10.9.2",
         "ts-sinon": "^2.0.1",
-        typescript: "^5.1.6",
+        typescript: "^5.4.5",
         "unzip-stream": "^0.3.4",
         winston: "^3.13.0",
         yargs: "^17.7.2"
@@ -24156,7 +24157,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.121",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.122",
         "date-fns": "^3.6.0",
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
