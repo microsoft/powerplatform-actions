@@ -26,6 +26,7 @@ export async function main(): Promise<void> {
         credentials: getCredentials(),
         environmentName: parameterMap['name'],
         environmentType: parameterMap['type'],
+        user: parameterMap['user'],
         region: parameterMap['region'],
         currency: parameterMap['currency'],
         language: parameterMap['language'],

@@ -36,10 +36,14 @@ inputs:
     description: 'File name for data zip file, or folder with data-schema.xml & data.xml, to be imported.'
     required: true
 
+  connection-count:
+    description: 'Number of parallel connections to use during import. Default: 5'
+    required: false
+
   verbose:
     description: 'Output more diagnostic information.'
     required: false
-    
+
 runs:
   using: 'node16'
   main: '../dist/actions/import-data/index.js'

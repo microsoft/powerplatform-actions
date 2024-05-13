@@ -23,6 +23,7 @@ import { runnerParameters } from '../../lib/runnerParameters';
         credentials: getCredentials(),
         environmentUrl: getEnvironmentUrl(),
         dataFile: parameterMap['data-file'],
+        connectionCount: parameterMap['connection-count'],
         verbose: {
             name: "verbose",
             required: false,
