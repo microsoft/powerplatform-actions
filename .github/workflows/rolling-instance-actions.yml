@@ -12,6 +12,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  id-token: write # OIDC token for Workload Identity Federation
+
 jobs:
   instance-actions:
     runs-on: ${{ matrix.os }}
@@ -70,6 +73,13 @@ jobs:
         environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
         app-id: ${{ env.WF_APPID }}
         client-secret: ${{ secrets.CLIENT_SECRET_PPDEVTOOLS }}
+        tenant-id: ${{ env.WF_TENANT_ID }}
+
+    - name: Test who-am-i action with appId + Workload Identity Federation
+      uses: ./who-am-i
+      with:
+        environment-url: ${{ steps.create-source-environment.outputs.environment-url }}
+        app-id: ${{ env.WF_APPID }}
         tenant-id: ${{ env.WF_TENANT_ID }}
 
     - name: Test who-am-i action with username/password
