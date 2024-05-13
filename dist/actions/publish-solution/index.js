@@ -1591,10 +1591,10 @@ var require_oidc_utils = __commonJS({
         return __awaiter2(this, void 0, void 0, function* () {
           const httpclient = _OidcClient.createHttpClient();
           const res = yield httpclient.getJson(id_token_url).catch((error) => {
-            throw new Error(`Failed to get ID Token.
-
+            throw new Error(`Failed to get ID Token. 
+ 
         Error Code : ${error.statusCode}
-
+ 
         Error Message: ${error.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -4540,9 +4540,9 @@ var require_cjs = __commonJS({
   }
 });
 
-// node_modules/path-scurry/node_modules/lru-cache/dist/commonjs/index.js
-var require_commonjs = __commonJS({
-  "node_modules/path-scurry/node_modules/lru-cache/dist/commonjs/index.js"(exports2) {
+// node_modules/path-scurry/node_modules/lru-cache/dist/cjs/index.js
+var require_cjs2 = __commonJS({
+  "node_modules/path-scurry/node_modules/lru-cache/dist/cjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LRUCache = void 0;
@@ -4914,8 +4914,6 @@ var require_commonjs = __commonJS({
           if (ttls[index]) {
             const ttl = ttls[index];
             const start = starts[index];
-            if (!ttl || !start)
-              return;
             status.ttl = ttl;
             status.start = start;
             status.now = cachedNow || getNow();
@@ -4942,16 +4940,14 @@ var require_commonjs = __commonJS({
           }
           const ttl = ttls[index];
           const start = starts[index];
-          if (!ttl || !start) {
+          if (ttl === 0 || start === 0) {
             return Infinity;
           }
           const age = (cachedNow || getNow()) - start;
           return ttl - age;
         };
         this.#isStale = (index) => {
-          const s = starts[index];
-          const t = ttls[index];
-          return !!t && !!s && (cachedNow || getNow()) - s > t;
+          return ttls[index] !== 0 && starts[index] !== 0 && (cachedNow || getNow()) - starts[index] > ttls[index];
         };
       }
       // conditionally set private methods related to TTL
@@ -5136,11 +5132,6 @@ var require_commonjs = __commonJS({
         return this.entries();
       }
       /**
-       * A String value that is used in the creation of the default string description of an object.
-       * Called by the built-in method Object.prototype.toString.
-       */
-      [Symbol.toStringTag] = "LRUCache";
-      /**
        * Find a value for which the supplied fn method returns a truthy value,
        * similar to Array.find().  fn is called as fn(value, key, cache).
        */
@@ -5196,35 +5187,6 @@ var require_commonjs = __commonJS({
           }
         }
         return deleted;
-      }
-      /**
-       * Get the extended info about a given entry, to get its value, size, and
-       * TTL info simultaneously. Like {@link LRUCache#dump}, but just for a
-       * single key. Always returns stale values, if their info is found in the
-       * cache, so be sure to check for expired TTLs if relevant.
-       */
-      info(key) {
-        const i = this.#keyMap.get(key);
-        if (i === void 0)
-          return void 0;
-        const v = this.#valList[i];
-        const value = this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
-        if (value === void 0)
-          return void 0;
-        const entry = { value };
-        if (this.#ttls && this.#starts) {
-          const ttl = this.#ttls[i];
-          const start = this.#starts[i];
-          if (ttl && start) {
-            const remain = ttl - (perf.now() - start);
-            entry.ttl = remain;
-            entry.start = Date.now();
-          }
-        }
-        if (this.#sizes) {
-          entry.size = this.#sizes[i];
-        }
-        return entry;
       }
       /**
        * Return an array of [key, {@link LRUCache.Entry}] tuples which can be
@@ -5458,11 +5420,10 @@ var require_commonjs = __commonJS({
       peek(k, peekOptions = {}) {
         const { allowStale = this.allowStale } = peekOptions;
         const index = this.#keyMap.get(k);
-        if (index === void 0 || !allowStale && this.#isStale(index)) {
-          return;
+        if (index !== void 0 && (allowStale || !this.#isStale(index))) {
+          const v = this.#valList[index];
+          return this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
         }
-        const v = this.#valList[index];
-        return this.#isBackgroundFetch(v) ? v.__staleWhileFetching : v;
       }
       #backgroundFetch(k, index, options, context) {
         const v = index === void 0 ? void 0 : this.#valList[index];
@@ -5759,10 +5720,8 @@ var require_commonjs = __commonJS({
               } else if (index === this.#head) {
                 this.#head = this.#next[index];
               } else {
-                const pi = this.#prev[index];
-                this.#next[pi] = this.#next[index];
-                const ni = this.#next[index];
-                this.#prev[ni] = this.#prev[index];
+                this.#next[this.#prev[index]] = this.#next[index];
+                this.#prev[this.#next[index]] = this.#prev[index];
               }
               this.#size--;
               this.#free.push(index);
@@ -5824,9 +5783,9 @@ var require_commonjs = __commonJS({
   }
 });
 
-// node_modules/minipass/dist/commonjs/index.js
-var require_commonjs2 = __commonJS({
-  "node_modules/minipass/dist/commonjs/index.js"(exports2) {
+// node_modules/minipass/dist/cjs/index.js
+var require_cjs3 = __commonJS({
+  "node_modules/minipass/dist/cjs/index.js"(exports2) {
     "use strict";
     var __importDefault = exports2 && exports2.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
@@ -6716,9 +6675,9 @@ var require_commonjs2 = __commonJS({
   }
 });
 
-// node_modules/path-scurry/dist/commonjs/index.js
-var require_commonjs3 = __commonJS({
-  "node_modules/path-scurry/dist/commonjs/index.js"(exports2) {
+// node_modules/path-scurry/dist/cjs/index.js
+var require_cjs4 = __commonJS({
+  "node_modules/path-scurry/dist/cjs/index.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -6754,14 +6713,14 @@ var require_commonjs3 = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PathScurry = exports2.Path = exports2.PathScurryDarwin = exports2.PathScurryPosix = exports2.PathScurryWin32 = exports2.PathScurryBase = exports2.PathPosix = exports2.PathWin32 = exports2.PathBase = exports2.ChildrenCache = exports2.ResolveCache = void 0;
-    var lru_cache_1 = require_commonjs();
+    var lru_cache_1 = require_cjs2();
     var path_1 = require("path");
     var url_1 = require("url");
     var actualFS = __importStar(require("fs"));
     var fs_1 = require("fs");
     var realpathSync = fs_1.realpathSync.native;
     var promises_1 = require("fs/promises");
-    var minipass_1 = require_commonjs2();
+    var minipass_1 = require_cjs3();
     var defaultFS = {
       lstatSync: fs_1.lstatSync,
       readdir: fs_1.readdir,
@@ -7334,7 +7293,7 @@ var require_commonjs3 = __commonJS({
         }
         try {
           const read = await this.#fs.promises.readlink(this.fullpath());
-          const linkTarget = (await this.parent.realpath())?.resolve(read);
+          const linkTarget = this.parent.resolve(read);
           if (linkTarget) {
             return this.#linkTarget = linkTarget;
           }
@@ -7359,7 +7318,7 @@ var require_commonjs3 = __commonJS({
         }
         try {
           const read = this.#fs.readlinkSync(this.fullpath());
-          const linkTarget = this.parent.realpathSync()?.resolve(read);
+          const linkTarget = this.parent.resolve(read);
           if (linkTarget) {
             return this.#linkTarget = linkTarget;
           }
@@ -7371,9 +7330,7 @@ var require_commonjs3 = __commonJS({
       #readdirSuccess(children) {
         this.#type |= READDIR_CALLED;
         for (let p = children.provisional; p < children.length; p++) {
-          const c = children[p];
-          if (c)
-            c.#markENOENT();
+          children[p].#markENOENT();
         }
       }
       #markENOENT() {
@@ -8690,10 +8647,6 @@ var require_ignore = __commonJS({
             if (!parsed || !globParts) {
               throw new Error("invalid pattern object");
             }
-            while (parsed[0] === "." && globParts[0] === ".") {
-              parsed.shift();
-              globParts.shift();
-            }
             const p = new pattern_js_1.Pattern(parsed, globParts, 0, platform);
             const m = new minimatch_1.Minimatch(p.globString(), mmopts);
             const children = globParts[globParts.length - 1] === "**";
@@ -8983,7 +8936,7 @@ var require_walker = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GlobStream = exports2.GlobWalker = exports2.GlobUtil = void 0;
-    var minipass_1 = require_commonjs2();
+    var minipass_1 = require_cjs3();
     var ignore_js_1 = require_ignore();
     var processor_js_1 = require_processor();
     var makeIgnore = (ignore, opts) => typeof ignore === "string" ? new ignore_js_1.Ignore([ignore], opts) : Array.isArray(ignore) ? new ignore_js_1.Ignore(ignore, opts) : ignore;
@@ -9056,17 +9009,10 @@ var require_walker = __commonJS({
           e = rpc;
         }
         const needStat = e.isUnknown() || this.opts.stat;
-        const s = needStat ? await e.lstat() : e;
-        if (this.opts.follow && this.opts.nodir && s?.isSymbolicLink()) {
-          const target = await s.realpath();
-          if (target && (target.isUnknown() || this.opts.stat)) {
-            await target.lstat();
-          }
-        }
-        return this.matchCheckTest(s, ifDir);
+        return this.matchCheckTest(needStat ? await e.lstat() : e, ifDir);
       }
       matchCheckTest(e, ifDir) {
-        return e && (this.maxDepth === Infinity || e.depth() <= this.maxDepth) && (!ifDir || e.canReaddir()) && (!this.opts.nodir || !e.isDirectory()) && (!this.opts.nodir || !this.opts.follow || !e.isSymbolicLink() || !e.realpathCached()?.isDirectory()) && !this.#ignored(e) ? e : void 0;
+        return e && (this.maxDepth === Infinity || e.depth() <= this.maxDepth) && (!ifDir || e.canReaddir()) && (!this.opts.nodir || !e.isDirectory()) && !this.#ignored(e) ? e : void 0;
       }
       matchCheckSync(e, ifDir) {
         if (ifDir && this.opts.nodir)
@@ -9079,14 +9025,7 @@ var require_walker = __commonJS({
           e = rpc;
         }
         const needStat = e.isUnknown() || this.opts.stat;
-        const s = needStat ? e.lstatSync() : e;
-        if (this.opts.follow && this.opts.nodir && s?.isSymbolicLink()) {
-          const target = s.realpathSync();
-          if (target && (target?.isUnknown() || this.opts.stat)) {
-            target.lstatSync();
-          }
-        }
-        return this.matchCheckTest(s, ifDir);
+        return this.matchCheckTest(needStat ? e.lstatSync() : e, ifDir);
       }
       matchFinish(e, absolute) {
         if (this.#ignored(e))
@@ -9315,7 +9254,7 @@ var require_glob = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Glob = void 0;
     var minimatch_1 = require_cjs();
-    var path_scurry_1 = require_commonjs3();
+    var path_scurry_1 = require_cjs4();
     var url_1 = require("url");
     var pattern_js_1 = require_pattern();
     var walker_js_1 = require_walker();
@@ -9537,7 +9476,7 @@ var require_has_magic = __commonJS({
 });
 
 // node_modules/glob/dist/commonjs/index.js
-var require_commonjs4 = __commonJS({
+var require_commonjs = __commonJS({
   "node_modules/glob/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -9760,7 +9699,7 @@ var require_polyfills = __commonJS({
           Object.setPrototypeOf(read, fs$read);
         return read;
       }(fs.read);
-      fs.readSync = typeof fs.readSync !== "function" ? fs.readSync : /* @__PURE__ */ function(fs$readSync) {
+      fs.readSync = typeof fs.readSync !== "function" ? fs.readSync : function(fs$readSync) {
         return function(fd, buffer, offset, length, position) {
           var eagCounter = 0;
           while (true) {
@@ -10655,23 +10594,18 @@ var require_path_exists = __commonJS({
 var require_utimes = __commonJS({
   "node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
     "use strict";
-    var fs = require_fs();
-    var u = require_universalify().fromPromise;
-    async function utimesMillis(path, atime, mtime) {
-      const fd = await fs.open(path, "r+");
-      let closeErr = null;
-      try {
-        await fs.futimes(fd, atime, mtime);
-      } finally {
-        try {
-          await fs.close(fd);
-        } catch (e) {
-          closeErr = e;
-        }
-      }
-      if (closeErr) {
-        throw closeErr;
-      }
+    var fs = require_graceful_fs();
+    function utimesMillis(path, atime, mtime, callback) {
+      fs.open(path, "r+", (err, fd) => {
+        if (err)
+          return callback(err);
+        fs.futimes(fd, atime, mtime, (futimesErr) => {
+          fs.close(fd, (closeErr) => {
+            if (callback)
+              callback(futimesErr || closeErr);
+          });
+        });
+      });
     }
     function utimesMillisSync(path, atime, mtime) {
       const fd = fs.openSync(path, "r+");
@@ -10679,7 +10613,7 @@ var require_utimes = __commonJS({
       return fs.closeSync(fd);
     }
     module2.exports = {
-      utimesMillis: u(utimesMillis),
+      utimesMillis,
       utimesMillisSync
     };
   }
@@ -10691,7 +10625,7 @@ var require_stat = __commonJS({
     "use strict";
     var fs = require_fs();
     var path = require("path");
-    var u = require_universalify().fromPromise;
+    var util = require("util");
     function getStats(src, dest, opts) {
       const statFunc = opts.dereference ? (file) => fs.stat(file, { bigint: true }) : (file) => fs.lstat(file, { bigint: true });
       return Promise.all([
@@ -10716,28 +10650,32 @@ var require_stat = __commonJS({
       }
       return { srcStat, destStat };
     }
-    async function checkPaths(src, dest, funcName, opts) {
-      const { srcStat, destStat } = await getStats(src, dest, opts);
-      if (destStat) {
-        if (areIdentical(srcStat, destStat)) {
-          const srcBaseName = path.basename(src);
-          const destBaseName = path.basename(dest);
-          if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
-            return { srcStat, destStat, isChangingCase: true };
+    function checkPaths(src, dest, funcName, opts, cb) {
+      util.callbackify(getStats)(src, dest, opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { srcStat, destStat } = stats;
+        if (destStat) {
+          if (areIdentical(srcStat, destStat)) {
+            const srcBaseName = path.basename(src);
+            const destBaseName = path.basename(dest);
+            if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
+              return cb(null, { srcStat, destStat, isChangingCase: true });
+            }
+            return cb(new Error("Source and destination must not be the same."));
           }
-          throw new Error("Source and destination must not be the same.");
+          if (srcStat.isDirectory() && !destStat.isDirectory()) {
+            return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`));
+          }
+          if (!srcStat.isDirectory() && destStat.isDirectory()) {
+            return cb(new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`));
+          }
         }
-        if (srcStat.isDirectory() && !destStat.isDirectory()) {
-          throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`);
+        if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
+          return cb(new Error(errMsg(src, dest, funcName)));
         }
-        if (!srcStat.isDirectory() && destStat.isDirectory()) {
-          throw new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`);
-        }
-      }
-      if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
-        throw new Error(errMsg(src, dest, funcName));
-      }
-      return { srcStat, destStat };
+        return cb(null, { srcStat, destStat });
+      });
     }
     function checkPathsSync(src, dest, funcName, opts) {
       const { srcStat, destStat } = getStatsSync(src, dest, opts);
@@ -10762,23 +10700,22 @@ var require_stat = __commonJS({
       }
       return { srcStat, destStat };
     }
-    async function checkParentPaths(src, srcStat, dest, funcName) {
+    function checkParentPaths(src, srcStat, dest, funcName, cb) {
       const srcParent = path.resolve(path.dirname(src));
       const destParent = path.resolve(path.dirname(dest));
       if (destParent === srcParent || destParent === path.parse(destParent).root)
-        return;
-      let destStat;
-      try {
-        destStat = await fs.stat(destParent, { bigint: true });
-      } catch (err) {
-        if (err.code === "ENOENT")
-          return;
-        throw err;
-      }
-      if (areIdentical(srcStat, destStat)) {
-        throw new Error(errMsg(src, dest, funcName));
-      }
-      return checkParentPaths(src, srcStat, destParent, funcName);
+        return cb();
+      fs.stat(destParent, { bigint: true }, (err, destStat) => {
+        if (err) {
+          if (err.code === "ENOENT")
+            return cb();
+          return cb(err);
+        }
+        if (areIdentical(srcStat, destStat)) {
+          return cb(new Error(errMsg(src, dest, funcName)));
+        }
+        return checkParentPaths(src, srcStat, destParent, funcName, cb);
+      });
     }
     function checkParentPathsSync(src, srcStat, dest, funcName) {
       const srcParent = path.resolve(path.dirname(src));
@@ -10804,19 +10741,16 @@ var require_stat = __commonJS({
     function isSrcSubdir(src, dest) {
       const srcArr = path.resolve(src).split(path.sep).filter((i) => i);
       const destArr = path.resolve(dest).split(path.sep).filter((i) => i);
-      return srcArr.every((cur, i) => destArr[i] === cur);
+      return srcArr.reduce((acc, cur, i) => acc && destArr[i] === cur, true);
     }
     function errMsg(src, dest, funcName) {
       return `Cannot ${funcName} '${src}' to a subdirectory of itself, '${dest}'.`;
     }
     module2.exports = {
-      // checkPaths
-      checkPaths: u(checkPaths),
+      checkPaths,
       checkPathsSync,
-      // checkParent
-      checkParentPaths: u(checkParentPaths),
+      checkParentPaths,
       checkParentPathsSync,
-      // Misc
       isSrcSubdir,
       areIdentical
     };
@@ -10827,16 +10761,22 @@ var require_stat = __commonJS({
 var require_copy = __commonJS({
   "node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
     "use strict";
-    var fs = require_fs();
+    var fs = require_graceful_fs();
     var path = require("path");
-    var { mkdirs } = require_mkdirs();
-    var { pathExists } = require_path_exists();
-    var { utimesMillis } = require_utimes();
+    var mkdirs = require_mkdirs().mkdirs;
+    var pathExists = require_path_exists().pathExists;
+    var utimesMillis = require_utimes().utimesMillis;
     var stat = require_stat();
-    async function copy(src, dest, opts = {}) {
-      if (typeof opts === "function") {
+    function copy(src, dest, opts, cb) {
+      if (typeof opts === "function" && !cb) {
+        cb = opts;
+        opts = {};
+      } else if (typeof opts === "function") {
         opts = { filter: opts };
       }
+      cb = cb || function() {
+      };
+      opts = opts || {};
       opts.clobber = "clobber" in opts ? !!opts.clobber : true;
       opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
       if (opts.preserveTimestamps && process.arch === "ia32") {
@@ -10846,111 +10786,204 @@ var require_copy = __commonJS({
           "fs-extra-WARN0001"
         );
       }
-      const { srcStat, destStat } = await stat.checkPaths(src, dest, "copy", opts);
-      await stat.checkParentPaths(src, srcStat, dest, "copy");
-      const include = await runFilter(src, dest, opts);
-      if (!include)
-        return;
+      stat.checkPaths(src, dest, "copy", opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { srcStat, destStat } = stats;
+        stat.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
+          if (err2)
+            return cb(err2);
+          runFilter(src, dest, opts, (err3, include) => {
+            if (err3)
+              return cb(err3);
+            if (!include)
+              return cb();
+            checkParentDir(destStat, src, dest, opts, cb);
+          });
+        });
+      });
+    }
+    function checkParentDir(destStat, src, dest, opts, cb) {
       const destParent = path.dirname(dest);
-      const dirExists = await pathExists(destParent);
-      if (!dirExists) {
-        await mkdirs(destParent);
-      }
-      await getStatsAndPerformCopy(destStat, src, dest, opts);
+      pathExists(destParent, (err, dirExists) => {
+        if (err)
+          return cb(err);
+        if (dirExists)
+          return getStats(destStat, src, dest, opts, cb);
+        mkdirs(destParent, (err2) => {
+          if (err2)
+            return cb(err2);
+          return getStats(destStat, src, dest, opts, cb);
+        });
+      });
     }
-    async function runFilter(src, dest, opts) {
+    function runFilter(src, dest, opts, cb) {
       if (!opts.filter)
-        return true;
-      return opts.filter(src, dest);
+        return cb(null, true);
+      Promise.resolve(opts.filter(src, dest)).then((include) => cb(null, include), (error) => cb(error));
     }
-    async function getStatsAndPerformCopy(destStat, src, dest, opts) {
-      const statFn = opts.dereference ? fs.stat : fs.lstat;
-      const srcStat = await statFn(src);
-      if (srcStat.isDirectory())
-        return onDir(srcStat, destStat, src, dest, opts);
-      if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice())
-        return onFile(srcStat, destStat, src, dest, opts);
-      if (srcStat.isSymbolicLink())
-        return onLink(destStat, src, dest, opts);
-      if (srcStat.isSocket())
-        throw new Error(`Cannot copy a socket file: ${src}`);
-      if (srcStat.isFIFO())
-        throw new Error(`Cannot copy a FIFO pipe: ${src}`);
-      throw new Error(`Unknown file: ${src}`);
+    function getStats(destStat, src, dest, opts, cb) {
+      const stat2 = opts.dereference ? fs.stat : fs.lstat;
+      stat2(src, (err, srcStat) => {
+        if (err)
+          return cb(err);
+        if (srcStat.isDirectory())
+          return onDir(srcStat, destStat, src, dest, opts, cb);
+        else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice())
+          return onFile(srcStat, destStat, src, dest, opts, cb);
+        else if (srcStat.isSymbolicLink())
+          return onLink(destStat, src, dest, opts, cb);
+        else if (srcStat.isSocket())
+          return cb(new Error(`Cannot copy a socket file: ${src}`));
+        else if (srcStat.isFIFO())
+          return cb(new Error(`Cannot copy a FIFO pipe: ${src}`));
+        return cb(new Error(`Unknown file: ${src}`));
+      });
     }
-    async function onFile(srcStat, destStat, src, dest, opts) {
+    function onFile(srcStat, destStat, src, dest, opts, cb) {
       if (!destStat)
-        return copyFile(srcStat, src, dest, opts);
-      if (opts.overwrite) {
-        await fs.unlink(dest);
-        return copyFile(srcStat, src, dest, opts);
-      }
-      if (opts.errorOnExist) {
-        throw new Error(`'${dest}' already exists`);
-      }
+        return copyFile(srcStat, src, dest, opts, cb);
+      return mayCopyFile(srcStat, src, dest, opts, cb);
     }
-    async function copyFile(srcStat, src, dest, opts) {
-      await fs.copyFile(src, dest);
-      if (opts.preserveTimestamps) {
-        if (fileIsNotWritable(srcStat.mode)) {
-          await makeFileWritable(dest, srcStat.mode);
-        }
-        const updatedSrcStat = await fs.stat(src);
-        await utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
+    function mayCopyFile(srcStat, src, dest, opts, cb) {
+      if (opts.overwrite) {
+        fs.unlink(dest, (err) => {
+          if (err)
+            return cb(err);
+          return copyFile(srcStat, src, dest, opts, cb);
+        });
+      } else if (opts.errorOnExist) {
+        return cb(new Error(`'${dest}' already exists`));
+      } else
+        return cb();
+    }
+    function copyFile(srcStat, src, dest, opts, cb) {
+      fs.copyFile(src, dest, (err) => {
+        if (err)
+          return cb(err);
+        if (opts.preserveTimestamps)
+          return handleTimestampsAndMode(srcStat.mode, src, dest, cb);
+        return setDestMode(dest, srcStat.mode, cb);
+      });
+    }
+    function handleTimestampsAndMode(srcMode, src, dest, cb) {
+      if (fileIsNotWritable(srcMode)) {
+        return makeFileWritable(dest, srcMode, (err) => {
+          if (err)
+            return cb(err);
+          return setDestTimestampsAndMode(srcMode, src, dest, cb);
+        });
       }
-      return fs.chmod(dest, srcStat.mode);
+      return setDestTimestampsAndMode(srcMode, src, dest, cb);
     }
     function fileIsNotWritable(srcMode) {
       return (srcMode & 128) === 0;
     }
-    function makeFileWritable(dest, srcMode) {
-      return fs.chmod(dest, srcMode | 128);
+    function makeFileWritable(dest, srcMode, cb) {
+      return setDestMode(dest, srcMode | 128, cb);
     }
-    async function onDir(srcStat, destStat, src, dest, opts) {
-      if (!destStat) {
-        await fs.mkdir(dest);
-      }
-      const items = await fs.readdir(src);
-      await Promise.all(items.map(async (item) => {
-        const srcItem = path.join(src, item);
-        const destItem = path.join(dest, item);
-        const include = await runFilter(srcItem, destItem, opts);
+    function setDestTimestampsAndMode(srcMode, src, dest, cb) {
+      setDestTimestamps(src, dest, (err) => {
+        if (err)
+          return cb(err);
+        return setDestMode(dest, srcMode, cb);
+      });
+    }
+    function setDestMode(dest, srcMode, cb) {
+      return fs.chmod(dest, srcMode, cb);
+    }
+    function setDestTimestamps(src, dest, cb) {
+      fs.stat(src, (err, updatedSrcStat) => {
+        if (err)
+          return cb(err);
+        return utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime, cb);
+      });
+    }
+    function onDir(srcStat, destStat, src, dest, opts, cb) {
+      if (!destStat)
+        return mkDirAndCopy(srcStat.mode, src, dest, opts, cb);
+      return copyDir(src, dest, opts, cb);
+    }
+    function mkDirAndCopy(srcMode, src, dest, opts, cb) {
+      fs.mkdir(dest, (err) => {
+        if (err)
+          return cb(err);
+        copyDir(src, dest, opts, (err2) => {
+          if (err2)
+            return cb(err2);
+          return setDestMode(dest, srcMode, cb);
+        });
+      });
+    }
+    function copyDir(src, dest, opts, cb) {
+      fs.readdir(src, (err, items) => {
+        if (err)
+          return cb(err);
+        return copyDirItems(items, src, dest, opts, cb);
+      });
+    }
+    function copyDirItems(items, src, dest, opts, cb) {
+      const item = items.pop();
+      if (!item)
+        return cb();
+      return copyDirItem(items, item, src, dest, opts, cb);
+    }
+    function copyDirItem(items, item, src, dest, opts, cb) {
+      const srcItem = path.join(src, item);
+      const destItem = path.join(dest, item);
+      runFilter(srcItem, destItem, opts, (err, include) => {
+        if (err)
+          return cb(err);
         if (!include)
-          return;
-        const { destStat: destStat2 } = await stat.checkPaths(srcItem, destItem, "copy", opts);
-        return getStatsAndPerformCopy(destStat2, srcItem, destItem, opts);
-      }));
-      if (!destStat) {
-        await fs.chmod(dest, srcStat.mode);
-      }
+          return copyDirItems(items, src, dest, opts, cb);
+        stat.checkPaths(srcItem, destItem, "copy", opts, (err2, stats) => {
+          if (err2)
+            return cb(err2);
+          const { destStat } = stats;
+          getStats(destStat, srcItem, destItem, opts, (err3) => {
+            if (err3)
+              return cb(err3);
+            return copyDirItems(items, src, dest, opts, cb);
+          });
+        });
+      });
     }
-    async function onLink(destStat, src, dest, opts) {
-      let resolvedSrc = await fs.readlink(src);
-      if (opts.dereference) {
-        resolvedSrc = path.resolve(process.cwd(), resolvedSrc);
-      }
-      if (!destStat) {
-        return fs.symlink(resolvedSrc, dest);
-      }
-      let resolvedDest = null;
-      try {
-        resolvedDest = await fs.readlink(dest);
-      } catch (e) {
-        if (e.code === "EINVAL" || e.code === "UNKNOWN")
-          return fs.symlink(resolvedSrc, dest);
-        throw e;
-      }
-      if (opts.dereference) {
-        resolvedDest = path.resolve(process.cwd(), resolvedDest);
-      }
-      if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
-        throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
-      }
-      if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
-        throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
-      }
-      await fs.unlink(dest);
-      return fs.symlink(resolvedSrc, dest);
+    function onLink(destStat, src, dest, opts, cb) {
+      fs.readlink(src, (err, resolvedSrc) => {
+        if (err)
+          return cb(err);
+        if (opts.dereference) {
+          resolvedSrc = path.resolve(process.cwd(), resolvedSrc);
+        }
+        if (!destStat) {
+          return fs.symlink(resolvedSrc, dest, cb);
+        } else {
+          fs.readlink(dest, (err2, resolvedDest) => {
+            if (err2) {
+              if (err2.code === "EINVAL" || err2.code === "UNKNOWN")
+                return fs.symlink(resolvedSrc, dest, cb);
+              return cb(err2);
+            }
+            if (opts.dereference) {
+              resolvedDest = path.resolve(process.cwd(), resolvedDest);
+            }
+            if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
+              return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
+            }
+            if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+              return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
+            }
+            return copyLink(resolvedSrc, dest, cb);
+          });
+        }
+      });
+    }
+    function copyLink(resolvedSrc, dest, cb) {
+      fs.unlink(dest, (err) => {
+        if (err)
+          return cb(err);
+        return fs.symlink(resolvedSrc, dest, cb);
+      });
     }
     module2.exports = copy;
   }
@@ -11101,7 +11134,7 @@ var require_copy_sync = __commonJS({
 var require_copy2 = __commonJS({
   "node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromPromise;
+    var u = require_universalify().fromCallback;
     module2.exports = {
       copy: u(require_copy()),
       copySync: require_copy_sync()
@@ -11171,36 +11204,43 @@ var require_empty = __commonJS({
 var require_file = __commonJS({
   "node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromPromise;
+    var u = require_universalify().fromCallback;
     var path = require("path");
-    var fs = require_fs();
+    var fs = require_graceful_fs();
     var mkdir = require_mkdirs();
-    async function createFile(file) {
-      let stats;
-      try {
-        stats = await fs.stat(file);
-      } catch {
+    function createFile(file, callback) {
+      function makeFile() {
+        fs.writeFile(file, "", (err) => {
+          if (err)
+            return callback(err);
+          callback();
+        });
       }
-      if (stats && stats.isFile())
-        return;
-      const dir = path.dirname(file);
-      let dirStats = null;
-      try {
-        dirStats = await fs.stat(dir);
-      } catch (err) {
-        if (err.code === "ENOENT") {
-          await mkdir.mkdirs(dir);
-          await fs.writeFile(file, "");
-          return;
-        } else {
-          throw err;
-        }
-      }
-      if (dirStats.isDirectory()) {
-        await fs.writeFile(file, "");
-      } else {
-        await fs.readdir(dir);
-      }
+      fs.stat(file, (err, stats) => {
+        if (!err && stats.isFile())
+          return callback();
+        const dir = path.dirname(file);
+        fs.stat(dir, (err2, stats2) => {
+          if (err2) {
+            if (err2.code === "ENOENT") {
+              return mkdir.mkdirs(dir, (err3) => {
+                if (err3)
+                  return callback(err3);
+                makeFile();
+              });
+            }
+            return callback(err2);
+          }
+          if (stats2.isDirectory())
+            makeFile();
+          else {
+            fs.readdir(dir, (err3) => {
+              if (err3)
+                return callback(err3);
+            });
+          }
+        });
+      });
     }
     function createFileSync(file) {
       let stats;
@@ -11234,33 +11274,42 @@ var require_file = __commonJS({
 var require_link = __commonJS({
   "node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromPromise;
+    var u = require_universalify().fromCallback;
     var path = require("path");
-    var fs = require_fs();
+    var fs = require_graceful_fs();
     var mkdir = require_mkdirs();
-    var { pathExists } = require_path_exists();
+    var pathExists = require_path_exists().pathExists;
     var { areIdentical } = require_stat();
-    async function createLink(srcpath, dstpath) {
-      let dstStat;
-      try {
-        dstStat = await fs.lstat(dstpath);
-      } catch {
+    function createLink(srcpath, dstpath, callback) {
+      function makeLink(srcpath2, dstpath2) {
+        fs.link(srcpath2, dstpath2, (err) => {
+          if (err)
+            return callback(err);
+          callback(null);
+        });
       }
-      let srcStat;
-      try {
-        srcStat = await fs.lstat(srcpath);
-      } catch (err) {
-        err.message = err.message.replace("lstat", "ensureLink");
-        throw err;
-      }
-      if (dstStat && areIdentical(srcStat, dstStat))
-        return;
-      const dir = path.dirname(dstpath);
-      const dirExists = await pathExists(dir);
-      if (!dirExists) {
-        await mkdir.mkdirs(dir);
-      }
-      await fs.link(srcpath, dstpath);
+      fs.lstat(dstpath, (_, dstStat) => {
+        fs.lstat(srcpath, (err, srcStat) => {
+          if (err) {
+            err.message = err.message.replace("lstat", "ensureLink");
+            return callback(err);
+          }
+          if (dstStat && areIdentical(srcStat, dstStat))
+            return callback(null);
+          const dir = path.dirname(dstpath);
+          pathExists(dir, (err2, dirExists) => {
+            if (err2)
+              return callback(err2);
+            if (dirExists)
+              return makeLink(srcpath, dstpath);
+            mkdir.mkdirs(dir, (err3) => {
+              if (err3)
+                return callback(err3);
+              makeLink(srcpath, dstpath);
+            });
+          });
+        });
+      });
     }
     function createLinkSync(srcpath, dstpath) {
       let dstStat;
@@ -11295,71 +11344,78 @@ var require_symlink_paths = __commonJS({
   "node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
     "use strict";
     var path = require("path");
-    var fs = require_fs();
-    var { pathExists } = require_path_exists();
-    var u = require_universalify().fromPromise;
-    async function symlinkPaths(srcpath, dstpath) {
+    var fs = require_graceful_fs();
+    var pathExists = require_path_exists().pathExists;
+    function symlinkPaths(srcpath, dstpath, callback) {
       if (path.isAbsolute(srcpath)) {
-        try {
-          await fs.lstat(srcpath);
-        } catch (err) {
-          err.message = err.message.replace("lstat", "ensureSymlink");
-          throw err;
-        }
-        return {
-          toCwd: srcpath,
-          toDst: srcpath
-        };
+        return fs.lstat(srcpath, (err) => {
+          if (err) {
+            err.message = err.message.replace("lstat", "ensureSymlink");
+            return callback(err);
+          }
+          return callback(null, {
+            toCwd: srcpath,
+            toDst: srcpath
+          });
+        });
+      } else {
+        const dstdir = path.dirname(dstpath);
+        const relativeToDst = path.join(dstdir, srcpath);
+        return pathExists(relativeToDst, (err, exists) => {
+          if (err)
+            return callback(err);
+          if (exists) {
+            return callback(null, {
+              toCwd: relativeToDst,
+              toDst: srcpath
+            });
+          } else {
+            return fs.lstat(srcpath, (err2) => {
+              if (err2) {
+                err2.message = err2.message.replace("lstat", "ensureSymlink");
+                return callback(err2);
+              }
+              return callback(null, {
+                toCwd: srcpath,
+                toDst: path.relative(dstdir, srcpath)
+              });
+            });
+          }
+        });
       }
-      const dstdir = path.dirname(dstpath);
-      const relativeToDst = path.join(dstdir, srcpath);
-      const exists = await pathExists(relativeToDst);
-      if (exists) {
-        return {
-          toCwd: relativeToDst,
-          toDst: srcpath
-        };
-      }
-      try {
-        await fs.lstat(srcpath);
-      } catch (err) {
-        err.message = err.message.replace("lstat", "ensureSymlink");
-        throw err;
-      }
-      return {
-        toCwd: srcpath,
-        toDst: path.relative(dstdir, srcpath)
-      };
     }
     function symlinkPathsSync(srcpath, dstpath) {
+      let exists;
       if (path.isAbsolute(srcpath)) {
-        const exists2 = fs.existsSync(srcpath);
-        if (!exists2)
+        exists = fs.existsSync(srcpath);
+        if (!exists)
           throw new Error("absolute srcpath does not exist");
         return {
           toCwd: srcpath,
           toDst: srcpath
         };
+      } else {
+        const dstdir = path.dirname(dstpath);
+        const relativeToDst = path.join(dstdir, srcpath);
+        exists = fs.existsSync(relativeToDst);
+        if (exists) {
+          return {
+            toCwd: relativeToDst,
+            toDst: srcpath
+          };
+        } else {
+          exists = fs.existsSync(srcpath);
+          if (!exists)
+            throw new Error("relative srcpath does not exist");
+          return {
+            toCwd: srcpath,
+            toDst: path.relative(dstdir, srcpath)
+          };
+        }
       }
-      const dstdir = path.dirname(dstpath);
-      const relativeToDst = path.join(dstdir, srcpath);
-      const exists = fs.existsSync(relativeToDst);
-      if (exists) {
-        return {
-          toCwd: relativeToDst,
-          toDst: srcpath
-        };
-      }
-      const srcExists = fs.existsSync(srcpath);
-      if (!srcExists)
-        throw new Error("relative srcpath does not exist");
-      return {
-        toCwd: srcpath,
-        toDst: path.relative(dstdir, srcpath)
-      };
     }
     module2.exports = {
-      symlinkPaths: u(symlinkPaths),
+      symlinkPaths,
       symlinkPathsSync
     };
   }
@@ -11369,23 +11425,23 @@ var require_symlink_paths = __commonJS({
 var require_symlink_type = __commonJS({
   "node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
     "use strict";
-    var fs = require_fs();
-    var u = require_universalify().fromPromise;
-    async function symlinkType(srcpath, type) {
+    var fs = require_graceful_fs();
+    function symlinkType(srcpath, type, callback) {
+      callback = typeof type === "function" ? type : callback;
+      type = typeof type === "function" ? false : type;
       if (type)
-        return type;
-      let stats;
-      try {
-        stats = await fs.lstat(srcpath);
-      } catch {
-        return "file";
-      }
-      return stats && stats.isDirectory() ? "dir" : "file";
+        return callback(null, type);
+      fs.lstat(srcpath, (err, stats) => {
+        if (err)
+          return callback(null, "file");
+        type = stats && stats.isDirectory() ? "dir" : "file";
+        callback(null, type);
+      });
     }
     function symlinkTypeSync(srcpath, type) {
+      let stats;
       if (type)
         return type;
-      let stats;
       try {
         stats = fs.lstatSync(srcpath);
       } catch {
@@ -11394,7 +11450,7 @@ var require_symlink_type = __commonJS({
       return stats && stats.isDirectory() ? "dir" : "file";
     }
     module2.exports = {
-      symlinkType: u(symlinkType),
+      symlinkType,
       symlinkTypeSync
     };
   }
@@ -11404,36 +11460,59 @@ var require_symlink_type = __commonJS({
 var require_symlink = __commonJS({
   "node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromPromise;
+    var u = require_universalify().fromCallback;
     var path = require("path");
     var fs = require_fs();
-    var { mkdirs, mkdirsSync } = require_mkdirs();
-    var { symlinkPaths, symlinkPathsSync } = require_symlink_paths();
-    var { symlinkType, symlinkTypeSync } = require_symlink_type();
-    var { pathExists } = require_path_exists();
+    var _mkdirs = require_mkdirs();
+    var mkdirs = _mkdirs.mkdirs;
+    var mkdirsSync = _mkdirs.mkdirsSync;
+    var _symlinkPaths = require_symlink_paths();
+    var symlinkPaths = _symlinkPaths.symlinkPaths;
+    var symlinkPathsSync = _symlinkPaths.symlinkPathsSync;
+    var _symlinkType = require_symlink_type();
+    var symlinkType = _symlinkType.symlinkType;
+    var symlinkTypeSync = _symlinkType.symlinkTypeSync;
+    var pathExists = require_path_exists().pathExists;
     var { areIdentical } = require_stat();
-    async function createSymlink(srcpath, dstpath, type) {
-      let stats;
-      try {
-        stats = await fs.lstat(dstpath);
-      } catch {
-      }
-      if (stats && stats.isSymbolicLink()) {
-        const [srcStat, dstStat] = await Promise.all([
-          fs.stat(srcpath),
-          fs.stat(dstpath)
-        ]);
-        if (areIdentical(srcStat, dstStat))
-          return;
-      }
-      const relative = await symlinkPaths(srcpath, dstpath);
-      srcpath = relative.toDst;
-      const toType = await symlinkType(relative.toCwd, type);
-      const dir = path.dirname(dstpath);
-      if (!await pathExists(dir)) {
-        await mkdirs(dir);
-      }
-      return fs.symlink(srcpath, dstpath, toType);
+    function createSymlink(srcpath, dstpath, type, callback) {
+      callback = typeof type === "function" ? type : callback;
+      type = typeof type === "function" ? false : type;
+      fs.lstat(dstpath, (err, stats) => {
+        if (!err && stats.isSymbolicLink()) {
+          Promise.all([
+            fs.stat(srcpath),
+            fs.stat(dstpath)
+          ]).then(([srcStat, dstStat]) => {
+            if (areIdentical(srcStat, dstStat))
+              return callback(null);
+            _createSymlink(srcpath, dstpath, type, callback);
+          });
+        } else
+          _createSymlink(srcpath, dstpath, type, callback);
+      });
+    }
+    function _createSymlink(srcpath, dstpath, type, callback) {
+      symlinkPaths(srcpath, dstpath, (err, relative) => {
+        if (err)
+          return callback(err);
+        srcpath = relative.toDst;
+        symlinkType(relative.toCwd, type, (err2, type2) => {
+          if (err2)
+            return callback(err2);
+          const dir = path.dirname(dstpath);
+          pathExists(dir, (err3, dirExists) => {
+            if (err3)
+              return callback(err3);
+            if (dirExists)
+              return fs.symlink(srcpath, dstpath, type2, callback);
+            mkdirs(dir, (err4) => {
+              if (err4)
+                return callback(err4);
+              fs.symlink(srcpath, dstpath, type2, callback);
+            });
+          });
+        });
+      });
     }
     function createSymlinkSync(srcpath, dstpath, type) {
       let stats;
@@ -11600,23 +11679,35 @@ var require_jsonfile2 = __commonJS({
 var require_output_file = __commonJS({
   "node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromPromise;
-    var fs = require_fs();
+    var u = require_universalify().fromCallback;
+    var fs = require_graceful_fs();
     var path = require("path");
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
-    async function outputFile(file, data, encoding = "utf-8") {
-      const dir = path.dirname(file);
-      if (!await pathExists(dir)) {
-        await mkdir.mkdirs(dir);
+    function outputFile(file, data, encoding, callback) {
+      if (typeof encoding === "function") {
+        callback = encoding;
+        encoding = "utf8";
       }
-      return fs.writeFile(file, data, encoding);
+      const dir = path.dirname(file);
+      pathExists(dir, (err, itDoes) => {
+        if (err)
+          return callback(err);
+        if (itDoes)
+          return fs.writeFile(file, data, encoding, callback);
+        mkdir.mkdirs(dir, (err2) => {
+          if (err2)
+            return callback(err2);
+          fs.writeFile(file, data, encoding, callback);
+        });
+      });
     }
     function outputFileSync(file, ...args) {
       const dir = path.dirname(file);
-      if (!fs.existsSync(dir)) {
-        mkdir.mkdirsSync(dir);
+      if (fs.existsSync(dir)) {
+        return fs.writeFileSync(file, ...args);
       }
+      mkdir.mkdirsSync(dir);
       fs.writeFileSync(file, ...args);
     }
     module2.exports = {
@@ -11676,49 +11767,80 @@ var require_json = __commonJS({
 var require_move = __commonJS({
   "node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
     "use strict";
-    var fs = require_fs();
+    var fs = require_graceful_fs();
     var path = require("path");
-    var { copy } = require_copy2();
-    var { remove } = require_remove();
-    var { mkdirp } = require_mkdirs();
-    var { pathExists } = require_path_exists();
+    var copy = require_copy2().copy;
+    var remove = require_remove().remove;
+    var mkdirp = require_mkdirs().mkdirp;
+    var pathExists = require_path_exists().pathExists;
     var stat = require_stat();
-    async function move(src, dest, opts = {}) {
+    function move(src, dest, opts, cb) {
+      if (typeof opts === "function") {
+        cb = opts;
+        opts = {};
+      }
+      opts = opts || {};
       const overwrite = opts.overwrite || opts.clobber || false;
-      const { srcStat, isChangingCase = false } = await stat.checkPaths(src, dest, "move", opts);
-      await stat.checkParentPaths(src, srcStat, dest, "move");
-      const destParent = path.dirname(dest);
-      const parsedParentPath = path.parse(destParent);
-      if (parsedParentPath.root !== destParent) {
-        await mkdirp(destParent);
-      }
-      return doRename(src, dest, overwrite, isChangingCase);
+      stat.checkPaths(src, dest, "move", opts, (err, stats) => {
+        if (err)
+          return cb(err);
+        const { srcStat, isChangingCase = false } = stats;
+        stat.checkParentPaths(src, srcStat, dest, "move", (err2) => {
+          if (err2)
+            return cb(err2);
+          if (isParentRoot(dest))
+            return doRename(src, dest, overwrite, isChangingCase, cb);
+          mkdirp(path.dirname(dest), (err3) => {
+            if (err3)
+              return cb(err3);
+            return doRename(src, dest, overwrite, isChangingCase, cb);
+          });
+        });
+      });
     }
-    async function doRename(src, dest, overwrite, isChangingCase) {
-      if (!isChangingCase) {
-        if (overwrite) {
-          await remove(dest);
-        } else if (await pathExists(dest)) {
-          throw new Error("dest already exists.");
-        }
-      }
-      try {
-        await fs.rename(src, dest);
-      } catch (err) {
-        if (err.code !== "EXDEV") {
-          throw err;
-        }
-        await moveAcrossDevice(src, dest, overwrite);
-      }
+    function isParentRoot(dest) {
+      const parent = path.dirname(dest);
+      const parsedPath = path.parse(parent);
+      return parsedPath.root === parent;
     }
-    async function moveAcrossDevice(src, dest, overwrite) {
+    function doRename(src, dest, overwrite, isChangingCase, cb) {
+      if (isChangingCase)
+        return rename(src, dest, overwrite, cb);
+      if (overwrite) {
+        return remove(dest, (err) => {
+          if (err)
+            return cb(err);
+          return rename(src, dest, overwrite, cb);
+        });
+      }
+      pathExists(dest, (err, destExists) => {
+        if (err)
+          return cb(err);
+        if (destExists)
+          return cb(new Error("dest already exists."));
+        return rename(src, dest, overwrite, cb);
+      });
+    }
+    function rename(src, dest, overwrite, cb) {
+      fs.rename(src, dest, (err) => {
+        if (!err)
+          return cb();
+        if (err.code !== "EXDEV")
+          return cb(err);
+        return moveAcrossDevice(src, dest, overwrite, cb);
+      });
+    }
+    function moveAcrossDevice(src, dest, overwrite, cb) {
       const opts = {
         overwrite,
         errorOnExist: true,
         preserveTimestamps: true
       };
-      await copy(src, dest, opts);
-      return remove(src);
+      copy(src, dest, opts, (err) => {
+        if (err)
+          return cb(err);
+        return remove(src, cb);
+      });
     }
     module2.exports = move;
   }
@@ -11785,7 +11907,7 @@ var require_move_sync = __commonJS({
 var require_move2 = __commonJS({
   "node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromPromise;
+    var u = require_universalify().fromCallback;
     module2.exports = {
       move: u(require_move()),
       moveSync: require_move_sync()
@@ -11847,7 +11969,7 @@ var require_checkSolution = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkSolution = void 0;
-    var glob = require_commonjs4();
+    var glob = require_commonjs();
     var os = require("os");
     var path = require("path");
     var InputValidator_1 = require_InputValidator();
@@ -18311,7 +18433,7 @@ var require_unzip_stream = __commonJS({
     UnzipStream.prototype._prepareOutStream = function(vars, entry) {
       var self = this;
       var isDirectory = vars.uncompressedSize === 0 && /[\/\\]$/.test(entry.path);
-      entry.path = entry.path.replace(/(?<=^|[/\\]+)[.][.]+(?=[/\\]+|$)/g, ".");
+      entry.path = entry.path.replace(/^([/\\]*[.]+[/\\]+)*[/\\]*/, "");
       entry.type = isDirectory ? "Directory" : "File";
       entry.isDirectory = isDirectory;
       var fileSizeKnown = !(vars.flags & 8);
@@ -18366,7 +18488,7 @@ var require_unzip_stream = __commonJS({
         var message = isEncrypted ? "Encrypted files are not supported!" : "Zip version " + Math.floor(vars.versionsNeededToExtract / 10) + "." + vars.versionsNeededToExtract % 10 + " is not supported";
         entry.skip = true;
         setImmediate(() => {
-          self.emit("error", new Error(message));
+          entry.emit("error", new Error(message));
         });
         this.outStreamInfo.stream.pipe(new Entry().autodrain());
         return;
@@ -18915,9 +19037,9 @@ var require_path_and_artifact_name_validation = __commonJS({
       for (const [invalidCharacterKey, errorMessageForCharacter] of invalidArtifactNameCharacters) {
         if (name.includes(invalidCharacterKey)) {
           throw new Error(`Artifact name is not valid: ${name}. Contains the following character: ${errorMessageForCharacter}
-
+          
 Invalid characters include: ${Array.from(invalidArtifactNameCharacters.values()).toString()}
-
+          
 These characters are not allowed in the artifact name due to limitations with certain file systems such as NTFS. To maintain file system agnostic behavior, these characters are intentionally not allowed to prevent potential problems with downloads on different file systems.`);
         }
       }
@@ -18931,9 +19053,9 @@ These characters are not allowed in the artifact name due to limitations with ce
       for (const [invalidCharacterKey, errorMessageForCharacter] of invalidArtifactFilePathCharacters) {
         if (path.includes(invalidCharacterKey)) {
           throw new Error(`Artifact path is not valid: ${path}. Contains the following character: ${errorMessageForCharacter}
-
+          
 Invalid characters include: ${Array.from(invalidArtifactFilePathCharacters.values()).toString()}
-
+          
 The following characters are not allowed in files that are uploaded due to limitations with certain file systems such as NTFS. To maintain file system agnostic behavior, these characters are intentionally not allowed to prevent potential problems with downloads on different file systems.
           `);
         }
