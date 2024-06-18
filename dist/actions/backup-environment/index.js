@@ -114,12 +114,12 @@ var require_authenticate = __commonJS({
     exports2.clearAuthentication = exports2.authenticateEnvironment = exports2.authenticateAdmin = void 0;
     function authenticateAdmin(pac, credentials, logger) {
       logger.log(`authN to admin API: authType=${isUsernamePassword(credentials) ? "UserPass" : "SPN"}; cloudInstance: ${credentials.cloudInstance || "<not set>"}`);
-      return pac("auth", "create", "--kind", "ADMIN", ...addCredentials(credentials), ...addCloudInstance(credentials));
+      return pac("auth", "create", ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateAdmin = authenticateAdmin;
     function authenticateEnvironment(pac, credentials, environmentUrl, logger) {
       logger.log(`authN to env. authType:${isUsernamePassword(credentials) ? "UserPass" : "SPN"} authScheme:${isUsernamePassword(credentials) ? "" : `${credentials.scheme}`}; cloudInstance: ${credentials.cloudInstance || "<not set>"}; envUrl: ${environmentUrl}`);
-      return pac("auth", "create", ...addUrl(environmentUrl), ...addCredentials(credentials), ...addCloudInstance(credentials));
+      return pac("auth", "create", ...addEnvironment(environmentUrl), ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
     exports2.authenticateEnvironment = authenticateEnvironment;
     function clearAuthentication(pac) {
@@ -127,8 +127,8 @@ var require_authenticate = __commonJS({
       return pac("auth", "clear");
     }
     exports2.clearAuthentication = clearAuthentication;
-    function addUrl(url) {
-      return ["--url", url];
+    function addEnvironment(env) {
+      return ["--environment", env];
     }
     function addCredentials(credentials) {
       if (isUsernamePassword(credentials)) {
@@ -974,9 +974,9 @@ var require_brace_expansion = __commonJS({
   }
 });
 
-// node_modules/glob/node_modules/minimatch/dist/cjs/assert-valid-pattern.js
+// node_modules/glob/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js
 var require_assert_valid_pattern = __commonJS({
-  "node_modules/glob/node_modules/minimatch/dist/cjs/assert-valid-pattern.js"(exports2) {
+  "node_modules/glob/node_modules/minimatch/dist/commonjs/assert-valid-pattern.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.assertValidPattern = void 0;
@@ -993,9 +993,9 @@ var require_assert_valid_pattern = __commonJS({
   }
 });
 
-// node_modules/glob/node_modules/minimatch/dist/cjs/brace-expressions.js
+// node_modules/glob/node_modules/minimatch/dist/commonjs/brace-expressions.js
 var require_brace_expressions = __commonJS({
-  "node_modules/glob/node_modules/minimatch/dist/cjs/brace-expressions.js"(exports2) {
+  "node_modules/glob/node_modules/minimatch/dist/commonjs/brace-expressions.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.parseClass = void 0;
@@ -1110,9 +1110,9 @@ var require_brace_expressions = __commonJS({
   }
 });
 
-// node_modules/glob/node_modules/minimatch/dist/cjs/unescape.js
+// node_modules/glob/node_modules/minimatch/dist/commonjs/unescape.js
 var require_unescape = __commonJS({
-  "node_modules/glob/node_modules/minimatch/dist/cjs/unescape.js"(exports2) {
+  "node_modules/glob/node_modules/minimatch/dist/commonjs/unescape.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.unescape = void 0;
@@ -1123,9 +1123,9 @@ var require_unescape = __commonJS({
   }
 });
 
-// node_modules/glob/node_modules/minimatch/dist/cjs/ast.js
+// node_modules/glob/node_modules/minimatch/dist/commonjs/ast.js
 var require_ast = __commonJS({
-  "node_modules/glob/node_modules/minimatch/dist/cjs/ast.js"(exports2) {
+  "node_modules/glob/node_modules/minimatch/dist/commonjs/ast.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.AST = void 0;
@@ -1404,6 +1404,9 @@ var require_ast = __commonJS({
           _glob: glob
         });
       }
+      get options() {
+        return this.#options;
+      }
       // returns the string match, the regexp source, whether there's magic
       // in the regexp (so a regular expression is required) and whether or
       // not the uflag is needed for the regular expression (for posix classes)
@@ -1609,9 +1612,9 @@ var require_ast = __commonJS({
   }
 });
 
-// node_modules/glob/node_modules/minimatch/dist/cjs/escape.js
+// node_modules/glob/node_modules/minimatch/dist/commonjs/escape.js
 var require_escape = __commonJS({
-  "node_modules/glob/node_modules/minimatch/dist/cjs/escape.js"(exports2) {
+  "node_modules/glob/node_modules/minimatch/dist/commonjs/escape.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.escape = void 0;
@@ -1622,9 +1625,9 @@ var require_escape = __commonJS({
   }
 });
 
-// node_modules/glob/node_modules/minimatch/dist/cjs/index.js
-var require_cjs = __commonJS({
-  "node_modules/glob/node_modules/minimatch/dist/cjs/index.js"(exports2) {
+// node_modules/glob/node_modules/minimatch/dist/commonjs/index.js
+var require_commonjs = __commonJS({
+  "node_modules/glob/node_modules/minimatch/dist/commonjs/index.js"(exports2) {
     "use strict";
     var __importDefault = exports2 && exports2.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
@@ -2240,7 +2243,10 @@ var require_cjs = __commonJS({
           fastTest = dotStarTest;
         }
         const re = ast_js_1.AST.fromGlob(pattern, this.options).toMMPattern();
-        return fastTest ? Object.assign(re, { test: fastTest }) : re;
+        if (fastTest && typeof re === "object") {
+          Reflect.defineProperty(re, "test", { value: fastTest });
+        }
+        return re;
       }
       makeRe() {
         if (this.regexp || this.regexp === false)
@@ -2371,7 +2377,7 @@ var require_cjs = __commonJS({
 });
 
 // node_modules/path-scurry/node_modules/lru-cache/dist/commonjs/index.js
-var require_commonjs = __commonJS({
+var require_commonjs2 = __commonJS({
   "node_modules/path-scurry/node_modules/lru-cache/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -3655,7 +3661,7 @@ var require_commonjs = __commonJS({
 });
 
 // node_modules/minipass/dist/commonjs/index.js
-var require_commonjs2 = __commonJS({
+var require_commonjs3 = __commonJS({
   "node_modules/minipass/dist/commonjs/index.js"(exports2) {
     "use strict";
     var __importDefault = exports2 && exports2.__importDefault || function(mod) {
@@ -3667,15 +3673,15 @@ var require_commonjs2 = __commonJS({
       stdout: null,
       stderr: null
     };
-    var events_1 = require("events");
-    var stream_1 = __importDefault(require("stream"));
-    var string_decoder_1 = require("string_decoder");
-    var isStream = (s) => !!s && typeof s === "object" && (s instanceof Minipass || s instanceof stream_1.default || (0, exports2.isReadable)(s) || (0, exports2.isWritable)(s));
+    var node_events_1 = require("node:events");
+    var node_stream_1 = __importDefault(require("node:stream"));
+    var node_string_decoder_1 = require("node:string_decoder");
+    var isStream = (s) => !!s && typeof s === "object" && (s instanceof Minipass || s instanceof node_stream_1.default || (0, exports2.isReadable)(s) || (0, exports2.isWritable)(s));
     exports2.isStream = isStream;
-    var isReadable = (s) => !!s && typeof s === "object" && s instanceof events_1.EventEmitter && typeof s.pipe === "function" && // node core Writable streams have a pipe() method, but it throws
-    s.pipe !== stream_1.default.Writable.prototype.pipe;
+    var isReadable = (s) => !!s && typeof s === "object" && s instanceof node_events_1.EventEmitter && typeof s.pipe === "function" && // node core Writable streams have a pipe() method, but it throws
+    s.pipe !== node_stream_1.default.Writable.prototype.pipe;
     exports2.isReadable = isReadable;
-    var isWritable = (s) => !!s && typeof s === "object" && s instanceof events_1.EventEmitter && typeof s.write === "function" && typeof s.end === "function";
+    var isWritable = (s) => !!s && typeof s === "object" && s instanceof node_events_1.EventEmitter && typeof s.write === "function" && typeof s.end === "function";
     exports2.isWritable = isWritable;
     var EOF = Symbol("EOF");
     var MAYBE_EMIT_END = Symbol("maybeEmitEnd");
@@ -3752,7 +3758,7 @@ var require_commonjs2 = __commonJS({
     };
     var isObjectModeOptions = (o) => !!o.objectMode;
     var isEncodingOptions = (o) => !o.objectMode && !!o.encoding && o.encoding !== "buffer";
-    var Minipass = class extends events_1.EventEmitter {
+    var Minipass = class extends node_events_1.EventEmitter {
       [FLOWING] = false;
       [PAUSED] = false;
       [PIPES] = [];
@@ -3803,7 +3809,7 @@ var require_commonjs2 = __commonJS({
           this[ENCODING] = null;
         }
         this[ASYNC] = !!options.async;
-        this[DECODER] = this[ENCODING] ? new string_decoder_1.StringDecoder(this[ENCODING]) : null;
+        this[DECODER] = this[ENCODING] ? new node_string_decoder_1.StringDecoder(this[ENCODING]) : null;
         if (options && options.debugExposeBuffer === true) {
           Object.defineProperty(this, "buffer", { get: () => this[BUFFER] });
         }
@@ -4547,7 +4553,7 @@ var require_commonjs2 = __commonJS({
 });
 
 // node_modules/path-scurry/dist/commonjs/index.js
-var require_commonjs3 = __commonJS({
+var require_commonjs4 = __commonJS({
   "node_modules/path-scurry/dist/commonjs/index.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
@@ -4579,14 +4585,14 @@ var require_commonjs3 = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PathScurry = exports2.Path = exports2.PathScurryDarwin = exports2.PathScurryPosix = exports2.PathScurryWin32 = exports2.PathScurryBase = exports2.PathPosix = exports2.PathWin32 = exports2.PathBase = exports2.ChildrenCache = exports2.ResolveCache = void 0;
-    var lru_cache_1 = require_commonjs();
-    var path_1 = require("path");
-    var url_1 = require("url");
-    var actualFS = __importStar(require("fs"));
+    var lru_cache_1 = require_commonjs2();
+    var node_path_1 = require("node:path");
+    var node_url_1 = require("node:url");
     var fs_1 = require("fs");
+    var actualFS = __importStar(require("node:fs"));
     var realpathSync = fs_1.realpathSync.native;
-    var promises_1 = require("fs/promises");
-    var minipass_1 = require_commonjs2();
+    var promises_1 = require("node:fs/promises");
+    var minipass_1 = require_commonjs3();
     var defaultFS = {
       lstatSync: fs_1.lstatSync,
       readdir: fs_1.readdir,
@@ -4699,6 +4705,11 @@ var require_commonjs3 = __commonJS({
        * @internal
        */
       nocase;
+      /**
+       * boolean indicating that this path is the current working directory
+       * of the PathScurry collection that contains it.
+       */
+      isCWD = false;
       // potential default fs override
       #fs;
       // Stats fields
@@ -4786,13 +4797,19 @@ var require_commonjs3 = __commonJS({
       #realpath;
       /**
        * This property is for compatibility with the Dirent class as of
-       * Node v20, where Dirent['path'] refers to the path of the directory
-       * that was passed to readdir.  So, somewhat counterintuitively, this
-       * property refers to the *parent* path, not the path object itself.
-       * For root entries, it's the path to the entry itself.
+       * Node v20, where Dirent['parentPath'] refers to the path of the
+       * directory that was passed to readdir. For root entries, it's the path
+       * to the entry itself.
+       */
+      get parentPath() {
+        return (this.parent || this).fullpath();
+      }
+      /**
+       * Deprecated alias for Dirent['parentPath'] Somewhat counterintuitively,
+       * this property refers to the *parent* path, not the path object itself.
        */
       get path() {
-        return (this.parent || this).fullpath();
+        return this.parentPath;
       }
       /**
        * Do not create new Path objects directly.  They should always be accessed
@@ -4919,6 +4936,8 @@ var require_commonjs3 = __commonJS({
        * the cwd, then this ends up being equivalent to the fullpath()
        */
       relative() {
+        if (this.isCWD)
+          return "";
         if (this.#relative !== void 0) {
           return this.#relative;
         }
@@ -4939,6 +4958,8 @@ var require_commonjs3 = __commonJS({
       relativePosix() {
         if (this.sep === "/")
           return this.relative();
+        if (this.isCWD)
+          return "";
         if (this.#relativePosix !== void 0)
           return this.#relativePosix;
         const name = this.name;
@@ -5545,6 +5566,8 @@ var require_commonjs3 = __commonJS({
       [setAsCwd](oldCwd) {
         if (oldCwd === this)
           return;
+        oldCwd.isCWD = false;
+        this.isCWD = true;
         const changed = /* @__PURE__ */ new Set([]);
         let rp = [];
         let p = this;
@@ -5592,7 +5615,7 @@ var require_commonjs3 = __commonJS({
        * @internal
        */
       getRootString(path) {
-        return path_1.win32.parse(path).root;
+        return node_path_1.win32.parse(path).root;
       }
       /**
        * @internal
@@ -5693,7 +5716,7 @@ var require_commonjs3 = __commonJS({
       constructor(cwd = process.cwd(), pathImpl, sep, { nocase, childrenCacheSize = 16 * 1024, fs = defaultFS } = {}) {
         this.#fs = fsFromOption(fs);
         if (cwd instanceof URL || cwd.startsWith("file://")) {
-          cwd = (0, url_1.fileURLToPath)(cwd);
+          cwd = (0, node_url_1.fileURLToPath)(cwd);
         }
         const cwdPath = pathImpl.resolve(cwd);
         this.roots = /* @__PURE__ */ Object.create(null);
@@ -6235,7 +6258,7 @@ var require_commonjs3 = __commonJS({
       sep = "\\";
       constructor(cwd = process.cwd(), opts = {}) {
         const { nocase = true } = opts;
-        super(cwd, path_1.win32, "\\", { ...opts, nocase });
+        super(cwd, node_path_1.win32, "\\", { ...opts, nocase });
         this.nocase = nocase;
         for (let p = this.cwd; p; p = p.parent) {
           p.nocase = this.nocase;
@@ -6245,7 +6268,7 @@ var require_commonjs3 = __commonJS({
        * @internal
        */
       parseRootPath(dir) {
-        return path_1.win32.parse(dir).root.toUpperCase();
+        return node_path_1.win32.parse(dir).root.toUpperCase();
       }
       /**
        * @internal
@@ -6268,7 +6291,7 @@ var require_commonjs3 = __commonJS({
       sep = "/";
       constructor(cwd = process.cwd(), opts = {}) {
         const { nocase = false } = opts;
-        super(cwd, path_1.posix, "/", { ...opts, nocase });
+        super(cwd, node_path_1.posix, "/", { ...opts, nocase });
         this.nocase = nocase;
       }
       /**
@@ -6309,7 +6332,7 @@ var require_pattern = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Pattern = void 0;
-    var minimatch_1 = require_cjs();
+    var minimatch_1 = require_commonjs();
     var isPatternList = (pl) => pl.length >= 1;
     var isGlobList = (gl) => gl.length >= 1;
     var Pattern = class _Pattern {
@@ -6483,7 +6506,7 @@ var require_ignore = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Ignore = void 0;
-    var minimatch_1 = require_cjs();
+    var minimatch_1 = require_commonjs();
     var pattern_js_1 = require_pattern();
     var defaultPlatform = typeof process === "object" && process && typeof process.platform === "string" ? process.platform : "linux";
     var Ignore = class {
@@ -6491,12 +6514,15 @@ var require_ignore = __commonJS({
       relativeChildren;
       absolute;
       absoluteChildren;
+      platform;
+      mmopts;
       constructor(ignored, { nobrace, nocase, noext, noglobstar, platform = defaultPlatform }) {
         this.relative = [];
         this.absolute = [];
         this.relativeChildren = [];
         this.absoluteChildren = [];
-        const mmopts = {
+        this.platform = platform;
+        this.mmopts = {
           dot: true,
           nobrace,
           nocase,
@@ -6507,32 +6533,34 @@ var require_ignore = __commonJS({
           nocomment: true,
           nonegate: true
         };
-        for (const ign of ignored) {
-          const mm = new minimatch_1.Minimatch(ign, mmopts);
-          for (let i = 0; i < mm.set.length; i++) {
-            const parsed = mm.set[i];
-            const globParts = mm.globParts[i];
-            if (!parsed || !globParts) {
-              throw new Error("invalid pattern object");
-            }
-            while (parsed[0] === "." && globParts[0] === ".") {
-              parsed.shift();
-              globParts.shift();
-            }
-            const p = new pattern_js_1.Pattern(parsed, globParts, 0, platform);
-            const m = new minimatch_1.Minimatch(p.globString(), mmopts);
-            const children = globParts[globParts.length - 1] === "**";
-            const absolute = p.isAbsolute();
+        for (const ign of ignored)
+          this.add(ign);
+      }
+      add(ign) {
+        const mm = new minimatch_1.Minimatch(ign, this.mmopts);
+        for (let i = 0; i < mm.set.length; i++) {
+          const parsed = mm.set[i];
+          const globParts = mm.globParts[i];
+          if (!parsed || !globParts) {
+            throw new Error("invalid pattern object");
+          }
+          while (parsed[0] === "." && globParts[0] === ".") {
+            parsed.shift();
+            globParts.shift();
+          }
+          const p = new pattern_js_1.Pattern(parsed, globParts, 0, this.platform);
+          const m = new minimatch_1.Minimatch(p.globString(), this.mmopts);
+          const children = globParts[globParts.length - 1] === "**";
+          const absolute = p.isAbsolute();
+          if (absolute)
+            this.absolute.push(m);
+          else
+            this.relative.push(m);
+          if (children) {
             if (absolute)
-              this.absolute.push(m);
+              this.absoluteChildren.push(m);
             else
-              this.relative.push(m);
-            if (children) {
-              if (absolute)
-                this.absoluteChildren.push(m);
-              else
-                this.relativeChildren.push(m);
-            }
+              this.relativeChildren.push(m);
           }
         }
       }
@@ -6575,7 +6603,7 @@ var require_processor = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Processor = exports2.SubWalks = exports2.MatchRecord = exports2.HasWalkedCache = void 0;
-    var minimatch_1 = require_cjs();
+    var minimatch_1 = require_commonjs();
     var HasWalkedCache = class _HasWalkedCache {
       store;
       constructor(store = /* @__PURE__ */ new Map()) {
@@ -6808,7 +6836,7 @@ var require_walker = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.GlobStream = exports2.GlobWalker = exports2.GlobUtil = void 0;
-    var minipass_1 = require_commonjs2();
+    var minipass_1 = require_commonjs3();
     var ignore_js_1 = require_ignore();
     var processor_js_1 = require_processor();
     var makeIgnore = (ignore, opts) => typeof ignore === "string" ? new ignore_js_1.Ignore([ignore], opts) : Array.isArray(ignore) ? new ignore_js_1.Ignore(ignore, opts) : ignore;
@@ -6824,13 +6852,19 @@ var require_walker = __commonJS({
       #sep;
       signal;
       maxDepth;
+      includeChildMatches;
       constructor(patterns, path, opts) {
         this.patterns = patterns;
         this.path = path;
         this.opts = opts;
         this.#sep = !opts.posix && opts.platform === "win32" ? "\\" : "/";
-        if (opts.ignore) {
-          this.#ignore = makeIgnore(opts.ignore, opts);
+        this.includeChildMatches = opts.includeChildMatches !== false;
+        if (opts.ignore || !this.includeChildMatches) {
+          this.#ignore = makeIgnore(opts.ignore ?? [], opts);
+          if (!this.includeChildMatches && typeof this.#ignore.add !== "function") {
+            const m = "cannot ignore child matches, ignore lacks add() method.";
+            throw new Error(m);
+          }
         }
         this.maxDepth = opts.maxDepth || Infinity;
         if (opts.signal) {
@@ -6916,6 +6950,10 @@ var require_walker = __commonJS({
       matchFinish(e, absolute) {
         if (this.#ignored(e))
           return;
+        if (!this.includeChildMatches && this.#ignore?.add) {
+          const ign = `${e.relativePosix()}/**`;
+          this.#ignore.add(ign);
+        }
         const abs = this.opts.absolute === void 0 ? absolute : this.opts.absolute;
         this.seen.add(e);
         const mark = this.opts.mark && e.isDirectory() ? this.#sep : "";
@@ -7055,10 +7093,9 @@ var require_walker = __commonJS({
     };
     exports2.GlobUtil = GlobUtil;
     var GlobWalker = class extends GlobUtil {
-      matches;
+      matches = /* @__PURE__ */ new Set();
       constructor(patterns, path, opts) {
         super(patterns, path, opts);
-        this.matches = /* @__PURE__ */ new Set();
       }
       matchEmit(e) {
         this.matches.add(e);
@@ -7139,9 +7176,9 @@ var require_glob = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.Glob = void 0;
-    var minimatch_1 = require_cjs();
-    var path_scurry_1 = require_commonjs3();
-    var url_1 = require("url");
+    var minimatch_1 = require_commonjs();
+    var node_url_1 = require("node:url");
+    var path_scurry_1 = require_commonjs4();
     var pattern_js_1 = require_pattern();
     var walker_js_1 = require_walker();
     var defaultPlatform = typeof process === "object" && process && typeof process.platform === "string" ? process.platform : "linux";
@@ -7170,6 +7207,7 @@ var require_glob = __commonJS({
       signal;
       windowsPathsNoEscape;
       withFileTypes;
+      includeChildMatches;
       /**
        * The options provided to the constructor.
        */
@@ -7203,7 +7241,7 @@ var require_glob = __commonJS({
         if (!opts.cwd) {
           this.cwd = "";
         } else if (opts.cwd instanceof URL || opts.cwd.startsWith("file://")) {
-          opts.cwd = (0, url_1.fileURLToPath)(opts.cwd);
+          opts.cwd = (0, node_url_1.fileURLToPath)(opts.cwd);
         }
         this.cwd = opts.cwd || "";
         this.root = opts.root;
@@ -7212,6 +7250,7 @@ var require_glob = __commonJS({
         this.noext = !!opts.noext;
         this.realpath = !!opts.realpath;
         this.absolute = opts.absolute;
+        this.includeChildMatches = opts.includeChildMatches !== false;
         this.noglobstar = !!opts.noglobstar;
         this.matchBase = !!opts.matchBase;
         this.maxDepth = typeof opts.maxDepth === "number" ? opts.maxDepth : Infinity;
@@ -7285,7 +7324,8 @@ var require_glob = __commonJS({
             ...this.opts,
             maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
             platform: this.platform,
-            nocase: this.nocase
+            nocase: this.nocase,
+            includeChildMatches: this.includeChildMatches
           }).walk()
         ];
       }
@@ -7295,7 +7335,8 @@ var require_glob = __commonJS({
             ...this.opts,
             maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
             platform: this.platform,
-            nocase: this.nocase
+            nocase: this.nocase,
+            includeChildMatches: this.includeChildMatches
           }).walkSync()
         ];
       }
@@ -7304,7 +7345,8 @@ var require_glob = __commonJS({
           ...this.opts,
           maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
           platform: this.platform,
-          nocase: this.nocase
+          nocase: this.nocase,
+          includeChildMatches: this.includeChildMatches
         }).stream();
       }
       streamSync() {
@@ -7312,7 +7354,8 @@ var require_glob = __commonJS({
           ...this.opts,
           maxDepth: this.maxDepth !== Infinity ? this.maxDepth + this.scurry.cwd.depth() : Infinity,
           platform: this.platform,
-          nocase: this.nocase
+          nocase: this.nocase,
+          includeChildMatches: this.includeChildMatches
         }).streamSync();
       }
       /**
@@ -7346,7 +7389,7 @@ var require_has_magic = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.hasMagic = void 0;
-    var minimatch_1 = require_cjs();
+    var minimatch_1 = require_commonjs();
     var hasMagic = (pattern, options = {}) => {
       if (!Array.isArray(pattern)) {
         pattern = [pattern];
@@ -7362,14 +7405,33 @@ var require_has_magic = __commonJS({
 });
 
 // node_modules/glob/dist/commonjs/index.js
-var require_commonjs4 = __commonJS({
+var require_commonjs5 = __commonJS({
   "node_modules/glob/dist/commonjs/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.glob = exports2.hasMagic = exports2.Glob = exports2.unescape = exports2.escape = exports2.sync = exports2.iterate = exports2.iterateSync = exports2.stream = exports2.streamSync = exports2.globIterate = exports2.globIterateSync = exports2.globSync = exports2.globStream = exports2.globStreamSync = void 0;
-    var minimatch_1 = require_cjs();
+    exports2.glob = exports2.sync = exports2.iterate = exports2.iterateSync = exports2.stream = exports2.streamSync = exports2.globIterate = exports2.globIterateSync = exports2.globSync = exports2.globStream = exports2.globStreamSync = exports2.Ignore = exports2.hasMagic = exports2.Glob = exports2.unescape = exports2.escape = void 0;
+    var minimatch_1 = require_commonjs();
     var glob_js_1 = require_glob();
     var has_magic_js_1 = require_has_magic();
+    var minimatch_2 = require_commonjs();
+    Object.defineProperty(exports2, "escape", { enumerable: true, get: function() {
+      return minimatch_2.escape;
+    } });
+    Object.defineProperty(exports2, "unescape", { enumerable: true, get: function() {
+      return minimatch_2.unescape;
+    } });
+    var glob_js_2 = require_glob();
+    Object.defineProperty(exports2, "Glob", { enumerable: true, get: function() {
+      return glob_js_2.Glob;
+    } });
+    var has_magic_js_2 = require_has_magic();
+    Object.defineProperty(exports2, "hasMagic", { enumerable: true, get: function() {
+      return has_magic_js_2.hasMagic;
+    } });
+    var ignore_js_1 = require_ignore();
+    Object.defineProperty(exports2, "Ignore", { enumerable: true, get: function() {
+      return ignore_js_1.Ignore;
+    } });
     function globStreamSync(pattern, options = {}) {
       return new glob_js_1.Glob(pattern, options).streamSync();
     }
@@ -7403,21 +7465,6 @@ var require_commonjs4 = __commonJS({
       stream: globStreamSync,
       iterate: globIterateSync
     });
-    var minimatch_2 = require_cjs();
-    Object.defineProperty(exports2, "escape", { enumerable: true, get: function() {
-      return minimatch_2.escape;
-    } });
-    Object.defineProperty(exports2, "unescape", { enumerable: true, get: function() {
-      return minimatch_2.unescape;
-    } });
-    var glob_js_2 = require_glob();
-    Object.defineProperty(exports2, "Glob", { enumerable: true, get: function() {
-      return glob_js_2.Glob;
-    } });
-    var has_magic_js_2 = require_has_magic();
-    Object.defineProperty(exports2, "hasMagic", { enumerable: true, get: function() {
-      return has_magic_js_2.hasMagic;
-    } });
     exports2.glob = Object.assign(glob_, {
       glob: glob_,
       globSync,
@@ -9585,7 +9632,7 @@ var require_checkSolution = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkSolution = void 0;
-    var glob = require_commonjs4();
+    var glob = require_commonjs5();
     var os = require("os");
     var path = require("path");
     var InputValidator_1 = require_InputValidator();
@@ -11286,6 +11333,7 @@ var require_installCatalog = __commonJS({
           const validator = new InputValidator_1.InputValidator(host);
           validator.pushInput(pacArgs, "--catalog-item-id", parameters.catalogItemId);
           validator.pushInput(pacArgs, "--target-url", parameters.targetEnvironmentUrl);
+          validator.pushInput(pacArgs, "--target-env", parameters.targetEnvironment);
           validator.pushInput(pacArgs, "--settings", parameters.settings);
           validator.pushInput(pacArgs, "--target-version", parameters.targetVersion);
           validator.pushInput(pacArgs, "--poll-status", parameters.pollStatus);
@@ -23783,10 +23831,10 @@ var require_package = __commonJS({
         async: "^3.2.5",
         chai: "^4.4.1",
         dotenv: "^16.4.5",
-        esbuild: "^0.21.1",
+        esbuild: "^0.21.5",
         eslint: "^8.49.0",
         "fancy-log": "^2.0.0",
-        glob: "^10.3.12",
+        glob: "^10.4.1",
         "glob-parent": "^6.0.2",
         gulp: "^5.0.0",
         "gulp-eslint-new": "^2.0.0",
@@ -23812,7 +23860,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.122",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.124",
         "date-fns": "^3.6.0",
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
