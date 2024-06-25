@@ -32,8 +32,12 @@ inputs:
     required: true
 
   target-url:
-    description: 'Target URL of Power Platform environment for catalog item installation.'
-    required: true
+    description: '(deprecated) Target URL of Power Platform environment for catalog item installation.'
+    required: false
+
+  target-environment:
+    description: 'Url or ID of the target environment for catalog item installation.'
+    required: false
 
   settings:
     description: 'Runtime Package Settings for the installation framework to execute. The format of the string must be `key=value|key=value`.'
