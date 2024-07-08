@@ -23976,6 +23976,7 @@ function main() {
       environmentUrl: (0, getEnvironmentUrl_1.default)(),
       catalogItemId: parameterMap["catalog-item-id"],
       targetEnvironmentUrl: parameterMap["target-url"],
+      targetEnvironment: parameterMap["target-environment"],
       settings: parameterMap["settings"],
       targetVersion: parameterMap["target-version"],
       pollStatus: parameterMap["poll-status"],
