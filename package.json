@@ -42,7 +42,7 @@
     "glob-parent": "^6.0.2",
     "gulp": "^5.0.0",
     "gulp-eslint-new": "^2.0.0",
-    "gulp-mocha": "^8.0.0",
+    "gulp-mocha": "^10.0.1",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "mocha": "^10.4.0",
