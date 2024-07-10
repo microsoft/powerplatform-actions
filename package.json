@@ -1,6 +1,6 @@
 {
   "name": "@microsoft/powerplatform-actions",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Github Action for Power Platform",
   "main": "index.js",
   "scripts": {
