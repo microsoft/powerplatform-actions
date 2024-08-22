@@ -14028,7 +14028,7 @@ var require_package = __commonJS({
   "package.json"(exports2, module2) {
     module2.exports = {
       name: "@microsoft/powerplatform-actions",
-      version: "1.6.0",
+      version: "1.7.0",
       description: "Github Action for Power Platform",
       main: "index.js",
       scripts: {
