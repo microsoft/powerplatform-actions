@@ -38,7 +38,9 @@ var require_InputValidator = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/host/InputValidator.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.normalizeLanguage = exports2.normalizeRegion = exports2.InputValidator = void 0;
+    exports2.InputValidator = void 0;
+    exports2.normalizeRegion = normalizeRegion;
+    exports2.normalizeLanguage = normalizeLanguage;
     var InputValidator = class {
       constructor(host) {
         this._host = host;
@@ -89,7 +91,6 @@ var require_InputValidator = __commonJS({
       const cliRegionName = regionMap[taskRegionName.toLowerCase()];
       return cliRegionName || taskRegionName;
     }
-    exports2.normalizeRegion = normalizeRegion;
     var languageMap = {
       // pac CLI accepts case-insensitive region names, only transpose different names:
       // pac CLI accepts languages by either the BAP names, e.g. 'English (United States)' or by langCode, here: 1033
@@ -102,7 +103,6 @@ var require_InputValidator = __commonJS({
       const cliLanguageName = languageMap[taskLanguageName.toLowerCase()];
       return cliLanguageName || taskLanguageName;
     }
-    exports2.normalizeLanguage = normalizeLanguage;
   }
 });
 
@@ -111,22 +111,21 @@ var require_authenticate = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/pac/auth/authenticate.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.clearAuthentication = exports2.authenticateEnvironment = exports2.authenticateAdmin = void 0;
+    exports2.authenticateAdmin = authenticateAdmin;
+    exports2.authenticateEnvironment = authenticateEnvironment;
+    exports2.clearAuthentication = clearAuthentication;
     function authenticateAdmin(pac, credentials, logger) {
       logger.log(`authN to admin API: authType=${isUsernamePassword(credentials) ? "UserPass" : "SPN"}; cloudInstance: ${credentials.cloudInstance || "<not set>"}`);
       return pac("auth", "create", ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
-    exports2.authenticateAdmin = authenticateAdmin;
     function authenticateEnvironment(pac, credentials, environmentUrl, logger) {
       logger.log(`authN to env. authType:${isUsernamePassword(credentials) ? "UserPass" : "SPN"} authScheme:${isUsernamePassword(credentials) ? "" : `${credentials.scheme}`}; cloudInstance: ${credentials.cloudInstance || "<not set>"}; envUrl: ${environmentUrl}`);
       return pac("auth", "create", ...addEnvironment(environmentUrl), ...addCredentials(credentials), ...addCloudInstance(credentials));
     }
-    exports2.authenticateEnvironment = authenticateEnvironment;
     function clearAuthentication(pac) {
       delete process.env.PAC_CLI_SPN_SECRET;
       return pac("auth", "clear");
     }
-    exports2.clearAuthentication = clearAuthentication;
     function addEnvironment(env) {
       return ["--environment", env];
     }
@@ -217,7 +216,8 @@ var require_CommandRunner = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.RunnerError = exports2.createCommandRunner = void 0;
+    exports2.RunnerError = void 0;
+    exports2.createCommandRunner = createCommandRunner;
     var child_process_1 = require("child_process");
     var process_1 = require("process");
     var readline = require("readline");
@@ -278,7 +278,6 @@ var require_CommandRunner = __commonJS({
         logger.debug(`command: ${commandPath}, first arg of ${args.length}: ${args.length ? args[0] : "<none>"}`);
       }
     }
-    exports2.createCommandRunner = createCommandRunner;
     var RunnerError = class extends Error {
       constructor(exitCode, message) {
         super(message);
@@ -294,13 +293,13 @@ var require_createPacRunner = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/pac/createPacRunner.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.default = createPacRunner;
     var os_1 = require("os");
     var path_1 = require("path");
     var CommandRunner_1 = require_CommandRunner();
     function createPacRunner({ workingDir, runnersDir, pacPath, logger, agent }) {
       return (0, CommandRunner_1.createCommandRunner)(workingDir, pacPath !== null && pacPath !== void 0 ? pacPath : (0, os_1.platform)() === "win32" ? (0, path_1.resolve)(runnersDir, "pac", "tools", "pac.exe") : (0, path_1.resolve)(runnersDir, "pac_linux", "tools", "pac"), logger, agent, void 0);
     }
-    exports2.default = createPacRunner;
   }
 });
 
@@ -336,7 +335,7 @@ var require_exportSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.exportSolution = void 0;
+    exports2.exportSolution = exportSolution;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -412,7 +411,6 @@ var require_exportSolution = __commonJS({
         }
       });
     }
-    exports2.exportSolution = exportSolution;
   }
 });
 
@@ -448,7 +446,7 @@ var require_whoAmI = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.whoAmI = void 0;
+    exports2.whoAmI = whoAmI;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -479,7 +477,6 @@ var require_whoAmI = __commonJS({
         }
       });
     }
-    exports2.whoAmI = whoAmI;
   }
 });
 
@@ -515,7 +512,7 @@ var require_importSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.importSolution = void 0;
+    exports2.importSolution = importSolution;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -566,7 +563,6 @@ var require_importSolution = __commonJS({
         }
       });
     }
-    exports2.importSolution = importSolution;
   }
 });
 
@@ -602,7 +598,7 @@ var require_upgradeSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.upgradeSolution = void 0;
+    exports2.upgradeSolution = upgradeSolution;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -631,7 +627,6 @@ var require_upgradeSolution = __commonJS({
         }
       });
     }
-    exports2.upgradeSolution = upgradeSolution;
   }
 });
 
@@ -667,7 +662,7 @@ var require_deleteEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.deleteEnvironment = void 0;
+    exports2.deleteEnvironment = deleteEnvironment;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -696,7 +691,6 @@ var require_deleteEnvironment = __commonJS({
         }
       });
     }
-    exports2.deleteEnvironment = deleteEnvironment;
   }
 });
 
@@ -732,7 +726,7 @@ var require_backupEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.backupEnvironment = void 0;
+    exports2.backupEnvironment = backupEnvironment;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -762,7 +756,6 @@ var require_backupEnvironment = __commonJS({
         }
       });
     }
-    exports2.backupEnvironment = backupEnvironment;
   }
 });
 
@@ -9631,7 +9624,7 @@ var require_checkSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.checkSolution = void 0;
+    exports2.checkSolution = checkSolution;
     var glob = require_commonjs5();
     var os = require("os");
     var path = require("path");
@@ -9732,7 +9725,6 @@ var require_checkSolution = __commonJS({
         }
       });
     }
-    exports2.checkSolution = checkSolution;
     function isolateStatus(pacResults) {
       for (let i = pacResults.length - 1; i >= 0; i--) {
         const hit = pacResults[i].match(/^\s*Status\s*:\s*(\S+)/i);
@@ -9826,7 +9818,7 @@ var require_publishSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.publishSolution = void 0;
+    exports2.publishSolution = publishSolution;
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
     var InputValidator_1 = require_InputValidator();
@@ -9854,7 +9846,6 @@ var require_publishSolution = __commonJS({
         }
       });
     }
-    exports2.publishSolution = publishSolution;
   }
 });
 
@@ -9890,7 +9881,7 @@ var require_deployPackage = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.deployPackage = void 0;
+    exports2.deployPackage = deployPackage;
     var path = require("path");
     var os = require("os");
     var fs = require_lib();
@@ -9941,7 +9932,6 @@ var require_deployPackage = __commonJS({
         }
       });
     }
-    exports2.deployPackage = deployPackage;
   }
 });
 
@@ -9977,7 +9967,8 @@ var require_createEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getEnvironmentDetails = exports2.createEnvironment = void 0;
+    exports2.createEnvironment = createEnvironment;
+    exports2.getEnvironmentDetails = getEnvironmentDetails;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10015,7 +10006,6 @@ var require_createEnvironment = __commonJS({
         }
       });
     }
-    exports2.createEnvironment = createEnvironment;
     function getEnvironmentDetails(pacResult) {
       var _a;
       const newEnvDetailColumns = (_a = pacResult.filter((l) => l.length > 0).pop()) === null || _a === void 0 ? void 0 : _a.trim().split(/\s+/);
@@ -10026,7 +10016,6 @@ var require_createEnvironment = __commonJS({
         environmentUrl: envUrl
       };
     }
-    exports2.getEnvironmentDetails = getEnvironmentDetails;
   }
 });
 
@@ -10062,7 +10051,7 @@ var require_restoreEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.restoreEnvironment = void 0;
+    exports2.restoreEnvironment = restoreEnvironment;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10108,7 +10097,6 @@ var require_restoreEnvironment = __commonJS({
         }
       });
     }
-    exports2.restoreEnvironment = restoreEnvironment;
   }
 });
 
@@ -10144,7 +10132,7 @@ var require_deleteSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.deleteSolution = void 0;
+    exports2.deleteSolution = deleteSolution;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10171,7 +10159,6 @@ var require_deleteSolution = __commonJS({
         }
       });
     }
-    exports2.deleteSolution = deleteSolution;
   }
 });
 
@@ -10180,7 +10167,7 @@ var require_solutionPackagingBase = __commonJS({
   "node_modules/@microsoft/powerplatform-cli-wrapper/dist/actions/solutionPackagingBase.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.setSolutionPackagingCommonArgs = void 0;
+    exports2.setSolutionPackagingCommonArgs = setSolutionPackagingCommonArgs;
     var path = require("path");
     function setSolutionPackagingCommonArgs(parameters, runnerParameters, validator, pacArgs) {
       function resolveFolder(folder) {
@@ -10203,7 +10190,6 @@ var require_solutionPackagingBase = __commonJS({
       validator.pushInput(pacArgs, "--processCanvasApps", parameters.processCanvasApps);
       validator.pushCommon(pacArgs, parameters);
     }
-    exports2.setSolutionPackagingCommonArgs = setSolutionPackagingCommonArgs;
   }
 });
 
@@ -10239,7 +10225,7 @@ var require_packSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.packSolution = void 0;
+    exports2.packSolution = packSolution;
     var InputValidator_1 = require_InputValidator();
     var createPacRunner_1 = require_createPacRunner();
     var solutionPackagingBase_1 = require_solutionPackagingBase();
@@ -10260,7 +10246,6 @@ var require_packSolution = __commonJS({
         }
       });
     }
-    exports2.packSolution = packSolution;
   }
 });
 
@@ -10296,7 +10281,7 @@ var require_unpackSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.unpackSolution = void 0;
+    exports2.unpackSolution = unpackSolution;
     var InputValidator_1 = require_InputValidator();
     var createPacRunner_1 = require_createPacRunner();
     var solutionPackagingBase_1 = require_solutionPackagingBase();
@@ -10326,7 +10311,6 @@ var require_unpackSolution = __commonJS({
         }
       });
     }
-    exports2.unpackSolution = unpackSolution;
   }
 });
 
@@ -10362,7 +10346,7 @@ var require_resetEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.resetEnvironment = void 0;
+    exports2.resetEnvironment = resetEnvironment;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10405,7 +10389,6 @@ var require_resetEnvironment = __commonJS({
         }
       });
     }
-    exports2.resetEnvironment = resetEnvironment;
   }
 });
 
@@ -10441,7 +10424,7 @@ var require_copyEnvironment = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.copyEnvironment = void 0;
+    exports2.copyEnvironment = copyEnvironment;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10483,7 +10466,6 @@ var require_copyEnvironment = __commonJS({
         }
       });
     }
-    exports2.copyEnvironment = copyEnvironment;
   }
 });
 
@@ -10519,7 +10501,7 @@ var require_uploadPaportal = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.uploadPaportal = void 0;
+    exports2.uploadPaportal = uploadPaportal;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10547,7 +10529,6 @@ var require_uploadPaportal = __commonJS({
         }
       });
     }
-    exports2.uploadPaportal = uploadPaportal;
   }
 });
 
@@ -10583,7 +10564,7 @@ var require_downloadPaportal = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.downloadPaportal = void 0;
+    exports2.downloadPaportal = downloadPaportal;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10613,7 +10594,6 @@ var require_downloadPaportal = __commonJS({
         }
       });
     }
-    exports2.downloadPaportal = downloadPaportal;
   }
 });
 
@@ -10649,7 +10629,7 @@ var require_cloneSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.cloneSolution = void 0;
+    exports2.cloneSolution = cloneSolution;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10679,7 +10659,6 @@ var require_cloneSolution = __commonJS({
         }
       });
     }
-    exports2.cloneSolution = cloneSolution;
   }
 });
 
@@ -10715,7 +10694,7 @@ var require_updateVersionSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.updateVersionSolution = void 0;
+    exports2.updateVersionSolution = updateVersionSolution;
     var InputValidator_1 = require_InputValidator();
     var createPacRunner_1 = require_createPacRunner();
     function updateVersionSolution(parameters, runnerParameters, host) {
@@ -10740,7 +10719,6 @@ var require_updateVersionSolution = __commonJS({
         }
       });
     }
-    exports2.updateVersionSolution = updateVersionSolution;
   }
 });
 
@@ -10776,7 +10754,7 @@ var require_onlineVersionSolution = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.onlineVersionSolution = void 0;
+    exports2.onlineVersionSolution = onlineVersionSolution;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10804,7 +10782,6 @@ var require_onlineVersionSolution = __commonJS({
         }
       });
     }
-    exports2.onlineVersionSolution = onlineVersionSolution;
   }
 });
 
@@ -10840,7 +10817,7 @@ var require_installApplication = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.installApplication = void 0;
+    exports2.installApplication = installApplication;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10874,7 +10851,6 @@ var require_installApplication = __commonJS({
         }
       });
     }
-    exports2.installApplication = installApplication;
   }
 });
 
@@ -10910,7 +10886,7 @@ var require_assignUser = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.assignUser = void 0;
+    exports2.assignUser = assignUser;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -10941,7 +10917,6 @@ var require_assignUser = __commonJS({
         }
       });
     }
-    exports2.assignUser = assignUser;
   }
 });
 
@@ -10977,7 +10952,7 @@ var require_addSolutionComponent = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.addSolutionComponent = void 0;
+    exports2.addSolutionComponent = addSolutionComponent;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11009,7 +10984,6 @@ var require_addSolutionComponent = __commonJS({
         }
       });
     }
-    exports2.addSolutionComponent = addSolutionComponent;
   }
 });
 
@@ -11045,7 +11019,7 @@ var require_dataExport = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.dataExport = void 0;
+    exports2.dataExport = dataExport;
     var os = require("os");
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
@@ -11080,7 +11054,6 @@ var require_dataExport = __commonJS({
         }
       });
     }
-    exports2.dataExport = dataExport;
   }
 });
 
@@ -11116,7 +11089,7 @@ var require_dataImport = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.dataImport = void 0;
+    exports2.dataImport = dataImport;
     var os = require("os");
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
@@ -11150,7 +11123,6 @@ var require_dataImport = __commonJS({
         }
       });
     }
-    exports2.dataImport = dataImport;
   }
 });
 
@@ -11186,7 +11158,7 @@ var require_assignGroup = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.assignGroup = void 0;
+    exports2.assignGroup = assignGroup;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11219,7 +11191,6 @@ var require_assignGroup = __commonJS({
         }
       });
     }
-    exports2.assignGroup = assignGroup;
   }
 });
 
@@ -11255,7 +11226,7 @@ var require_virtualAgentsStatus = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.virtualAgentsStatus = void 0;
+    exports2.virtualAgentsStatus = virtualAgentsStatus;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11282,7 +11253,6 @@ var require_virtualAgentsStatus = __commonJS({
         }
       });
     }
-    exports2.virtualAgentsStatus = virtualAgentsStatus;
   }
 });
 
@@ -11318,7 +11288,7 @@ var require_installCatalog = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.installCatalog = void 0;
+    exports2.installCatalog = installCatalog;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11350,7 +11320,6 @@ var require_installCatalog = __commonJS({
         }
       });
     }
-    exports2.installCatalog = installCatalog;
   }
 });
 
@@ -11386,7 +11355,7 @@ var require_catalogStatus = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.catalogStatus = void 0;
+    exports2.catalogStatus = catalogStatus;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11414,7 +11383,6 @@ var require_catalogStatus = __commonJS({
         }
       });
     }
-    exports2.catalogStatus = catalogStatus;
   }
 });
 
@@ -11450,7 +11418,7 @@ var require_submitCatalog = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.submitCatalog = void 0;
+    exports2.submitCatalog = submitCatalog;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11484,7 +11452,6 @@ var require_submitCatalog = __commonJS({
         }
       });
     }
-    exports2.submitCatalog = submitCatalog;
   }
 });
 
@@ -11520,7 +11487,7 @@ var require_pipelineDeploy = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.pipelineDeploy = void 0;
+    exports2.pipelineDeploy = pipelineDeploy;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11552,7 +11519,6 @@ var require_pipelineDeploy = __commonJS({
         }
       });
     }
-    exports2.pipelineDeploy = pipelineDeploy;
   }
 });
 
@@ -11588,7 +11554,7 @@ var require_updateOrgSettings = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.updateOrgSettings = void 0;
+    exports2.updateOrgSettings = updateOrgSettings;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11618,7 +11584,6 @@ var require_updateOrgSettings = __commonJS({
         }
       });
     }
-    exports2.updateOrgSettings = updateOrgSettings;
   }
 });
 
@@ -11654,7 +11619,7 @@ var require_setGovernanceConfig = __commonJS({
       });
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.setGovernanceConfig = void 0;
+    exports2.setGovernanceConfig = setGovernanceConfig;
     var InputValidator_1 = require_InputValidator();
     var authenticate_1 = require_authenticate();
     var createPacRunner_1 = require_createPacRunner();
@@ -11688,7 +11653,6 @@ var require_setGovernanceConfig = __commonJS({
         }
       });
     }
-    exports2.setGovernanceConfig = setGovernanceConfig;
   }
 });
 
@@ -23860,7 +23824,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.124",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.129",
         "date-fns": "^3.6.0",
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
