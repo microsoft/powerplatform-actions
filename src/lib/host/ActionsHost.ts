@@ -46,15 +46,15 @@ class ActionsArtifactStore implements IArtifactStore {
   public async upload(artifactName: string, files: string[]): Promise<void> {
     ActionsLogger.debug(`files: ${files.join(';')}`);
     await fs.emptyDir(this._resultsDirectory);
-    for (const file of files) {
+    await Promise.all(files.map((file) => {
       if (path.extname(file).toLowerCase() === '.zip') {
         ActionsLogger.debug(`unzipping ${file} into ${this._resultsDirectory} ...`);
-        await extractToFolder(file, this._resultsDirectory);
+        return extractToFolder(file, this._resultsDirectory);
       } else {
         ActionsLogger.debug(`copying ${file} into ${this._resultsDirectory} ...`);
-        await fs.copyFile(file, path.join(this._resultsDirectory, path.basename(file)));
+        return fs.copyFile(file, path.join(this._resultsDirectory, path.basename(file)));
       }
-    }
+    }));
 
     const client = artifact.create();
     // pipeline has no artifact store (e.g. release pipelines):
