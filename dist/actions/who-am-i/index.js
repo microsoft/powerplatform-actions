@@ -14052,7 +14052,7 @@ var require_package = __commonJS({
         yargs: "^17.7.2"
       },
       dependencies: {
-        "@actions/artifact": "^1.1.1",
+        "@actions/artifact": "^2.2.1",
         "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
