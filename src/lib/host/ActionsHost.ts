@@ -3,7 +3,7 @@ import path = require("path");
 import os = require("os");
 import unzip = require('unzip-stream');
 import * as core from '@actions/core';
-import * as artifact from '@actions/artifact';
+import { DefaultArtifactClient } from '@actions/artifact'
 import { HostParameterEntry, IHostAbstractions } from "@microsoft/powerplatform-cli-wrapper/dist/host/IHostAbstractions";
 import { IArtifactStore } from "@microsoft/powerplatform-cli-wrapper/dist/host/IArtifactStore";
 import ActionsLogger from "./ActionsLogger";
@@ -56,12 +56,13 @@ class ActionsArtifactStore implements IArtifactStore {
       }
     }
 
-    const client = artifact.create();
+    const client = new DefaultArtifactClient()
+
     // pipeline has no artifact store (e.g. release pipelines):
     const resultFiles = (await fs.readdir(this._resultsDirectory))
         .map(f => path.resolve(this._resultsDirectory, f)); // .uploadArtifacts insists on FQN files
     if (resultFiles.length > 0) {
-      client.uploadArtifact(artifactName, resultFiles, this._resultsDirectory, { continueOnError: true });
+      client.uploadArtifact(artifactName, resultFiles, this._resultsDirectory, { });
     } else {
         ActionsLogger.warn(`Found no result files`);
     }
