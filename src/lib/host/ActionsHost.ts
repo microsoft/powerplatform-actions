@@ -3,7 +3,6 @@ import path = require("path");
 import os = require("os");
 import unzip = require('unzip-stream');
 import * as core from '@actions/core';
-import * as artifact from '@actions/artifact';
 import { DefaultArtifactClient } from '@actions/artifact'
 import { HostParameterEntry, IHostAbstractions } from "@microsoft/powerplatform-cli-wrapper/dist/host/IHostAbstractions";
 import { IArtifactStore } from "@microsoft/powerplatform-cli-wrapper/dist/host/IArtifactStore";
