@@ -1,0 +1,10 @@
+name: "CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - src
+paths-ignore:
+  - build
+  - dist
