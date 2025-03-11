@@ -55,8 +55,13 @@ jobs:
     - name: Install npm@9
       run: npm i -g npm@9
 
-    - name: Build and test
-      run: npm run build
+     - name: Build and test
+      run: |
+        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
+        npm ci
+        npm run ci
+      env:
+        AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
       
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
