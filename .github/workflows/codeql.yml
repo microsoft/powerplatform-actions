@@ -17,7 +17,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '35 1 * * 5'
+    - cron: '21 0 * * 6'
 
 jobs:
   analyze:
@@ -55,7 +55,7 @@ jobs:
     - name: Install npm@9
       run: npm i -g npm@9
 
-     - name: Build and test
+    - name: Build and test
       run: |
         npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
         npm ci
