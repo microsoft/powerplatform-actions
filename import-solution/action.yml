@@ -44,7 +44,7 @@ inputs:
   force-overwrite:
     description: 'Force an overwrite of unmanaged customizations.'
     required: false
-    default: 'true'
+    default: 'false'
 
   skip-dependency-check:
     description: 'Skip dependency check against dependencies flagged as product update.'

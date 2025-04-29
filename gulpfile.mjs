@@ -85,6 +85,11 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
             // https://dev.azure.com/msazure/One/_packaging?_a=feed&feed=CAP_ISVExp_Tools_Daily
             baseUrl: 'https://pkgs.dev.azure.com/msazure/_packaging/b0441cf8-0bc8-4fad-b126-841a6184e784/nuget/v3/flat2/'
         },
+        'DPX-Tools-Upstream' : {
+            authenticated: true,
+            // https://dev.azure.com/dynamicscrm/OneCRM/_artifacts/feed/DPX-Tools-Upstream
+            baseUrl: "https://pkgs.dev.azure.com/dynamicscrm/OneCRM/_packaging/1b55351d-c15e-45b3-9454-70a9549af804/nuget/v3/flat2/"
+        },
         'PowerPortalPackages': {
             authenticated: true,
             // https://dynamicscrm.visualstudio.com/DefaultCollection/OneCRM/_packaging?_a=feed&feed=PowerPortalPackages
@@ -92,7 +97,10 @@ async function nugetInstall(nugetSource, packageName, version, targetDir) {
         },
     }
 
-    const selectedFeed = feeds[nugetSource];
+    // Override the feed used if specified by the --useFeed argument
+    const selectedFeedName = argv.useFeed || nugetSource;
+
+    const selectedFeed = feeds[selectedFeedName];
     const baseUrl = selectedFeed.baseUrl;
 
     packageName = packageName.toLowerCase();
@@ -267,6 +275,7 @@ const updateDist = gulp.series(
 
 export {
     clean,
+    restore,
     compile,
     recompile,
     lint,
