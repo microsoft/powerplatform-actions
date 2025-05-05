@@ -45,7 +45,7 @@
     "gulp-mocha": "^8.0.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
-    "mocha": "^10.4.0",
+    "mocha": "^11.2.2",
     "node-fetch": "^3.3.2",
     "postcss": "^8.4.38",
     "ps-list": "^8.1.1",
