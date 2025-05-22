@@ -50,5 +50,5 @@ inputs:
     default: 'false'
 
 runs:
-  using: 'node16'
+  using: 'node24'
   main: '../dist/actions/submit-catalog/index.js'

@@ -54,6 +54,6 @@ inputs:
     default: 'true'
 
 runs:
-  using: 'node16'
+  using: 'node24'
   main: '../dist/actions/check-solution/index.js'
   # main: '../out/actions/check-solution/index.js'

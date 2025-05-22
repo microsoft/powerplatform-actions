@@ -125,6 +125,6 @@ inputs:
     default: 'false'
 
 runs:
-  using: 'node16'
+  using: 'node24'
   main: '../dist/actions/export-solution/index.js'
   # main: '../out/actions/export-solution/index.js'

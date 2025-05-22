@@ -80,6 +80,6 @@ outputs:
     description: 'ID of the freshly created environment'
 
 runs:
-  using: 'node16'
+  using: 'node24'
   main: '../dist/actions/create-environment/index.js'
   # main: '../out/actions/create-environment/index.js'

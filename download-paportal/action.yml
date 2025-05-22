@@ -57,6 +57,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node16'
+  using: 'node24'
   main: '../dist/actions/download-paportal/index.js'
   #main: '../out/actions/download-paportal/index.js'
