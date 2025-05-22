@@ -43,6 +43,11 @@ inputs:
     description: 'Indicates whether other solution components that are required by the solution component that you are adding should also be added to the unmanaged solution'
     required: false
 
+  run-asynchronously:
+    description: 'Runs operation asynchronously.'
+    required: false
+    default: 'false'
+
 runs:
   using: 'node16'
   main: '../dist/actions/add-solution-component/index.js'
