@@ -28,9 +28,9 @@ pool:
 
 steps:
 - task: NodeTool@0
-  displayName: 'Use nodejs 22.x'
+  displayName: 'Use nodejs 20.x'
   inputs:
-    versionSpec: '22.x'
+    versionSpec: '20.x'
 
 # need to authenticate to npm package feed in microsoft/powerplatform-cli-wrapper (see also README.md)
 - task: npmAuthenticate@0

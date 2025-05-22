@@ -49,5 +49,5 @@ inputs:
     default: 'false'
 
 runs:
-  using: 'node22'
+  using: 'node20'
   main: '../dist/actions/add-solution-component/index.js'

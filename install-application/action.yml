@@ -36,5 +36,5 @@ inputs:
     required: false
 
 runs:
-  using: 'node22'
+  using: 'node20'
   main: '../dist/actions/install-application/index.js'

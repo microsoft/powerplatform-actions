@@ -60,6 +60,6 @@ inputs:
     default: '60'
 
 runs:
-  using: 'node22'
+  using: 'node20'
   main: '../dist/actions/clone-solution/index.js'
   # main: '../out/actions/clone-solution/index.js'

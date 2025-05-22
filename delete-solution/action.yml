@@ -38,6 +38,6 @@ inputs:
     required: true
 
 runs:
-  using: 'node22'
+  using: 'node20'
   main: '../dist/actions/delete-solution/index.js'
   # main: '../out/actions/delete-solution/index.js'

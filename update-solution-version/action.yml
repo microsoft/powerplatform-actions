@@ -24,6 +24,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node22'
+  using: 'node20'
   main: '../dist/actions/update-solution-version/index.js'
   # main: '../out/actions/update-solution-version/index.js'
