@@ -36,6 +36,6 @@ inputs:
     required: true
 
 runs:
-  using: 'node24'
+  using: 'node22'
   main: '../dist/actions/set-online-solution-version/index.js'
   # main: '../out/actions/set-online-solution-version/index.js'

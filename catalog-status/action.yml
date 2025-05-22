@@ -36,5 +36,5 @@ inputs:
     required: true
 
 runs:
-  using: 'node24'
+  using: 'node22'
   main: '../dist/actions/catalog-status/index.js'

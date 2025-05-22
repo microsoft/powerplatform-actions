@@ -58,6 +58,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node24'
+  using: 'node22'
   main: '../dist/actions/unpack-solution/index.js'
   # main: '../out/actions/unpack-solution/index.js'

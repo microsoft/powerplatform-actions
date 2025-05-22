@@ -29,6 +29,6 @@ inputs:
     required: false
 
 runs:
-  using: 'node24'
+  using: 'node22'
   main: '../dist/actions/actions-install/index.js'
 

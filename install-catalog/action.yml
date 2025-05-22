@@ -53,5 +53,5 @@ inputs:
     default: 'false'
 
 runs:
-  using: 'node24'
+  using: 'node22'
   main: '../dist/actions/install-catalog/index.js'

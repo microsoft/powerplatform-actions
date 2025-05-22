@@ -42,5 +42,5 @@ inputs:
     default: 'Public'
 
 runs:
-  using: 'node24'
+  using: 'node22'
   main: '../dist/actions/delete-environment/index.js'
