@@ -43,6 +43,7 @@ describe("add-solution-component tests", () => {
             component: { name: 'component', required: true, defaultValue: undefined },
             componentType: { name: 'component-type', required: true, defaultValue: undefined },
             addRequiredComponents: { name: 'add-required-components', required: false, defaultValue: undefined },
+            async: { name: 'run-asynchronously', required: false, defaultValue: 'false' }
         }, runnerParameters, new ActionsHost());
     });
 });

@@ -31,6 +31,7 @@ export async function main(): Promise<void> {
         component: parameterMap['component'],
         componentType: parameterMap['component-type'],
         addRequiredComponents: parameterMap['add-required-components'],
+        async: parameterMap['run-asynchronously'],
     }, runnerParameters, new ActionsHost());
     core.endGroup();
 }
