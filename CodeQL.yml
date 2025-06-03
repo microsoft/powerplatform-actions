@@ -1,0 +1,5 @@
+path_classifiers:
+  # Exclude build and dist directories from alerts
+  generated:
+    - build/
+    - dist/
