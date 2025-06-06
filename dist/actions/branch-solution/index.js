@@ -19916,7 +19916,7 @@ var require_package = __commonJS({
         "@actions/core": "^1.10.1",
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
-        "@microsoft/powerplatform-cli-wrapper": "^0.1.134",
+        "@microsoft/powerplatform-cli-wrapper": "^0.1.135",
         "@tsconfig/node20": "^20.1.0",
         "date-fns": "^3.6.0",
         "fs-extra": "^11.2.0",
