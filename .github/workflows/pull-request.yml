@@ -18,7 +18,7 @@ jobs:
       WF_USERNAME: ppdevautomation@ppdevtools.onmicrosoft.com
       WF_USER_ROLE: "Bot Author"
       WF_USER_AAD_OBJECT_ID: "b846fe83-cea6-4743-9e35-c158f307dc1e"
-      WF_APP_USER_ID: "60806ffd-886b-477f-baa5-5837c9dcd7ca"
+      WF_APP_USER_ID: "9221a039-7e8f-4495-bb45-c97640522bad"
 
     steps:
     - uses: actions/checkout@v3
