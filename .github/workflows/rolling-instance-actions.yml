@@ -29,7 +29,7 @@ jobs:
       WF_TENANT_ID: 3041a058-5110-495a-a575-b2a5571d9eac
       WF_USER_ROLE: "Bot Author"
       WF_USER_AAD_OBJECT_ID: "b846fe83-cea6-4743-9e35-c158f307dc1e"
-      WF_APP_USER_ID: "82e66a08-8bf9-42bf-883a-7e2d17c7cede"
+      WF_APP_USER_ID: "9221a039-7e8f-4495-bb45-c97640522bad"
 
     steps:
     - uses: actions/checkout@v3
