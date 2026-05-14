@@ -19808,7 +19808,7 @@ var require_pacPackageInfo = __commonJS({
       PacPackageName: "Microsoft.PowerApps.CLI",
       LegacyLinuxPackage: "Microsoft.PowerApps.CLI.Core.linux-x64",
       DotnetToolName: "Microsoft.PowerApps.CLI.Tool",
-      PacPackageVersion: "1.43.6"
+      PacPackageVersion: "2.7.4"
     };
   }
 });
