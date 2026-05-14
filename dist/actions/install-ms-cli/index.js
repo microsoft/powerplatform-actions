@@ -19918,10 +19918,21 @@ function writeTempNpmrc(registryUrl, authToken) {
     const tmpDir = yield fs.mkdtemp(path.join(os.tmpdir(), "install-ms-cli-"));
     const npmrcPath = path.join(tmpDir, ".npmrc");
     const registryHost = registryUrl.replace(/^https?:/, "");
+    const isAzureDevOps = /pkgs\.dev\.azure\.com/i.test(registryUrl);
+    let authBlock;
+    if (isAzureDevOps) {
+      const base64Pat = Buffer.from(authToken, "utf8").toString("base64");
+      authBlock = `${registryHost}:username=AzureDevOps
+${registryHost}:_password=${base64Pat}
+${registryHost}:email=npm requires email to be set but does not use it
+`;
+    } else {
+      authBlock = `${registryHost}:_authToken=${authToken}
+`;
+    }
     const content = `registry=${registryUrl}
 always-auth=true
-${registryHost}:_authToken=${authToken}
-`;
+` + authBlock;
     yield fs.writeFile(npmrcPath, content, { mode: 384 });
     core.info(`Using private registry: ${registryUrl}`);
     return npmrcPath;

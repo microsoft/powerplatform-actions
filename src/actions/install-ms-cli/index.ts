@@ -145,13 +145,30 @@ async function writeTempNpmrc(registryUrl: string, authToken: string): Promise<s
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'install-ms-cli-'));
     const npmrcPath = path.join(tmpDir, '.npmrc');
 
-    // Strip protocol from registry URL for the auth entry. Azure DevOps
-    // Artifacts feeds also need always-auth=true.
     const registryHost = registryUrl.replace(/^https?:/, '');
+
+    // Azure DevOps Artifacts npm feeds use HTTP basic auth with a base64-encoded
+    // PAT in `_password`. The `_authToken` field expects an OAuth bearer token,
+    // which a PAT is NOT — using it produces a 401 "Incorrect or missing password".
+    // For non-ADO feeds, the bearer-style `_authToken` is the correct form.
+    const isAzureDevOps = /pkgs\.dev\.azure\.com/i.test(registryUrl);
+
+    let authBlock: string;
+    if (isAzureDevOps) {
+        const base64Pat = Buffer.from(authToken, 'utf8').toString('base64');
+        authBlock =
+            `${registryHost}:username=AzureDevOps\n` +
+            `${registryHost}:_password=${base64Pat}\n` +
+            `${registryHost}:email=npm requires email to be set but does not use it\n`;
+    } else {
+        authBlock = `${registryHost}:_authToken=${authToken}\n`;
+    }
+
     const content =
         `registry=${registryUrl}\n` +
         `always-auth=true\n` +
-        `${registryHost}:_authToken=${authToken}\n`;
+        authBlock;
+
     await fs.writeFile(npmrcPath, content, { mode: 0o600 });
 
     core.info(`Using private registry: ${registryUrl}`);
