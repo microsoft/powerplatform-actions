@@ -19922,6 +19922,10 @@ var require_package = __commonJS({
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
         uuid: "^9.0.1"
+      },
+      overrides: {
+        "brace-expansion": "2.0.2",
+        nanoid: "3.3.11"
       }
     };
   }
