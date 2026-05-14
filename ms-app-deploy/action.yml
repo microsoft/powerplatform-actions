@@ -1,0 +1,145 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# ms-app-deploy/action.yml
+#
+# Orchestrates the MAAF dogfood publish flow for a Power Apps code app on the
+# current commit:
+#
+#   1. ms app build       --commit <sha>   → start server-side build
+#   2. ms app build-status --operation-id <id>  → poll until "Succeeded"
+#   3. ms app deploy      --commit <sha>   → deploy the built bits
+#
+# The action reads `appId` and `environmentId` from `ms.config.json` in the
+# working directory (written by `ms app create` during one-time setup).
+#
+# ---------------------------------------------------------------------------
+# KNOWN BLOCKER (as of 2026-05):
+#   The Power Apps RP currently rejects Service Principal identities for MAAF
+#   operations (error: ServicePrincipalNotSupportedForMaafOperations). This
+#   action's auth inputs (`app-id`, `client-secret`, `tenant-id`) are wired
+#   to the CLI's documented SPN env vars, but the server will reject them
+#   until either:
+#     (a) the RP enables SPN for MAAF operations, OR
+#     (b) the CLI adds federated/OIDC auth and the RP accepts it.
+#   Track the ask with the MAAF CLI team (Anshul / Casey).
+# ---------------------------------------------------------------------------
+#
+# Example usage:
+#
+#   - uses: actions/checkout@v4
+#   - uses: actions/setup-node@v4
+#     with:
+#       node-version: '22'
+#   - run: npm ci         # install app dependencies (some local-validation paths
+#                         # in the CLI inspect node_modules / package-lock.json;
+#                         # also needed if you run lint or typecheck steps).
+#   - uses: microsoft/powerplatform-actions/setup-ms@v1
+#     with:
+#       version: '0.3.1-dev.20260511.4'
+#       registry-url: 'https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/'
+#       registry-auth-token: ${{ secrets.AZURE_DEVOPS_PAT }}
+#   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
+#     with:
+#       cloud: 'test'
+#       commit-sha: ${{ github.sha }}
+#       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
+#       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
+#       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
+#
+name: 'ms-app-deploy'
+description: 'Power Platform MS App Deploy — builds, polls, and deploys a MAAF code app for the given commit'
+
+inputs:
+  # ── App context ───────────────────────────────────────────────────────────
+
+  app-name:
+    description: >
+      Optional override for the MAAF app name. By default the CLI reads
+      `appId` from `ms.config.json` in the working directory, so this is
+      rarely needed.
+    required: false
+    default: ''
+
+  commit-sha:
+    description: >
+      Commit SHA to build and deploy. Defaults to GITHUB_SHA (the commit that
+      triggered the workflow). The CLI also falls back to the current git HEAD
+      if neither this input nor GITHUB_SHA is set.
+    required: false
+    default: ''
+
+  cloud:
+    description: >
+      Cloud instance to target. One of: prod, test, preprod, preview,
+      gccmoderate, dev. The MAAF end-to-end flow is currently supported only
+      in 'test'. Maps to MS_CLI_CLOUD_INSTANCE.
+    required: false
+    default: 'test'
+
+  working-directory:
+    description: >
+      Path to the app directory containing ms.config.json and package.json.
+      Defaults to the repository root (GITHUB_WORKSPACE).
+    required: false
+    default: ''
+
+  # ── Build orchestration ───────────────────────────────────────────────────
+
+  build-timeout-seconds:
+    description: >
+      Maximum seconds to wait for the server-side build to reach a terminal
+      state (Succeeded/Failed/Cancelled). Defaults to 1200 (20 minutes).
+    required: false
+    default: '1200'
+
+  build-poll-interval-seconds:
+    description: >
+      Seconds between build-status polls. Defaults to 10.
+    required: false
+    default: '10'
+
+  skip-build:
+    description: >
+      Set to 'true' to skip `ms app build` and only run `ms app deploy`. Use
+      when a previous step (or workflow) already built this commit.
+    required: false
+    default: 'false'
+
+  # ── Service Principal authentication (optional, currently RP-blocked) ─────
+  # All three must be provided together to enable SPN mode. If any is empty,
+  # the action will not set MS_CLI_USE_SP_AUTH and the CLI will fail with a
+  # clear "not signed in" error rather than silently using a stale identity.
+
+  app-id:
+    description: 'SPN client ID. Maps to MS_CLI_SP_CLIENT_ID.'
+    required: false
+    default: ''
+
+  client-secret:
+    description: >
+      SPN client secret. Maps to MS_CLI_SP_CLIENT_SECRET. Pass as a secret.
+    required: false
+    default: ''
+
+  tenant-id:
+    description: 'AAD tenant ID. Maps to MS_CLI_SP_TENANT_ID.'
+    required: false
+    default: ''
+
+outputs:
+  build-operation-id:
+    description: 'Operation ID returned by `ms app build` (empty if skip-build=true or build was already cached).'
+
+  app-id:
+    description: 'Deployed app id (GUID), parsed from `ms app deploy --json`.'
+
+  environment-id:
+    description: 'Environment id the app was deployed to.'
+
+  commit-sha:
+    description: 'The commit SHA that was deployed.'
+
+runs:
+  using: 'node24'
+  main: '../dist/actions/ms-app-deploy/index.js'

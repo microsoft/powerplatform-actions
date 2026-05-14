@@ -1,0 +1,67 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# setup-ms/action.yml
+#
+# Installs the MAAF `ms` CLI (@microsoft/apps-cli) on the GitHub Actions runner.
+#
+# IMPORTANT — feed availability (as of 2026-05):
+#   The real CLI is only published to the internal Azure DevOps feed:
+#     https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/
+#   The public npm package @microsoft/apps-cli@0.0.1 is a placeholder with no
+#   `bin` field. Consumers must currently pass `registry-url` + `registry-auth-token`
+#   pointing at the internal feed, plus pin `version` to a specific dev tag
+#   (e.g. 0.3.1-dev.20260511.4). This will simplify once the package is
+#   published to public npm.
+#
+# Example — internal feed usage:
+#
+#   - uses: microsoft/powerplatform-actions/setup-ms@v1
+#     with:
+#       version: '0.3.1-dev.20260511.4'
+#       registry-url: 'https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/'
+#       registry-auth-token: ${{ secrets.AZURE_DEVOPS_PAT }}
+#
+name: 'setup-ms'
+description: 'Power Platform Setup ms CLI — installs @microsoft/apps-cli (binary: ms)'
+
+inputs:
+  version:
+    description: >
+      Version of @microsoft/apps-cli to install.
+      Use 'latest' or a specific semver / dev tag (e.g. '0.3.1-dev.20260511.4').
+      For internal-feed installs today, pin to a specific dev tag.
+    required: false
+    default: 'latest'
+
+  registry-url:
+    description: >
+      npm registry URL. For MAAF dogfood today, point at the internal Azure
+      DevOps feed:
+        https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/
+      Defaults to public npmjs.com (which currently has only a placeholder).
+    required: false
+    default: 'https://registry.npmjs.org'
+
+  registry-auth-token:
+    description: >
+      Auth token for the npm registry. Required when registry-url is the internal
+      Azure DevOps feed. Generate a PAT with Packaging (Read) scope, store as a
+      GitHub secret, and pass it here.
+    required: false
+    default: ''
+
+  npm-package-name:
+    description: >
+      npm package to install. Defaults to @microsoft/apps-cli, which provides
+      the `ms` binary. Override only for testing alternate builds.
+    required: false
+    default: '@microsoft/apps-cli'
+
+outputs:
+  cli-version:
+    description: 'The installed ms CLI version'
+
+runs:
+  using: 'node24'
+  main: '../dist/actions/setup-ms/index.js'
