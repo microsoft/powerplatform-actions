@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
-# setup-ms/action.yml
+# install-ms-cli/action.yml
 #
 # Installs the MAAF `ms` CLI (@microsoft/apps-cli) on the GitHub Actions runner.
 #
@@ -16,14 +16,14 @@
 #
 # Example — internal feed usage:
 #
-#   - uses: microsoft/powerplatform-actions/setup-ms@v1
+#   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
 #     with:
 #       version: '0.3.1-dev.20260511.4'
 #       registry-url: 'https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/'
 #       registry-auth-token: ${{ secrets.AZURE_DEVOPS_PAT }}
 #
-name: 'setup-ms'
-description: 'Power Platform Setup ms CLI — installs @microsoft/apps-cli (binary: ms)'
+name: 'install-ms-cli'
+description: 'Power Platform Install MS CLI — installs @microsoft/apps-cli (binary: ms)'
 
 inputs:
   version:
@@ -64,4 +64,4 @@ outputs:
 
 runs:
   using: 'node24'
-  main: '../dist/actions/setup-ms/index.js'
+  main: '../dist/actions/install-ms-cli/index.js'

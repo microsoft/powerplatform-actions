@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// src/actions/setup-ms/index.ts
+// src/actions/install-ms-cli/index.ts
 //
 // Installs the MAAF `ms` CLI (@microsoft/apps-cli) on the GitHub Actions runner
 // via npm. The package's `bin` field maps to the `ms` executable.
@@ -30,13 +30,13 @@ const argName = {
         await main();
     }
 })().catch(error => {
-    core.error(`setup-ms failed: ${error}`);
+    core.error(`install-ms-cli failed: ${error}`);
     core.setFailed(error instanceof Error ? error.message : String(error));
     core.endGroup();
 });
 
 export async function main(): Promise<void> {
-    core.startGroup('setup-ms:');
+    core.startGroup('install-ms-cli:');
 
     const version = core.getInput(argName.version, { required: false }) || 'latest';
     const registryUrl = core.getInput(argName.registryUrl, { required: false }) || 'https://registry.npmjs.org';
@@ -142,7 +142,7 @@ async function getInstalledVersion(cliPath: string): Promise<string> {
 }
 
 async function writeTempNpmrc(registryUrl: string, authToken: string): Promise<string> {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'setup-ms-'));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'install-ms-cli-'));
     const npmrcPath = path.join(tmpDir, '.npmrc');
 
     // Strip protocol from registry URL for the auth entry. Azure DevOps

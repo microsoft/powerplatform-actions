@@ -18,7 +18,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { MsInstalledEnvVarName } from '../setup-ms/index';
+import { MsInstalledEnvVarName } from '../install-ms-cli/index';
 
 const CLI_ENV_VARS = {
     useSpAuth: 'MS_CLI_USE_SP_AUTH',
@@ -100,8 +100,8 @@ export async function main(): Promise<void> {
 
     if (process.env[MsInstalledEnvVarName] !== 'true') {
         throw new Error(
-            'ms CLI is not installed. Add the setup-ms action before ms-app-deploy:\n' +
-            '  - uses: microsoft/powerplatform-actions/setup-ms@v1'
+            'ms CLI is not installed. Add the install-ms-cli action before ms-app-deploy:\n' +
+            '  - uses: microsoft/powerplatform-actions/install-ms-cli@v1'
         );
     }
 

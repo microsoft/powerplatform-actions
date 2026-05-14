@@ -19771,7 +19771,7 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
   }
 });
 
-// out/actions/setup-ms/index.js
+// out/actions/install-ms-cli/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve) {
@@ -19822,13 +19822,13 @@ var argName = {
     yield main();
   }
 }))().catch((error) => {
-  core.error(`setup-ms failed: ${error}`);
+  core.error(`install-ms-cli failed: ${error}`);
   core.setFailed(error instanceof Error ? error.message : String(error));
   core.endGroup();
 });
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
-    core.startGroup("setup-ms:");
+    core.startGroup("install-ms-cli:");
     const version = core.getInput(argName.version, { required: false }) || "latest";
     const registryUrl = core.getInput(argName.registryUrl, { required: false }) || "https://registry.npmjs.org";
     const registryAuthToken = core.getInput(argName.registryAuthToken, { required: false });
@@ -19915,7 +19915,7 @@ function getInstalledVersion(cliPath) {
 }
 function writeTempNpmrc(registryUrl, authToken) {
   return __awaiter(this, void 0, void 0, function* () {
-    const tmpDir = yield fs.mkdtemp(path.join(os.tmpdir(), "setup-ms-"));
+    const tmpDir = yield fs.mkdtemp(path.join(os.tmpdir(), "install-ms-cli-"));
     const npmrcPath = path.join(tmpDir, ".npmrc");
     const registryHost = registryUrl.replace(/^https?:/, "");
     const content = `registry=${registryUrl}

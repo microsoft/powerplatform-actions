@@ -34,7 +34,7 @@
 #   - run: npm ci         # install app dependencies (some local-validation paths
 #                         # in the CLI inspect node_modules / package-lock.json;
 #                         # also needed if you run lint or typecheck steps).
-#   - uses: microsoft/powerplatform-actions/setup-ms@v1
+#   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
 #     with:
 #       version: '0.3.1-dev.20260511.4'
 #       registry-url: 'https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/'
