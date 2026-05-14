@@ -19771,9 +19771,9 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
   }
 });
 
-// out/actions/setup-ms/index.js
-var require_setup_ms = __commonJS({
-  "out/actions/setup-ms/index.js"(exports2) {
+// out/actions/install-ms-cli/index.js
+var require_install_ms_cli = __commonJS({
+  "out/actions/install-ms-cli/index.js"(exports2) {
     "use strict";
     var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
@@ -19825,13 +19825,13 @@ var require_setup_ms = __commonJS({
         yield main2();
       }
     }))().catch((error) => {
-      core2.error(`setup-ms failed: ${error}`);
+      core2.error(`install-ms-cli failed: ${error}`);
       core2.setFailed(error instanceof Error ? error.message : String(error));
       core2.endGroup();
     });
     function main2() {
       return __awaiter2(this, void 0, void 0, function* () {
-        core2.startGroup("setup-ms:");
+        core2.startGroup("install-ms-cli:");
         const version = core2.getInput(argName2.version, { required: false }) || "latest";
         const registryUrl = core2.getInput(argName2.registryUrl, { required: false }) || "https://registry.npmjs.org";
         const registryAuthToken = core2.getInput(argName2.registryAuthToken, { required: false });
@@ -19918,13 +19918,24 @@ ${result.stderr}`);
     }
     function writeTempNpmrc(registryUrl, authToken) {
       return __awaiter2(this, void 0, void 0, function* () {
-        const tmpDir = yield fs2.mkdtemp(path2.join(os.tmpdir(), "setup-ms-"));
+        const tmpDir = yield fs2.mkdtemp(path2.join(os.tmpdir(), "install-ms-cli-"));
         const npmrcPath = path2.join(tmpDir, ".npmrc");
         const registryHost = registryUrl.replace(/^https?:/, "");
+        const isAzureDevOps = /pkgs\.dev\.azure\.com/i.test(registryUrl);
+        let authBlock;
+        if (isAzureDevOps) {
+          const base64Pat = Buffer.from(authToken, "utf8").toString("base64");
+          authBlock = `${registryHost}:username=AzureDevOps
+${registryHost}:_password=${base64Pat}
+${registryHost}:email=npm requires email to be set but does not use it
+`;
+        } else {
+          authBlock = `${registryHost}:_authToken=${authToken}
+`;
+        }
         const content = `registry=${registryUrl}
 always-auth=true
-${registryHost}:_authToken=${authToken}
-`;
+` + authBlock;
         yield fs2.writeFile(npmrcPath, content, { mode: 384 });
         core2.info(`Using private registry: ${registryUrl}`);
         return npmrcPath;
@@ -19967,7 +19978,7 @@ var core = require_core();
 var exec = require_exec();
 var path = require("node:path");
 var fs = require("node:fs/promises");
-var index_1 = require_setup_ms();
+var index_1 = require_install_ms_cli();
 var CLI_ENV_VARS = {
   useSpAuth: "MS_CLI_USE_SP_AUTH",
   spClientId: "MS_CLI_SP_CLIENT_ID",
@@ -20016,7 +20027,7 @@ function main() {
     if (clientSecret)
       core.setSecret(clientSecret);
     if (process.env[index_1.MsInstalledEnvVarName] !== "true") {
-      throw new Error("ms CLI is not installed. Add the setup-ms action before ms-app-deploy:\n  - uses: microsoft/powerplatform-actions/setup-ms@v1");
+      throw new Error("ms CLI is not installed. Add the install-ms-cli action before ms-app-deploy:\n  - uses: microsoft/powerplatform-actions/install-ms-cli@v1");
     }
     yield validateAppDirectory(workingDirectory);
     const cliEnv = buildCliEnv({
