@@ -19995,7 +19995,7 @@ var argName = {
   clientSecret: "client-secret",
   tenantId: "tenant-id"
 };
-var CONFIG_CANDIDATES = ["power.config.json", "ms.config.json"];
+var MS_CONFIG_FILE = "ms.config.json";
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
@@ -20067,17 +20067,12 @@ function resolveWorkingDirectory(input) {
 }
 function validateAppDirectory(dir) {
   return __awaiter(this, void 0, void 0, function* () {
-    for (const filename of CONFIG_CANDIDATES) {
-      const candidate = path.join(dir, filename);
-      try {
-        yield fs.access(candidate);
-        core.info(`App directory validated (config: ${filename}): ${dir}`);
-        return;
-      } catch (_a) {
-      }
-    }
-    throw new Error(`Neither ${CONFIG_CANDIDATES.join(" nor ")} found in working-directory: ${dir}
+    const configPath = path.join(dir, MS_CONFIG_FILE);
+    yield fs.access(configPath).catch(() => {
+      throw new Error(`${MS_CONFIG_FILE} not found in working-directory: ${dir}
 Ensure working-directory points to a MAAF app created via \`ms app create\`.`);
+    });
+    core.info(`App directory validated: ${dir}`);
   });
 }
 function buildCliEnv(opts) {

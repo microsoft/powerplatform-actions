@@ -10,8 +10,8 @@
 // older `ms app build` verb is deprecated and rejected by the CLI; this
 // action no longer calls it.
 //
-// Config file: tries `power.config.json` first (current CLI), then falls back
-// to legacy `ms.config.json` for older CLIs.
+// Config file: `ms.config.json`, written by `ms app create`. Contains the
+// app's `environmentId` and `appId`.
 //
 // Auth: optionally sets MS_CLI_SP_* + MS_CLI_USE_SP_AUTH=true when all three
 // SPN inputs are supplied. SPN auth is currently rejected by the Power Apps
@@ -41,8 +41,7 @@ const argName = {
     tenantId: 'tenant-id',
 } as const;
 
-// Try the new filename first; fall back to the legacy one.
-const CONFIG_CANDIDATES = ['power.config.json', 'ms.config.json'];
+const MS_CONFIG_FILE = 'ms.config.json';
 
 interface DeployResult {
     id?: string;
@@ -144,20 +143,14 @@ function resolveWorkingDirectory(input: string): string {
 }
 
 async function validateAppDirectory(dir: string): Promise<void> {
-    for (const filename of CONFIG_CANDIDATES) {
-        const candidate = path.join(dir, filename);
-        try {
-            await fs.access(candidate);
-            core.info(`App directory validated (config: ${filename}): ${dir}`);
-            return;
-        } catch {
-            // try next candidate
-        }
-    }
-    throw new Error(
-        `Neither ${CONFIG_CANDIDATES.join(' nor ')} found in working-directory: ${dir}\n` +
-        'Ensure working-directory points to a MAAF app created via `ms app create`.'
-    );
+    const configPath = path.join(dir, MS_CONFIG_FILE);
+    await fs.access(configPath).catch(() => {
+        throw new Error(
+            `${MS_CONFIG_FILE} not found in working-directory: ${dir}\n` +
+            'Ensure working-directory points to a MAAF app created via `ms app create`.'
+        );
+    });
+    core.info(`App directory validated: ${dir}`);
 }
 
 function buildCliEnv(opts: {

@@ -8,9 +8,8 @@
 # auto-triggers a server-side build for a commit if one doesn't exist, so no
 # explicit `ms app build` step is needed.
 #
-# The action reads `appId` and `environmentId` from `power.config.json` in the
-# working directory (written by `ms app create`). For older CLI versions it
-# also accepts the legacy `ms.config.json`.
+# The action reads `appId` and `environmentId` from `ms.config.json` in the
+# working directory (written by `ms app create`).
 #
 # ---------------------------------------------------------------------------
 # KNOWN BLOCKER (as of 2026-05):
@@ -48,8 +47,8 @@ inputs:
   app-name:
     description: >
       Optional override for the MAAF app name. By default the CLI reads
-      `appId` from power.config.json (or ms.config.json) in the working
-      directory, so this is rarely needed.
+      `appId` from ms.config.json in the working directory, so this is
+      rarely needed.
     required: false
     default: ''
 
@@ -71,8 +70,8 @@ inputs:
 
   working-directory:
     description: >
-      Path to the app directory containing power.config.json (or
-      ms.config.json) and package.json. Defaults to GITHUB_WORKSPACE.
+      Path to the app directory containing ms.config.json and package.json.
+      Defaults to GITHUB_WORKSPACE.
     required: false
     default: ''
 
