@@ -32,6 +32,9 @@
 #   - uses: microsoft/powerplatform-actions/ms-app-pack@v1
 #     with:
 #       working-directory: 'maaf-apps'
+#       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
+#       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
+#       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
 #   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
 #     with:
 #       working-directory: 'maaf-apps'
@@ -47,6 +50,27 @@ inputs:
     description: >
       Path to the app directory containing ms.config.json and package.json.
       Defaults to GITHUB_WORKSPACE.
+    required: false
+    default: ''
+
+  # ── Service Principal authentication ──
+  # Required even for pack (which doesn't make any RP calls itself), because
+  # the CLI auto-activates SP auth in CI mode (CI=true is set by GitHub
+  # Actions) and validates that MS_CLI_SP_* env vars are present at startup.
+
+  app-id:
+    description: 'SPN client ID. Maps to MS_CLI_SP_CLIENT_ID.'
+    required: false
+    default: ''
+
+  client-secret:
+    description: >
+      SPN client secret. Maps to MS_CLI_SP_CLIENT_SECRET. Pass as a secret.
+    required: false
+    default: ''
+
+  tenant-id:
+    description: 'AAD tenant ID. Maps to MS_CLI_SP_TENANT_ID.'
     required: false
     default: ''
 

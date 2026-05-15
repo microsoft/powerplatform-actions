@@ -19980,6 +19980,12 @@ var path = require("node:path");
 var fs = require("node:fs/promises");
 var index_1 = require_install_ms_cli();
 var MS_CONFIG_FILE = "ms.config.json";
+var CLI_ENV_VARS = {
+  useSpAuth: "MS_CLI_USE_SP_AUTH",
+  spClientId: "MS_CLI_SP_CLIENT_ID",
+  spClientSecret: "MS_CLI_SP_CLIENT_SECRET",
+  spTenantId: "MS_CLI_SP_TENANT_ID"
+};
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
@@ -19993,12 +19999,18 @@ function main() {
   return __awaiter(this, void 0, void 0, function* () {
     core.startGroup("ms-app-pack:");
     const workingDirectory = resolveWorkingDirectory(core.getInput("working-directory", { required: false }));
+    const appId = core.getInput("app-id", { required: false });
+    const clientSecret = core.getInput("client-secret", { required: false });
+    const tenantId = core.getInput("tenant-id", { required: false });
+    if (clientSecret)
+      core.setSecret(clientSecret);
     if (process.env[index_1.MsInstalledEnvVarName] !== "true") {
       throw new Error("ms CLI is not installed. Add the install-ms-cli action before ms-app-pack:\n  - uses: microsoft/powerplatform-actions/install-ms-cli@v1");
     }
     yield validateAppDirectory(workingDirectory);
+    const cliEnv = buildCliEnv({ appId, clientSecret, tenantId });
     core.info("Running `ms app pack` (runs configured build command internally)...");
-    const result = yield exec.getExecOutput("ms", ["app", "pack", "--non-interactive", "--json"], { cwd: workingDirectory, ignoreReturnCode: true });
+    const result = yield exec.getExecOutput("ms", ["app", "pack", "--non-interactive", "--json"], { cwd: workingDirectory, env: cliEnv, ignoreReturnCode: true });
     if (result.exitCode !== 0) {
       throw new Error(`ms app pack failed (exit ${result.exitCode}):
 ${result.stderr || result.stdout}`);
@@ -20022,6 +20034,24 @@ Ensure working-directory points to a MAAF app created via \`ms app create\`.`);
     });
     core.info(`App directory validated: ${dir}`);
   });
+}
+function buildCliEnv(opts) {
+  const env = {};
+  for (const [k, v] of Object.entries(process.env)) {
+    if (typeof v === "string")
+      env[k] = v;
+  }
+  const hasFullSpn = opts.appId && opts.clientSecret && opts.tenantId;
+  if (hasFullSpn) {
+    env[CLI_ENV_VARS.useSpAuth] = "true";
+    env[CLI_ENV_VARS.spClientId] = opts.appId;
+    env[CLI_ENV_VARS.spClientSecret] = opts.clientSecret;
+    env[CLI_ENV_VARS.spTenantId] = opts.tenantId;
+    core.info("Service Principal auth env vars forwarded.");
+  } else if (opts.appId || opts.clientSecret || opts.tenantId) {
+    core.warning("Partial SPN inputs supplied (need all of app-id, client-secret, tenant-id). Pack will likely fail because the CLI auto-activates SP auth in CI.");
+  }
+  return env;
 }
 /*! Bundled license information:
 
