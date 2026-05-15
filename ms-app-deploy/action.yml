@@ -3,13 +3,24 @@
 #
 # ms-app-deploy/action.yml
 #
-# Deploys a MAAF code app for the current commit by invoking `ms app deploy`.
-# Per the MAAF Git Inner Loop spec (§7.1), builds are JIT — `ms app deploy`
-# auto-triggers a server-side build for a commit if one doesn't exist, so no
-# explicit `ms app build` step is needed.
+# Deploys a MAAF code app via the artifact / escape-hatch path
+# (MAAF Git Inner Loop spec §7.5):
+#
+#   1. ms app pack    → run npm run build and pack into a deployable artifact
+#   2. ms app deploy  → upload the artifact and deploy it
+#
+# This path bypasses the server-side build and the
+# Repositories.MicrosoftApps.Build.Write permission requirement. Works for
+# escape-hatch apps (`ms app create --repo none`) and other artifact-mode
+# scenarios.
 #
 # The action reads `appId` and `environmentId` from `ms.config.json` in the
 # working directory (written by `ms app create`).
+#
+# CALLER PREREQUISITES:
+#   - Run `npm ci` (or `npm install`) in the working directory before this
+#     action. `ms app pack` runs `npm run build` internally and needs the
+#     project's node_modules to be present.
 #
 # ---------------------------------------------------------------------------
 # KNOWN BLOCKER (as of 2026-05):
@@ -29,8 +40,10 @@
 #   - uses: actions/setup-node@v4
 #     with:
 #       node-version: '22'
+#   - run: npm ci
+#     working-directory: 'maaf-apps'   # required — pack runs `npm run build`
 #   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
-#     # @microsoft/apps-cli is now on public npm — no inputs needed by default.
+#     # @microsoft/apps-cli is on public npm — no inputs needed by default.
 #   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
 #     with:
 #       working-directory: 'maaf-apps'
@@ -39,7 +52,7 @@
 #       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
 #
 name: 'ms-app-deploy'
-description: 'Power Platform MS App Deploy — deploys a MAAF code app for the given commit'
+description: 'Power Platform MS App Deploy — packs and deploys a MAAF code app via the artifact path'
 
 inputs:
   # ── App context ───────────────────────────────────────────────────────────

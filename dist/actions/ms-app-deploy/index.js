@@ -20030,6 +20030,7 @@ function main() {
       tenantId
     });
     core.setOutput("commit-sha", commitSha);
+    yield runPack(workingDirectory, cliEnv);
     const deployResult = yield runDeploy(workingDirectory, cliEnv, commitSha);
     if (deployResult.id)
       core.setOutput("app-id", deployResult.id);
@@ -20037,6 +20038,18 @@ function main() {
       core.setOutput("environment-id", deployResult.environmentId);
     core.info(`App '${(_a = deployResult.displayName) !== null && _a !== void 0 ? _a : "(unknown)"}' deployed (id: ${(_b = deployResult.id) !== null && _b !== void 0 ? _b : "unknown"}).`);
     core.endGroup();
+  });
+}
+function runPack(cwd, env) {
+  return __awaiter(this, void 0, void 0, function* () {
+    core.info("Packing app (runs npm run build internally)...");
+    const args = ["app", "pack", "--non-interactive", "--json"];
+    const result = yield exec.getExecOutput("ms", args, { cwd, env, ignoreReturnCode: true });
+    if (result.exitCode !== 0) {
+      throw new Error(`ms app pack failed (exit ${result.exitCode}):
+${result.stderr || result.stdout}`);
+    }
+    core.info("App packed.");
   });
 }
 function runDeploy(cwd, env, commitSha) {
