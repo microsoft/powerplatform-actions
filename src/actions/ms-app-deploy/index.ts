@@ -3,20 +3,15 @@
 
 // src/actions/ms-app-deploy/index.ts
 //
-// Deploys a MAAF code app using the escape-hatch / artifact path
-// (MAAF Git Inner Loop spec §7.5):
+// Deploys a MAAF code app via `ms app deploy`. For escape-hatch apps
+// (repoType:'none'), the artifact must already exist under
+// .ms/packed/apps/<appId>/client/ — produced by the `ms-app-pack` action.
+// For git-backed apps (native/github), deploy resolves the commit and
+// uses the corresponding server-side build.
 //
-//   1. ms app pack    → run npm run build and pack into a deployable artifact
-//   2. ms app deploy  → upload the artifact and deploy it
-//
-// This path does not require a server-side build (and therefore does not
-// require the Repositories.MicrosoftApps.Build.Write permission). It works
-// for escape-hatch apps (created with `--repo none`) and other artifact-mode
-// scenarios.
-//
-// Caller is expected to have run `npm ci` (or `npm install`) in the working
-// directory before invoking this action — `ms app pack` runs `npm run build`
-// internally and needs node_modules present.
+// Once the upcoming CLI PR adds `ms app deploy --artifact <path>` and folds
+// pack into deploy for repoType:'none' apps, the explicit `ms-app-pack`
+// step in the workflow can be dropped.
 //
 // Config file: `ms.config.json`, written by `ms app create`. Contains the
 // app's `environmentId` and `appId`.
@@ -104,8 +99,6 @@ export async function main(): Promise<void> {
 
     core.setOutput('commit-sha', commitSha);
 
-    await runPack(workingDirectory, cliEnv);
-
     const deployResult = await runDeploy(workingDirectory, cliEnv, commitSha);
     if (deployResult.id) core.setOutput('app-id', deployResult.id);
     if (deployResult.environmentId) core.setOutput('environment-id', deployResult.environmentId);
@@ -115,20 +108,6 @@ export async function main(): Promise<void> {
     );
 
     core.endGroup();
-}
-
-async function runPack(
-    cwd: string,
-    env: Record<string, string>
-): Promise<void> {
-    core.info('Packing app (runs npm run build internally)...');
-    const args = ['app', 'pack', '--non-interactive', '--json'];
-    const result = await exec.getExecOutput('ms', args, { cwd, env, ignoreReturnCode: true });
-
-    if (result.exitCode !== 0) {
-        throw new Error(`ms app pack failed (exit ${result.exitCode}):\n${result.stderr || result.stdout}`);
-    }
-    core.info('App packed.');
 }
 
 async function runDeploy(

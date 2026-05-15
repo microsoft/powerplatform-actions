@@ -19814,7 +19814,7 @@ var require_install_ms_cli = __commonJS({
     var MS_CLI_BINARY = "ms";
     exports2.MsInstalledEnvVarName = "POWERPLATFORMTOOLS_MSINSTALLED";
     exports2.MsPathEnvVarName = "POWERPLATFORMTOOLS_MSPATH";
-    var argName2 = {
+    var argName = {
       version: "version",
       registryUrl: "registry-url",
       registryAuthToken: "registry-auth-token",
@@ -19832,10 +19832,10 @@ var require_install_ms_cli = __commonJS({
     function main2() {
       return __awaiter2(this, void 0, void 0, function* () {
         core2.startGroup("install-ms-cli:");
-        const version = core2.getInput(argName2.version, { required: false }) || "latest";
-        const registryUrl = core2.getInput(argName2.registryUrl, { required: false }) || "https://registry.npmjs.org";
-        const registryAuthToken = core2.getInput(argName2.registryAuthToken, { required: false });
-        const npmPackageName = core2.getInput(argName2.npmPackageName, { required: false }) || "@microsoft/apps-cli";
+        const version = core2.getInput(argName.version, { required: false }) || "latest";
+        const registryUrl = core2.getInput(argName.registryUrl, { required: false }) || "https://registry.npmjs.org";
+        const registryAuthToken = core2.getInput(argName.registryAuthToken, { required: false });
+        const npmPackageName = core2.getInput(argName.npmPackageName, { required: false }) || "@microsoft/apps-cli";
         if (registryAuthToken) {
           core2.setSecret(registryAuthToken);
         }
@@ -19944,7 +19944,7 @@ always-auth=true
   }
 });
 
-// out/actions/ms-app-deploy/index.js
+// out/actions/ms-app-pack/index.js
 var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve) {
@@ -19979,85 +19979,33 @@ var exec = require_exec();
 var path = require("node:path");
 var fs = require("node:fs/promises");
 var index_1 = require_install_ms_cli();
-var CLI_ENV_VARS = {
-  useSpAuth: "MS_CLI_USE_SP_AUTH",
-  spClientId: "MS_CLI_SP_CLIENT_ID",
-  spClientSecret: "MS_CLI_SP_CLIENT_SECRET",
-  spTenantId: "MS_CLI_SP_TENANT_ID",
-  cloudInstance: "MS_CLI_CLOUD_INSTANCE"
-};
-var argName = {
-  appName: "app-name",
-  commitSha: "commit-sha",
-  cloud: "cloud",
-  workingDirectory: "working-directory",
-  appId: "app-id",
-  clientSecret: "client-secret",
-  tenantId: "tenant-id"
-};
 var MS_CONFIG_FILE = "ms.config.json";
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
   }
 }))().catch((error) => {
-  core.error(`ms-app-deploy failed: ${error}`);
+  core.error(`ms-app-pack failed: ${error}`);
   core.setFailed(error instanceof Error ? error.message : String(error));
   core.endGroup();
 });
 function main() {
   return __awaiter(this, void 0, void 0, function* () {
-    var _a, _b;
-    core.startGroup("ms-app-deploy:");
-    const appNameOverride = core.getInput(argName.appName, { required: false });
-    const cloud = core.getInput(argName.cloud, { required: false }) || "test";
-    const commitSha = resolveCommitSha(core.getInput(argName.commitSha, { required: false }));
-    const appId = core.getInput(argName.appId, { required: false });
-    const clientSecret = core.getInput(argName.clientSecret, { required: false });
-    const tenantId = core.getInput(argName.tenantId, { required: false });
-    const workingDirectory = resolveWorkingDirectory(core.getInput(argName.workingDirectory, { required: false }));
-    if (clientSecret)
-      core.setSecret(clientSecret);
+    core.startGroup("ms-app-pack:");
+    const workingDirectory = resolveWorkingDirectory(core.getInput("working-directory", { required: false }));
     if (process.env[index_1.MsInstalledEnvVarName] !== "true") {
-      throw new Error("ms CLI is not installed. Add the install-ms-cli action before ms-app-deploy:\n  - uses: microsoft/powerplatform-actions/install-ms-cli@v1");
+      throw new Error("ms CLI is not installed. Add the install-ms-cli action before ms-app-pack:\n  - uses: microsoft/powerplatform-actions/install-ms-cli@v1");
     }
     yield validateAppDirectory(workingDirectory);
-    const cliEnv = buildCliEnv({
-      cloud,
-      appNameOverride,
-      appId,
-      clientSecret,
-      tenantId
-    });
-    core.setOutput("commit-sha", commitSha);
-    const deployResult = yield runDeploy(workingDirectory, cliEnv, commitSha);
-    if (deployResult.id)
-      core.setOutput("app-id", deployResult.id);
-    if (deployResult.environmentId)
-      core.setOutput("environment-id", deployResult.environmentId);
-    core.info(`App '${(_a = deployResult.displayName) !== null && _a !== void 0 ? _a : "(unknown)"}' deployed (id: ${(_b = deployResult.id) !== null && _b !== void 0 ? _b : "unknown"}).`);
-    core.endGroup();
-  });
-}
-function runDeploy(cwd, env, commitSha) {
-  return __awaiter(this, void 0, void 0, function* () {
-    core.info(`Deploying commit ${commitSha}...`);
-    const args = ["app", "deploy", "--non-interactive", "--json", "--commit", commitSha];
-    const result = yield exec.getExecOutput("ms", args, { cwd, env, ignoreReturnCode: true });
+    core.info("Running `ms app pack` (runs configured build command internally)...");
+    const result = yield exec.getExecOutput("ms", ["app", "pack", "--non-interactive", "--json"], { cwd: workingDirectory, ignoreReturnCode: true });
     if (result.exitCode !== 0) {
-      throw new Error(`ms app deploy failed (exit ${result.exitCode}):
+      throw new Error(`ms app pack failed (exit ${result.exitCode}):
 ${result.stderr || result.stdout}`);
     }
-    return parseJsonOutput(result.stdout, "ms app deploy");
+    core.info("App packed. Artifact ready under .ms/packed/.");
+    core.endGroup();
   });
-}
-function resolveCommitSha(input) {
-  if (input)
-    return input;
-  const githubSha = process.env["GITHUB_SHA"];
-  if (githubSha)
-    return githubSha;
-  throw new Error("No commit SHA available. Provide `commit-sha` input or run inside a GitHub Actions checkout.");
 }
 function resolveWorkingDirectory(input) {
   if (!input) {
@@ -20074,41 +20022,6 @@ Ensure working-directory points to a MAAF app created via \`ms app create\`.`);
     });
     core.info(`App directory validated: ${dir}`);
   });
-}
-function buildCliEnv(opts) {
-  const env = {};
-  for (const [k, v] of Object.entries(process.env)) {
-    if (typeof v === "string")
-      env[k] = v;
-  }
-  env[CLI_ENV_VARS.cloudInstance] = opts.cloud;
-  const hasFullSpn = opts.appId && opts.clientSecret && opts.tenantId;
-  if (hasFullSpn) {
-    env[CLI_ENV_VARS.useSpAuth] = "true";
-    env[CLI_ENV_VARS.spClientId] = opts.appId;
-    env[CLI_ENV_VARS.spClientSecret] = opts.clientSecret;
-    env[CLI_ENV_VARS.spTenantId] = opts.tenantId;
-    core.info("Service Principal auth enabled.");
-    core.warning("Note: the Power Apps RP currently rejects SPN identities for MAAF operations. This call will likely fail with ServicePrincipalNotSupportedForMaafOperations until the RP enables SPN or the CLI adds federated auth.");
-  } else if (opts.appId || opts.clientSecret || opts.tenantId) {
-    core.warning("Partial SPN inputs supplied (need all of app-id, client-secret, tenant-id). Falling back to whatever identity is already cached by the CLI.");
-  }
-  return env;
-}
-function parseJsonOutput(stdout, label) {
-  const trimmed = stdout.trim();
-  if (!trimmed) {
-    throw new Error(`${label} produced no JSON output.`);
-  }
-  const match = trimmed.match(/\{[\s\S]*\}\s*$/);
-  const payload = match ? match[0] : trimmed;
-  try {
-    return JSON.parse(payload);
-  } catch (e) {
-    throw new Error(`Failed to parse ${label} JSON output: ${e instanceof Error ? e.message : e}
-Raw stdout:
-${stdout}`);
-  }
 }
 /*! Bundled license information:
 

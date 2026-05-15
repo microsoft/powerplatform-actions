@@ -3,24 +3,23 @@
 #
 # ms-app-deploy/action.yml
 #
-# Deploys a MAAF code app via the artifact / escape-hatch path
-# (MAAF Git Inner Loop spec §7.5):
+# Deploys a MAAF code app via `ms app deploy`. For escape-hatch apps
+# (repoType:'none'), the artifact must already exist under
+# .ms/packed/apps/<appId>/client/ — produced by the `ms-app-pack` action.
+# For git-backed apps (native/github), deploy resolves the commit and uses
+# the corresponding server-side build.
 #
-#   1. ms app pack    → run npm run build and pack into a deployable artifact
-#   2. ms app deploy  → upload the artifact and deploy it
-#
-# This path bypasses the server-side build and the
-# Repositories.MicrosoftApps.Build.Write permission requirement. Works for
-# escape-hatch apps (`ms app create --repo none`) and other artifact-mode
-# scenarios.
+# Once the upcoming CLI PR adds `ms app deploy --artifact <path>` and folds
+# pack into deploy for repoType:'none' apps, you can drop the
+# `- uses: ms-app-pack` step from your workflow.
 #
 # The action reads `appId` and `environmentId` from `ms.config.json` in the
 # working directory (written by `ms app create`).
 #
 # CALLER PREREQUISITES:
-#   - Run `npm ci` (or `npm install`) in the working directory before this
-#     action. `ms app pack` runs `npm run build` internally and needs the
-#     project's node_modules to be present.
+#   - install-ms-cli has run earlier in the job.
+#   - For repoType:'none' apps: `ms-app-pack` ran earlier in the job (which
+#     itself requires a prior `npm ci`).
 #
 # ---------------------------------------------------------------------------
 # KNOWN BLOCKER (as of 2026-05):
@@ -41,9 +40,11 @@
 #     with:
 #       node-version: '22'
 #   - run: npm ci
-#     working-directory: 'maaf-apps'   # required — pack runs `npm run build`
+#     working-directory: 'maaf-apps'
 #   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
-#     # @microsoft/apps-cli is on public npm — no inputs needed by default.
+#   - uses: microsoft/powerplatform-actions/ms-app-pack@v1
+#     with:
+#       working-directory: 'maaf-apps'
 #   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
 #     with:
 #       working-directory: 'maaf-apps'
@@ -52,7 +53,7 @@
 #       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
 #
 name: 'ms-app-deploy'
-description: 'Power Platform MS App Deploy — packs and deploys a MAAF code app via the artifact path'
+description: 'Power Platform MS App Deploy — deploys a MAAF code app for the given commit'
 
 inputs:
   # ── App context ───────────────────────────────────────────────────────────
