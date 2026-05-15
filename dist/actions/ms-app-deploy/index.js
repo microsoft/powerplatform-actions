@@ -19991,16 +19991,11 @@ var argName = {
   commitSha: "commit-sha",
   cloud: "cloud",
   workingDirectory: "working-directory",
-  buildTimeoutSeconds: "build-timeout-seconds",
-  buildPollIntervalSeconds: "build-poll-interval-seconds",
-  skipBuild: "skip-build",
   appId: "app-id",
   clientSecret: "client-secret",
   tenantId: "tenant-id"
 };
-var MS_CONFIG_FILE = "ms.config.json";
-var TERMINAL_SUCCESS = /* @__PURE__ */ new Set(["succeeded"]);
-var TERMINAL_FAILURE = /* @__PURE__ */ new Set(["failed", "cancelled", "canceled"]);
+var CONFIG_CANDIDATES = ["power.config.json", "ms.config.json"];
 (() => __awaiter(void 0, void 0, void 0, function* () {
   if (process.env.GITHUB_ACTIONS) {
     yield main();
@@ -20016,9 +20011,6 @@ function main() {
     core.startGroup("ms-app-deploy:");
     const appNameOverride = core.getInput(argName.appName, { required: false });
     const cloud = core.getInput(argName.cloud, { required: false }) || "test";
-    const skipBuild = core.getInput(argName.skipBuild, { required: false }) === "true";
-    const buildTimeoutSeconds = parseIntInput(argName.buildTimeoutSeconds, 1200);
-    const pollIntervalSeconds = parseIntInput(argName.buildPollIntervalSeconds, 10);
     const commitSha = resolveCommitSha(core.getInput(argName.commitSha, { required: false }));
     const appId = core.getInput(argName.appId, { required: false });
     const clientSecret = core.getInput(argName.clientSecret, { required: false });
@@ -20033,27 +20025,11 @@ function main() {
     const cliEnv = buildCliEnv({
       cloud,
       appNameOverride,
-      commitSha,
       appId,
       clientSecret,
       tenantId
     });
     core.setOutput("commit-sha", commitSha);
-    let operationId;
-    if (skipBuild) {
-      core.info("Skipping build (skip-build=true)");
-    } else {
-      const buildResult = yield runBuild(workingDirectory, cliEnv, commitSha);
-      operationId = buildResult.operationId;
-      if (buildResult.cached) {
-        core.info(`Build already up to date for commit ${commitSha}; skipping poll.`);
-      } else if (operationId) {
-        core.setOutput("build-operation-id", operationId);
-        yield pollBuildStatus(workingDirectory, cliEnv, operationId, buildTimeoutSeconds, pollIntervalSeconds);
-      } else {
-        throw new Error("`ms app build` returned no operation ID and was not cached.");
-      }
-    }
     const deployResult = yield runDeploy(workingDirectory, cliEnv, commitSha);
     if (deployResult.id)
       core.setOutput("app-id", deployResult.id);
@@ -20061,53 +20037,6 @@ function main() {
       core.setOutput("environment-id", deployResult.environmentId);
     core.info(`App '${(_a = deployResult.displayName) !== null && _a !== void 0 ? _a : "(unknown)"}' deployed (id: ${(_b = deployResult.id) !== null && _b !== void 0 ? _b : "unknown"}).`);
     core.endGroup();
-  });
-}
-function runBuild(cwd, env, commitSha) {
-  return __awaiter(this, void 0, void 0, function* () {
-    core.info(`Triggering server-side build for commit ${commitSha}...`);
-    const args = ["app", "build", "--non-interactive", "--json", "--commit", commitSha];
-    const result = yield exec.getExecOutput("ms", args, { cwd, env, ignoreReturnCode: true });
-    if (result.exitCode !== 0) {
-      throw new Error(`ms app build failed (exit ${result.exitCode}):
-${result.stderr || result.stdout}`);
-    }
-    const parsed = parseJsonOutput(result.stdout, "ms app build");
-    return parsed;
-  });
-}
-function pollBuildStatus(cwd, env, operationId, timeoutSeconds, pollIntervalSeconds) {
-  return __awaiter(this, void 0, void 0, function* () {
-    var _a;
-    core.info(`Polling build status (operation ${operationId}, timeout ${timeoutSeconds}s)...`);
-    const deadline = Date.now() + timeoutSeconds * 1e3;
-    while (Date.now() < deadline) {
-      const args = [
-        "app",
-        "build-status",
-        "--non-interactive",
-        "--json",
-        "--operation-id",
-        operationId
-      ];
-      const result = yield exec.getExecOutput("ms", args, { cwd, env, ignoreReturnCode: true });
-      if (result.exitCode !== 0) {
-        throw new Error(`ms app build-status failed (exit ${result.exitCode}):
-${result.stderr || result.stdout}`);
-      }
-      const parsed = parseJsonOutput(result.stdout, "ms app build-status");
-      const status = ((_a = parsed.status) !== null && _a !== void 0 ? _a : "").toLowerCase();
-      core.info(`Build status: ${parsed.status}`);
-      if (TERMINAL_SUCCESS.has(status)) {
-        return;
-      }
-      if (TERMINAL_FAILURE.has(status)) {
-        throw new Error(`Build reached terminal failure state '${parsed.status}'. Full payload:
-` + JSON.stringify(parsed, null, 2));
-      }
-      yield sleep(pollIntervalSeconds * 1e3);
-    }
-    throw new Error(`Build did not reach a terminal state within ${timeoutSeconds}s. Last operation ID: ${operationId}`);
   });
 }
 function runDeploy(cwd, env, commitSha) {
@@ -20138,12 +20067,17 @@ function resolveWorkingDirectory(input) {
 }
 function validateAppDirectory(dir) {
   return __awaiter(this, void 0, void 0, function* () {
-    const configPath = path.join(dir, MS_CONFIG_FILE);
-    yield fs.access(configPath).catch(() => {
-      throw new Error(`${MS_CONFIG_FILE} not found in working-directory: ${dir}
+    for (const filename of CONFIG_CANDIDATES) {
+      const candidate = path.join(dir, filename);
+      try {
+        yield fs.access(candidate);
+        core.info(`App directory validated (config: ${filename}): ${dir}`);
+        return;
+      } catch (_a) {
+      }
+    }
+    throw new Error(`Neither ${CONFIG_CANDIDATES.join(" nor ")} found in working-directory: ${dir}
 Ensure working-directory points to a MAAF app created via \`ms app create\`.`);
-    });
-    core.info(`App directory validated: ${dir}`);
   });
 }
 function buildCliEnv(opts) {
@@ -20180,19 +20114,6 @@ function parseJsonOutput(stdout, label) {
 Raw stdout:
 ${stdout}`);
   }
-}
-function parseIntInput(name, defaultValue) {
-  const raw = core.getInput(name, { required: false });
-  if (!raw)
-    return defaultValue;
-  const parsed = Number.parseInt(raw, 10);
-  if (Number.isNaN(parsed) || parsed <= 0) {
-    throw new Error(`Input '${name}' must be a positive integer, got '${raw}'.`);
-  }
-  return parsed;
-}
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 /*! Bundled license information:
 

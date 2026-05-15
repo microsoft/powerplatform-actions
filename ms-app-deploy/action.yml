@@ -3,15 +3,14 @@
 #
 # ms-app-deploy/action.yml
 #
-# Orchestrates the MAAF dogfood publish flow for a Power Apps code app on the
-# current commit:
+# Deploys a MAAF code app for the current commit by invoking `ms app deploy`.
+# Per the MAAF Git Inner Loop spec (§7.1), builds are JIT — `ms app deploy`
+# auto-triggers a server-side build for a commit if one doesn't exist, so no
+# explicit `ms app build` step is needed.
 #
-#   1. ms app build       --commit <sha>   → start server-side build
-#   2. ms app build-status --operation-id <id>  → poll until "Succeeded"
-#   3. ms app deploy      --commit <sha>   → deploy the built bits
-#
-# The action reads `appId` and `environmentId` from `ms.config.json` in the
-# working directory (written by `ms app create` during one-time setup).
+# The action reads `appId` and `environmentId` from `power.config.json` in the
+# working directory (written by `ms app create`). For older CLI versions it
+# also accepts the legacy `ms.config.json`.
 #
 # ---------------------------------------------------------------------------
 # KNOWN BLOCKER (as of 2026-05):
@@ -31,24 +30,17 @@
 #   - uses: actions/setup-node@v4
 #     with:
 #       node-version: '22'
-#   - run: npm ci         # install app dependencies (some local-validation paths
-#                         # in the CLI inspect node_modules / package-lock.json;
-#                         # also needed if you run lint or typecheck steps).
 #   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
-#     with:
-#       version: '0.3.1-dev.20260511.4'
-#       registry-url: 'https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/'
-#       registry-auth-token: ${{ secrets.AZURE_DEVOPS_PAT }}
+#     # @microsoft/apps-cli is now on public npm — no inputs needed by default.
 #   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
 #     with:
-#       cloud: 'test'
-#       commit-sha: ${{ github.sha }}
+#       working-directory: 'maaf-apps'
 #       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
 #       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
 #       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
 #
 name: 'ms-app-deploy'
-description: 'Power Platform MS App Deploy — builds, polls, and deploys a MAAF code app for the given commit'
+description: 'Power Platform MS App Deploy — deploys a MAAF code app for the given commit'
 
 inputs:
   # ── App context ───────────────────────────────────────────────────────────
@@ -56,16 +48,16 @@ inputs:
   app-name:
     description: >
       Optional override for the MAAF app name. By default the CLI reads
-      `appId` from `ms.config.json` in the working directory, so this is
-      rarely needed.
+      `appId` from power.config.json (or ms.config.json) in the working
+      directory, so this is rarely needed.
     required: false
     default: ''
 
   commit-sha:
     description: >
-      Commit SHA to build and deploy. Defaults to GITHUB_SHA (the commit that
-      triggered the workflow). The CLI also falls back to the current git HEAD
-      if neither this input nor GITHUB_SHA is set.
+      Commit SHA to deploy. Defaults to GITHUB_SHA (the commit that triggered
+      the workflow). The CLI also falls back to the current git HEAD if
+      neither this input nor GITHUB_SHA is set.
     required: false
     default: ''
 
@@ -79,32 +71,10 @@ inputs:
 
   working-directory:
     description: >
-      Path to the app directory containing ms.config.json and package.json.
-      Defaults to the repository root (GITHUB_WORKSPACE).
+      Path to the app directory containing power.config.json (or
+      ms.config.json) and package.json. Defaults to GITHUB_WORKSPACE.
     required: false
     default: ''
-
-  # ── Build orchestration ───────────────────────────────────────────────────
-
-  build-timeout-seconds:
-    description: >
-      Maximum seconds to wait for the server-side build to reach a terminal
-      state (Succeeded/Failed/Cancelled). Defaults to 1200 (20 minutes).
-    required: false
-    default: '1200'
-
-  build-poll-interval-seconds:
-    description: >
-      Seconds between build-status polls. Defaults to 10.
-    required: false
-    default: '10'
-
-  skip-build:
-    description: >
-      Set to 'true' to skip `ms app build` and only run `ms app deploy`. Use
-      when a previous step (or workflow) already built this commit.
-    required: false
-    default: 'false'
 
   # ── Service Principal authentication (optional, currently RP-blocked) ─────
   # All three must be provided together to enable SPN mode. If any is empty,
@@ -128,9 +98,6 @@ inputs:
     default: ''
 
 outputs:
-  build-operation-id:
-    description: 'Operation ID returned by `ms app build` (empty if skip-build=true or build was already cached).'
-
   app-id:
     description: 'Deployed app id (GUID), parsed from `ms app deploy --json`.'
 

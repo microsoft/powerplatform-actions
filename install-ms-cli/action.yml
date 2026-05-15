@@ -5,16 +5,13 @@
 #
 # Installs the MAAF `ms` CLI (@microsoft/apps-cli) on the GitHub Actions runner.
 #
-# IMPORTANT — feed availability (as of 2026-05):
-#   The real CLI is only published to the internal Azure DevOps feed:
-#     https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/
-#   The public npm package @microsoft/apps-cli@0.0.1 is a placeholder with no
-#   `bin` field. Consumers must currently pass `registry-url` + `registry-auth-token`
-#   pointing at the internal feed, plus pin `version` to a specific dev tag
-#   (e.g. 0.3.1-dev.20260511.4). This will simplify once the package is
-#   published to public npm.
+# Defaults to the public npm registry — @microsoft/apps-cli is published there
+# (since 2026-05-14). No inputs are required for standard usage:
 #
-# Example — internal feed usage:
+#   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
+#
+# For preview/dev builds from the internal Azure DevOps feed, override the
+# registry inputs:
 #
 #   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
 #     with:
@@ -28,26 +25,23 @@ description: 'Power Platform Install MS CLI — installs @microsoft/apps-cli (bi
 inputs:
   version:
     description: >
-      Version of @microsoft/apps-cli to install.
-      Use 'latest' or a specific semver / dev tag (e.g. '0.3.1-dev.20260511.4').
-      For internal-feed installs today, pin to a specific dev tag.
+      Version of @microsoft/apps-cli to install. Use 'latest' or a specific
+      semver / dev tag. Defaults to 'latest'.
     required: false
     default: 'latest'
 
   registry-url:
     description: >
-      npm registry URL. For MAAF dogfood today, point at the internal Azure
-      DevOps feed:
-        https://pkgs.dev.azure.com/msazure/OneAgile/_packaging/PowerPlatform-Managed-Host-consumption/npm/registry/
-      Defaults to public npmjs.com (which currently has only a placeholder).
+      npm registry URL. Defaults to public npmjs.com. Override for internal
+      Azure DevOps feeds when installing preview/dev builds.
     required: false
     default: 'https://registry.npmjs.org'
 
   registry-auth-token:
     description: >
-      Auth token for the npm registry. Required when registry-url is the internal
-      Azure DevOps feed. Generate a PAT with Packaging (Read) scope, store as a
-      GitHub secret, and pass it here.
+      Auth token for the npm registry. Required when registry-url is a private
+      feed (e.g. Azure DevOps Artifacts). For Azure DevOps, generate a PAT with
+      Packaging (Read) scope in the same organization as the feed.
     required: false
     default: ''
 
