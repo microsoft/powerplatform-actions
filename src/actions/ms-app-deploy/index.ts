@@ -45,6 +45,13 @@ const argName = {
 
 const MS_CONFIG_FILE = 'ms.config.json';
 
+interface MsConfig {
+    appId?: string;
+    environmentId?: string;
+    repoType?: string;
+    [key: string]: unknown;
+}
+
 interface DeployResult {
     id?: string;
     displayName?: string;
@@ -68,7 +75,7 @@ export async function main(): Promise<void> {
 
     const appNameOverride = core.getInput(argName.appName, { required: false });
     const cloud = core.getInput(argName.cloud, { required: false }) || 'test';
-    const commitSha = resolveCommitSha(core.getInput(argName.commitSha, { required: false }));
+    const commitShaInput = core.getInput(argName.commitSha, { required: false });
 
     const appId = core.getInput(argName.appId, { required: false });
     const clientSecret = core.getInput(argName.clientSecret, { required: false });
@@ -89,6 +96,18 @@ export async function main(): Promise<void> {
 
     await validateAppDirectory(workingDirectory);
 
+    // Read repoType from ms.config.json — repoType:'none' apps pack+upload
+    // locally and must NOT receive --commit (no git binding on the server).
+    const msConfig = await readMsConfig(workingDirectory);
+    const isEscapeHatch = msConfig.repoType === 'none';
+
+    const commitSha = isEscapeHatch ? undefined : resolveCommitSha(commitShaInput);
+    if (commitSha) core.setOutput('commit-sha', commitSha);
+
+    if (isEscapeHatch) {
+        core.info('repoType is "none" — using local pack+upload (no --commit).');
+    }
+
     const cliEnv = buildCliEnv({
         cloud,
         appNameOverride,
@@ -96,8 +115,6 @@ export async function main(): Promise<void> {
         clientSecret,
         tenantId,
     });
-
-    core.setOutput('commit-sha', commitSha);
 
     const deployResult = await runDeploy(workingDirectory, cliEnv, commitSha);
     if (deployResult.id) core.setOutput('app-id', deployResult.id);
@@ -113,10 +130,15 @@ export async function main(): Promise<void> {
 async function runDeploy(
     cwd: string,
     env: Record<string, string>,
-    commitSha: string
+    commitSha: string | undefined
 ): Promise<DeployResult> {
-    core.info(`Deploying commit ${commitSha}...`);
-    const args = ['app', 'deploy', '--non-interactive', '--json', '--commit', commitSha];
+    const args = ['app', 'deploy', '--non-interactive', '--json'];
+    if (commitSha) {
+        core.info(`Deploying commit ${commitSha}...`);
+        args.push('--commit', commitSha);
+    } else {
+        core.info('Deploying (local pack + upload)...');
+    }
     const result = await exec.getExecOutput('ms', args, { cwd, env, ignoreReturnCode: true });
 
     if (result.exitCode !== 0) {
@@ -142,6 +164,16 @@ function resolveWorkingDirectory(input: string): string {
     return path.isAbsolute(input)
         ? input
         : path.resolve(process.env['GITHUB_WORKSPACE'] || process.cwd(), input);
+}
+
+async function readMsConfig(dir: string): Promise<MsConfig> {
+    const configPath = path.join(dir, MS_CONFIG_FILE);
+    try {
+        const raw = await fs.readFile(configPath, 'utf-8');
+        return JSON.parse(raw) as MsConfig;
+    } catch {
+        return {};
+    }
 }
 
 async function validateAppDirectory(dir: string): Promise<void> {

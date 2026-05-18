@@ -20011,7 +20011,7 @@ function main() {
     core.startGroup("ms-app-deploy:");
     const appNameOverride = core.getInput(argName.appName, { required: false });
     const cloud = core.getInput(argName.cloud, { required: false }) || "test";
-    const commitSha = resolveCommitSha(core.getInput(argName.commitSha, { required: false }));
+    const commitShaInput = core.getInput(argName.commitSha, { required: false });
     const appId = core.getInput(argName.appId, { required: false });
     const clientSecret = core.getInput(argName.clientSecret, { required: false });
     const tenantId = core.getInput(argName.tenantId, { required: false });
@@ -20022,6 +20022,14 @@ function main() {
       throw new Error("ms CLI is not installed. Add the install-ms-cli action before ms-app-deploy:\n  - uses: microsoft/powerplatform-actions/install-ms-cli@v1");
     }
     yield validateAppDirectory(workingDirectory);
+    const msConfig = yield readMsConfig(workingDirectory);
+    const isEscapeHatch = msConfig.repoType === "none";
+    const commitSha = isEscapeHatch ? void 0 : resolveCommitSha(commitShaInput);
+    if (commitSha)
+      core.setOutput("commit-sha", commitSha);
+    if (isEscapeHatch) {
+      core.info('repoType is "none" \u2014 using local pack+upload (no --commit).');
+    }
     const cliEnv = buildCliEnv({
       cloud,
       appNameOverride,
@@ -20029,7 +20037,6 @@ function main() {
       clientSecret,
       tenantId
     });
-    core.setOutput("commit-sha", commitSha);
     const deployResult = yield runDeploy(workingDirectory, cliEnv, commitSha);
     if (deployResult.id)
       core.setOutput("app-id", deployResult.id);
@@ -20041,8 +20048,13 @@ function main() {
 }
 function runDeploy(cwd, env, commitSha) {
   return __awaiter(this, void 0, void 0, function* () {
-    core.info(`Deploying commit ${commitSha}...`);
-    const args = ["app", "deploy", "--non-interactive", "--json", "--commit", commitSha];
+    const args = ["app", "deploy", "--non-interactive", "--json"];
+    if (commitSha) {
+      core.info(`Deploying commit ${commitSha}...`);
+      args.push("--commit", commitSha);
+    } else {
+      core.info("Deploying (local pack + upload)...");
+    }
     const result = yield exec.getExecOutput("ms", args, { cwd, env, ignoreReturnCode: true });
     if (result.exitCode !== 0) {
       throw new Error(`ms app deploy failed (exit ${result.exitCode}):
@@ -20064,6 +20076,17 @@ function resolveWorkingDirectory(input) {
     return process.env["GITHUB_WORKSPACE"] || process.cwd();
   }
   return path.isAbsolute(input) ? input : path.resolve(process.env["GITHUB_WORKSPACE"] || process.cwd(), input);
+}
+function readMsConfig(dir) {
+  return __awaiter(this, void 0, void 0, function* () {
+    const configPath = path.join(dir, MS_CONFIG_FILE);
+    try {
+      const raw = yield fs.readFile(configPath, "utf-8");
+      return JSON.parse(raw);
+    } catch (_a) {
+      return {};
+    }
+  });
 }
 function validateAppDirectory(dir) {
   return __awaiter(this, void 0, void 0, function* () {
