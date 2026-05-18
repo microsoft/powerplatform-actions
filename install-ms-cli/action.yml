@@ -3,9 +3,9 @@
 #
 # install-ms-cli/action.yml
 #
-# Installs the MAAF `ms` CLI (@microsoft/apps-cli) on the GitHub Actions runner.
+# Installs the MAAF `ms` CLI (@microsoft/managed-apps-cli) on the GitHub Actions runner.
 #
-# Defaults to the public npm registry — @microsoft/apps-cli is published there
+# Defaults to the public npm registry — @microsoft/managed-apps-cli is published there
 # (since 2026-05-14). No inputs are required for standard usage:
 #
 #   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
@@ -20,12 +20,12 @@
 #       registry-auth-token: ${{ secrets.AZURE_DEVOPS_PAT }}
 #
 name: 'install-ms-cli'
-description: 'Power Platform Install MS CLI — installs @microsoft/apps-cli (binary: ms)'
+description: 'Power Platform Install MS CLI — installs @microsoft/managed-apps-cli (binary: ms)'
 
 inputs:
   version:
     description: >
-      Version of @microsoft/apps-cli to install. Use 'latest' or a specific
+      Version of @microsoft/managed-apps-cli to install. Use 'latest' or a specific
       semver / dev tag. Defaults to 'latest'.
     required: false
     default: 'latest'
@@ -47,10 +47,10 @@ inputs:
 
   npm-package-name:
     description: >
-      npm package to install. Defaults to @microsoft/apps-cli, which provides
+      npm package to install. Defaults to @microsoft/managed-apps-cli, which provides
       the `ms` binary. Override only for testing alternate builds.
     required: false
-    default: '@microsoft/apps-cli'
+    default: '@microsoft/managed-apps-cli'
 
 outputs:
   cli-version:

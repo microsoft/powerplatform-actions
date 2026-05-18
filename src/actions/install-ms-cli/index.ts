@@ -3,7 +3,7 @@
 
 // src/actions/install-ms-cli/index.ts
 //
-// Installs the MAAF `ms` CLI (@microsoft/apps-cli) on the GitHub Actions runner
+// Installs the MAAF `ms` CLI (@microsoft/managed-apps-cli) on the GitHub Actions runner
 // via npm. The package's `bin` field maps to the `ms` executable.
 
 import * as core from '@actions/core';
@@ -41,7 +41,7 @@ export async function main(): Promise<void> {
     const version = core.getInput(argName.version, { required: false }) || 'latest';
     const registryUrl = core.getInput(argName.registryUrl, { required: false }) || 'https://registry.npmjs.org';
     const registryAuthToken = core.getInput(argName.registryAuthToken, { required: false });
-    const npmPackageName = core.getInput(argName.npmPackageName, { required: false }) || '@microsoft/apps-cli';
+    const npmPackageName = core.getInput(argName.npmPackageName, { required: false }) || '@microsoft/managed-apps-cli';
 
     // Mask the auth token so it never appears in logs
     if (registryAuthToken) {
