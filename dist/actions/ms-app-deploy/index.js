@@ -19835,7 +19835,7 @@ var require_install_ms_cli = __commonJS({
         const version = core2.getInput(argName2.version, { required: false }) || "latest";
         const registryUrl = core2.getInput(argName2.registryUrl, { required: false }) || "https://registry.npmjs.org";
         const registryAuthToken = core2.getInput(argName2.registryAuthToken, { required: false });
-        const npmPackageName = core2.getInput(argName2.npmPackageName, { required: false }) || "@microsoft/apps-cli";
+        const npmPackageName = core2.getInput(argName2.npmPackageName, { required: false }) || "@microsoft/managed-apps-cli";
         if (registryAuthToken) {
           core2.setSecret(registryAuthToken);
         }

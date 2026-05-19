@@ -19832,7 +19832,7 @@ function main() {
     const version = core.getInput(argName.version, { required: false }) || "latest";
     const registryUrl = core.getInput(argName.registryUrl, { required: false }) || "https://registry.npmjs.org";
     const registryAuthToken = core.getInput(argName.registryAuthToken, { required: false });
-    const npmPackageName = core.getInput(argName.npmPackageName, { required: false }) || "@microsoft/apps-cli";
+    const npmPackageName = core.getInput(argName.npmPackageName, { required: false }) || "@microsoft/managed-apps-cli";
     if (registryAuthToken) {
       core.setSecret(registryAuthToken);
     }
