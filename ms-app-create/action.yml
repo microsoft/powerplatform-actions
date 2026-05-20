@@ -1,0 +1,97 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# ms-app-create/action.yml
+#
+# Provisions a new MAAF code app via `ms app create` and scaffolds the project
+# files into the working directory. Writes `ms.config.json` containing `appId`
+# and `environmentId`, which downstream `ms-app-pack` and `ms-app-deploy`
+# actions read.
+#
+# Hardcodes `--repo none` — the GitHub Actions context already lives in a
+# GitHub repo, so the escape-hatch / byoBuild mode is the right fit. To bind
+# a MAAF app to GHE.com or a platform-managed GRS repo, run `ms app create`
+# locally instead.
+#
+# OUTPUT FILES:
+#   The action does NOT commit the scaffolded files back to the repo. Add a
+#   follow-up step (git add/commit/push, or actions/upload-artifact) if you
+#   want to persist them.
+#
+# Example:
+#
+#   - uses: actions/checkout@v4
+#   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
+#   - uses: microsoft/powerplatform-actions/ms-app-create@v1
+#     with:
+#       display-name: 'My MAAF App'
+#       working-directory: 'apps/my-maaf-app'
+#       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
+#       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
+#       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
+#
+name: 'ms-app-create'
+description: 'Power Platform MS App Create — provisions a new MAAF code app (--repo none) and scaffolds the project'
+
+inputs:
+  display-name:
+    description: 'Display name shown in Power Platform. Maps to `--display-name`.'
+    required: true
+
+  app-identifier:
+    description: >
+      User-defined app identifier (letters, numbers, underscores; 1-64 chars).
+      Maps to `--app-id` on the CLI. Distinct from the SPN `app-id` input below.
+    required: false
+    default: ''
+
+  working-directory:
+    description: >
+      Path to scaffold the app into. Defaults to GITHUB_WORKSPACE.
+    required: false
+    default: ''
+
+  cloud:
+    description: >
+      Cloud instance to target. Defaults to 'test'. Maps to MS_CLI_CLOUD_INSTANCE.
+    required: false
+    default: 'test'
+
+  force:
+    description: >
+      Set to 'true' to overwrite files in working-directory if it is not empty.
+      Maps to `--force`. Defaults to 'false'.
+    required: false
+    default: 'false'
+
+  # ── Service Principal authentication ──
+
+  app-id:
+    description: 'SPN client ID. Maps to MS_CLI_SP_CLIENT_ID.'
+    required: false
+    default: ''
+
+  client-secret:
+    description: >
+      SPN client secret. Maps to MS_CLI_SP_CLIENT_SECRET. Pass as a secret.
+    required: false
+    default: ''
+
+  tenant-id:
+    description: 'AAD tenant ID. Maps to MS_CLI_SP_TENANT_ID.'
+    required: false
+    default: ''
+
+outputs:
+  app-id:
+    description: 'Server-assigned app id (GUID), parsed from `ms app create --json` output.'
+
+  environment-id:
+    description: 'Environment id stamped into ms.config.json.'
+
+  config-path:
+    description: 'Filesystem path to the written ms.config.json.'
+
+runs:
+  using: 'node24'
+  main: '../dist/actions/ms-app-create/index.js'
