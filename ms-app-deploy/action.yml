@@ -3,23 +3,34 @@
 #
 # ms-app-deploy/action.yml
 #
-# Deploys a MAAF code app via `ms app deploy`. For escape-hatch apps
-# (repoType:'none'), the artifact must already exist under
-# .ms/packed/apps/<appId>/client/ — produced by the `ms-app-pack` action.
-# For git-backed apps (native/github), deploy resolves the commit and uses
-# the corresponding server-side build.
+# Deploys a MAAF code app via `ms app deploy`. Three deploy modes are
+# supported, selected based on inputs and the app's repoType from
+# ms.config.json:
 #
-# Once the upcoming CLI PR adds `ms app deploy --artifact <path>` and folds
-# pack into deploy for repoType:'none' apps, you can drop the
-# `- uses: ms-app-pack` step from your workflow.
+#   1. repoType:'none' + artifact-path supplied → `ms app deploy --artifact <zip>`
+#      Uploads the pre-built zip and deploys it. Skips local pack.
 #
-# The action reads `appId` and `environmentId` from `ms.config.json` in the
-# working directory (written by `ms app create`).
+#   2. repoType:'none' + no artifact-path → `ms app deploy`
+#      CLI runs pack internally, zips, uploads, and deploys.
+#      (Or, if the workflow already ran `ms-app-pack` earlier, the existing
+#      .ms/packed/ artifact is reused.)
+#
+#   3. repoType:'native' / 'github' → `ms app deploy --commit <sha>`
+#      Server-side build for the commit, then deploy.
+#
+# Requires @microsoft/managed-apps-cli >= 0.7.0 for `--artifact` support.
+#
+# The action reads `appId`, `environmentId`, and `repoType` from
+# ms.config.json (written by `ms app create`).
 #
 # CALLER PREREQUISITES:
 #   - install-ms-cli has run earlier in the job.
-#   - For repoType:'none' apps: `ms-app-pack` ran earlier in the job (which
-#     itself requires a prior `npm ci`).
+#   - For repoType:'none' without artifact-path: either `ms-app-pack` ran
+#     earlier (with a prior `npm ci`), OR the CLI will pack internally.
+#   - Tenant admin has enabled `AllowExternalArtifactsDeployment` on the
+#     target environment. Without it, deploy returns a policy error from
+#     the RP. Wiki:
+#     microsoft.ghe.com/bic/Managed-Ops-Internal/blob/main/docs/devops/MAAF/allowExternalArtifactDeployment-powershell.md
 #
 # ---------------------------------------------------------------------------
 # KNOWN BLOCKER (as of 2026-05):
@@ -33,18 +44,33 @@
 #   Track the ask with the MAAF CLI team (Anshul / Casey).
 # ---------------------------------------------------------------------------
 #
-# Example usage:
+# Example 1 — repoType:'none' with locally-built artifact:
 #
 #   - uses: actions/checkout@v4
 #   - uses: actions/setup-node@v4
+#     with: { node-version: '22' }
+#   - run: npm ci
+#     working-directory: 'maaf-apps'
+#   - run: npm run build
+#     working-directory: 'maaf-apps'
+#   - run: cd maaf-apps && zip -r ../app.zip dist ms.config.json
+#   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
+#   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
 #     with:
-#       node-version: '22'
+#       working-directory: 'maaf-apps'
+#       artifact-path: '../app.zip'
+#       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
+#       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
+#       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
+#
+# Example 2 — repoType:'none' letting the CLI pack internally:
+#
+#   - uses: actions/checkout@v4
+#   - uses: actions/setup-node@v4
+#     with: { node-version: '22' }
 #   - run: npm ci
 #     working-directory: 'maaf-apps'
 #   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
-#   - uses: microsoft/powerplatform-actions/ms-app-pack@v1
-#     with:
-#       working-directory: 'maaf-apps'
 #   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
 #     with:
 #       working-directory: 'maaf-apps'
@@ -68,9 +94,17 @@ inputs:
 
   commit-sha:
     description: >
-      Commit SHA to deploy. Defaults to GITHUB_SHA (the commit that triggered
-      the workflow). The CLI also falls back to the current git HEAD if
-      neither this input nor GITHUB_SHA is set.
+      Commit SHA to deploy for git-backed apps (repoType:'native' or
+      'github'). Defaults to GITHUB_SHA. Ignored for repoType:'none' apps.
+      Mutually exclusive with artifact-path.
+    required: false
+    default: ''
+
+  artifact-path:
+    description: >
+      Path to a pre-built .zip artifact to upload and deploy. Only valid for
+      repoType:'none' (escape-hatch / byoBuild) apps. Maps to `--artifact`
+      on the CLI. Mutually exclusive with commit-sha.
     required: false
     default: ''
 

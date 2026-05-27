@@ -19989,6 +19989,7 @@ var CLI_ENV_VARS = {
 var argName = {
   appName: "app-name",
   commitSha: "commit-sha",
+  artifactPath: "artifact-path",
   cloud: "cloud",
   workingDirectory: "working-directory",
   appId: "app-id",
@@ -20012,6 +20013,7 @@ function main() {
     const appNameOverride = core.getInput(argName.appName, { required: false });
     const cloud = core.getInput(argName.cloud, { required: false }) || "test";
     const commitShaInput = core.getInput(argName.commitSha, { required: false });
+    const artifactPathInput = core.getInput(argName.artifactPath, { required: false });
     const appId = core.getInput(argName.appId, { required: false });
     const clientSecret = core.getInput(argName.clientSecret, { required: false });
     const tenantId = core.getInput(argName.tenantId, { required: false });
@@ -20024,11 +20026,20 @@ function main() {
     yield validateAppDirectory(workingDirectory);
     const msConfig = yield readMsConfig(workingDirectory);
     const isEscapeHatch = msConfig.repoType === "none";
+    if (commitShaInput && artifactPathInput) {
+      throw new Error("commit-sha and artifact-path are mutually exclusive. Use commit-sha for git-backed apps and artifact-path for repoType:'none' byoBuild deploys.");
+    }
+    if (artifactPathInput && !isEscapeHatch) {
+      throw new Error("artifact-path is only valid for apps created with repoType:'none'. For git-backed apps (native/github), deploy via commit-sha.");
+    }
+    const artifactPath = artifactPathInput ? resolveArtifactPath(artifactPathInput, workingDirectory) : void 0;
     const commitSha = isEscapeHatch ? void 0 : resolveCommitSha(commitShaInput);
     if (commitSha)
       core.setOutput("commit-sha", commitSha);
-    if (isEscapeHatch) {
-      core.info('repoType is "none" \u2014 using local pack+upload (no --commit).');
+    if (artifactPath) {
+      core.info(`Using pre-built artifact: ${artifactPath}`);
+    } else if (isEscapeHatch) {
+      core.info('repoType is "none" \u2014 CLI will pack and upload (no --commit).');
     }
     const cliEnv = buildCliEnv({
       cloud,
@@ -20037,7 +20048,7 @@ function main() {
       clientSecret,
       tenantId
     });
-    const deployResult = yield runDeploy(workingDirectory, cliEnv, commitSha);
+    const deployResult = yield runDeploy(workingDirectory, cliEnv, { commitSha, artifactPath });
     if (deployResult.id)
       core.setOutput("app-id", deployResult.id);
     if (deployResult.environmentId)
@@ -20046,14 +20057,17 @@ function main() {
     core.endGroup();
   });
 }
-function runDeploy(cwd, env, commitSha) {
+function runDeploy(cwd, env, opts) {
   return __awaiter(this, void 0, void 0, function* () {
     const args = ["app", "deploy", "--non-interactive", "--json"];
-    if (commitSha) {
-      core.info(`Deploying commit ${commitSha}...`);
-      args.push("--commit", commitSha);
+    if (opts.artifactPath) {
+      core.info(`Deploying artifact at ${opts.artifactPath}...`);
+      args.push("--artifact", opts.artifactPath);
+    } else if (opts.commitSha) {
+      core.info(`Deploying commit ${opts.commitSha}...`);
+      args.push("--commit", opts.commitSha);
     } else {
-      core.info("Deploying (local pack + upload)...");
+      core.info("Deploying (CLI will pack + upload)...");
     }
     const result = yield exec.getExecOutput("ms", args, { cwd, env, ignoreReturnCode: true });
     if (result.exitCode !== 0) {
@@ -20062,6 +20076,9 @@ ${result.stderr || result.stdout}`);
     }
     return parseJsonOutput(result.stdout, "ms app deploy");
   });
+}
+function resolveArtifactPath(input, cwd) {
+  return path.isAbsolute(input) ? input : path.resolve(cwd, input);
 }
 function resolveCommitSha(input) {
   if (input)

@@ -3,21 +3,22 @@
 
 // src/actions/ms-app-deploy/index.ts
 //
-// Deploys a MAAF code app via `ms app deploy`. For escape-hatch apps
-// (repoType:'none'), the artifact must already exist under
-// .ms/packed/apps/<appId>/client/ — produced by the `ms-app-pack` action.
-// For git-backed apps (native/github), deploy resolves the commit and
-// uses the corresponding server-side build.
+// Deploys a MAAF code app via `ms app deploy`. Three modes:
 //
-// Once the upcoming CLI PR adds `ms app deploy --artifact <path>` and folds
-// pack into deploy for repoType:'none' apps, the explicit `ms-app-pack`
-// step in the workflow can be dropped.
+//   1. repoType:'none' + artifact-path supplied → --artifact <zip>
+//      Uploads a pre-built zip and deploys it.
+//   2. repoType:'none' + no artifact-path → no extra flags
+//      CLI runs pack internally, zips, uploads, and deploys.
+//   3. repoType:'native'/'github' → --commit <sha>
+//      Server-side build for the commit, then deploy.
 //
-// Config file: `ms.config.json`, written by `ms app create`. Contains the
-// app's `environmentId` and `appId`.
+// Requires @microsoft/managed-apps-cli >= 0.7.0 for --artifact support.
 //
-// Auth: optionally sets MS_CLI_SP_* + MS_CLI_USE_SP_AUTH=true when all three
-// SPN inputs are supplied.
+// Reads `appId`, `environmentId`, `repoType` from ms.config.json (written
+// by `ms app create`).
+//
+// Auth: optionally sets MS_CLI_SP_* + MS_CLI_USE_SP_AUTH=true when all
+// three SPN inputs are supplied.
 
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
@@ -36,6 +37,7 @@ const CLI_ENV_VARS = {
 const argName = {
     appName: 'app-name',
     commitSha: 'commit-sha',
+    artifactPath: 'artifact-path',
     cloud: 'cloud',
     workingDirectory: 'working-directory',
     appId: 'app-id',
@@ -76,6 +78,7 @@ export async function main(): Promise<void> {
     const appNameOverride = core.getInput(argName.appName, { required: false });
     const cloud = core.getInput(argName.cloud, { required: false }) || 'test';
     const commitShaInput = core.getInput(argName.commitSha, { required: false });
+    const artifactPathInput = core.getInput(argName.artifactPath, { required: false });
 
     const appId = core.getInput(argName.appId, { required: false });
     const clientSecret = core.getInput(argName.clientSecret, { required: false });
@@ -96,16 +99,37 @@ export async function main(): Promise<void> {
 
     await validateAppDirectory(workingDirectory);
 
-    // Read repoType from ms.config.json — repoType:'none' apps pack+upload
-    // locally and must NOT receive --commit (no git binding on the server).
+    // Read repoType from ms.config.json — repoType:'none' apps deploy via
+    // pack/upload (with or without --artifact) and must NOT receive --commit.
     const msConfig = await readMsConfig(workingDirectory);
     const isEscapeHatch = msConfig.repoType === 'none';
 
+    // Mutual exclusion mirrors the CLI's UsageError:
+    //   --commit + --artifact is ambiguous and rejected up-front.
+    if (commitShaInput && artifactPathInput) {
+        throw new Error(
+            'commit-sha and artifact-path are mutually exclusive. ' +
+            'Use commit-sha for git-backed apps and artifact-path for repoType:\'none\' byoBuild deploys.'
+        );
+    }
+    if (artifactPathInput && !isEscapeHatch) {
+        throw new Error(
+            "artifact-path is only valid for apps created with repoType:'none'. " +
+            'For git-backed apps (native/github), deploy via commit-sha.'
+        );
+    }
+
+    const artifactPath = artifactPathInput
+        ? resolveArtifactPath(artifactPathInput, workingDirectory)
+        : undefined;
     const commitSha = isEscapeHatch ? undefined : resolveCommitSha(commitShaInput);
+
     if (commitSha) core.setOutput('commit-sha', commitSha);
 
-    if (isEscapeHatch) {
-        core.info('repoType is "none" — using local pack+upload (no --commit).');
+    if (artifactPath) {
+        core.info(`Using pre-built artifact: ${artifactPath}`);
+    } else if (isEscapeHatch) {
+        core.info('repoType is "none" — CLI will pack and upload (no --commit).');
     }
 
     const cliEnv = buildCliEnv({
@@ -116,7 +140,7 @@ export async function main(): Promise<void> {
         tenantId,
     });
 
-    const deployResult = await runDeploy(workingDirectory, cliEnv, commitSha);
+    const deployResult = await runDeploy(workingDirectory, cliEnv, { commitSha, artifactPath });
     if (deployResult.id) core.setOutput('app-id', deployResult.id);
     if (deployResult.environmentId) core.setOutput('environment-id', deployResult.environmentId);
 
@@ -130,14 +154,17 @@ export async function main(): Promise<void> {
 async function runDeploy(
     cwd: string,
     env: Record<string, string>,
-    commitSha: string | undefined
+    opts: { commitSha?: string; artifactPath?: string }
 ): Promise<DeployResult> {
     const args = ['app', 'deploy', '--non-interactive', '--json'];
-    if (commitSha) {
-        core.info(`Deploying commit ${commitSha}...`);
-        args.push('--commit', commitSha);
+    if (opts.artifactPath) {
+        core.info(`Deploying artifact at ${opts.artifactPath}...`);
+        args.push('--artifact', opts.artifactPath);
+    } else if (opts.commitSha) {
+        core.info(`Deploying commit ${opts.commitSha}...`);
+        args.push('--commit', opts.commitSha);
     } else {
-        core.info('Deploying (local pack + upload)...');
+        core.info('Deploying (CLI will pack + upload)...');
     }
     const result = await exec.getExecOutput('ms', args, { cwd, env, ignoreReturnCode: true });
 
@@ -146,6 +173,10 @@ async function runDeploy(
     }
 
     return parseJsonOutput<DeployResult>(result.stdout, 'ms app deploy');
+}
+
+function resolveArtifactPath(input: string, cwd: string): string {
+    return path.isAbsolute(input) ? input : path.resolve(cwd, input);
 }
 
 function resolveCommitSha(input: string): string {
