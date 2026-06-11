@@ -151,7 +151,12 @@ async function writeTempNpmrc(registryUrl: string, authToken: string): Promise<s
     // PAT in `_password`. The `_authToken` field expects an OAuth bearer token,
     // which a PAT is NOT — using it produces a 401 "Incorrect or missing password".
     // For non-ADO feeds, the bearer-style `_authToken` is the correct form.
-    const isAzureDevOps = /pkgs\.dev\.azure\.com/i.test(registryUrl);
+    //
+    // Match strictly against the parsed URL's hostname (not via a free-form
+    // regex on the URL string) so an attacker-controlled URL like
+    // https://attacker.com/pkgs.dev.azure.com/... cannot trigger this path
+    // and exfiltrate the PAT into an .npmrc pointed at the attacker's host.
+    const isAzureDevOps = isAzureDevOpsHost(registryUrl);
 
     let authBlock: string;
     if (isAzureDevOps) {
@@ -173,4 +178,14 @@ async function writeTempNpmrc(registryUrl: string, authToken: string): Promise<s
 
     core.info(`Using private registry: ${registryUrl}`);
     return npmrcPath;
+}
+
+function isAzureDevOpsHost(url: string): boolean {
+    let host: string;
+    try {
+        host = new URL(url).hostname.toLowerCase();
+    } catch {
+        return false;
+    }
+    return host === 'pkgs.dev.azure.com' || host.endsWith('.pkgs.dev.azure.com');
 }

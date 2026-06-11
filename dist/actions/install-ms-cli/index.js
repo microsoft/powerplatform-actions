@@ -19918,7 +19918,7 @@ function writeTempNpmrc(registryUrl, authToken) {
     const tmpDir = yield fs.mkdtemp(path.join(os.tmpdir(), "install-ms-cli-"));
     const npmrcPath = path.join(tmpDir, ".npmrc");
     const registryHost = registryUrl.replace(/^https?:/, "");
-    const isAzureDevOps = /pkgs\.dev\.azure\.com/i.test(registryUrl);
+    const isAzureDevOps = isAzureDevOpsHost(registryUrl);
     let authBlock;
     if (isAzureDevOps) {
       const base64Pat = Buffer.from(authToken, "utf8").toString("base64");
@@ -19937,6 +19937,15 @@ always-auth=true
     core.info(`Using private registry: ${registryUrl}`);
     return npmrcPath;
   });
+}
+function isAzureDevOpsHost(url) {
+  let host;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch (_a) {
+    return false;
+  }
+  return host === "pkgs.dev.azure.com" || host.endsWith(".pkgs.dev.azure.com");
 }
 /*! Bundled license information:
 
