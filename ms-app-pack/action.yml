@@ -1,0 +1,79 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# ms-app-pack/action.yml
+#
+# Packs a MAAF code app into a deployable artifact by invoking `ms app pack`.
+# Pack runs the `buildCommand` from ms.config.json (default `npm run build`)
+# and copies the build output to the canonical packed layout at
+#   <workingDirectory>/.ms/packed/apps/<appId>/client/
+#
+# After pack, `ms-app-deploy` picks up the artifact automatically.
+#
+# This action is a transitional step. The MAAF CLI is adding a `--artifact`
+# flag to `ms app deploy` that will fold pack into deploy for repoType:'none'
+# apps. Once that ships, you can drop the `- uses: ms-app-pack` step from
+# your workflow.
+#
+# CALLER PREREQUISITES:
+#   - install-ms-cli has run earlier in the job.
+#   - `npm ci` (or `npm install`) was run in the working directory so that
+#     `npm run build` can resolve node_modules.
+#
+# Example usage:
+#
+#   - uses: actions/checkout@v4
+#   - uses: actions/setup-node@v4
+#     with:
+#       node-version: '22'
+#   - run: npm ci
+#     working-directory: 'maaf-apps'
+#   - uses: microsoft/powerplatform-actions/install-ms-cli@v1
+#   - uses: microsoft/powerplatform-actions/ms-app-pack@v1
+#     with:
+#       working-directory: 'maaf-apps'
+#       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
+#       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
+#       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
+#   - uses: microsoft/powerplatform-actions/ms-app-deploy@v1
+#     with:
+#       working-directory: 'maaf-apps'
+#       app-id:        ${{ secrets.PP_SP_CLIENT_ID }}
+#       client-secret: ${{ secrets.PP_SP_CLIENT_SECRET }}
+#       tenant-id:     ${{ secrets.PP_SP_TENANT_ID }}
+#
+name: 'ms-app-pack'
+description: 'Power Platform MS App Pack — builds and packs a MAAF code app into a deployable artifact'
+
+inputs:
+  working-directory:
+    description: >
+      Path to the app directory containing ms.config.json and package.json.
+      Defaults to GITHUB_WORKSPACE.
+    required: false
+    default: ''
+
+  # ── Service Principal authentication ──
+  # Required even for pack (which doesn't make any RP calls itself), because
+  # the CLI auto-activates SP auth in CI mode (CI=true is set by GitHub
+  # Actions) and validates that MS_CLI_SP_* env vars are present at startup.
+
+  app-id:
+    description: 'SPN client ID. Maps to MS_CLI_SP_CLIENT_ID.'
+    required: false
+    default: ''
+
+  client-secret:
+    description: >
+      SPN client secret. Maps to MS_CLI_SP_CLIENT_SECRET. Pass as a secret.
+    required: false
+    default: ''
+
+  tenant-id:
+    description: 'AAD tenant ID. Maps to MS_CLI_SP_TENANT_ID.'
+    required: false
+    default: ''
+
+runs:
+  using: 'node24'
+  main: '../dist/actions/ms-app-pack/index.js'
