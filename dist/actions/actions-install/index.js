@@ -19808,7 +19808,7 @@ var require_pacPackageInfo = __commonJS({
       PacPackageName: "Microsoft.PowerApps.CLI",
       LegacyLinuxPackage: "Microsoft.PowerApps.CLI.Core.linux-x64",
       DotnetToolName: "Microsoft.PowerApps.CLI.Tool",
-      PacPackageVersion: "1.43.6"
+      PacPackageVersion: "2.8.1"
     };
   }
 });
@@ -19869,7 +19869,7 @@ var require_package = __commonJS({
         "@types/glob": "^8.1.0",
         "@types/js-yaml": "^4.0.9",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.12.10",
+        "@types/node": "^24.0.0",
         "@types/sinon": "^10.0.15",
         "@types/sinon-chai": "^3.2.12",
         "@types/unzip-stream": "^0.3.4",
@@ -19910,11 +19910,15 @@ var require_package = __commonJS({
         "@actions/exec": "^1.1.1",
         "@actions/io": "^1.1.3",
         "@microsoft/powerplatform-cli-wrapper": "^0.1.135",
-        "@tsconfig/node20": "^20.1.0",
+        "@tsconfig/node24": "^24.0.0",
         "date-fns": "^3.6.0",
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1",
         uuid: "^9.0.1"
+      },
+      overrides: {
+        "brace-expansion": "2.0.2",
+        nanoid: "3.3.11"
       }
     };
   }
