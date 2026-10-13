@@ -20,5 +20,5 @@ inputs:
 
 runs:
   using: 'node24'
-  main: '../dist/actions/who-am-i/index.js'
-  # main: '../out/actions/who-am-i/index.js'
+  main: 'dist/actions/who-am-i/index.js'
+  # main: 'out/actions/who-am-i/index.js'
