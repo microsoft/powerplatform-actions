@@ -27,6 +27,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      packages: read # restore @microsoft/powerplatform-cli-wrapper from GitHub Packages
       security-events: write
 
     strategy:
@@ -37,17 +38,17 @@ jobs:
           build-mode: none
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@9418214df1f2c4b8128c770156c409013b07d6b9 # v3.39.3
       with:
         languages: ${{ matrix.language }}
         config-file: ./.github/codeql/codeql-config.yml
     
     - name: Setup Node.js environment
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
       with:
         node-version: 24.x
         registry-url: https://npm.pkg.github.com
@@ -57,13 +58,13 @@ jobs:
 
     - name: Build and test
       run: |
-        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GPR_ACCESS_TOKEN }}
+        npm config set //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}
         npm ci
         npm run ci
       env:
         AZ_DevOps_Read_PAT: ${{ secrets.AZ_DevOps_Read_PAT }}
       
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@9418214df1f2c4b8128c770156c409013b07d6b9 # v3.39.3
       with:
         category: "/language:${{matrix.language}}"
